@@ -1,0 +1,28 @@
+### Android Studio
+*.iml
+.idea/
+/out/
+.idea_modules/
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+
+### Android 
+*.apk
+*.ap_
+*.dex
+bin/
+gen/
+.gradle/
+build/
+local.properties
+*.log
+.navigation/
+
+### Java 
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
