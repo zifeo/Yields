@@ -18,7 +18,10 @@ object Yields extends Build {
       "-Xlint:_"
     ),
 
-    libraryDependencies ++= Seq()
+    libraryDependencies ++= {
+      import Dependencies._
+      config ++ akka ++ akkaStream ++ orientDB
+    }
 
   )
 
