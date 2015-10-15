@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Nicolas on 16.10.15.
+ * Connected user who will do the connexion with the outside world
+ *
  */
 public class ClientUser extends User {
     List<Group> groups;
