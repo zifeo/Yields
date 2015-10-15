@@ -7,5 +7,10 @@ import java.util.List;
  */
 abstract class Node {
 
-    public abstract List<Node> findConnected();
+    public abstract List<Node> getConnectedNode();
+
+    public abstract List<Node> getName();
+
+    public abstract List<Node> getId();
+
 }
