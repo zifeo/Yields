@@ -5,32 +5,26 @@ import java.util.Collections;
 import java.util.List;
 
 abstract class Node {
-    private String name;
-    private long id;
+    private final String name;
+    private final long id;
     private List<Node> connectedNodes;
 
-    public Node(){
-        this.name = "";
-        this.id = 0l;
-        connectedNodes = new ArrayList<>();
-    }
-
-    public Node(String name, long id) {
+    public Node(String name, long id, List<Node> connectedNodes){
         this.name = name;
         this.id = id;
-    }
-
-    public Node(String name, long id, List connectedNodes){
-        this(name, id);
         this.connectedNodes = connectedNodes;
     }
 
-    public List<Node> getConnectedNode() {
+    public Node(String name, long id) {
+        this(name, id, new ArrayList<Node>());
+    }
+
+    public List<Node> getConnected() {
         return Collections.unmodifiableList(connectedNodes);
     }
 
-    public void connectNode(User user) {
-        connectedNodes.add(user);
+    protected void connectNode(Node node) {
+        connectedNodes.add(node);
     }
 
     public String getName() {
