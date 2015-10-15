@@ -1,21 +1,34 @@
 package yields.client.node;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class User extends Node{
-    private static long ids = 0;
+    private static long nextId = 0;
     private String email;
+    private List<Group> connectedGroups;
 
-    private User(String name) {
-        super(name, ids);
-        ++ids;
-    }
+    private User(String name, long id,
+                 String email, List<Group> groups) {
 
-    public User(String name, String email) {
-        this(name);
+        super(name, id);
+        this.connectedGroups = new ArrayList<>(groups);
         this.email = email;
     }
 
+    private User(String name, String email, List<Group> groups) {
+
+        this(name, nextId, email, groups);
+        ++nextId;
+    }
+
+    public User(String name, String email) {
+        this(name, email, new ArrayList<Group>());
+    }
+
     public User(String name, long id, String email) {
-        super(name, id);
+        this(name, id, email, new ArrayList<Group>());
         this.email = email;
     }
 
@@ -24,6 +37,10 @@ public class User extends Node{
     }
 
     public void connectGroup(Group group) {
-        connectNode(group);
+        connectedGroups.add(group);
+    }
+
+    public List<Group> getGroups() {
+        return Collections.unmodifiableList(connectedGroups);
     }
 }
