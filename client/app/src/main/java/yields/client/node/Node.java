@@ -1,16 +1,32 @@
 package yields.client.node;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Nicolas on 15.10.15.
- */
 abstract class Node {
+    private String name;
+    private long id;
 
-    public abstract List<Node> getConnectedNode();
+    public Node(){
+        this.name = "";
+        this.id = 0l;
+    }
 
-    public abstract List<Node> getName();
+    public Node(String name, long id) {
+        this.name = name;
+        this.id = id;
+    }
 
-    public abstract List<Node> getId();
+    public List<Node> getConnectedNode() {
+        return new ArrayList<Node>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Long getId() {
+        return id;
+    }
 
 }
