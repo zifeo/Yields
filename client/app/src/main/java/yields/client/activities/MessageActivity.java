@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yields.client.R;
-import yields.client.message.Message;
+import yields.client.messages.Message;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
