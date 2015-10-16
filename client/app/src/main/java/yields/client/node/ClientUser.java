@@ -3,6 +3,7 @@ package yields.client.node;
 import android.util.ArrayMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -11,33 +12,23 @@ import java.util.Map;
  * Connected user who will do the connexion with the outside world
  *
  */
-public class ClientUser extends User {
+public abstract class ClientUser extends User {
     List<Group> groups;
 
     public ClientUser(String name, long id, String email) {
         super(name, id, email);
-        //TODO : get groups from connexion
         this.groups = new ArrayList<>();
     }
 
-    public void sendMessage(Group group) {
-        //TODO : to implement
-    }
+    public abstract void sendMessage(Group group);
 
-    public void addNewGroup(Group group) {
-        //TODO : to implement
-    }
+    public abstract void addNewGroup(Group group);
 
-    public void deleteGroup(Group group) {
-        //TODO : to implement
-    }
+    public abstract void deleteGroup(Group group);
 
-    public Map<User, String> getHistory(Date from) {
-        //TODO : to implement
-        return new ArrayMap<>();
-    }
+    public abstract Map<User, String> getHistory(Date from);
 
     public List<Group> getGroups() {
-        return groups;
+        return Collections.unmodifiableList(groups);
     }
 }
