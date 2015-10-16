@@ -1,13 +1,14 @@
 package yields.client.yieldsapplication;
 
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
 
 public class YieldsApplication {
-    private static User mUser;
+    private static ClientUser mUser;
     private static Group mGroup;
 
-    public static User getUser(){
+    public static ClientUser getUser(){
         return mUser;
     }
 
@@ -19,7 +20,7 @@ public class YieldsApplication {
         mGroup = g;
     }
 
-    public static void setUser(User u){
+    public static void setUser(ClientUser u){
         mUser = u;
     }
 }
