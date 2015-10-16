@@ -39,7 +39,8 @@ public class MessageActivity extends AppCompatActivity {
      * @param m The message to send.
      */
     public void onSendMessage(Message m){
-        /* TODO : update message deque, send message to the server. */
+        mMessages.add(m);
+        YieldsApplication.getUser().sendMessage(mGroup, m);
     }
 
     /**
@@ -61,5 +62,12 @@ public class MessageActivity extends AppCompatActivity {
         User mockUser2 = new User(mockName2, mockId2, mockEmail2);
         mMessages.add(new Message(mockUser1, mockContent1));
         mMessages.add(new Message(mockUser2, mockContent2));
+    }
+
+    /**
+     * Displays the messages contained in mMessages on the layout.
+     */
+    private void displayMessages(){
+
     }
 }
