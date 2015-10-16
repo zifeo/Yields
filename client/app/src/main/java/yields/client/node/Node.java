@@ -1,6 +1,6 @@
 package yields.client.node;
 
-abstract class Node {
+public abstract class Node {
     private final String name;
     private final long id;
 
