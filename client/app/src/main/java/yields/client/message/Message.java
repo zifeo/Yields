@@ -1,7 +1,5 @@
 package yields.client.message;
 
-public interface Message {
+public class Message {
 
-    @Override
-    String toString();
 }
