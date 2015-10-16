@@ -15,14 +15,14 @@ object UserUpdateJsonFormat extends RootJsonFormat[UserUpdate] {
       "image" -> obj.image.toJson
     )
 
-  // TODO : handle image as array of bytes
+  // TODO : handle image as array of bytes (change test accordingly)
   override def read(json: JsValue): UserUpdate =
     json.asJsObject.getFields("uid", "email", "name", "image") match {
       case Seq(JsNumber(uid), JsString(email), JsString(name), JsNull) =>
         UserUpdate(uid.toLong, Some(email), Some(name), None)
       case Seq(JsNumber(uid), JsString(email), JsNull, JsNull) =>
         UserUpdate(uid.toLong, Some(email), None, None)
-      case Seq(JsNumber(uid), JsString(name), JsNull, JsNull) =>
+      case Seq(JsNumber(uid), JsNull, JsString(name), JsNull) =>
         UserUpdate(uid.toLong, None, Some(name), None)
       case _ => deserializationError("UserUpdateJsonFormat expected")
     }
