@@ -15,9 +15,13 @@ object Dependencies {
     )
   }
 
-  val akkaStream = Seq(
-    "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
-  )
+  val akkaStream = {
+    val version = "1.0"
+    Seq(
+      "com.typesafe.akka" %% "akka-stream-experimental" % version,
+      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % version
+    )
+  }
 
 
   val orientDB = {

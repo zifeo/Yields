@@ -21,10 +21,10 @@ object Yields extends Build {
     libraryDependencies ++= {
       import Dependencies._
       config ++ akka ++ akkaStream ++ orientDB
-    }
+    },
+
+    cancelable in Global := true
 
   )
-
-  cancelable in Global := true
 
 }
