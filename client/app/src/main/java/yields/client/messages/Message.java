@@ -19,7 +19,6 @@ public class Message {
 
     public User getSender() {return mSender;}
 
-
     public Content getContent() {
         return mContent;
     }
