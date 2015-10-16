@@ -4,9 +4,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ScrollView;
+import android.widget.Scroller;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import yields.client.R;
@@ -32,6 +39,8 @@ public class MessageActivity extends AppCompatActivity {
         mMessages = new ArrayDeque<>();
 
         setTitle(mGroup.getName());
+
+        retrieveGroupMessages();
     }
 
     /**
@@ -68,6 +77,14 @@ public class MessageActivity extends AppCompatActivity {
      * Displays the messages contained in mMessages on the layout.
      */
     private void displayMessages(){
+        ScrollView messagesScrollView = (ScrollView) findViewById(R.id.messagesScrollView);
 
+        Iterator<Message> iterator = mMessages.iterator();
+        Message nextMessage;
+        while (iterator.hasNext()){
+            nextMessage = iterator.next();
+            View messageView = nextMessage.getMessageView();
+            messagesScrollView.addView(messageView);
+        }
     }
 }
