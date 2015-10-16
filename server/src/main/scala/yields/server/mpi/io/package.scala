@@ -8,5 +8,6 @@ import spray.json.DefaultJsonProtocol._
 package object io {
 
   implicit val groupMessageJsonFormat = jsonFormat2(GroupMessage)
+  implicit val userUpdateJsonFormat = UserUpdateJsonFormat
 
 }

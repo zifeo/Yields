@@ -16,4 +16,10 @@ package object models {
   /** Represents a node id. */
   type NID = ID
 
+  /** Represents an email address. */
+  type Email = String
+
+  /** Represents a byte array. */
+  type Blob = Array[Byte]
+
 }
