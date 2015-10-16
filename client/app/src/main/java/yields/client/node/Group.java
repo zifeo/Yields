@@ -1,5 +1,6 @@
 package yields.client.node;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +10,7 @@ public class Group extends Node {
 
     public Group(String name, long id, List<User> connectedUsers) {
         super(name, id);
-        this.connectedUsers = connectedUsers;
+        this.connectedUsers = new ArrayList<>(connectedUsers);
     }
 
     private void connectUser(User user) {
