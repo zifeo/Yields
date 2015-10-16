@@ -12,12 +12,13 @@
         android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/linearLayout">
+        android:layout_above="@+id/bottomLayout"
+        android:id="@+id/messagesLayout">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/scrollView" />
+            android:id="@+id/messagesScrollView" />
     </LinearLayout>
 
     <LinearLayout
@@ -27,7 +28,7 @@
         android:weightSum="1"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/linearLayout">
+        android:id="@+id/bottomLayout">
 
         <EditText
             android:layout_width="wrap_content"
@@ -41,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Send"
-            android:id="@+id/button" />
+            android:id="@+id/sendButton" />
     </LinearLayout>
 
 </RelativeLayout>
