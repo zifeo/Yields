@@ -1,4 +1,4 @@
-package yields.client.message;
+package yields.client.messages;
 
 public interface Message {
 

@@ -1,4 +1,4 @@
-package yields.client.message;
+package yields.client.messages;
 
 public class TextMessage implements Message {
     String message;
