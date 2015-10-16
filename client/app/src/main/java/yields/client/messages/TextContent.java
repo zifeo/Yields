@@ -9,6 +9,8 @@ public class TextContent implements Content {
         mText = text;
     }
 
+    public String getText(){return mText;};
+
     @Override
     public String getType() {
         return "text";
