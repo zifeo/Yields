@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import org.junit.Test;
 
+import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.User;
@@ -14,8 +15,8 @@ import static junit.framework.Assert.assertEquals;
 
 public class MessageClassTests {
     private static final TextContent MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
-    private static final User MOCK_USER = new User("Mock name", 117, "Mock email");
-    private static final Message MOCK_MESSAGE_1 = new Message("Mock node name", 2, MOCK_USER, MOCK_TEXT_CONTENT_1);
+    private static final User MOCK_USER = new User("Mock name", new Id(117), "Mock email");
+    private static final Message MOCK_MESSAGE_1 = new Message("Mock node name", new Id(2), MOCK_USER, MOCK_TEXT_CONTENT_1);
 
     @Test
     public void testTextContentHasRightType(){

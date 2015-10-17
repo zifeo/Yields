@@ -1,5 +1,6 @@
 package yields.client.messages;
 
+import yields.client.id.Id;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -12,7 +13,7 @@ public class Message extends Node{
     private final User mSender;
     private final Content mContent;
 
-    public Message(String nodeName, long nodeID, User sender, Content content){
+    public Message(String nodeName, Id nodeID, User sender, Content content){
         super(nodeName, nodeID);
         this.mSender = sender;
         this.mContent = content;
