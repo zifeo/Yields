@@ -3,6 +3,7 @@ package yields.client.serverconnection;
 import junit.framework.Assert;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,24 +20,24 @@ import java.io.PrintWriter;
 
 public class ServerChannelTest {
     private final static String FAKE_RESPONSE = "{" +
-            "\"type\":\"test\"" +
-            "\"time\":\"0\"" +
-            "\"hash\":\"0\"" +
-            "\"message\":\"{" +
+            "\"type\":\"test\"," +
+            "\"time\":0," +
+            "\"hash\":0," +
+            "\"message\":{" +
             "\"text\":\"hello world\"" +
-            "}\"" +
+            "}" +
             "}";
     private final static String SIMPLE_REQUEST = "{" +
-            "\"type\":\"PING\"" +
-            "\"time\":\"0\"" +
-            "\"hash\":\"0\"" +
-            "\"message\":\"{" +
+            "\"hash\":0," +
+            "\"time\":0," +
+            "\"type\":\"PING\"," +
+            "\"message\":{" +
             "\"name\":\"test\"" +
-            "}\"" +
+            "}" +
             "}";
 
     @Test
-    public void testWorkingSendRequest() {
+    public void testWorkingSendRequest() throws JSONException{
         Request simpleRequest = prepareSimpleRequest();
 
         ByteArrayInputStream input = new ByteArrayInputStream(
@@ -55,14 +56,34 @@ public class ServerChannelTest {
             return;
         }
 
-        Assert.assertEquals(SIMPLE_REQUEST.getBytes(),output.toByteArray());
+        Assert.assertEquals(SIMPLE_REQUEST, output.toString());
 
         try {
             Assert.assertEquals("Response is wrong",
                     response.object().toString(), FAKE_RESPONSE);
         } catch (JSONException e) {
-            Assert.fail("can't decipher message");
+            Assert.fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testNotWorkingConnection() throws IOException{
+        Request simpleRequest = prepareSimpleRequest();
+
+        ByteArrayInputStream input = new ByteArrayInputStream(
+                FAKE_RESPONSE.getBytes());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        ServerChannel channel = new ServerChannel(toWriter(output),
+                toReade(input), simpleStatus(false));
+
+        try {
+            channel.sendRequest(simpleRequest);
+            Assert.fail("");
+        } catch (IOException e) {
+        }
+
+        Assert.assertEquals("", output.toString());
     }
 
     private ConnectionStatus simpleStatus(final boolean status) {

@@ -10,7 +10,7 @@ public class Response{
         this.rawResponse = rawResponse;
     }
 
-    public JSONObject object() throws JSONException{
+    public JSONObject object() throws JSONException {
         return new JSONObject(rawResponse);
     }
 }
