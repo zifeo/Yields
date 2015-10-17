@@ -1,5 +1,5 @@
 package yields.client.serverconnection;
 
-public interface Connection {
+public interface ConnectionStatus {
     boolean working();
 }
