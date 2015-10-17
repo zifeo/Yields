@@ -1,5 +1,6 @@
 package yields.client.messages;
 
+import yields.client.node.Node;
 import yields.client.node.User;
 
 /**
@@ -7,13 +8,17 @@ import yields.client.node.User;
  */
 public class Message {
 
+    private final Node mNode;
     private final User mSender;
     private final Content mContent;
 
-    public Message(User sender, Content content){
+    public Message(Node node, User sender, Content content){
+        this.mNode = node;
         this.mSender = sender;
         this.mContent = content;
     }
+
+    public Node getNode(){return mNode};
 
     public User getSender() {return mSender;}
 

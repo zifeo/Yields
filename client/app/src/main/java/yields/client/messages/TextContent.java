@@ -2,12 +2,14 @@ package yields.client.messages;
 
 public class TextContent implements Content {
 
-    public String mText;
+    private String mText;
 
     public TextContent(String text){
         //TODO Check for safe content
         mText = text;
     }
+
+    public String getText(){return mText;};
 
     @Override
     public String getType() {
