@@ -1,7 +1,10 @@
 package yields.client.messages;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.widget.TextView;
 
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class TextMessageViewGenerator implements MessageViewGenerator {
@@ -17,13 +20,16 @@ public class TextMessageViewGenerator implements MessageViewGenerator {
 
     private class TextMessageView extends MessageView {
 
-        private Message mMessage;
+        private User mSender;
+        private String mContent;
 
         public TextMessageView(Context context, Message message) throws MessageViewGenerationException{
             super(context);
-            if(mMessage == null || message.getContent().getType() != "text"){
+            if(message == null || message.getContent().getType() != "text"){
                 throw new MessageViewGenerationException();
             }
+            mSender = message.getSender();
+            mContent = ((TextContent) message.getContent()).getText();
         }
     }
 }
