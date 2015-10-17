@@ -11,7 +11,7 @@ import java.net.URL;
  * retrieve data from a given {@link URL}.
  *
  */
-public interface NetworkProvider {
+public interface SocketProvider {
     /**
      * Returns a new {@link Socket} object on the application server.
      *
@@ -19,6 +19,6 @@ public interface NetworkProvider {
      * connections to the server.
      * @throws IOException if the server is not available.
      */
-    Socket getConnection(InetAddress localAddress) throws IOException;
+    Socket getConnection() throws IOException;
 
 }

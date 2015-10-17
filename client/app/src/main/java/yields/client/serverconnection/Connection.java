@@ -2,7 +2,7 @@ package yields.client.serverconnection;
 
 public interface Connection {
 
-    Sender getSender();
+    CommunicationChannel getCommunicationChannel();
 
     void subscribeToConnection();
 }
