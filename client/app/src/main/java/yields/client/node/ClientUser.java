@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import yields.client.messages.Message;
+
 /**
  * Connected user who will do the connexion with the outside world
  *
@@ -20,7 +22,9 @@ public abstract class ClientUser extends User {
         this.groups = new ArrayList<>();
     }
 
-    public abstract void sendMessage(Group group);
+    public abstract void sendMessage(Group group, Message message);
+
+    public abstract List<Message> getGroupMessages(Group group);
 
     public abstract void addNewGroup(Group group);
 
