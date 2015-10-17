@@ -14,22 +14,17 @@ import java.net.UnknownHostException;
  *
  */
 public class YieldEmulatorSocketProvider implements SocketProvider {
-    private final static int DST_PORT = 10;
-    private final static int LOCAL_PORT = 10;
+    private final static int DST_PORT = 7777;
     private final static String LOCAL_ADDRESS = "10.0.2.2";
-    private final static String PHONE_ADDRESS = "localhost";
-    private final InetAddress localAddress;
     private final InetAddress dstAddress;
 
     public YieldEmulatorSocketProvider() throws UnknownHostException{
         this.dstAddress = InetAddress.getByName(LOCAL_ADDRESS);
-        this.localAddress = InetAddress.getByName(PHONE_ADDRESS);
     }
 
     public Socket getConnection() throws IOException {
 
-        Socket socket = new Socket(dstAddress, DST_PORT,
-                localAddress, LOCAL_PORT);
+        Socket socket = new Socket(dstAddress, DST_PORT);
         return socket;
     }
 }

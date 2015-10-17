@@ -27,6 +27,7 @@ public class ServerChannelTest {
             "\"text\":\"hello world\"" +
             "}" +
             "}";
+
     private final static String SIMPLE_REQUEST = "{" +
             "\"hash\":0," +
             "\"time\":0," +
