@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
@@ -58,7 +59,7 @@ public class MessageActivity extends AppCompatActivity {
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
         TextContent content = new TextContent(inputMessage);
-        Message message = new Message("message", 1230, mUser, content);
+        Message message = new Message("message", new Id(1230), mUser, content);
                 // TODO : take tight name and right id.
         mMessages.addLast(message);
        // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
