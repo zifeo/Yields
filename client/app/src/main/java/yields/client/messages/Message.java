@@ -2,6 +2,7 @@ package yields.client.messages;
 
 import yields.client.node.Node;
 import yields.client.node.User;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Message is a {@code Node} which is shared as a message in a conversation.
@@ -23,12 +24,7 @@ public class Message extends Node{
         return mContent;
     }
 
-    public MessageView getMessageView(){
-        try {
-            MessageViewGenerator generator = MessageViewGeneratorFactory.getMessageViewGenerator(mContent);
-            return generator.generateMessageView(this);
-        }catch (MessageViewGenerationException e){
-            return null; //TODO : Decide what to do in this case
-        }
+    public MessageView getMessageView(boolean showUsername){
+        return new MessageView(YieldsApplication.getApplicationContext(), this, showUsername);
     }
 }
