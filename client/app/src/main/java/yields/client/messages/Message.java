@@ -18,7 +18,7 @@ public class Message {
         this.mContent = content;
     }
 
-    public Node getNode(){return mNode};
+    public Node getNode(){return mNode;};
 
     public User getSender() {return mSender;}
 
