@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import yields.client.id.Id;
 import yields.client.messages.Message;
 
 /**
@@ -17,7 +18,7 @@ import yields.client.messages.Message;
 public abstract class ClientUser extends User {
     List<Group> groups;
 
-    public ClientUser(String name, long id, String email) {
+    public ClientUser(String name, Id id, String email) {
         super(name, id, email);
         this.groups = new ArrayList<>();
     }

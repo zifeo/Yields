@@ -3,6 +3,7 @@ package yields.client.messages;
 import java.io.IOException;
 import java.util.Date;
 
+import yields.client.id.Id;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -17,7 +18,7 @@ public class Message extends Node{
     private final Date mDate;
 
     public Message(String nodeName, long nodeID, User sender, Content content, Date date){
-        super(nodeName, nodeID);
+        super(nodeName, new Id(nodeID));
         this.mSender = sender;
         this.mContent = content;
         this.mDate = new Date(date.getTime());
