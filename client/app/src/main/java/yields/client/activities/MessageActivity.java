@@ -1,27 +1,17 @@
 package yields.client.activities;
 
-import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Scroller;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import yields.client.R;
-import yields.client.messages.Content;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -57,8 +47,9 @@ public class MessageActivity extends AppCompatActivity {
     public void onSendTextMessage(View v){
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
+        inputField.setText("");
         TextContent content = new TextContent(inputMessage);
-        Message message = new Message("message", 1230, mUser, content);
+        Message message = new Message("message", 1230, mUser, content, new Date());
                 // TODO : take tight name and right id.
         mMessages.addLast(message);
        // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
@@ -96,10 +87,10 @@ public class MessageActivity extends AppCompatActivity {
             nextMessage = iterator.next();
             nextSender = nextMessage.getSender();
             if (lastSender != null && lastSender.getId().equals(nextSender.getId())){
-                messageLayout = nextMessage.getMessageView(false);
+                messageLayout = nextMessage.getMessageView(true);
             }
             else{
-                messageLayout = nextMessage.getMessageView(false);
+                messageLayout = nextMessage.getMessageView(true);
             }
             lastSender = nextSender;
             messagesScrollView.addView(messageLayout);

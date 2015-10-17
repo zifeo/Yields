@@ -4,7 +4,7 @@ import android.widget.LinearLayout;
 
 public interface Content {
 
-    public String getType();
+    String getType();
 
-    public LinearLayout getLayout();
+    LinearLayout getLayout();
 }
