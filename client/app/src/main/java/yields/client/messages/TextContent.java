@@ -1,6 +1,7 @@
 package yields.client.messages;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
