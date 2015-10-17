@@ -38,4 +38,9 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
     public void subscribeToConnection() {
 
     }
+
+    @Override
+    public void close() throws IOException {
+        socket.close();
+    }
 }
