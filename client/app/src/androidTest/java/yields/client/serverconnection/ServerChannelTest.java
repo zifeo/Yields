@@ -1,5 +1,8 @@
 package yields.client.serverconnection;
 
+import junit.framework.Assert;
+
+import org.json.JSONException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -7,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -22,19 +26,43 @@ public class ServerChannelTest {
             "\"text\":\"hello world\"" +
             "}\"" +
             "}";
+    private final static String SIMPLE_REQUEST = "{" +
+            "\"type\":\"PING\"" +
+            "\"time\":\"0\"" +
+            "\"hash\":\"0\"" +
+            "\"message\":\"{" +
+            "\"name\":\"test\"" +
+            "}\"" +
+            "}";
 
     @Test
-    public void testSendRequest() {
+    public void testWorkingSendRequest() {
         Request simpleRequest = prepareSimpleRequest();
 
-        InputStream input = new ByteArrayInputStream(FAKE_RESPONSE.getBytes());
-        OutputStream output = new ByteArrayOutputStream();
+        ByteArrayInputStream input = new ByteArrayInputStream(
+                FAKE_RESPONSE.getBytes());
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 
         ServerChannel channel = new ServerChannel(toWriter(output),
                 toReade(input), simpleStatus(true));
 
-        channel.sendRequest()
+        Response response;
+        try {
+            response = channel.sendRequest(simpleRequest);
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+            return;
+        }
+
+        Assert.assertEquals(SIMPLE_REQUEST.getBytes(),output.toByteArray());
+
+        try {
+            Assert.assertEquals("Response is wrong",
+                    response.object().toString(), FAKE_RESPONSE);
+        } catch (JSONException e) {
+            Assert.fail("can't decipher message");
+        }
     }
 
     private ConnectionStatus simpleStatus(final boolean status) {
