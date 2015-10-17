@@ -1,10 +1,14 @@
 package yields.client.activities;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.TextView;
@@ -39,18 +43,33 @@ public class MessageActivity extends AppCompatActivity {
         mGroup = YieldsApplication.getGroup();
         mMessages = new ArrayDeque<>();
 
-        setTitle(mGroup.getName());
+        //setTitle(mGroup.getName());
 
-        retrieveGroupMessages();
+        //retrieveGroupMessages();
+        YieldsApplication.setApplicationContext(getApplicationContext());
+        displayMessages();
     }
 
     /**
      * Listener called when the user sends a message to the group.
-     * @param m The message to send.
      */
-    public void onSendMessage(Message m){
-        mMessages.add(m);
-        YieldsApplication.getUser().sendMessage(mGroup, m);
+    public void onSendTextMessage(View v){
+        TextView inputField = (TextView) findViewById(R.id.inputMessageField);
+        String inputMessage =  inputField.getText().toString();
+        TextContent content = new TextContent(inputMessage);
+        Message message = new Message(null, mUser, content);
+        mMessages.addLast(message);
+       // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
+        displayMessages();
+    }
+
+    /**
+     * Called when new message(s) have been received.
+     * @param newMessages The new message(s) received.
+     */
+    public void receiveNewMessage(List<Message> newMessages){
+        mMessages.addAll(newMessages);
+        displayMessages();
     }
 
     /**
@@ -64,14 +83,17 @@ public class MessageActivity extends AppCompatActivity {
      * Displays the messages contained in mMessages on the layout.
      */
     private void displayMessages(){
-        ScrollView messagesScrollView = (ScrollView) findViewById(R.id.messagesScrollView);
-
+        LinearLayout  messagesScrollView = (LinearLayout) findViewById(R.id.messageScrollLayout);
+        messagesScrollView.removeAllViews();
         Iterator<Message> iterator = mMessages.iterator();
         Message nextMessage;
         while (iterator.hasNext()){
             nextMessage = iterator.next();
-            View messageView = nextMessage.getMessageView();
-            messagesScrollView.addView(messageView);
+            TextView tv = new TextView(YieldsApplication.getApplicationContext());
+            tv.setText(((TextContent) nextMessage.getContent()).getText());
+            tv.setTextColor(Color.BLACK);
+            tv.setTextSize(20);
+            messagesScrollView.addView(tv);
         }
     }
 }
