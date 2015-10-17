@@ -12,8 +12,8 @@ import java.net.Socket;
 public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
     private Socket socket;
 
-    public ConnectionManager(InetAddress localAdress) throws IOException{
-        socket = new YieldSocketProviderEmulator().getConnection();
+    public ConnectionManager(SocketProvider socketProvider) throws IOException{
+        socket = socketProvider.getConnection();
     }
 
     @Override

@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface CommunicationChannel {
 
-    ProtocolMessage sendRequest(ProtocolMessage request) throws IOException;
+    Response sendRequest(Request request) throws IOException;
 }

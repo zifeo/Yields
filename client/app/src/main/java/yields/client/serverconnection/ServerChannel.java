@@ -9,7 +9,7 @@ public class ServerChannel implements CommunicationChannel {
     BufferedReader receiver;
     ConnectionStatus connectionStatus;
 
-    public ServerChannel(PrintWriter sender, BufferedReader receiver,
+    protected ServerChannel(PrintWriter sender, BufferedReader receiver,
                          ConnectionStatus connectionStatus){
 
         this.sender = sender;
@@ -18,7 +18,7 @@ public class ServerChannel implements CommunicationChannel {
     }
 
     @Override
-    public ProtocolMessage sendRequest(ProtocolMessage request)
+    public Response sendRequest(Request request)
             throws IOException {
 
         if (request == null) {
@@ -28,24 +28,20 @@ public class ServerChannel implements CommunicationChannel {
             throw new IOException("Not connected to server");
         }
 
-        sender.print(serverMessage(request));
+        sender.print(request.message());
         sender.flush();
 
-        ResponseParser response = null;
+        Response response = null;
 
         String rawResponse = receiver.readLine();
 
         if (isValid(rawResponse)) {
-            response = new ResponseParser(rawResponse);
+            response = new Response(rawResponse);
         } else {
             throw new IOException("Invalid response");
         }
 
         return response;
-    }
-
-    private String serverMessage(ProtocolMessage request){
-        return request.message().toString();
     }
 
     private boolean isValid(String response){
