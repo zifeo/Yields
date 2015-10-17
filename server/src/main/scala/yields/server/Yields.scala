@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Tcp}
 import akka.util.ByteString
+import com.typesafe.config.ConfigFactory
 import yields.server.pipeline.LoggingModule
 
 /**
@@ -12,10 +13,12 @@ import yields.server.pipeline.LoggingModule
 object Yields extends App {
 
   implicit val system = ActorSystem("Yields-server")
-  implicit val logger = system.log
   implicit val materializer = ActorMaterializer()
+  implicit val logger = system.log
+  implicit val config = ConfigFactory.load().getConfig("yields")
 
-  val connections = Tcp().bind("127.0.0.1", 7777)
+  // Port mapping
+  val connections = Tcp().bind(config.getString("addr"), config.getInt("port"))
 
   // Modules creation
   val loggingModule = LoggingModule[ByteString, ByteString]
@@ -32,7 +35,7 @@ object Yields extends App {
 
   // Handle incoming connections
   connections runForeach { connection =>
-    logger.info(s"Connection from: ${connection.remoteAddress}")
+    logger.info(s"[CONNECT] ${connection.remoteAddress}")
     connection.handleWith(pipeline)
   }
   
