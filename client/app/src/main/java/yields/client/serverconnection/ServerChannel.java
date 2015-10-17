@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class ServerChannel implements CommunicationChannel {
-    PrintWriter sender;
-    BufferedReader receiver;
-    ConnectionStatus connectionStatus;
+    private PrintWriter sender;
+    private BufferedReader receiver;
+    private ConnectionStatus connectionStatus;
 
     protected ServerChannel(PrintWriter sender, BufferedReader receiver,
                          ConnectionStatus connectionStatus){

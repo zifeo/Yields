@@ -4,13 +4,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Response{
-    private final JSONObject object;
+    private final String rawResponse;
 
-    public Response(String response) {
-        object = new JSONObject();
+    public Response(String rawResponse) {
+        this.rawResponse = rawResponse;
     }
 
-    public JSONObject object() {
-        return object;
+    public JSONObject object() throws JSONException{
+        return new JSONObject(rawResponse);
     }
 }
