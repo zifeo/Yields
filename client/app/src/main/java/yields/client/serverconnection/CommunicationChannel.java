@@ -1,6 +1,6 @@
 package yields.client.serverconnection;
 
-public abstract class CommunicationChannel {
+public interface CommunicationChannel {
 
-    public abstract ProtocolMessage sendRequest(ProtocolMessage request);
+    ProtocolMessage sendRequest(ProtocolMessage request);
 }
