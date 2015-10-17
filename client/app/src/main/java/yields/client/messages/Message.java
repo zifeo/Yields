@@ -6,19 +6,16 @@ import yields.client.node.User;
 /**
  * Message is a {@code Node} which is shared as a message in a conversation.
  */
-public class Message {
+public class Message extends Node{
 
-    private final Node mNode;
     private final User mSender;
     private final Content mContent;
 
-    public Message(Node node, User sender, Content content){
-        this.mNode = node;
+    public Message(String nodeName, long nodeID, User sender, Content content){
+        super(nodeName, nodeID);
         this.mSender = sender;
         this.mContent = content;
     }
-
-    public Node getNode(){return mNode;};
 
     public User getSender() {return mSender;}
 
