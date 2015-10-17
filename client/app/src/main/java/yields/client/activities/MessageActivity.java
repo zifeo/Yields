@@ -57,7 +57,8 @@ public class MessageActivity extends AppCompatActivity {
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
         TextContent content = new TextContent(inputMessage);
-        Message message = new Message(null, mUser, content);
+        Message message = new Message("message", 1230, mUser, content);
+                // TODO : take tight name and right id.
         mMessages.addLast(message);
        // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         displayMessages();
