@@ -83,6 +83,7 @@ public class MessageActivity extends AppCompatActivity {
         LinearLayout messageLayout;
         User lastSender = null;
         User nextSender;
+
         while (iterator.hasNext()){
             nextMessage = iterator.next();
             nextSender = nextMessage.getSender();

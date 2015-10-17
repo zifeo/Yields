@@ -44,7 +44,7 @@ public class MessageView extends LinearLayout{
     private void createMessageView(Message message, boolean showUsername) throws IOException {
         int messageColor = BACKGROUND_COLORS[sColorIndex];
         sColorIndex = (sColorIndex + 1) % 2;
-       // this.setBackgroundColor(messageColor);
+        //this.setBackgroundColor(messageColor);
 
         //tmp
         ImageView imageView = new ImageView(YieldsApplication.getApplicationContext());
@@ -53,7 +53,7 @@ public class MessageView extends LinearLayout{
 
         imageView.setImageBitmap(image);
 
-        this.setBackgroundColor(messageColor);
+        //this.setBackgroundColor(messageColor);
         this.setOrientation(HORIZONTAL);
         this.addView(imageView);
 
@@ -93,11 +93,11 @@ public class MessageView extends LinearLayout{
         this.setOrientation(HORIZONTAL);
         this.addView(contentLayout);
 
-        GradientDrawable drawable = new GradientDrawable();
+        /*GradientDrawable drawable = new GradientDrawable();
         drawable.setShape(GradientDrawable.RECTANGLE);
         drawable.setStroke(3, Color.GRAY);
         drawable.setAlpha(60);
-        this.setBackground(drawable);
+        this.setBackground(drawable);*/
     }
 
     public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
