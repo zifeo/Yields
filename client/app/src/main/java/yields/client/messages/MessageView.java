@@ -45,7 +45,6 @@ public class MessageView extends LinearLayout{
         int messageColor = BACKGROUND_COLORS[sColorIndex];
         sColorIndex = (sColorIndex + 1) % 2;
         //this.setBackgroundColor(messageColor);
-
         //tmp
         ImageView imageView = new ImageView(YieldsApplication.getApplicationContext());
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.userpicture);
@@ -83,12 +82,14 @@ public class MessageView extends LinearLayout{
         relativeLayout.addView(date, lp);
 
         userNameAndDateLayout.addView(relativeLayout);
+
         LinearLayout contentLayout = new LinearLayout(YieldsApplication.getApplicationContext());
         contentLayout.setOrientation(VERTICAL);
         contentLayout.addView(userNameAndDateLayout);
 
-        LinearLayout content = message.getContent().getLayout();
-        contentLayout.addView(content);
+        /*LinearLayout content = message.getContent().getView();
+        contentLayout.addView(content);*/
+        // NO LONGER TRUE ERROR
 
         this.setOrientation(HORIZONTAL);
         this.addView(contentLayout);

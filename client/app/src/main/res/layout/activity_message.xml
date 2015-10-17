@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="yields.client.activities.MessageActivity">
 
@@ -11,7 +10,8 @@
         android:weightSum="1"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:id="@+id/bottomLayout">
+        android:id="@+id/bottomLayout"
+        android:showDividers="end">
 
         <EditText
             android:layout_width="0dp"
@@ -30,29 +30,12 @@
             android:nestedScrollingEnabled="false" />
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView"
-        android:layout_above="@+id/bottomLayout"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginBottom="0dp"
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/messageScrollLayout"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:fillViewport="true"
-        android:layout_alignParentEnd="true">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/messageScrollLayout"
-            android:padding="0dp"
-            android:contextClickable="false"
-            android:divider="@drawable/messageseparator"
-            android:focusable="true"
-            android:showDividers="middle|beginning|end"></LinearLayout>
-    </ScrollView>
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/bottomLayout" />
 
 </RelativeLayout>
