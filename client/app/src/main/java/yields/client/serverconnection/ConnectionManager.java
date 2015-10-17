@@ -1,25 +1,37 @@
 package yields.client.serverconnection;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class ConnectionManager implements Connection, ConnectionProvider {
-    private Socket connection;
+public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
+    private Socket socket;
 
     public ConnectionManager(InetAddress localAdress) throws IOException{
-        connection = new YieldSocketProviderEmulator().getConnection();
+        socket = new YieldSocketProviderEmulator().getConnection();
     }
 
     @Override
     public boolean working(){
-        return connection.isConnected();
+        return socket.isConnected();
     }
 
     @Override
-    public CommunicationChannel getCommunicationChannel() {
-        //sender = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-        return null;
+    public CommunicationChannel getCommunicationChannel() throws IOException{
+        PrintWriter sender = new PrintWriter(
+                new BufferedWriter(
+                        new OutputStreamWriter(
+                                socket.getOutputStream())), true);
+
+        BufferedReader receiver = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()));
+
+        return new ServerChannel(sender, receiver, this);
     }
 
     @Override
