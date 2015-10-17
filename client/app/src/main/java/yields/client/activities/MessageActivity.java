@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.messages.Content;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -88,13 +89,20 @@ public class MessageActivity extends AppCompatActivity {
         messagesScrollView.removeAllViews();
         Iterator<Message> iterator = mMessages.iterator();
         Message nextMessage;
+        LinearLayout messageLayout;
+        User lastSender = null;
+        User nextSender;
         while (iterator.hasNext()){
             nextMessage = iterator.next();
-            TextView tv = new TextView(YieldsApplication.getApplicationContext());
-            tv.setText(((TextContent) nextMessage.getContent()).getText());
-            tv.setTextColor(Color.BLACK);
-            tv.setTextSize(20);
-            messagesScrollView.addView(tv);
+            nextSender = nextMessage.getSender();
+            if (lastSender != null && lastSender.getId().equals(nextSender.getId())){
+                messageLayout = nextMessage.getMessageView(false);
+            }
+            else{
+                messageLayout = nextMessage.getMessageView(false);
+            }
+            lastSender = nextSender;
+            messagesScrollView.addView(messageLayout);
         }
     }
 }
