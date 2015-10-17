@@ -1,7 +1,5 @@
 package yields.client.messages;
 
-import java.util.ArrayList;
-
 public interface MessageViewGenerator {
 
     /**
