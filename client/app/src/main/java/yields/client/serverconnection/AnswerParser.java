@@ -3,20 +3,16 @@ package yields.client.serverconnection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class AnswerParser {
-    String type;
+public class AnswerParser implements ProtocolMessage{
+    private final JSONObject object;
 
-    public AnswerParser(JSONObject answer) {
-        if (answer == null || answer.has("type")) {
-            throw new IllegalArgumentException();
-        }
-
-        try {
-            type = (String) answer.get("type");
-        } catch (JSONException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
+    public AnswerParser(String answer) {
+        object = new JSONObject();
     }
 
 
+    @Override
+    public JSONObject message() {
+        return object;
+    }
 }

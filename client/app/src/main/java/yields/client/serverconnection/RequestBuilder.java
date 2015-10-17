@@ -42,7 +42,7 @@ public class RequestBuilder implements ProtocolMessage {
     }
 
     @Override
-    public JSONObject toJson() {
+    public JSONObject message() {
         return new JSONObject(constructingMap);
     }
 }
