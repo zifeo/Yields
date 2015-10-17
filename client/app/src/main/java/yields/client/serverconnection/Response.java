@@ -3,15 +3,14 @@ package yields.client.serverconnection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ResponseParser implements ProtocolMessage{
+public class Response{
     private final JSONObject object;
 
-    public ResponseParser(String response) {
+    public Response(String response) {
         object = new JSONObject();
     }
 
-    @Override
-    public JSONObject message() {
+    public JSONObject object() {
         return object;
     }
 }

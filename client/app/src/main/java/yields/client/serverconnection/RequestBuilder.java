@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class RequestBuilder implements ProtocolMessage {
+public class RequestBuilder {
 
     public static enum MessageTypes {
         PING("PING");
@@ -22,14 +22,12 @@ public class RequestBuilder implements ProtocolMessage {
     private final MessageTypes type;
     private final Map<String, Object> constructingMap;
 
-    public RequestBuilder(MessageTypes type) throws RequestBuilderException {
+    public RequestBuilder(MessageTypes type){
         this.type = type;
         this.constructingMap = new ArrayMap<>();
-        constructingMap.put("type", type.name);
     }
 
-    public void addField(Fields fieldType, String field)
-            throws RequestBuilderException {
+    public void addField(Fields fieldType, String field) {
 
         switch (fieldType) {
             case NAME:
@@ -37,12 +35,16 @@ public class RequestBuilder implements ProtocolMessage {
                     constructingMap.put("name", field);
                 }
                 break;
-            default: throw new RequestBuilderException("Field doesn't exist");
+            default: throw new IllegalArgumentException();
         }
     }
 
-    @Override
-    public JSONObject message() {
-        return new JSONObject(constructingMap);
+    public Request request() {
+        Map<String, Object> object = new ArrayMap<>();
+        object.put("type", type.name);
+        object.put("time", 0);
+        object.put("hash", 0);
+        object.put("message", new JSONObject(constructingMap));
+        return new Request(new JSONObject(object));
     }
 }
