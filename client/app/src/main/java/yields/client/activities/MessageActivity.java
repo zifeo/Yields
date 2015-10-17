@@ -44,10 +44,10 @@ public class MessageActivity extends AppCompatActivity {
         mGroup = YieldsApplication.getGroup();
         mMessages = new ArrayDeque<>();
 
-        //setTitle(mGroup.getName());
+        setTitle(mGroup.getName());
 
-        //retrieveGroupMessages();
-        YieldsApplication.setApplicationContext(getApplicationContext());
+        retrieveGroupMessages();
+
         displayMessages();
     }
 
