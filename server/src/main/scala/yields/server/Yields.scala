@@ -12,6 +12,7 @@ import yields.server.pipeline.LoggingModule
 object Yields extends App {
 
   implicit val system = ActorSystem("Yields-server")
+  implicit val logger = system.log
   implicit val materializer = ActorMaterializer()
 
   val connections = Tcp().bind("127.0.0.1", 7777)
@@ -31,7 +32,7 @@ object Yields extends App {
 
   // Handle incoming connections
   connections runForeach { connection =>
-    println(s"New connection from: ${connection.remoteAddress}")
+    logger.info(s"Connection from: ${connection.remoteAddress}")
     connection.handleWith(pipeline)
   }
   

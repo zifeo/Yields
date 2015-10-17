@@ -1,6 +1,6 @@
 package yields.server.pipeline
 
-import akka.http.scaladsl.model.DateTime
+import akka.event.LoggingAdapter
 import akka.util.ByteString
 
 /**
@@ -8,7 +8,7 @@ import akka.util.ByteString
  * @tparam C incoming
  * @tparam G outgoing
  */
-class LoggingModule[C, G] extends Module[C, C, G, G] {
+class LoggingModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
 
   /**
    * Logs to stdOut by prefixing item with its chan.
@@ -17,9 +17,8 @@ class LoggingModule[C, G] extends Module[C, C, G, G] {
    * @return no input change
    */
   def log[T](channel: String): T => T = { item: T =>
-    val time = DateTime.now
     val trace = beautifier(item)
-    println(f"$time%s $channel%-6s $trace%s")
+    logger.info(s"[$channel] $trace")
     item
   }
 
@@ -35,7 +34,7 @@ class LoggingModule[C, G] extends Module[C, C, G, G] {
   }
 
   /** Incoming log with given channel. */
-  override val incoming: C => C = log("IN ")
+  override val incoming: C => C = log("IN")
 
   /** Outgoing log with given channel. */
   override val outgoing: G => G = log("OUT")
@@ -46,6 +45,6 @@ class LoggingModule[C, G] extends Module[C, C, G, G] {
 object LoggingModule {
 
   /** Shortcut for creating a new logging module. */
-  def apply[C, G] = new LoggingModule[C, G].create
+  def apply[C, G](implicit logger: LoggingAdapter) = new LoggingModule[C, G](logger).create
 
 }
