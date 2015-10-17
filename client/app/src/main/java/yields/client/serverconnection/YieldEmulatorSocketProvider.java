@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
  * {@link HttpURLConnection} objects.
  *
  */
-public class YieldSocketProviderEmulator implements SocketProvider {
+public class YieldEmulatorSocketProvider implements SocketProvider {
     private final static int DST_PORT = 10;
     private final static int LOCAL_PORT = 10;
     private final static String LOCAL_ADDRESS = "10.0.2.2";
@@ -21,7 +21,7 @@ public class YieldSocketProviderEmulator implements SocketProvider {
     private final InetAddress localAddress;
     private final InetAddress dstAddress;
 
-    public YieldSocketProviderEmulator() throws UnknownHostException{
+    public YieldEmulatorSocketProvider() throws UnknownHostException{
         this.dstAddress = InetAddress.getByName(LOCAL_ADDRESS);
         this.localAddress = InetAddress.getByName(PHONE_ADDRESS);
     }
