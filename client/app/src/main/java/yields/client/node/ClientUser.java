@@ -24,6 +24,8 @@ public abstract class ClientUser extends User {
 
     public abstract void sendMessage(Group group, Message message);
 
+    public abstract List<Message> getGroupMessages(Group group);
+
     public abstract void addNewGroup(Group group);
 
     public abstract void deleteGroup(Group group);
