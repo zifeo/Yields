@@ -14,7 +14,7 @@ public class Group extends Node {
     }
 
     private void connectUser(User user) {
-        User newUser = new User(user.getName(), user.getId(),
+        User newUser = new User(user.getName(), user.getId().getId(),
                 user.getEmail());
 
         connectedUsers.add(newUser);

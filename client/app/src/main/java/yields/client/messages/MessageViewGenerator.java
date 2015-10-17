@@ -9,5 +9,5 @@ public interface MessageViewGenerator {
      *                generated.
      * @return The {@code MessageView} that was generated from the message.
      */
-    MessageView generateMessageView(Message message);
+    MessageView generateMessageView(Message message) throws  MessageViewGenerationException;
 }
