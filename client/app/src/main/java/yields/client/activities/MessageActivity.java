@@ -76,7 +76,7 @@ public class MessageActivity extends Activity {
         Content content;
         if (mSendImage){
             content = new ImageContent(mImage, inputMessage);
-            mSendImage = true;
+            mSendImage = false;
         }
         else {
             content = new TextContent(inputMessage);

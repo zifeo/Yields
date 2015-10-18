@@ -40,11 +40,13 @@
                 android:inputType="textMultiLine"
                 android:ems="10"
                 android:id="@+id/inputMessageField"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:nestedScrollingEnabled="true"
+                android:maxLines="4" />
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:id="@+id/sendButton"
                 android:src="@drawable/send_icon"
                 android:background="#ffffff"
