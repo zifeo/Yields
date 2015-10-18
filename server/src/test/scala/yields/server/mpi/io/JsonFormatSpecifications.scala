@@ -5,7 +5,7 @@ import spray.json._
 import yields.server.mpi.exceptions.SerializationMessageException
 import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.mpi.Message
-import yields.server.mpi.users.{UserConnect, UserUpdate}
+import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
 
 object JsonFormatSpecifications extends Properties("CustomJsonFormat") with MessageGenerators {
 
@@ -35,6 +35,10 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
   }
 
   property("UserUpdate") = forAll { (x: UserUpdate) =>
+    toAndFromJson(x) == x
+  }
+
+  property("UserGroupList") = forAll { (x: UserGroupList) =>
     toAndFromJson(x) == x
   }
 

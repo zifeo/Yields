@@ -3,7 +3,7 @@ package yields.server.mpi
 import spray.json.DefaultJsonProtocol._
 import yields.server.mpi.exceptions.SerializationMessageException
 import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.mpi.users.{UserConnect, UserUpdate}
+import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
 
 /**
  * Provides json format for read/write specification.
@@ -21,6 +21,7 @@ package object io {
 
   implicit val userConnectJsonFormat = jsonFormat1(UserConnect)
   implicit val userUpdateJsonFormat = jsonFormat4(UserUpdate)
+  implicit val userGroupListJsonFormat = jsonFormat1(UserGroupList)
 
   // Message exception
   implicit val parseMessageExceptionJsonFormat = jsonFormat1(SerializationMessageException)

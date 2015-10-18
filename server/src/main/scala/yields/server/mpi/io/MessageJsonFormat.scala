@@ -5,7 +5,7 @@ import spray.json._
 import yields.server.mpi._
 import yields.server.mpi.exceptions.{SerializationMessageException, MessageException}
 import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.mpi.users.{UserConnect, UserUpdate}
+import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
 
 import scala.util.{Failure, Success, Try}
 
@@ -36,6 +36,7 @@ object MessageJsonFormat extends RootJsonFormat[Message] {
     case x: GroupHistory => packWithKind(x)
     case x: UserConnect => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
+    case x: UserGroupList => packWithKind(x)
     case x: MessageException => packWithKind(x)
     case x => packWithKind(SerializationMessageException(s"unknown message: $x"))
   }
@@ -50,6 +51,7 @@ object MessageJsonFormat extends RootJsonFormat[Message] {
         case JsString("GroupHistory") => raw.convertTo[GroupHistory]
         case JsString("UserConnect") => raw.convertTo[UserConnect]
         case JsString("UserUpdate") => raw.convertTo[UserUpdate]
+        case JsString("UserGroupList") => raw.convertTo[UserGroupList]
         case other => SerializationMessageException(s"unknown message kind: $other")
       }
     // TODO : handle metadata

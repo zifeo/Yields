@@ -1,11 +1,11 @@
 package yields.server.mpi.io
 
 import org.scalacheck.{Gen, Arbitrary}
-import yields.server.models.{DateTime, Blob, NID}
+import yields.server.models._
 import yields.server.mpi.exceptions.SerializationMessageException
 import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.mpi.Message
-import yields.server.mpi.users.{UserConnect, UserUpdate}
+import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
 
 trait MessageGenerators {
 
@@ -24,7 +24,7 @@ trait MessageGenerators {
 
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
     for {
-      gid <- arbitrary[Long]
+      gid <- arbitrary[GID]
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
       if name.isDefined || image.isDefined
@@ -33,14 +33,14 @@ trait MessageGenerators {
 
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
-      gid <- arbitrary[Long]
+      gid <- arbitrary[GID]
       content <- arbitrary[String]
     } yield GroupMessage(gid, avoidEOI(content))
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
     for {
-      gid <- arbitrary[Long]
+      gid <- arbitrary[GID]
       from <- arbitrary[DateTime]
       to <- arbitrary[DateTime]
     } yield GroupHistory(gid, from, to)
@@ -54,12 +54,18 @@ trait MessageGenerators {
 
   implicit lazy val userUpdateArb: Arbitrary[UserUpdate] = Arbitrary {
     for {
-      uid <- arbitrary[Long]
+      uid <- arbitrary[UID]
       email <- arbitrary[Option[String]]
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
       if email.isDefined || name.isDefined || image.isDefined
     } yield UserUpdate(uid, email.map(avoidEOI), name.map(avoidEOI), image)
+  }
+
+  implicit lazy val userGroupListArb: Arbitrary[UserGroupList] = Arbitrary {
+    for {
+      uid <- arbitrary[UID]
+    } yield UserGroupList(uid)
   }
 
   implicit lazy val serializationMessageExceptionArb: Arbitrary[SerializationMessageException] = Arbitrary {
