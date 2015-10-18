@@ -1,5 +1,6 @@
 package yields.client.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +38,7 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends Activity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -62,7 +64,8 @@ public class MessageActivity extends AppCompatActivity {
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
         lv.setAdapter(mAdapter);
 
-        //setTitle(mGroup.getName()); TODO
+        TextView groupNameView = (TextView) findViewById(R.id.groupName);
+        groupNameView.setText("Mock Group");
 
         //retrieveGroupMessages();  TODO
     }
