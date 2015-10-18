@@ -1,8 +1,9 @@
 package yields.server.mpi.io
 
 import org.scalacheck.{Gen, Arbitrary}
+import yields.server.models.NID
 import yields.server.mpi.exceptions.SerializationMessageException
-import yields.server.mpi.groups.GroupMessage
+import yields.server.mpi.groups.{GroupCreate, GroupMessage}
 import yields.server.mpi.Message
 import yields.server.mpi.users.UserUpdate
 
@@ -16,6 +17,13 @@ trait MessageGenerators {
       gid <- arbitrary[Long]
       context <- arbitrary[String]
     } yield GroupMessage(gid, context)
+  }
+
+  implicit lazy val groupCreateArb: Arbitrary[GroupCreate] = Arbitrary {
+    for {
+      name <- arbitrary[String]
+      nodes <- arbitrary[Seq[NID]]
+    } yield GroupCreate(name, nodes)
   }
 
   implicit lazy val userUpdateArb: Arbitrary[UserUpdate] = Arbitrary {
@@ -34,7 +42,7 @@ trait MessageGenerators {
   }
 
   implicit lazy val messageArb: Arbitrary[Message] = Arbitrary {
-    val arbs = Seq(groupMessageArb, userUpdateArb)
+    val arbs = Seq(groupMessageArb, userUpdateArb, groupCreateArb)
     val gens = arbs.map(_.arbitrary)
     oneOf(gens.head, gens.tail.head, gens.drop(2): _*) // requires at least 2 brute entries
   }

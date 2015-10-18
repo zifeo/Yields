@@ -2,7 +2,7 @@ package yields.server.mpi
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.mpi.exceptions.SerializationMessageException
-import yields.server.mpi.groups.GroupMessage
+import yields.server.mpi.groups.{GroupCreate, GroupMessage}
 import yields.server.mpi.users.UserUpdate
 
 /**
@@ -15,6 +15,7 @@ package object io {
 
   // Message subclasses (do not forgot to add class/name binding in message json format superclass)
   implicit val groupMessageJsonFormat = jsonFormat2(GroupMessage)
+  implicit val groupCreateJsonFormat = jsonFormat2(GroupCreate)
   implicit val userUpdateJsonFormat = jsonFormat4(UserUpdate)
 
   // Message exception

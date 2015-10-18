@@ -4,7 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.mpi._
 import yields.server.mpi.exceptions.{SerializationMessageException, MessageException}
-import yields.server.mpi.groups.GroupMessage
+import yields.server.mpi.groups.{GroupCreate, GroupMessage}
 import yields.server.mpi.users.UserUpdate
 
 import scala.util.{Failure, Success, Try}
@@ -30,6 +30,7 @@ object MessageJsonFormat extends RootJsonFormat[Message] {
     )
 
   override def write(obj: Message): JsValue = obj match {
+    case x: GroupCreate => packWithKind(x)
     case x: GroupMessage => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
     case x: MessageException => packWithKind(x)
@@ -40,6 +41,7 @@ object MessageJsonFormat extends RootJsonFormat[Message] {
     case Success(flds) if flds.contains(kindFld) && flds.contains(messageFld) && flds.contains(metadataFld) =>
       val raw = flds(messageFld)
       flds(kindFld) match {
+        case JsString("GroupCreate") => raw.convertTo[GroupCreate]
         case JsString("GroupMessage") => raw.convertTo[GroupMessage]
         case JsString("UserUpdate") => raw.convertTo[UserUpdate]
         case other => SerializationMessageException(s"unknown message kind: $other")

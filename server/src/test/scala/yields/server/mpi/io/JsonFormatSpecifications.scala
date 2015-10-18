@@ -3,7 +3,7 @@ package yields.server.mpi.io
 import org.scalacheck.{Prop, Properties}
 import spray.json._
 import yields.server.mpi.exceptions.SerializationMessageException
-import yields.server.mpi.groups.GroupMessage
+import yields.server.mpi.groups.{GroupCreate, GroupMessage}
 import yields.server.mpi.Message
 import yields.server.mpi.users.UserUpdate
 
@@ -14,20 +14,24 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
   def toAndFromJson[T: JsonWriter: JsonReader](elem: T): T =
     elem.toJson.toString().parseJson.convertTo[T]
 
-  property("GroupMessage") = forAll { (gm: GroupMessage) =>
-    toAndFromJson(gm) == gm
+  property("GroupCreate") = forAll { (x: GroupCreate) =>
+    toAndFromJson(x) == x
   }
 
-  property("UserUpdate") = forAll { (uu: UserUpdate) =>
-    toAndFromJson(uu) == uu
+  property("GroupMessage") = forAll { (x: GroupMessage) =>
+    toAndFromJson(x) == x
   }
 
-  property("SerializationMessageException") = forAll { (sme: SerializationMessageException) =>
-    toAndFromJson(sme) == sme
+  property("UserUpdate") = forAll { (x: UserUpdate) =>
+    toAndFromJson(x) == x
   }
 
-  property("Message") = forAll { (m: Message) =>
-    toAndFromJson(m) == m
+  property("SerializationMessageException") = forAll { (x: SerializationMessageException) =>
+    toAndFromJson(x) == x
+  }
+
+  property("Message") = forAll { (x: Message) =>
+    toAndFromJson(x) == x
   }
 
 }
