@@ -2,6 +2,7 @@ package yields.server.mpi.io
 
 import org.scalacheck.{Prop, Properties}
 import spray.json._
+import yields.server.mpi.exceptions.SerializationMessageException
 import yields.server.mpi.groups.GroupMessage
 import yields.server.mpi.Message
 import yields.server.mpi.users.UserUpdate
@@ -19,6 +20,10 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
 
   property("UserUpdate") = forAll { (uu: UserUpdate) =>
     toAndFromJson(uu) == uu
+  }
+
+  property("SerializationMessageException") = forAll { (sme: SerializationMessageException) =>
+    toAndFromJson(sme) == sme
   }
 
   property("Message") = forAll { (m: Message) =>

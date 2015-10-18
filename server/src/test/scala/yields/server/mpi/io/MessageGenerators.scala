@@ -1,6 +1,7 @@
 package yields.server.mpi.io
 
 import org.scalacheck.{Gen, Arbitrary}
+import yields.server.mpi.exceptions.SerializationMessageException
 import yields.server.mpi.groups.GroupMessage
 import yields.server.mpi.Message
 import yields.server.mpi.users.UserUpdate
@@ -24,6 +25,12 @@ trait MessageGenerators {
       name <- arbitrary[Option[String]]
       if email.isDefined || name.isDefined
     } yield UserUpdate(uid, email, name, None)
+  }
+
+  implicit lazy val serializationMessageExceptionArb: Arbitrary[SerializationMessageException] = Arbitrary {
+    for {
+      message <- arbitrary[String]
+    } yield SerializationMessageException(message)
   }
 
   implicit lazy val messageArb: Arbitrary[Message] = Arbitrary {
