@@ -23,9 +23,20 @@ import java.text.SimpleDateFormat;
 import yields.client.R;
 import yields.client.yieldsapplication.YieldsApplication;
 
-public class MessageView {
+public class MessageView extends LinearLayout{
 
-    public static View createMessageView(Message message) throws IOException {
+    private View mMessageView;
+
+    public MessageView(Context context, Message message) {
+        super(context);
+        mMessageView = createMessageView(message);
+    }
+
+    public View getView(){
+        return mMessageView;
+    }
+
+    private static View createMessageView(Message message) {
         Context applicationContext = YieldsApplication.getApplicationContext();
 
         LayoutInflater vi;
@@ -59,7 +70,6 @@ public class MessageView {
         date.setAlpha(0.6f);
         date.setTextColor(Color.GRAY);
         relativeLayout.addView(date, lp);
-
 
         LinearLayout usernameDate = (LinearLayout) v.findViewById(R.id.usernamedate);
         userNameAndDateLayout.addView(relativeLayout);
