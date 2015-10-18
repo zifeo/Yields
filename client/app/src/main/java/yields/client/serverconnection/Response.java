@@ -13,4 +13,8 @@ public class Response{
     public JSONObject object() throws JSONException {
         return new JSONObject(rawResponse);
     }
+
+    protected String rawResponse(){
+        return rawResponse;
+    }
 }

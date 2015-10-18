@@ -3,8 +3,6 @@ package yields.client.serverconnection;
 import junit.framework.Assert;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -17,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.UnknownHostException;
 
 public class ServerChannelTest {
     private final static String FAKE_RESPONSE = "{" +
@@ -68,7 +67,38 @@ public class ServerChannelTest {
     }
 
     @Test
-    public void testNotWorkingConnection() throws IOException{
+    public void testActualServerConnection() throws JSONException{
+        Request simpleRequest = prepareSimpleRequest();
+
+        CommunicationChannel channel;
+
+        try {
+            channel = new ConnectionManager(
+                    new YieldEmulatorSocketProvider())
+                    .getCommunicationChannel();
+        } catch (UnknownHostException e) {
+            Assert.fail(e.getMessage());
+            return;
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+            return;
+        }
+
+        Response response;
+        try {
+            response = channel.sendRequest(simpleRequest);
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+            return;
+        }
+
+        Assert.assertEquals("Response is wrong",
+                response.rawResponse(),
+                SIMPLE_REQUEST + " was server answered !");
+    }
+
+    @Test
+    public void testNonWorkingConnection() throws IOException{
         Request simpleRequest = prepareSimpleRequest();
 
         ByteArrayInputStream input = new ByteArrayInputStream(

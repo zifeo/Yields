@@ -40,7 +40,7 @@ public class ConnectionManagerTest {
 
     @Before
     public void setup(){
-        //TODO : better implementation
+        //TODO : better implementation ?
         mockedSocket = Mockito.mock(Socket.class);
         sampleSocketProvider = new SocketProvider() {
             @Override
