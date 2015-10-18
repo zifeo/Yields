@@ -59,8 +59,8 @@ public class MessageActivity extends AppCompatActivity {
         mImage = null;
         mSendImage = false;
 
-        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
-        lv.setAdapter(mAdapter);
+        ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
+        listView.setAdapter(mAdapter);
 
         //setTitle(mGroup.getName()); TODO
 
@@ -74,16 +74,16 @@ public class MessageActivity extends AppCompatActivity {
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
         inputField.setText("");
-        Content content = null;
+        Content content;
         if (mSendImage){
             content = new ImageContent(mImage, inputMessage);
-            mSendImage = false;
+            mSendImage = true;
         }
         else {
             content = new TextContent(inputMessage);
         }
         Message message = new Message("message", new Id(1230), mUser, content);
-                // TODO : take tight name and right id.
+                // TODO : take right name and right id.
         mMessages.add(message);
        // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
