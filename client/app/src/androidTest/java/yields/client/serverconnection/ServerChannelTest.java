@@ -66,6 +66,11 @@ public class ServerChannelTest {
         }
     }
 
+    /**
+     * This test needs to have the local server running
+     *
+     * @throws JSONException
+     */
     @Test
     public void testActualServerConnection() throws JSONException{
         Request simpleRequest = prepareSimpleRequest();
