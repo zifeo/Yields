@@ -1,5 +1,6 @@
 package yields.client.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +29,7 @@ import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends Activity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -77,7 +79,7 @@ public class MessageActivity extends AppCompatActivity {
         Content content;
         if (mSendImage){
             content = new ImageContent(mImage, inputMessage);
-            mSendImage = true;
+            mSendImage = false;
         }
         else {
             content = new TextContent(inputMessage);
@@ -125,7 +127,8 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setHeaderBar(){
-        this.setTitle(mGroup.getName());
+        TextView groupNameField = (TextView) findViewById(R.id.groupName);
+        groupNameField.setText(mGroup.getName());
     }
 
     @Override
