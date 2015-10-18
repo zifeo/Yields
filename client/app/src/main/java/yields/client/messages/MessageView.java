@@ -9,8 +9,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.drawable.GradientDrawable;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,38 +23,53 @@ import java.text.SimpleDateFormat;
 import yields.client.R;
 import yields.client.yieldsapplication.YieldsApplication;
 
-public class MessageView{
-    public static View createMessageView(Message message) throws IOException {
+public class MessageView extends LinearLayout{
+
+    private View mMessageView;
+
+    public MessageView(Context context, Message message) {
+        super(context);
+        mMessageView = createMessageView(message);
+    }
+
+    public View getView(){
+        return mMessageView;
+    }
+
+    private static View createMessageView(Message message) {
+        Context applicationContext = YieldsApplication.getApplicationContext();
+
         LayoutInflater vi;
-        vi = LayoutInflater.from(YieldsApplication.getApplicationContext());
+        vi = LayoutInflater.from(applicationContext);
         View v = vi.inflate(R.layout.messagelayout, null);
 
-        ImageView imageView = (ImageView) v.findViewById(R.id.profilpic);
-        Bitmap image = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-        image = getCroppedBitmap(image,80);
-        imageView.setImageBitmap(image);
+        ImageView imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
+        //TODO: Retrieve actual user picture
+        Bitmap image = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                R.drawable.userpicture);
+        image = getCroppedCircleBitmap(image, 80);
+        imageViewProfilPicture.setImageBitmap(image);
 
-        LinearLayout userNameAndDateLayout = new LinearLayout(YieldsApplication.getApplicationContext());
+        LinearLayout userNameAndDateLayout = new LinearLayout(applicationContext);
         userNameAndDateLayout.setOrientation(LinearLayout.HORIZONTAL);
-        RelativeLayout relativeLayout = new RelativeLayout(YieldsApplication.getApplicationContext());
+        RelativeLayout relativeLayout = new RelativeLayout(applicationContext);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
                 (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-        TextView username  = new TextView(YieldsApplication.getApplicationContext());
+        TextView username = new TextView(applicationContext);
         username.setText("Nicolas");
         username.setTextSize(10);
         username.setTextColor(Color.rgb(39, 89, 196));
         userNameAndDateLayout.addView(username);
-        TextView date = new TextView(YieldsApplication.getApplicationContext());
+        TextView date = new TextView(applicationContext);
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        String time  = dateFormat.format(message.getDate());
+        String time = dateFormat.format(message.getDate());
         date.setText(time);
         date.setTextSize(10);
         date.setAlpha(0.6f);
         date.setTextColor(Color.GRAY);
         relativeLayout.addView(date, lp);
-
 
         LinearLayout usernameDate = (LinearLayout) v.findViewById(R.id.usernamedate);
         userNameAndDateLayout.addView(relativeLayout);
@@ -67,31 +80,43 @@ public class MessageView{
         return v;
     }
 
-    private static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
-        Bitmap sbmp;
-        if(bmp.getWidth() != radius || bmp.getHeight() != radius)
-            sbmp = Bitmap.createScaledBitmap(bmp, radius, radius, false);
-        else
-            sbmp = bmp;
-        Bitmap output = Bitmap.createBitmap(sbmp.getWidth(),
-                sbmp.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
 
-        final int color = 0xffa19774;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, sbmp.getWidth(), sbmp.getHeight());
+    /**
+     *  Computes a circle shaped {@code Bitmap} image of the one passed as an argument.
+     *  The input image must have a square shape.
+     * @param inputImage The image that is corped in a circle shape manner.
+     * @param diameter The diameter of the the new image.
+     * @return  A {@code Bitmap} image which has a circle shape.
+     * @throws IllegalArgumentException If the inputImage does not have the same width as height.
+     */
+    private static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter)
+            throws  IllegalArgumentException
+    {
+        if (inputImage.getWidth() != inputImage.getHeight()) {
+            throw new IllegalArgumentException();
+        }
 
+        Bitmap scaledInputImage;
+        if (inputImage.getWidth() != diameter || inputImage.getHeight() != diameter) {
+            scaledInputImage = Bitmap.createScaledBitmap(inputImage, diameter, diameter, false);
+        } else {
+            scaledInputImage = inputImage;
+        }
+
+        Bitmap outputImage = Bitmap.createBitmap(diameter, diameter, Bitmap.Config.ARGB_8888);
+        Rect rect = new Rect(0, 0, scaledInputImage.getWidth(), scaledInputImage.getHeight());
+
+        Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
         paint.setDither(true);
+
+        Canvas canvas = new Canvas(outputImage);
         canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle(sbmp.getWidth() / 2+0.7f, sbmp.getHeight() / 2+0.7f,
-                sbmp.getWidth() / 2+0.1f, paint);
+        canvas.drawCircle(diameter / 2f, diameter / 2f, diameter / 2f, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(sbmp, rect, rect, paint);
+        canvas.drawBitmap(scaledInputImage, rect, rect, paint);
 
-
-        return output;
+        return outputImage;
     }
 }
