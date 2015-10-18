@@ -8,26 +8,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         android:id="@+id/bottomLayout"
-        android:showDividers="end">
+        android:showDividers="end"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/addImageButton"
+            android:src="@drawable/camera_icon"
+            android:background="#ffffff"
+            android:layout_weight="0.52"
+            android:onClick="onClickAddImage"
+            android:nestedScrollingEnabled="false" />
 
         <EditText
-            android:layout_width="0dp"
+            android:layout_width="311dp"
             android:layout_height="wrap_content"
             android:id="@+id/inputMessageField"
             android:inputType="text"
-            android:hint="@string/inputMessageFieldHintString"
-            android:layout_weight="0.96" />
+            android:hint="@string/inputMessageFieldHintString" />
 
-        <Button
+        <ImageButton
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sendButtonString"
+            android:layout_height="match_parent"
             android:id="@+id/sendButton"
-            android:onClick="onSendTextMessage"
-            android:nestedScrollingEnabled="false" />
+            android:src="@drawable/send_icon"
+            android:background="#00ffffff"
+            android:layout_weight="0.04"
+            android:layout_below="@+id/messageScrollLayout"
+            android:layout_alignParentEnd="true"
+            android:onClick="onSendTextMessage" />
+
     </LinearLayout>
 
     <ListView
