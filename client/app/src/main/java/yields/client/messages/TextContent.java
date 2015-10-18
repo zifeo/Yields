@@ -30,7 +30,6 @@ public class TextContent implements Content {
         text.setText(mText);
         text.setTextColor(Color.BLACK);
         text.setTextSize(20);
-        Log.d("DEBUG ---------", "GET LYOUT : " + mText);
         return text;
     }
 }
