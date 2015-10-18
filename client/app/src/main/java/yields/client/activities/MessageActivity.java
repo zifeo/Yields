@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.id.Id;
 import yields.client.listadapter.ListAdapter;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
@@ -50,8 +51,6 @@ public class MessageActivity extends AppCompatActivity {
         //setTitle(mGroup.getName());
 
         //retrieveGroupMessages();
-
-        displayMessages();
     }
 
     /**
@@ -67,7 +66,6 @@ public class MessageActivity extends AppCompatActivity {
         mMessages.add(message);
        // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
-        displayMessages();
     }
 
     /**
@@ -76,7 +74,7 @@ public class MessageActivity extends AppCompatActivity {
      */
     public void receiveNewMessage(List<Message> newMessages){
         mMessages.addAll(newMessages);
-        displayMessages();
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -84,34 +82,5 @@ public class MessageActivity extends AppCompatActivity {
      */
     private void retrieveGroupMessages(){
         mMessages = new ArrayList<>(mUser.getGroupMessages(mGroup));
-    }
-
-    /**
-     * Displays the messages contained in mMessages on the layout.
-     */
-    private void displayMessages(){
-        /*ListView messagesScrollView = (ListView) findViewById(R.id.messageScrollLayout);
-        Iterator<Message> iterator = mMessages.iterator();
-        //messagesScrollView.setAdapter(new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout));
-        Message nextMessage;
-        LinearLayout messageLayout;
-        User lastSender = null;
-        User nextSender;
-        ArrayList<Message> list = new ArrayList<>();
-        while (iterator.hasNext()){
-            nextMessage = iterator.next();
-            nextSender = nextMessage.getSender();
-            if (lastSender != null && lastSender.getId().equals(nextSender.getId())){
-                messageLayout = nextMessage.getMessageView(true);
-            }
-            else{
-                messageLayout = nextMessage.getMessageView(true);
-            }
-            lastSender = nextSender;
-
-        }
-        /*ListAdapter adapter = new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout, list);
-
-        messagesScrollView.setAdapter(adapter);*/
     }
 }

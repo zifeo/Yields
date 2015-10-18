@@ -11,6 +11,8 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,55 +25,29 @@ import java.text.SimpleDateFormat;
 import yields.client.R;
 import yields.client.yieldsapplication.YieldsApplication;
 
-public class MessageView extends LinearLayout{
+public class MessageView{
+    public static View createMessageView(Message message) throws IOException {
+        LayoutInflater vi;
+        vi = LayoutInflater.from(YieldsApplication.getApplicationContext());
+        View v = vi.inflate(R.layout.messagelayout, null);
 
-    private static final int BACKGROUND_COLORS[] = {Color.WHITE, Color.GRAY};
-    private static int sColorIndex = 0;
-
-    public MessageView(Context context, Message m, boolean showUsername) throws IOException {
-        super(context);
-        createMessageView(m, showUsername);
-    }
-
-    public MessageView(Context context, AttributeSet attrs, Message m, boolean showUsername) {
-        super(context, attrs);
-    }
-
-    public MessageView(Context context, AttributeSet attrs, int defStyleAttr, Message m, boolean showUsername) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    private void createMessageView(Message message, boolean showUsername) throws IOException {
-        int messageColor = BACKGROUND_COLORS[sColorIndex];
-        sColorIndex = (sColorIndex + 1) % 2;
-        //this.setBackgroundColor(messageColor);
-        //tmp
-        ImageView imageView = new ImageView(YieldsApplication.getApplicationContext());
-        Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.userpicture);
+        ImageView imageView = (ImageView) v.findViewById(R.id.profilpic);
+        Bitmap image = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
         image = getCroppedBitmap(image,80);
-
         imageView.setImageBitmap(image);
 
-        //this.setBackgroundColor(messageColor);
-        this.setOrientation(HORIZONTAL);
-        this.addView(imageView);
-
         LinearLayout userNameAndDateLayout = new LinearLayout(YieldsApplication.getApplicationContext());
-        userNameAndDateLayout.setOrientation(HORIZONTAL);
+        userNameAndDateLayout.setOrientation(LinearLayout.HORIZONTAL);
         RelativeLayout relativeLayout = new RelativeLayout(YieldsApplication.getApplicationContext());
-
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
-                (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-
-        if (showUsername){
-            TextView username  = new TextView(YieldsApplication.getApplicationContext());
-            username.setText("Nicolas");
-            username.setTextSize(10);
-            username.setTextColor(Color.rgb(39, 89, 196));
-            userNameAndDateLayout.addView(username);
-        }
+        TextView username  = new TextView(YieldsApplication.getApplicationContext());
+        username.setText("Nicolas");
+        username.setTextSize(10);
+        username.setTextColor(Color.rgb(39, 89, 196));
+        userNameAndDateLayout.addView(username);
         TextView date = new TextView(YieldsApplication.getApplicationContext());
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
         String time  = dateFormat.format(message.getDate());
@@ -81,27 +57,17 @@ public class MessageView extends LinearLayout{
         date.setTextColor(Color.GRAY);
         relativeLayout.addView(date, lp);
 
+
+        LinearLayout usernameDate = (LinearLayout) v.findViewById(R.id.usernamedate);
         userNameAndDateLayout.addView(relativeLayout);
+        usernameDate.addView(userNameAndDateLayout);
 
-        LinearLayout contentLayout = new LinearLayout(YieldsApplication.getApplicationContext());
-        contentLayout.setOrientation(VERTICAL);
-        contentLayout.addView(userNameAndDateLayout);
-
-        /*LinearLayout content = message.getContent().getView();
-        contentLayout.addView(content);*/
-        // NO LONGER TRUE ERROR
-
-        this.setOrientation(HORIZONTAL);
-        this.addView(contentLayout);
-
-        /*GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.RECTANGLE);
-        drawable.setStroke(3, Color.GRAY);
-        drawable.setAlpha(60);
-        this.setBackground(drawable);*/
+        LinearLayout contentLayout = (LinearLayout) v.findViewById(R.id.contentfield);
+        contentLayout.addView(message.getContent().getView());
+        return v;
     }
 
-    public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
+    private static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
         Bitmap sbmp;
         if(bmp.getWidth() != radius || bmp.getHeight() != radius)
             sbmp = Bitmap.createScaledBitmap(bmp, radius, radius, false);

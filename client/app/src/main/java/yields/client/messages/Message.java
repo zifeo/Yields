@@ -35,13 +35,4 @@ public class Message extends Node{
     public Date getDate(){
         return new Date(mDate.getTime());
     }
-
-    public MessageView getMessageView(boolean showUsername) {
-        try {
-            return new MessageView(YieldsApplication.getApplicationContext(), this, showUsername);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }
