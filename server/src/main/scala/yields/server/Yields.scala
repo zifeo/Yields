@@ -5,7 +5,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Tcp}
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
-import yields.server.pipeline.LoggingModule
+import yields.server.mpi.{GroupMessage, Message}
+import yields.server.pipeline.{ParserModule, LoggerModule}
 
 /**
  * Yields server daemon.
@@ -21,22 +22,24 @@ object Yields extends App {
   val connections = Tcp().bind(config.getString("addr"), config.getInt("port"))
 
   // Modules creation
-  val loggingModule = LoggingModule[ByteString, ByteString]
+  val loggerModule = LoggerModule[ByteString, ByteString]()
+  val parserModule = ParserModule()
   val mockExecuteStep =
-    Flow[ByteString]
-    .map(_.utf8String)
-    .map(_ + " was server answered !\n")
-    .map(ByteString(_))
+    Flow[Message].map {
+      case GroupMessage(gid, mess) => GroupMessage(gid, "answered")
+      case x => x
+    }
 
   // Pipeline setup
   val pipeline =
-    loggingModule
-    .join(mockExecuteStep)
+    loggerModule
+      .atop(parserModule)
+      .join(mockExecuteStep)
 
   // Handle incoming connections
   connections runForeach { connection =>
     logger.info(s"[CONNECT] ${connection.remoteAddress}")
     connection.handleWith(pipeline)
   }
-  
+
 }

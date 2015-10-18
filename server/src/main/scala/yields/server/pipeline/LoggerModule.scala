@@ -8,7 +8,7 @@ import akka.util.ByteString
  * @tparam C incoming
  * @tparam G outgoing
  */
-class LoggingModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
+class LoggerModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
 
   /**
    * Logs to stdOut by prefixing item with its chan.
@@ -33,18 +33,18 @@ class LoggingModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
     case _ => item.toString
   }
 
-  /** Incoming log with given channel. */
+  /** Logs incoming item. */
   override val incoming: C => C = log("IN")
 
-  /** Outgoing log with given channel. */
+  /** Logs outgoing item. */
   override val outgoing: G => G = log("OUT")
 
 }
 
-/** [[LoggingModule]] companion object. */
-object LoggingModule {
+/** [[LoggerModule]] companion object. */
+object LoggerModule {
 
   /** Shortcut for creating a new logging module. */
-  def apply[C, G](implicit logger: LoggingAdapter) = new LoggingModule[C, G](logger).create
+  def apply[C, G]()(implicit logger: LoggingAdapter) = new LoggerModule[C, G](logger).create
 
 }
