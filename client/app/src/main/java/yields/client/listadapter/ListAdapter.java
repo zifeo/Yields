@@ -49,6 +49,10 @@ public class ListAdapter extends ArrayAdapter<Message> {
 
         Message message = getItem(position);
 
+        ImageView imageView = (ImageView) v.findViewById(R.id.profilpic);
+        Bitmap image = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+        image = getCroppedBitmap(image,80);
+        imageView.setImageBitmap(image);
 
         LinearLayout userNameAndDateLayout = new LinearLayout(YieldsApplication.getApplicationContext());
         userNameAndDateLayout.setOrientation(LinearLayout.HORIZONTAL);

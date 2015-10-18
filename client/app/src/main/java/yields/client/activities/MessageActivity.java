@@ -37,6 +37,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
+        YieldsApplication.setResources(getResources());
 
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
