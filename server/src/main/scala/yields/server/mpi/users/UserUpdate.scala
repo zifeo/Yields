@@ -4,7 +4,7 @@ import yields.server.models.{Blob, Email, UID}
 import yields.server.mpi.Message
 
 /**
- * User update given specific fields.
+ * Update an user given specific fields.
  * @param uid user id
  * @param email new email address
  * @param name new name

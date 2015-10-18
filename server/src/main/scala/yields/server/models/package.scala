@@ -20,6 +20,6 @@ package object models {
   type Email = String
 
   /** Represents a byte array. */
-  type Blob = Array[Byte]
+  type Blob = String
 
 }

@@ -3,7 +3,7 @@ package yields.server.mpi.io
 import org.scalacheck.{Prop, Properties}
 import spray.json._
 import yields.server.mpi.exceptions.SerializationMessageException
-import yields.server.mpi.groups.{GroupCreate, GroupMessage}
+import yields.server.mpi.groups.{GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.mpi.Message
 import yields.server.mpi.users.UserUpdate
 
@@ -15,6 +15,10 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
     elem.toJson.toString().parseJson.convertTo[T]
 
   property("GroupCreate") = forAll { (x: GroupCreate) =>
+    toAndFromJson(x) == x
+  }
+
+  property("GroupUpdate") = forAll { (x: GroupUpdate) =>
     toAndFromJson(x) == x
   }
 
