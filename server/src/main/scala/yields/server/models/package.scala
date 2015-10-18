@@ -23,6 +23,6 @@ package object models {
   type Blob = String
 
   /** Represents a date with time. */
-  type DateTime = String
+  type DateTime = Int
 
 }

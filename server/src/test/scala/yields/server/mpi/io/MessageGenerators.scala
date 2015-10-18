@@ -5,7 +5,7 @@ import yields.server.models.{DateTime, Blob, NID}
 import yields.server.mpi.exceptions.SerializationMessageException
 import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.mpi.Message
-import yields.server.mpi.users.UserUpdate
+import yields.server.mpi.users.{UserConnect, UserUpdate}
 
 trait MessageGenerators {
 
@@ -34,8 +34,8 @@ trait MessageGenerators {
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
       gid <- arbitrary[Long]
-      context <- arbitrary[String]
-    } yield GroupMessage(gid, avoidEOI(context))
+      content <- arbitrary[String]
+    } yield GroupMessage(gid, avoidEOI(content))
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
@@ -44,6 +44,12 @@ trait MessageGenerators {
       from <- arbitrary[DateTime]
       to <- arbitrary[DateTime]
     } yield GroupHistory(gid, from, to)
+  }
+
+  implicit lazy val userConnectArb: Arbitrary[UserConnect] = Arbitrary {
+    for {
+      email <- arbitrary[String]
+    } yield UserConnect(avoidEOI(email))
   }
 
   implicit lazy val userUpdateArb: Arbitrary[UserUpdate] = Arbitrary {
@@ -63,7 +69,7 @@ trait MessageGenerators {
   }
 
   implicit lazy val messageArb: Arbitrary[Message] = Arbitrary {
-    val arbs = Seq(groupMessageArb, userUpdateArb, groupCreateArb)
+    val arbs = Seq(groupCreateArb, groupUpdateArb, groupMessageArb, groupHistoryArb, userUpdateArb, userConnectArb)
     val gens = arbs.map(_.arbitrary)
     oneOf(gens.head, gens.tail.head, gens.drop(2): _*) // requires at least 2 brute entries
   }
