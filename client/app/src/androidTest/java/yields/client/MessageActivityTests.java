@@ -5,7 +5,9 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import yields.client.activities.MessageActivity;
 import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.Message;
+import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
@@ -53,13 +56,27 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      */
     @Test
     public void testStartingDisplay(){
-        //assertEquals(getActivity().getTitle(), MOCK_GROUP.getName());
+        assertEquals(getActivity().getTitle(), MOCK_GROUP.getName());
 
         ListView listView = (ListView) getActivity().findViewById(R.id.messageScrollLayout);
         for(int i = 0; i < MOCK_MESSAGES.size(); i ++){
-            String name = "Mock user " + i;
+            String userName = "Mock user " + i;
             String email = "Mock email " + i;
-            View messageView = listView.getChildAt(i);
+            String nodeName =  "Mock node name " + i;
+            Id id = new Id(-i);
+            String textContent = "Mock message #" + i;
+
+            MessageView messageView = (MessageView) listView.getChildAt(i);
+
+
+            assertEquals(userName, messageView.getMessage().getSender().getName());
+            assertEquals(email, messageView.getMessage().getSender().getEmail());
+
+            assertEquals(nodeName, messageView.getMessage().getName());
+            assertEquals(id.getId(), messageView.getMessage().getId().getId());
+
+            assertEquals("text", messageView.getMessage().getContent().getType());
+            assertEquals(textContent,((TextContent)messageView.getMessage().getContent()).getText());
         }
     }
 

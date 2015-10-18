@@ -2,24 +2,17 @@ package yields.client.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import yields.client.R;
@@ -32,7 +25,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class MessageActivity extends AppCompatActivity {
@@ -54,16 +46,24 @@ public class MessageActivity extends AppCompatActivity {
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
         mMessages = new ArrayList<>();
-        mAdapter = new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout, mMessages);
         mImage = null;
         mSendImage = false;
 
 
+        mAdapter = new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
+                mMessages);
         ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
         listView.setAdapter(mAdapter);
 
-        //setTitle(mGroup.getName());
-        //retrieveGroupMessages();
+        if(mUser == null || mGroup == null) {
+            setTitle("");
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(this, "Impossible to load group info", duration);
+            toast.show();
+        }else {
+            setHeaderBar();
+            retrieveGroupMessages();
+        }
     }
 
     /**
@@ -85,7 +85,7 @@ public class MessageActivity extends AppCompatActivity {
         Message message = new Message("message", new Id(1230), mUser, content);
                 // TODO : take right name and right id.
         mMessages.add(message);
-       // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
+        //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
         lv.setSelection(lv.getAdapter().getCount() - 1);
@@ -109,15 +109,23 @@ public class MessageActivity extends AppCompatActivity {
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
     private void retrieveGroupMessages(){
-        mMessages = new ArrayList<>(mUser.getGroupMessages(mGroup));
+        for(Message m : mUser.getGroupMessages(mGroup)){
+            mMessages.add(m);
+        }
+        mAdapter.notifyDataSetChanged();
+        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
+        lv.setSelection(lv.getAdapter().getCount() - 1);
     }
-
 
     private void pickImageFromGallery(){
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    private void setHeaderBar(){
+        this.setTitle(mGroup.getName());
     }
 
     @Override
