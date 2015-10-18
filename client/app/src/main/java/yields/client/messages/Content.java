@@ -1,10 +1,11 @@
 package yields.client.messages;
 
+import android.view.View;
 import android.widget.LinearLayout;
 
 public interface Content {
 
-    public String getType();
+    String getType();
 
-    public LinearLayout getLayout();
+    View getView();
 }
