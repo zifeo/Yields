@@ -2,7 +2,9 @@ package yields.server.mpi.io
 
 import org.scalacheck.{Prop, Properties}
 import spray.json._
-import yields.server.mpi.{GroupMessage, Message, UserUpdate}
+import yields.server.mpi.groups.GroupMessage
+import yields.server.mpi.Message
+import yields.server.mpi.users.UserUpdate
 
 object JsonFormatSpecifications extends Properties("CustomJsonFormat") with MessageGenerators {
 

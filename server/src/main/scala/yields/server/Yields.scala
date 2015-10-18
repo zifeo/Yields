@@ -5,7 +5,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Flow, Tcp}
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
-import yields.server.mpi.{GroupMessage, Message}
+import yields.server.mpi.Message
+import yields.server.mpi.groups.GroupMessage
 import yields.server.pipeline.{ParserModule, LoggerModule}
 
 /**
@@ -22,7 +23,8 @@ object Yields extends App {
   val connections = Tcp().bind(config.getString("addr"), config.getInt("port"))
 
   // Modules creation
-  val loggerModule = LoggerModule[ByteString, ByteString]()
+  val strLoggerModule = LoggerModule[ByteString, ByteString]()
+  val messageLoggerModule = LoggerModule[Message, Message]()
   val parserModule = ParserModule()
   val mockExecuteStep =
     Flow[Message].map {
@@ -32,8 +34,9 @@ object Yields extends App {
 
   // Pipeline setup
   val pipeline =
-    loggerModule
+    strLoggerModule
       .atop(parserModule)
+      .atop(messageLoggerModule)
       .join(mockExecuteStep)
 
   // Handle incoming connections

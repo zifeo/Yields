@@ -1,7 +1,9 @@
 package yields.server.mpi.io
 
 import org.scalacheck.{Gen, Arbitrary}
-import yields.server.mpi.{Message, UserUpdate, GroupMessage}
+import yields.server.mpi.groups.GroupMessage
+import yields.server.mpi.Message
+import yields.server.mpi.users.UserUpdate
 
 trait MessageGenerators {
 
