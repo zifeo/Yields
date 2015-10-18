@@ -12,11 +12,14 @@ trait MessageGenerators {
   import Arbitrary.arbitrary
   import Gen.oneOf
 
+  /** Avoids string to contain end-of-input char (waiting on spray-json/#137). */
+  def avoidEOI(str: String): String = str.replace('\uFFFF', ' ')
+
   implicit lazy val groupCreateArb: Arbitrary[GroupCreate] = Arbitrary {
     for {
       name <- arbitrary[String]
       nodes <- arbitrary[Seq[NID]]
-    } yield GroupCreate(name, nodes)
+    } yield GroupCreate(avoidEOI(name), nodes)
   }
 
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
@@ -25,14 +28,14 @@ trait MessageGenerators {
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
       if name.isDefined || image.isDefined
-    } yield GroupUpdate(gid, name, image)
+    } yield GroupUpdate(gid, name.map(avoidEOI), image)
   }
 
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
       gid <- arbitrary[Long]
       context <- arbitrary[String]
-    } yield GroupMessage(gid, context)
+    } yield GroupMessage(gid, avoidEOI(context))
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
@@ -50,13 +53,13 @@ trait MessageGenerators {
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
       if email.isDefined || name.isDefined || image.isDefined
-    } yield UserUpdate(uid, email, name, image)
+    } yield UserUpdate(uid, email.map(avoidEOI), name.map(avoidEOI), image)
   }
 
   implicit lazy val serializationMessageExceptionArb: Arbitrary[SerializationMessageException] = Arbitrary {
     for {
       message <- arbitrary[String]
-    } yield SerializationMessageException(message)
+    } yield SerializationMessageException(avoidEOI(message))
   }
 
   implicit lazy val messageArb: Arbitrary[Message] = Arbitrary {
