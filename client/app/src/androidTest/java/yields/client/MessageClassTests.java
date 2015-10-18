@@ -46,8 +46,8 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
 
     @Test
     public void testTextContentReturnRightLayout(){
-        LinearLayout layout = MOCK_TEXT_CONTENT_1.getLayout();
-        TextView text = (TextView) layout.getChildAt(0);
+        View view = MOCK_TEXT_CONTENT_1.getView();
+        TextView text = (TextView) view;
         assertEquals("Mock text.", text.getText());
     }
 }

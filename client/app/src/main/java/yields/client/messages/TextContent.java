@@ -1,8 +1,7 @@
 package yields.client.messages;
 
 import android.graphics.Color;
-import android.util.Log;
-import android.widget.LinearLayout;
+import android.view.View;
 import android.widget.TextView;
 
 import yields.client.yieldsapplication.YieldsApplication;
@@ -24,14 +23,11 @@ public class TextContent implements Content {
     }
 
     @Override
-    public LinearLayout getLayout() {
-        LinearLayout layout = new LinearLayout(YieldsApplication.getApplicationContext());
-        layout.setOrientation(LinearLayout.HORIZONTAL);
+    public View getView() {
         TextView text = new TextView(YieldsApplication.getApplicationContext());
         text.setText(mText);
         text.setTextColor(Color.BLACK);
         text.setTextSize(20);
-        layout.addView(text);
-        return layout;
+        return text;
     }
 }

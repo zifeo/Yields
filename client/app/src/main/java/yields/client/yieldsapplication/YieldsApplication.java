@@ -1,6 +1,7 @@
 package yields.client.yieldsapplication;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import java.util.ConcurrentModificationException;
 
@@ -11,7 +12,9 @@ import yields.client.node.User;
 public class YieldsApplication {
     private static ClientUser mUser;
     private static Group mGroup;
-    private static Context mApplicationContext = getApplicationContext();
+
+    private static Context mApplicationContext;
+    private static Resources mResources;
 
     public static ClientUser getUser(){
         return mUser;
@@ -25,6 +28,10 @@ public class YieldsApplication {
         return mApplicationContext;
     }
 
+    public static void setResources(Resources r){
+        mResources = r;
+    }
+
     public static void setGroup(Group g){
         mGroup = g;
     }
@@ -35,5 +42,9 @@ public class YieldsApplication {
 
     public static void setApplicationContext(Context c){
         mApplicationContext = c;
+    }
+
+    public static Resources getResources(){
+        return mResources;
     }
 }
