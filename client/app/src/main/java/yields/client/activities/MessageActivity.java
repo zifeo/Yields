@@ -70,15 +70,12 @@ public class MessageActivity extends AppCompatActivity {
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendTextMessage(View v){
+    public void onSendMessage(View v){
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
         inputField.setText("");
         Content content = null;
-        Log.i("DEBUG", "Entering if");
-        if (!mSendImage){
-            Log.i("DEBUG", "Creating image");
-            mImage = BitmapFactory.decodeResource(getResources(), R.drawable.image_test);
+        if (mSendImage){
             content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
         }
@@ -90,15 +87,13 @@ public class MessageActivity extends AppCompatActivity {
         mMessages.add(message);
        // mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
+        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
+        lv.setSelection(lv.getAdapter().getCount() - 1);
     }
 
     public void onClickAddImage(View v){
         mSendImage = true;
         pickImageFromGallery();
-        Toast toast = new Toast(YieldsApplication.getApplicationContext());
-        toast.setDuration(Toast.LENGTH_SHORT);
-        toast.setText("Image added to message");
-        toast.show();
     }
 
     /**
@@ -134,6 +129,8 @@ public class MessageActivity extends AppCompatActivity {
 
             try {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
+                toast.show();
             } catch (IOException e) {
                 e.printStackTrace();
             }

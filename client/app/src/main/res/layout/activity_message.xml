@@ -39,7 +39,7 @@
             android:layout_weight="0.04"
             android:layout_below="@+id/messageScrollLayout"
             android:layout_alignParentEnd="true"
-            android:onClick="onSendTextMessage" />
+            android:onClick="onSendMessage" />
 
     </LinearLayout>
 
