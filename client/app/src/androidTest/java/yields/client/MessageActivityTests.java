@@ -4,6 +4,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
+import android.view.View;
+import android.widget.ListView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,15 +45,24 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-    }
-
-    @Test
-    public void testDisplay(){
-        getActivity();
-        YieldsApplication.setApplicationContext(getActivity().getApplicationContext());
+        YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
         YieldsApplication.setGroup(MOCK_GROUP);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
-        assertEquals(true, true);
+    }
+
+    /**
+     * Test if the starting display for that activity is correct
+     */
+    @Test
+    public void testStartingDisplay(){
+        assertEquals(getActivity().getTitle(), MOCK_GROUP.getName());
+
+        ListView listView = (ListView) getActivity().findViewById(R.id.messageScrollLayout);
+        for(int i = 0; i < MOCK_MESSAGES.size(); i ++){
+            String name = "Mock user " + i;
+            String email = "Mock email " + i;
+            View messageView = listView.getChildAt(i);
+        }
     }
 
     private static class FakeClientUser extends ClientUser{
@@ -88,19 +99,19 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     private static List<Message> generateMockMessages(int number){
         ArrayList<Message> messages = new ArrayList<>();
         for (int i = 0; i < number; i ++){
-            int rand = new Random().nextInt();
-            Content content = generateFakeContent();
-            messages.add(new Message("Mock node name " + rand, new Id(rand), generateFakeUser(), content));
+            Content content = generateFakeTextContent(i);
+            messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser(i), content));
         }
         return messages;
     }
 
-    private static Content generateFakeContent(){
-        return new TextContent("Mock message #" + (new Random()).nextInt());
+    private static Content generateFakeTextContent(int i){
+        return new TextContent("Mock message #" + (i));
     }
 
-    private static User generateFakeUser(){
-        int rand = new Random().nextInt();
-        return new User("Mock user " + rand, new Id(rand), "Mock email " + rand);
+    private static User generateFakeUser(int i){
+        String name = "Mock user " + i;
+        String email = "Mock email " + i;
+        return new User(name, new Id(i), email);
     }
 }
