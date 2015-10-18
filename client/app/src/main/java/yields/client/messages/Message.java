@@ -1,8 +1,5 @@
 package yields.client.messages;
-
 import java.io.IOException;
-import java.util.Date;
-
 import yields.client.id.Id;
 import yields.client.node.Node;
 import yields.client.node.User;
@@ -15,13 +12,13 @@ public class Message extends Node{
 
     private final User mSender;
     private final Content mContent;
-    private final Date mDate;
+    private final java.util.Date mDate;
 
-    public Message(String nodeName, long nodeID, User sender, Content content, Date date){
-        super(nodeName, new Id(nodeID));
+    public Message(String nodeName, Id nodeID, User sender, Content content){
+        super(nodeName, nodeID);
         this.mSender = sender;
         this.mContent = content;
-        this.mDate = new Date(date.getTime());
+        this.mDate = new java.util.Date();
     }
 
     public User getSender(){
@@ -32,7 +29,7 @@ public class Message extends Node{
         return mContent;
     }
 
-    public Date getDate(){
-        return new Date(mDate.getTime());
+    public java.util.Date getDate(){
+        return new java.util.Date(mDate.getTime());
     }
 }
