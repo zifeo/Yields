@@ -36,7 +36,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
 
     @Override
     public void subscribeToConnection() {
-
+        //TODO : Implement listener
     }
 
     @Override
