@@ -12,6 +12,7 @@ import yields.client.node.User;
 public class YieldsApplication {
     private static ClientUser mUser;
     private static Group mGroup;
+
     private static Context mApplicationContext;
     private static Resources mResources;
 

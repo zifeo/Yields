@@ -1,9 +1,9 @@
 package yields.client.messages;
-import java.io.IOException;
+
+import yields.client.node.User;
 import yields.client.id.Id;
 import yields.client.node.Node;
-import yields.client.node.User;
-import yields.client.yieldsapplication.YieldsApplication;
+
 
 /**
  * Message is a {@code Node} which is shared as a message in a conversation.

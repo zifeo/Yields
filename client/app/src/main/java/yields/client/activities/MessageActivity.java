@@ -19,6 +19,7 @@ import java.util.List;
 
 import yields.client.R;
 import yields.client.id.Id;
+
 import yields.client.listadapter.ListAdapter;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
@@ -50,6 +51,7 @@ public class MessageActivity extends Activity {
         mImage = null;
         mSendImage = false;
 
+
         mAdapter = new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
                 mMessages);
         ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
@@ -72,6 +74,7 @@ public class MessageActivity extends Activity {
     public void onSendMessage(View v){
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
+
         inputField.setText("");
         Content content;
         if (mSendImage){
@@ -108,7 +111,12 @@ public class MessageActivity extends Activity {
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
     private void retrieveGroupMessages(){
-        mMessages = new ArrayList<>(mUser.getGroupMessages(mGroup));
+        for(Message m : mUser.getGroupMessages(mGroup)){
+            mMessages.add(m);
+        }
+        mAdapter.notifyDataSetChanged();
+        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
+        lv.setSelection(lv.getAdapter().getCount() - 1);
     }
 
     private void pickImageFromGallery(){
@@ -137,6 +145,7 @@ public class MessageActivity extends Activity {
                 toast.show();
             } catch (IOException e) {
                 e.printStackTrace();
+
             }
         }
     }
