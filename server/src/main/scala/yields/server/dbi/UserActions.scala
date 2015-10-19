@@ -6,11 +6,12 @@ import java.util.Date
 import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
 import com.orientechnologies.orient.core.id.ORecordId
 import yields.server.models.{Group, User}
+import scala.language.reflectiveCalls
 
 /**
  * Actions to do on the db about users
  */
-class UserActions {
+object UserActions {
   var uri = "remote:127.0.0.1/orientdbtest"
 
   var db: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "test")

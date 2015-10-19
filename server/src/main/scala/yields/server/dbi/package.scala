@@ -4,6 +4,7 @@ import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
 
 import scala.collection.JavaConverters._
+import scala.language.implicitConversions
 
 /**
  * Created by jeremy on 18/10/15.
