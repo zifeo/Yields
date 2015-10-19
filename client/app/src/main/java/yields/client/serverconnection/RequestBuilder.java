@@ -27,7 +27,7 @@ public class RequestBuilder {
         this.constructingMap = new ArrayMap<>();
     }
 
-    private void addField(Fields fieldType, String field) {
+    protected void addField(Fields fieldType, String field) {
 
         if(this.kind == MessageKind.PING ){
             constructingMap.put("name", field);
@@ -35,11 +35,15 @@ public class RequestBuilder {
     }
 
     public Request request() {
-        Map<String, Object> object = new ArrayMap<>();
-        object.put("kind", this.kind.name);
-        object.put("time", 0);
-        object.put("hash", 0);
-        object.put("message", new JSONObject(constructingMap));
-        return new Request(new JSONObject(object));
+        Map<String, Object> request = new ArrayMap<>();
+        request.put("kind", this.kind.name);
+        request.put("message", new JSONObject(constructingMap));
+
+        Map<String, Object> metadata = new ArrayMap<>();
+        metadata.put("time", 0);
+
+        request.put("metadata", new JSONObject(metadata));
+
+        return new Request(new JSONObject(request));
     }
 }
