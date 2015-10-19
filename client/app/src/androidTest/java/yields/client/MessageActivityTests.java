@@ -66,7 +66,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testStartingDisplay(){
         Activity messageActivity = getActivity();
 
-        //Group name
+        //Group info
         TextView groupName = (TextView) messageActivity.findViewById(R.id.groupName);
         assertEquals(MOCK_GROUP.getName(), groupName.getText());
 
