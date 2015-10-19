@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import yields.client.activities.MessageActivity;
+import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
@@ -27,9 +28,9 @@ import static junit.framework.Assert.assertEquals;
 
 public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageActivity> {
     private static final TextContent MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
-    private static final ImageContent MOCK_IMAGE_CONTENT = new ImageContent(null, "Mock caption");
-    private static final User MOCK_USER = new User("Mock name", new Id(117), "Mock email");
-    private static final Message MOCK_MESSAGE = new Message("Mock node name", new Id(2), MOCK_USER, MOCK_TEXT_CONTENT_1);
+    private static final ImageContent MOCK_IMAGE_CONTENT = MockFactory.generateFakeImageContent(null, "Mock caption");
+    private static final User MOCK_USER = MockFactory.generateFakeUser("Mock name", new Id(117), "Mock email");
+    private static final Message MOCK_MESSAGE = MockFactory.generateMockMessage("Mock node name", new Id(2), MOCK_USER, MOCK_TEXT_CONTENT_1);
 
     public MessageClassTests() {
         super(MessageActivity.class);
@@ -65,7 +66,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectImage(){
         Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.send_icon);
-        ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
+        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
         assertEquals(bitmap, imageContent.getImage());
     }
 
@@ -79,8 +80,13 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectLayout(){
         Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.send_icon);
-        ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
-        LinearLayout view = (LinearLayout) imageContent.getView();
+        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
+        LinearLayout view = null;
+        try {
+            view = (LinearLayout) imageContent.getView();
+        } catch (ContentException e) {
+            e.printStackTrace();
+        }
         //Caption from TextView
         TextView caption = (TextView) view.getChildAt(0);
         assertEquals("Mock caption", caption.getText());

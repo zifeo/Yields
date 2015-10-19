@@ -14,21 +14,24 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import yields.client.exceptions.ContentException;
+import yields.client.exceptions.MessageException;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class ImageContent implements Content{
     private Bitmap mImage;
     private String mCaption;
 
-    public ImageContent(Bitmap img, String caption){
-        if (img != null) {
-            mImage = Bitmap.createBitmap(img);
+    public ImageContent(Bitmap img, String caption) throws ContentException {
+        if (img == null){
+            throw new ContentException("Error, passing null image to the ImageContent constructor.");
         }
+        mImage = Bitmap.createBitmap(img);
         mCaption = new String(caption);
     }
 
     public String getCaption(){
-        return mCaption;
+        return new String(mCaption);
     }
 
     public Bitmap getImage(){
@@ -41,7 +44,7 @@ public class ImageContent implements Content{
     }
 
     @Override
-    public View getView() {
+    public View getView() throws ContentException{
         WindowManager wm = (WindowManager) YieldsApplication.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
@@ -53,14 +56,8 @@ public class ImageContent implements Content{
         layout.setLayoutParams(params);
         layout.setOrientation(LinearLayout.VERTICAL);
         ImageView img = new ImageView(YieldsApplication.getApplicationContext());
-        Log.d("DEBUG", "Width = " + mImage.getWidth());
-        Log.d("DEBUG", "Height = " + mImage.getHeight());
-        Log.d("DEBUG", "max Width = " + screenWidth);
         if (mImage.getWidth() > (screenWidth - 200)){ // TODO : remove hardcoded value
             float scalefactor = ((float)(screenWidth - 200)) / mImage.getWidth();
-            Log.d("DEBUG", "Scale factor = " + scalefactor);
-            Log.d("DEBUG", "New width = " +(screenWidth - 200));
-            Log.d("DEBUG", "New height = " +(int) (scalefactor*mImage.getHeight()));
             img.setImageBitmap(Bitmap.createScaledBitmap(mImage, (screenWidth - 200), (int) (scalefactor * mImage.getHeight()), false));
         }
         else {

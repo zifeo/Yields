@@ -21,14 +21,19 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import yields.client.R;
+import yields.client.exceptions.ContentException;
+import yields.client.exceptions.MessageViewException;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class MessageView extends LinearLayout{
 
     private Message mMessage;
 
-    public MessageView(Context context, Message message) {
+    public MessageView(Context context, Message message) throws MessageViewException {
         super(context);
+        if (message == null){
+            throw new MessageViewException("Error, null message in MessageView constructor");
+        }
         this.mMessage = message;
         this.addView(createMessageView(message));
     }
@@ -37,7 +42,7 @@ public class MessageView extends LinearLayout{
         return mMessage;
     }
 
-    private View createMessageView(Message message) {
+    private View createMessageView(Message message) throws MessageViewException {
         Context applicationContext = YieldsApplication.getApplicationContext();
         
         LayoutInflater vi;
@@ -59,7 +64,7 @@ public class MessageView extends LinearLayout{
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
         TextView username = new TextView(applicationContext);
-        username.setText("Nicolas");
+        username.setText(mMessage.getSender().getName());
         username.setTextSize(10);
         username.setTextColor(Color.rgb(39, 89, 196));
         userNameAndDateLayout.addView(username);
@@ -77,7 +82,11 @@ public class MessageView extends LinearLayout{
         usernameDate.addView(userNameAndDateLayout);
 
         LinearLayout contentLayout = (LinearLayout) v.findViewById(R.id.contentfield);
-        contentLayout.addView(message.getContent().getView());
+        try {
+            contentLayout.addView(message.getContent().getView());
+        } catch (ContentException e) {
+            throw new MessageViewException("Error, couldn't create contentLayout in createMessageView()");
+        }
         return v;
     }
 

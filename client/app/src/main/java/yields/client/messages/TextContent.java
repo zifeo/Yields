@@ -12,10 +12,10 @@ public class TextContent implements Content {
 
     public TextContent(String text){
         //TODO Check for safe content
-        mText = text;
+        mText = new String(text);
     }
 
-    public String getText(){return mText;};
+    public String getText(){return new String(mText);};
 
     @Override
     public String getType() {

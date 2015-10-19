@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import android.widget.ListView;
@@ -15,9 +14,15 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import yields.client.R;
+import yields.client.exceptions.ContentException;
+import yields.client.exceptions.MessageActivityException;
+import yields.client.exceptions.MessageException;
+import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
 import yields.client.listadapter.ListAdapter;
@@ -27,6 +32,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class MessageActivity extends Activity {
@@ -45,8 +51,22 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+        /*mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();*/
+
+        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
+        try {
+            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email");
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+        try {
+            mGroup = createFakeGroup();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+        /****/
+
         mMessages = new ArrayList<>();
         mImage = null;
         mSendImage = false;
@@ -58,8 +78,9 @@ public class MessageActivity extends Activity {
         listView.setAdapter(mAdapter);
 
         if(mUser == null || mGroup == null) {
-            setTitle("");
             int duration = Toast.LENGTH_SHORT;
+            TextView groupName = (TextView) findViewById(R.id.groupName);
+            groupName.setText("Unknown group");
             Toast toast = Toast.makeText(this, "Impossible to load group info", duration);
             toast.show();
         }else {
@@ -71,21 +92,35 @@ public class MessageActivity extends Activity {
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendMessage(View v){
+    public void onSendMessage(View v) throws MessageActivityException {
         TextView inputField = (TextView) findViewById(R.id.inputMessageField);
         String inputMessage =  inputField.getText().toString();
 
         inputField.setText("");
         Content content;
         if (mSendImage){
-            content = new ImageContent(mImage, inputMessage);
+            if (mImage == null){
+                throw new MessageActivityException("Error, attempting to send a null image.");
+            }
+            try {
+                content = new ImageContent(mImage, inputMessage);
+            } catch (ContentException e) {
+                throw new MessageActivityException("Error im message activity, couldn't create ImageContent.");
+            }
             mSendImage = false;
         }
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(1230), mUser, content);
-                // TODO : take right name and right id.
+        Message message = null;
+        try {
+            message = new Message("message", new Id(1230), mUser, content);
+        } catch (MessageException e) {
+            throw new MessageActivityException("Error in message activity, couldn't create message");
+        } catch (NodeException e) {
+            throw new MessageActivityException("Error in message activity, couldn't create message");
+        }
+        // TODO : take right name and right id.
         mMessages.add(message);
         //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
@@ -148,5 +183,48 @@ public class MessageActivity extends Activity {
 
             }
         }
+    }
+
+    /**
+     * Mock Client user, only for presentation during the second sprint.
+     */
+    private class  MockClientUser extends ClientUser{
+
+        public MockClientUser(String name, Id id, String email) throws NodeException {
+            super(name, id, email);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message) {
+            /* Nothing */
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group) {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public void addNewGroup(Group group) {
+            /* Nothing */
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+            /* Nothing */
+        }
+
+        @Override
+        public Map<User, String> getHistory(Date from) {
+            return null;
+        }
+    }
+
+    /**
+     * Create fake group for sake of the presentation.
+     * @return fake group.
+     */
+    private Group createFakeGroup() throws NodeException {
+        return new Group("Mock group", new Id(123), new ArrayList<User>());
     }
 }

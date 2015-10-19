@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
+import yields.client.exceptions.MessageViewException;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -20,7 +21,12 @@ public class ListAdapter extends ArrayAdapter<Message> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Message message = getItem(position);
-        MessageView messageView = new MessageView(YieldsApplication.getApplicationContext(), message);
+        MessageView messageView = null;
+        try {
+            messageView = new MessageView(YieldsApplication.getApplicationContext(), message);
+        } catch (MessageViewException e) {
+            e.printStackTrace();
+        }
         return messageView;
     }
 }
