@@ -8,40 +8,35 @@ import java.util.Map;
 
 public class RequestBuilder {
 
-    public static enum MessageTypes {
+    public static enum MessageKind {
         PING("PING");
 
         private final String name;
-        MessageTypes(String name) { this.name = name; }
+        MessageKind(String name) { this.name = name; }
         public String getValue() { return name; }
     }
     public static enum Fields {
         NAME
     }
 
-    private final MessageTypes type;
+    private final MessageKind kind;
     private final Map<String, Object> constructingMap;
 
-    public RequestBuilder(MessageTypes type){
-        this.type = type;
+    public RequestBuilder(MessageKind kind){
+        this.kind = kind;
         this.constructingMap = new ArrayMap<>();
     }
 
-    public void addField(Fields fieldType, String field) {
+    private void addField(Fields fieldType, String field) {
 
-        switch (fieldType) {
-            case NAME:
-                if(type == MessageTypes.PING ){
-                    constructingMap.put("name", field);
-                }
-                break;
-            default: throw new IllegalArgumentException();
+        if(this.kind == MessageKind.PING ){
+            constructingMap.put("name", field);
         }
     }
 
     public Request request() {
         Map<String, Object> object = new ArrayMap<>();
-        object.put("type", type.name);
+        object.put("kind", this.kind.name);
         object.put("time", 0);
         object.put("hash", 0);
         object.put("message", new JSONObject(constructingMap));

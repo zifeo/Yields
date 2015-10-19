@@ -132,7 +132,7 @@ public class ServerChannelTest {
     }
 
     private Request prepareSimpleRequest(){
-        RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.MessageTypes.PING);
+        RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.MessageKind.PING);
         requestBuilder.addField(RequestBuilder.Fields.NAME, "test");
 
         return requestBuilder.request();
