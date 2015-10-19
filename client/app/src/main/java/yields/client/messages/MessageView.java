@@ -25,15 +25,16 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class MessageView extends LinearLayout{
 
-    private View mMessageView;
+    private Message mMessage;
 
     public MessageView(Context context, Message message) {
         super(context);
-        mMessageView = createMessageView(message);
+        this.mMessage = message;
+        this.addView(createMessageView(message));
     }
 
-    public View getView(){
-        return mMessageView;
+    public Message getMessage(){
+        return mMessage;
     }
 
     private static View createMessageView(Message message) {
