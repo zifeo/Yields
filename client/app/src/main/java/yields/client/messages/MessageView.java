@@ -37,9 +37,9 @@ public class MessageView extends LinearLayout{
         return mMessage;
     }
 
-    private static View createMessageView(Message message) {
+    private View createMessageView(Message message) {
         Context applicationContext = YieldsApplication.getApplicationContext();
-
+        
         LayoutInflater vi;
         vi = LayoutInflater.from(applicationContext);
         View v = vi.inflate(R.layout.messagelayout, null);
