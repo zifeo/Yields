@@ -1,11 +1,14 @@
 package yields.server.dbi
 
+import java.text.{DateFormat, SimpleDateFormat}
+import java.util.Date
+
 import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
 import com.orientechnologies.orient.core.id.ORecordId
-import yields.server.models.User
+import yields.server.models.{Group, User}
 
 /**
- * Created by jeremy on 18/10/15.
+ * Actions to do on the db about users
  */
 class UserActions {
   var uri = "remote:127.0.0.1/orientdbtest"
@@ -13,19 +16,22 @@ class UserActions {
   var db: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "test")
   db.getEntityManager.registerEntityClasses("User")
 
+  // Create a date for now
+  val dateFormat: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  val date: String = dateFormat.format(new Date())
 
-  def getUserByEmail(email: String):User = {
+  def getUserByEmail(email: String): User = {
     val user = db.queryBySql[User]("select from user where email = ?", email)
     user.head
   }
 
-  def getUserByRid(rid: String):User = {
+  def getUserByRid(rid: String): User = {
     val user = db.queryBySql[User]("select from user where @rid = ?", new ORecordId(rid))
     user.head
   }
 
   def createUser(name: String, email: String): User = {
-    val user = db.queryBySql[User]("insert into user Set date_creation = '2015-10-17', email = ?, name = ?", name, email)
+    val user = db.queryBySql[User]("insert into user Set date_creation = ?, email = ?, name = ?", date, name, email)
     user.head
   }
 
@@ -34,7 +40,6 @@ class UserActions {
   }
 
   def getGroupsFromUser(ridUser: String) = {
-    db.queryBySql[User]("select from E where out = ?", new ORecordId(ridUser))
+    db.queryBySql[Group]("select from E where out = ?", new ORecordId(ridUser))
   }
-
 }

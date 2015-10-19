@@ -1,12 +1,14 @@
 package yields.server.dbi
 
+import java.text.{SimpleDateFormat, DateFormat}
+import java.util.Date
+
 import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
 import com.orientechnologies.orient.core.id.ORecordId
-import com.orientechnologies.orient.core.record.impl.ODocument
-import yields.server.models.{User, Group}
+import yields.server.models.{Group, User}
 
 /**
- * Created by jeremy on 19/10/15.
+ * Actions to do on the db about groups
  */
 class GroupActions {
   var uri = "remote:127.0.0.1/orientdbtest"
@@ -14,8 +16,11 @@ class GroupActions {
   var db: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "test")
   db.getEntityManager.registerEntityClasses("Group")
 
+  val dateFormat: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  val date: String = dateFormat.format(new Date())
+
   def createGroup(name: String): Group = {
-    db.queryBySql("insert into group Set date_creation = '2015-10-17', group_name = ?", name).head
+    db.queryBySql("insert into group Set date_creation = ?, group_name = ?", date, name).head
   }
 
   def getUsersFromGroup(ridGroup: String): List[User] = {
@@ -23,10 +28,10 @@ class GroupActions {
   }
 
   def addMessage(ridGroup: String, ridSender: String, body: String) = {
-    db.queryBySql("update ? ADD messages = '{\"sender\":\"?\", \"time\":2015-10-18, \"body\":\"?\"}'", new ORecordId(ridGroup), new ORecordId(ridSender), body)
+    db.queryBySql("update ? ADD messages = '{\"sender\":\"?\", \"time\":?, \"body\":\"?\"}'", new ORecordId(ridGroup), new ORecordId(ridSender), date, body)
   }
 
-  def getGroupInfos(ridGroup: String):Group = {
-    db.queryBySql("select from ?", new ORecordId(ridGroup))
+  def getGroupInfos(ridGroup: String): Group = {
+    db.queryBySql("select from ?", new ORecordId(ridGroup)).head
   }
 }

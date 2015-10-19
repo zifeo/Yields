@@ -1,9 +1,9 @@
 package yields.server.models
 
-import javax.persistence.{Version, Id}
+import javax.persistence.{Id, Version}
 
 /**
- * Created by jeremy on 18/10/15.
+ * Representation of a group
  */
 class Group {
   @Id var id: String = _
@@ -13,5 +13,5 @@ class Group {
   var last_activity: java.util.Date = _
   var messages: java.util.List[String] = new java.util.ArrayList()
 
-  override def toString = "User: " + this.id
+  override def toString = "Group: " + this.id + ", name: " + group_name + ", creation: " + date_creation + ", last activity: " + last_activity
 }
