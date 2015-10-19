@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import yields.client.id.Id;
+
 public class RequestBuilder {
 
     public static enum MessageKind {
@@ -20,10 +22,12 @@ public class RequestBuilder {
     }
 
     private final MessageKind kind;
+    private final Id sender;
     private final Map<String, Object> constructingMap;
 
-    public RequestBuilder(MessageKind kind){
+    public RequestBuilder(MessageKind kind, Id sender){
         this.kind = kind;
+        this.sender = sender;
         this.constructingMap = new ArrayMap<>();
     }
 
@@ -40,6 +44,7 @@ public class RequestBuilder {
         request.put("message", new JSONObject(constructingMap));
 
         Map<String, Object> metadata = new ArrayMap<>();
+        metadata.put("sender", sender.getId().toString());
         metadata.put("time", 0);
 
         request.put("metadata", new JSONObject(metadata));
