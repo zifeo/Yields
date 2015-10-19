@@ -27,6 +27,14 @@ public class ImageContent implements Content{
         mCaption = new String(caption);
     }
 
+    public String getCaption(){
+        return mCaption;
+    }
+
+    public Bitmap getImage(){
+        return Bitmap.createBitmap(mImage);
+    }
+
     @Override
     public String getType() {
         return "image";
@@ -53,7 +61,7 @@ public class ImageContent implements Content{
             Log.d("DEBUG", "Scale factor = " + scalefactor);
             Log.d("DEBUG", "New width = " +(screenWidth - 200));
             Log.d("DEBUG", "New height = " +(int) (scalefactor*mImage.getHeight()));
-            img.setImageBitmap(Bitmap.createScaledBitmap(mImage, (screenWidth - 200), (int) (scalefactor*mImage.getHeight()), false));
+            img.setImageBitmap(Bitmap.createScaledBitmap(mImage, (screenWidth - 200), (int) (scalefactor * mImage.getHeight()), false));
         }
         else {
             img.setImageBitmap(mImage);

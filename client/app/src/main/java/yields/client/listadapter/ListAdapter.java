@@ -20,9 +20,7 @@ public class ListAdapter extends ArrayAdapter<Message> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Message message = getItem(position);
-        View v = null;
         MessageView messageView = new MessageView(YieldsApplication.getApplicationContext(), message);
-        v = messageView.getView();
-        return v;
+        return messageView;
     }
 }
