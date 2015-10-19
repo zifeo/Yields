@@ -28,17 +28,19 @@ public class ServerChannelTest {
             "}";
 
     private final static String SIMPLE_REQUEST = "{" +
-            "\"hash\":0," +
-            "\"time\":0," +
-            "\"type\":\"PING\"," +
+            "\"metadata\":{" +
+            "\"sender\":\"0\"," +
+            "\"time\":0" +
+            "}," +
+            "\"kind\":\"PING\"," +
             "\"message\":{" +
-            "\"name\":\"test\"" +
+            "\"content\":\"test\"" +
             "}" +
             "}";
 
     @Test
-    public void testWorkingSendRequest() throws JSONException{
-        Request simpleRequest = prepareSimpleRequest();
+    public void testWorkingSendRequestAndReadResponse() throws JSONException{
+        Request simpleRequest = RequestBuilder.simpleRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -73,7 +75,7 @@ public class ServerChannelTest {
      */
     @Test
     public void testActualServerConnection() throws JSONException{
-        Request simpleRequest = prepareSimpleRequest();
+        Request simpleRequest = RequestBuilder.simpleRequest("test");
 
         CommunicationChannel channel;
 
@@ -104,7 +106,7 @@ public class ServerChannelTest {
 
     @Test
     public void testNonWorkingConnection() throws IOException{
-        Request simpleRequest = prepareSimpleRequest();
+        Request simpleRequest = RequestBuilder.simpleRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -129,13 +131,6 @@ public class ServerChannelTest {
                 return status;
             }
         };
-    }
-
-    private Request prepareSimpleRequest(){
-        RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.MessageKind.PING);
-        requestBuilder.addField(RequestBuilder.Fields.NAME, "test");
-
-        return requestBuilder.request();
     }
 
     private PrintWriter toWriter(OutputStream output) {

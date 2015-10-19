@@ -16,7 +16,7 @@ import java.net.Socket;
 
 public class ConnectionManagerTest {
     private final static String FAKE_RESPONSE = "{" +
-            "\"type\":\"test\"," +
+            "\"kind\":\"test\"," +
             "\"time\":0," +
             "\"hash\":0," +
             "\"message\":{" +
