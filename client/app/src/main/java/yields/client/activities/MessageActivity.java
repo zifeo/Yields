@@ -3,6 +3,7 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -35,6 +36,9 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Activity used to display messages for a group
+ */
 public class MessageActivity extends Activity {
     private static ClientUser mUser;
     private static Group mGroup;
@@ -44,6 +48,11 @@ public class MessageActivity extends Activity {
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
 
+    /**
+     * Starts the activity by displaying the group info and showing the most recent
+     * messages.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,16 +65,12 @@ public class MessageActivity extends Activity {
 
         /** FOR SAKE OF SPRINT PRESENTATION !!! **/
         try {
-            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email");
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        try {
+            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email", image1);
             mGroup = createFakeGroup();
         } catch (NodeException e) {
             e.printStackTrace();
         }
-        /****/
 
         mMessages = new ArrayList<>();
         mImage = null;
@@ -128,6 +133,10 @@ public class MessageActivity extends Activity {
         lv.setSelection(lv.getAdapter().getCount() - 1);
     }
 
+    /**
+     * Listener called when the user presses the picture icon.
+     * @param v The view which called this method
+     */
     public void onClickAddImage(View v){
         mSendImage = true;
         pickImageFromGallery();
@@ -154,6 +163,10 @@ public class MessageActivity extends Activity {
         lv.setSelection(lv.getAdapter().getCount() - 1);
     }
 
+    /**
+     * Starts the activity which allows the user to pick which image from his gallery
+     * he wants to send.
+     */
     private void pickImageFromGallery(){
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -161,11 +174,18 @@ public class MessageActivity extends Activity {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Sets the correct information on the header.
+     */
     private void setHeaderBar(){
         TextView groupNameField = (TextView) findViewById(R.id.groupName);
         groupNameField.setText(mGroup.getName());
     }
 
+    /**
+     * Is called once the image picking is finished. It displays a toast informing the
+     * user that he added a message to his message.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -190,8 +210,8 @@ public class MessageActivity extends Activity {
      */
     private class  MockClientUser extends ClientUser{
 
-        public MockClientUser(String name, Id id, String email) throws NodeException {
-            super(name, id, email);
+        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+            super(name, id, email, img);
         }
 
         @Override
@@ -201,7 +221,35 @@ public class MessageActivity extends Activity {
 
         @Override
         public List<Message> getGroupMessages(Group group) {
-            return new ArrayList<>();
+            ArrayList<Message> messageList =  new ArrayList<>();
+            /*
+            Message message1 = null;
+            Message message2 = null;
+            Message message3 = null;
+            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+            Bitmap image2 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.jbouron);
+            Bitmap image3 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.tstocco);
+
+
+            try {
+                User user1 = new MockClientUser("Teo Stocco", new Id(1), "lol@jpg.com", image3);
+                Content content1 = new TextContent("This app is going to be sick ! Look at how "+
+                        "fast we're making progress !");
+                message1 = new Message("lol", new Id(1), user1, content1);
+                User user2 = new MockClientUser("Nicolas Roussel", new Id(1), "lol@jpg.com", image1);
+                Content content2 = new TextContent("Well, actually I can't really work, "+
+                " because I'm not sure the app will run on any given device.");
+                message2 = new Message("lol", new Id(1), user2, content2);
+                User user3 = new MockClientUser("Justinien Bouron", new Id(1), "lol@jpg.com", image2);
+                Content content3 = new TextContent("If only we could use Jenkins :/");
+                message3 = new Message("lol", new Id(1), user3, content3);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            messageList.add(message1);
+            messageList.add(message2);
+            messageList.add(message3);*/
+            return messageList;
         }
 
         @Override

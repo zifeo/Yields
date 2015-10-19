@@ -18,10 +18,20 @@ import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageException;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Content type used for images and an associated caption.
+ */
 public class ImageContent implements Content{
+
     private Bitmap mImage;
     private String mCaption;
 
+    /**
+     * Mains constructor, builds a Content from an image and a caption.
+     * @param img The image this content contains.
+     * @param caption The caption this content contains.
+     * @throws ContentException If the image is null.
+     */
     public ImageContent(Bitmap img, String caption) throws ContentException {
         if (img == null){
             throw new ContentException("Error, passing null image to the ImageContent constructor.");
@@ -30,19 +40,36 @@ public class ImageContent implements Content{
         mCaption = new String(caption);
     }
 
+    /**
+     * Returns the caption of this Content.
+     * @return The caption of this Content.
+     */
     public String getCaption(){
         return new String(mCaption);
     }
 
+    /**
+     * Returns the image of this Content.
+     * @return The image of this Content.
+     */
     public Bitmap getImage(){
         return Bitmap.createBitmap(mImage);
     }
 
+    /**
+     * Returns a String which describes the type of the Content.
+     * @return A String which describes the type of the Content - "image".
+     */
     @Override
     public String getType() {
         return "image";
     }
 
+    /**
+     * Returns a View which displays the data this Content contains.
+     * @return A View which displays the data this Content contains.
+     * @throws ContentException If a View could not be built from the data of this Content.
+     */
     @Override
     public View getView() throws ContentException{
         WindowManager wm = (WindowManager) YieldsApplication.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);

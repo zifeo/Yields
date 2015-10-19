@@ -1,6 +1,6 @@
 package yields.client.node;
 
-import android.util.ArrayMap;
+import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,8 +19,8 @@ import yields.client.messages.Message;
 public abstract class ClientUser extends User {
     List<Group> groups;
 
-    public ClientUser(String name, Id id, String email) throws NodeException {
-        super(name, id, email);
+    public ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+        super(name, id, email,img);
         this.groups = new ArrayList<>();
     }
 

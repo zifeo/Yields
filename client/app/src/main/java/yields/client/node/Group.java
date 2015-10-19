@@ -21,8 +21,7 @@ public class Group extends Node {
 
     private void connectUser(User user) throws NodeException {
         User newUser = new User(user.getName(), user.getId(),
-                user.getEmail());
-
+                user.getEmail(), user.getImg());
         connectedUsers.add(newUser);
     }
 

@@ -1,30 +1,24 @@
 package yields.client;
 
-import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import yields.client.activities.MessageActivity;
 import yields.client.id.Id;
-import yields.client.messages.Content;
-import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -32,29 +26,35 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
-import org.junit.runner.RunWith;
-
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
+/**
+ * Tests which test the MessageActivity (display and interaction).
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
-    private static final ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user", new Id(117), "Mock email client user");
+
     private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<User>());
 
     public MessageActivityTests() {
         super(MessageActivity.class);
     }
 
+    /**
+     * Set up for the tests.
+     */
     @Before
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
         YieldsApplication.setGroup(MOCK_GROUP);
+        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+        ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user", new Id(117), "Mock email client user", image1);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
     }
 
@@ -110,7 +110,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
         ListView listView = (ListView) messageActivity.findViewById(R.id.messageScrollLayout);
-        MessageView messageView = (MessageView) listView.getChildAt(4);
+        int i = listView.getChildCount();
+        MessageView messageView = (MessageView) listView.getChildAt(i-1);
         assertEquals("Mock input message 1",
                 ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);

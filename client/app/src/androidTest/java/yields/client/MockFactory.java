@@ -1,6 +1,7 @@
 package yields.client;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,8 +19,13 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Factory used to create Mock Groups, Messages, Users, ClientUsers, Contents.
+ */
 public class MockFactory {
+
     private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
 
     public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
@@ -36,7 +42,8 @@ public class MockFactory {
         for (int i = 0; i < number; i ++){
             Content content = generateFakeTextContent(i);
             try {
-                messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "mock email"), content));
+                Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+                messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "mock email", image1), content));
             } catch (MessageException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
@@ -50,18 +57,18 @@ public class MockFactory {
         return new TextContent("Mock message #" + (i));
     }
 
-    public static User generateFakeUser(String name, Id id, String email){
+    public static User generateFakeUser(String name, Id id, String email, Bitmap img){
         try {
-            return new User(name, id, email);
+            return new User(name, id, email, img);
         } catch (NodeException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static FakeClientUser generateFakeClientUser(String name, Id id, String email){
+    public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img){
         try {
-            return new FakeClientUser(name, id, email);
+            return new FakeClientUser(name, id, email, img);
         } catch (NodeException e) {
             e.printStackTrace();
         }
@@ -93,8 +100,8 @@ public class MockFactory {
     }
 
     private static class FakeClientUser extends ClientUser {
-        public FakeClientUser(String name, Id id, String email) throws NodeException {
-            super(name, id, email);
+        public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+            super(name, id, email, img);
         }
 
         @Override

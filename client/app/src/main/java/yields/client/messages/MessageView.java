@@ -25,24 +25,43 @@ import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * A View which corresponds to a given message.
+ */
 public class MessageView extends LinearLayout{
 
     private Message mMessage;
 
+    /**
+     * Main constructor for MessageView, it constructs itself based on the information which
+     * the Message parameter contains.
+     * @param context The context of the Application.
+     * @param message The Message from which the MessageView is built.
+     * @throws MessageViewException If the message contains incorrect infromation.
+     */
     public MessageView(Context context, Message message) throws MessageViewException {
         super(context);
         if (message == null){
             throw new MessageViewException("Error, null message in MessageView constructor");
         }
         this.mMessage = message;
-        this.addView(createMessageView(message));
+        this.addView(createMessageView());
     }
 
+    /**
+     * Returns the Message from which this View was built.
+     * @return The Message from which this View was built.
+     */
     public Message getMessage(){
         return mMessage;
     }
 
-    private View createMessageView(Message message) throws MessageViewException {
+    /**
+     * Creates the view for this instance.
+     * @return The View for this instance.
+     * @throws MessageViewException If the message contains incorrect information.
+     */
+    private View createMessageView() throws MessageViewException {
         Context applicationContext = YieldsApplication.getApplicationContext();
         
         LayoutInflater vi;
@@ -51,8 +70,7 @@ public class MessageView extends LinearLayout{
 
         ImageView imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
         //TODO: Retrieve actual user picture
-        Bitmap image = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                R.drawable.userpicture);
+        Bitmap image = mMessage.getSender().getImg();
         image = getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
 
@@ -70,7 +88,7 @@ public class MessageView extends LinearLayout{
         userNameAndDateLayout.addView(username);
         TextView date = new TextView(applicationContext);
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        String time = dateFormat.format(message.getDate());
+        String time = dateFormat.format(mMessage.getDate());
         date.setText(time);
         date.setTextSize(10);
         date.setAlpha(0.6f);
@@ -83,7 +101,7 @@ public class MessageView extends LinearLayout{
 
         LinearLayout contentLayout = (LinearLayout) v.findViewById(R.id.contentfield);
         try {
-            contentLayout.addView(message.getContent().getView());
+            contentLayout.addView(mMessage.getContent().getView());
         } catch (ContentException e) {
             throw new MessageViewException("Error, couldn't create contentLayout in createMessageView()");
         }
