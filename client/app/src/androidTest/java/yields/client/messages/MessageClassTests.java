@@ -12,15 +12,10 @@ import android.widget.TextView;
 import org.junit.Before;
 import org.junit.Test;
 
-import yields.client.MockFactory;
+import yields.client.activities.MockFactory;
 import yields.client.R;
 import yields.client.activities.MessageActivity;
 import yields.client.exceptions.ContentException;
-import yields.client.id.Id;
-import yields.client.messages.ImageContent;
-import yields.client.messages.Message;
-import yields.client.messages.TextContent;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**

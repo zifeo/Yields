@@ -17,9 +17,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 
-import yields.client.MockFactory;
 import yields.client.R;
-import yields.client.activities.MessageActivity;
 import yields.client.id.Id;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
