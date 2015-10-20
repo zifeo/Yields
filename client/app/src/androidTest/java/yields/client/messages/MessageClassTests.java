@@ -1,4 +1,4 @@
-package yields.client;
+package yields.client.messages;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 import org.junit.Before;
 import org.junit.Test;
 
+import yields.client.MockFactory;
+import yields.client.R;
 import yields.client.activities.MessageActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
@@ -55,7 +57,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
      */
     @Test
     public void testImageContentHasCorrectType(){
-        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(),R.drawable.send_icon);
+        Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.send_icon);
         ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
         assertEquals("image", imageContent.getType());
     }
