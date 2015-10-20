@@ -3,7 +3,6 @@
     package="yields.client" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET" />
@@ -20,8 +19,6 @@
 
         <activity
             android:name=".activities.MessageActivity">
-            android:name=".activities.SelectUsernameActivity"
-            android:label="@string/title_activity_select_username" >
         </activity>
 
         <activity
@@ -32,6 +29,11 @@
 
                     <category android:name="android.intent.category.LAUNCHER" />
                 </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.SelectUsernameActivity"
+            android:label="@string/title_activity_select_username" >
         </activity>
 
         <activity
