@@ -10,6 +10,9 @@ import java.net.UnknownHostException;
 
 public class YieldEmulatorSocketProviderTest {
 
+    /**
+     * needs the server running
+     */
     @Test
     public void testConnectionToServer(){
         SocketProvider socketProvider;

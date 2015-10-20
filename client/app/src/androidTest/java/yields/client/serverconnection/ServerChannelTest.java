@@ -29,7 +29,7 @@ public class ServerChannelTest {
 
     private final static String SIMPLE_REQUEST = "{" +
             "\"metadata\":{" +
-            "\"sender\":\"0\"," +
+            "\"sender\":0," +
             "\"time\":0" +
             "}," +
             "\"kind\":\"PING\"," +
@@ -66,42 +66,6 @@ public class ServerChannelTest {
         } catch (JSONException e) {
             Assert.fail(e.getMessage());
         }
-    }
-
-    /**
-     * This test needs to have the local server running
-     *
-     * @throws JSONException
-     */
-    @Test
-    public void testActualServerConnection() throws JSONException{
-        Request simpleRequest = RequestBuilder.simpleRequest("test");
-
-        CommunicationChannel channel;
-
-        try {
-            channel = new ConnectionManager(
-                    new YieldEmulatorSocketProvider())
-                    .getCommunicationChannel();
-        } catch (UnknownHostException e) {
-            Assert.fail(e.getMessage());
-            return;
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-            return;
-        }
-
-        Response response;
-        try {
-            response = channel.sendRequest(simpleRequest);
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-            return;
-        }
-
-        Assert.assertEquals("Response is wrong",
-                response.rawResponse(),
-                SIMPLE_REQUEST + " was server answered !");
     }
 
     @Test
