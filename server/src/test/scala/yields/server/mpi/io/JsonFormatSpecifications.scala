@@ -1,40 +1,53 @@
 package yields.server.mpi.io
 
+import org.scalacheck.{Prop, Properties}
 import spray.json._
+import yields.server.mpi.exceptions.SerializationMessageException
+import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
+import yields.server.mpi.Message
+import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
 
-import org.scalacheck.Prop.forAll
-import org.scalacheck.{Arbitrary, Properties}
-import yields.server.mpi.{UserUpdate, GroupMessage}
+object JsonFormatSpecifications extends Properties("CustomJsonFormat") with MessageGenerators {
 
-object JsonFormatSpecifications extends Properties("CustomJsonFormat") {
-
-  import Arbitrary.arbitrary
-
-  implicit val groupMessageArb = Arbitrary {
-    for {
-      gid <- arbitrary[Long]
-      context <- arbitrary[String]
-    } yield GroupMessage(gid, context)
-  }
-
-  implicit val userUpdateArb = Arbitrary {
-    for {
-      uid <- arbitrary[Long]
-      email <- arbitrary[Option[String]]
-      name <- arbitrary[Option[String]]
-      if email.isDefined || name.isDefined
-    } yield UserUpdate(uid, email, name, None)
-  }
+  import Prop.forAll
 
   def toAndFromJson[T: JsonWriter: JsonReader](elem: T): T =
     elem.toJson.toString().parseJson.convertTo[T]
 
-  property("GroupMessage") = forAll { (gm: GroupMessage) =>
-    toAndFromJson(gm) == gm
+  property("GroupCreate") = forAll { (x: GroupCreate) =>
+    toAndFromJson(x) == x
   }
 
-  property("UserUpdate") = forAll { (uu: UserUpdate) =>
-    toAndFromJson(uu) == uu
+  property("GroupUpdate") = forAll { (x: GroupUpdate) =>
+    toAndFromJson(x) == x
+  }
+
+  property("GroupMessage") = forAll { (x: GroupMessage) =>
+    toAndFromJson(x) == x
+  }
+
+  property("GroupHistory") = forAll { (x: GroupHistory) =>
+    toAndFromJson(x) == x
+  }
+
+  property("UserConnect") = forAll { (x: UserConnect) =>
+    toAndFromJson(x) == x
+  }
+
+  property("UserUpdate") = forAll { (x: UserUpdate) =>
+    toAndFromJson(x) == x
+  }
+
+  property("UserGroupList") = forAll { (x: UserGroupList) =>
+    toAndFromJson(x) == x
+  }
+
+  property("SerializationMessageException") = forAll { (x: SerializationMessageException) =>
+    toAndFromJson(x) == x
+  }
+
+  property("Message") = forAll { (x: Message) =>
+    toAndFromJson(x) == x
   }
 
 }
