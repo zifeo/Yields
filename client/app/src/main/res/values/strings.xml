@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Yields</string>
+    <string name="title_activity_message">MessageActivity</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="inputMessageFieldHintString">Enter your message</string>
+    <string name="sendButtonString">Send</string>
 </resources>
