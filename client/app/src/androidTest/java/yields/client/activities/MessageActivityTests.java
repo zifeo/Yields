@@ -1,4 +1,4 @@
-package yields.client;
+package yields.client.activities;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 
-import yields.client.activities.MessageActivity;
+import yields.client.R;
 import yields.client.id.Id;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;

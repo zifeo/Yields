@@ -1,4 +1,4 @@
-package yields.client;
+package yields.client.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import yields.client.R;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
