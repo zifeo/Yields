@@ -32,6 +32,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -232,6 +233,6 @@ public class MessageActivity extends Activity {
      * @return fake group.
      */
     private Group createFakeGroup() throws NodeException {
-        return new Group("Mock group", new Id(123), new ArrayList<User>());
+        return new Group("Mock group", new Id(123), new ArrayList<Node>());
     }
 }
