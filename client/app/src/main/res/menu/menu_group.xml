@@ -1,0 +1,35 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context="yields.client.activities.GroupActivity">
+
+
+
+    <item android:id="@+id/action_entourage"
+        android:icon="@drawable/ic_group_black_24dp"
+        android:title="@string/entourage"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+    />
+
+    <item android:id="@+id/action_discover"
+        android:icon="@drawable/ic_explore_black_24dp"
+        android:title="@string/discover"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+        />
+
+    <item android:id="@+id/action_create"
+        android:icon="@drawable/ic_add_black_24dp"
+        android:title="@string/createGroup"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+        />
+
+    <item android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/settings"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+        />
+</menu>

@@ -16,7 +16,7 @@ public class Group extends Node {
     private Bitmap mImage;
     private List<Message> mCurrentMessages; // not all the messages the group has ever sent, just
                                             // the ones that are currently in the listView
-    
+
 
     /** Constructor for groups
      *

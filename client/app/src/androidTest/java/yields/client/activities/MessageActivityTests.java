@@ -23,6 +23,7 @@ import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -38,7 +39,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 @LargeTest
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<User>());
+    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Node>());
 
     public MessageActivityTests() {
         super(MessageActivity.class);
