@@ -19,6 +19,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -29,9 +30,9 @@ public class MockFactory {
 
     private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
 
-    public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
+    public static Group createMockGroup(String name, Id id, List<Node> nodes){
         try {
-            return new Group(name, id, connectedUsers);
+            return new Group(name, id, nodes);
         } catch (NodeException e) {
             e.printStackTrace();
         }
