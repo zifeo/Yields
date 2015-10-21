@@ -6,19 +6,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
-    private Socket socket;
+    private Socket mSocket;
 
     public ConnectionManager(SocketProvider socketProvider) throws IOException{
-        socket = socketProvider.getConnection();
+        mSocket = socketProvider.getConnection();
     }
 
     @Override
     public boolean working(){
-        return socket.isConnected();
+        return mSocket.isConnected();
     }
 
     @Override
@@ -26,10 +25,10 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
         PrintWriter sender = new PrintWriter(
                 new BufferedWriter(
                         new OutputStreamWriter(
-                                socket.getOutputStream())), true);
+                                mSocket.getOutputStream())), true);
 
         BufferedReader receiver = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
+                new InputStreamReader(mSocket.getInputStream()));
 
         return new ServerChannel(sender, receiver, this);
     }
@@ -41,6 +40,6 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
 
     @Override
     public void close() throws IOException {
-        socket.close();
+        mSocket.close();
     }
 }

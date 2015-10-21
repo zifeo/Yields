@@ -16,15 +16,15 @@ import java.net.UnknownHostException;
 public class YieldEmulatorSocketProvider implements SocketProvider {
     private final static int DST_PORT = 7777;
     private final static String LOCAL_ADDRESS = "10.0.2.2";
-    private final InetAddress dstAddress;
+    private final InetAddress mDstAddress;
 
     public YieldEmulatorSocketProvider() throws UnknownHostException{
-        this.dstAddress = InetAddress.getByName(LOCAL_ADDRESS);
+        this.mDstAddress = InetAddress.getByName(LOCAL_ADDRESS);
     }
 
     public Socket getConnection() throws IOException {
 
-        Socket socket = new Socket(dstAddress, DST_PORT);
+        Socket socket = new Socket(mDstAddress, DST_PORT);
         return socket;
     }
 }
