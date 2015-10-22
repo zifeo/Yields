@@ -27,9 +27,7 @@ public class Message extends Node{
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, User sender, Content content)
-            throws MessageException, NodeException
-    {
+    public Message(String nodeName, Id nodeID, User sender, Content content) {
         super(nodeName, nodeID);
         Objects.requireNonNull(sender);
         Objects.requireNonNull(content);

@@ -1,5 +1,7 @@
 package yields.client.id;
 
+import java.util.Objects;
+
 /**
  * Id used in the App.
  */
@@ -18,6 +20,6 @@ public class Id implements IdInterface<Long> {
 
     @Override
     public boolean equals(IdInterface<Long> other) {
-        return mId.equals(other.getId());
+        return Objects.equals(mId, other);
     }
 }

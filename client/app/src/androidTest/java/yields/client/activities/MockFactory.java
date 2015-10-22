@@ -91,7 +91,7 @@ public class MockFactory {
         }
 
         @Override
-        public Map<User, String> getHistory(Date from) {
+        public Map<User, String> getHistory(Group group, Date from) {
             return null;
         }
     }

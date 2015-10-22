@@ -3,9 +3,11 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 
 import android.widget.ListView;
@@ -14,19 +16,23 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
+import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
-import yields.client.listadapter.ListAdapter;
+import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -36,7 +42,7 @@ public class MessageActivity extends Activity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
-    private static ListAdapter mAdapter;
+    private static ListAdapterMessages mAdapter;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
@@ -53,16 +59,24 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+        /*mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();*/
 
+        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
+        try {
+            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email", image1);
+            mGroup = createFakeGroup();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
 
         mMessages = new ArrayList<>();
         mImage = null;
         mSendImage = false;
 
 
-        mAdapter = new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
+        mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
                 mMessages);
         ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
         listView.setAdapter(mAdapter);
@@ -170,9 +184,52 @@ public class MessageActivity extends Activity {
                 Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
                 toast.show();
             } catch (IOException e) {
-                e.printStackTrace();
-
+                Log.d("Message Activity", "Couldn't add image to the message");
             }
         }
+    }
+
+    /**
+     * Mock Client user, only for presentation during the second sprint.
+     */
+    private class  MockClientUser extends ClientUser{
+
+        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+            super(name, id, email, img);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message) {
+            /* Nothing */
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group) {
+            ArrayList<Message> messageList =  new ArrayList<>();
+            return messageList;
+        }
+
+        @Override
+        public void addNewGroup(Group group) {
+            /* Nothing */
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+            /* Nothing */
+        }
+
+        @Override
+        public Map<User, String> getHistory(Group group, Date from) {
+            return null;
+        }
+    }
+
+    /**
+     * Create fake group for sake of the presentation.
+     * @return fake group.
+     */
+    private Group createFakeGroup() throws NodeException {
+        return new Group("Mock group", new Id(123), new ArrayList<User>());
     }
 }

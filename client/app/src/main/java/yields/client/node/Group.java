@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
@@ -11,11 +12,9 @@ import yields.client.id.Id;
 public class Group extends Node {
     private List<User> connectedUsers;
 
-    public Group(String name, Id id, List<User> connectedUsers) throws NodeException {
+    public Group(String name, Id id, List<User> connectedUsers){
         super(name, id);
-        if (connectedUsers == null){
-            throw new NodeException("Error, null list in Group constructor");
-        }
+        Objects.requireNonNull(connectedUsers);
         this.connectedUsers = new ArrayList<>(connectedUsers);
     }
 

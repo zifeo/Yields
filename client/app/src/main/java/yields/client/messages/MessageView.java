@@ -119,7 +119,7 @@ public class MessageView extends LinearLayout{
     private static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter)
     {
         if (inputImage.getWidth() != inputImage.getHeight()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Image should be squared.");
         }
 
         Bitmap scaledInputImage;
