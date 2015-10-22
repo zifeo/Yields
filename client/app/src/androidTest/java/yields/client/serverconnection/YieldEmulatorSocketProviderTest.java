@@ -19,23 +19,9 @@ public class YieldEmulatorSocketProviderTest {
 
         try {
             socketProvider = new YieldEmulatorSocketProvider();
-        } catch (UnknownHostException e) {
-            Assert.fail(e.getMessage());
-            return;
-        }
-
-        Socket socket;
-
-        try {
+            Socket socket;
             socket = socketProvider.getConnection();
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-            return;
-        }
-
-        Assert.assertTrue(socket.isConnected());
-
-        try {
+            Assert.assertTrue(socket.isConnected());
             socket.close();
         } catch (IOException e) {
             Assert.fail(e.getMessage());

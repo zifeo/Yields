@@ -50,20 +50,13 @@ public class ServerChannelTest {
         ServerChannel channel = new ServerChannel(toWriter(output),
                 toReade(input), simpleStatus(true));
 
-        Response response;
-        try {
-            response = channel.sendRequest(simpleRequest);
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-            return;
-        }
-
-        Assert.assertEquals(SIMPLE_REQUEST, output.toString());
 
         try {
+            Response response = channel.sendRequest(simpleRequest);
+            Assert.assertEquals(SIMPLE_REQUEST, output.toString());
             Assert.assertEquals("Response is wrong",
                     response.object().toString(), FAKE_RESPONSE);
-        } catch (JSONException e) {
+        } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
     }

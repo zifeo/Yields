@@ -6,9 +6,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
@@ -23,6 +27,9 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
 
+    /* String used for debug log */
+    private static final String TAG = "GoogleLoginActivity";
+
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
 
@@ -32,12 +39,15 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     /* Should we automatically resolve ConnectionResults when possible? */
     private boolean mShouldResolve = false;
 
+    private SignInButton mGoogleSingInButton;
+    private Button mButtonCancelGoogleConnection;
+    private ProgressBar mProgressBarGoogleConnection;
+    private TextView mTextViewGoogleConnecting;
+
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.sign_in_button) {
-            onSignInClicked();
-        }
+        onSignInClicked();
     }
 
     @Override
@@ -54,7 +64,14 @@ public class GoogleLoginActivity extends AppCompatActivity implements
                 .addScope(new Scope(Scopes.EMAIL))
                 .build();
 
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        mGoogleSingInButton = (SignInButton) findViewById(R.id.googleSignInButton);
+        mButtonCancelGoogleConnection = (Button) findViewById(R.id.buttonCancelGoogleConnection);
+        mProgressBarGoogleConnection = (ProgressBar) findViewById(R.id.progressBarGoogleConnection);
+        mTextViewGoogleConnecting = (TextView) findViewById(R.id.textViewGoogleConnecting);
+
+        // Cannot use the xml file :
+        // https://developers.google.com/android/reference/com/google/android/gms/common/SignInButton
+        mGoogleSingInButton.setOnClickListener(this);
     }
 
     @Override
@@ -81,7 +98,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         // onConnected indicates that an account was selected on the device, that the selected
         // account has granted any requested permissions to our app and that we were able to
         // establish a service connection to Google Play services.
-        Log.d("Login log", "onConnected:" + bundle);
+        Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
         Intent intent = new Intent(this, SelectUsernameActivity.class);
@@ -89,7 +106,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onConnectionSuspended(int i) {
+    public void onConnectionSuspended(int unused) {
         // The connection to Google Play services was lost. The GoogleApiClient will automatically
         // attempt to re-connect. Any UI elements that depend on connection to Google APIs should
         // be hidden or disabled until onConnected is called again.
@@ -102,7 +119,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         // Could not connect to Google Play Services.  The user needs to select an account,
         // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
         // ConnectionResult to see possible error codes.
-        Log.d("Login error", "onConnectionFailed:" + connectionResult);
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
 
         if (!mIsResolving && mShouldResolve) {
             if (connectionResult.hasResolution()) {
@@ -110,7 +127,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
                     connectionResult.startResolutionForResult(this, RC_SIGN_IN);
                     mIsResolving = true;
                 } catch (IntentSender.SendIntentException e) {
-                    Log.e("Login error", "Could not resolve ConnectionResult.", e);
+                    Log.e(TAG, "Could not resolve ConnectionResult.", e);
                     mIsResolving = false;
                     connect();
                 }
@@ -128,7 +145,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Login log", "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
+        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
 
         if (requestCode == RC_SIGN_IN) {
             // If the error resolution was not successful we should not resolve further.
@@ -143,19 +160,19 @@ public class GoogleLoginActivity extends AppCompatActivity implements
 
 
     private void connect(){
-        findViewById(R.id.sign_in_button).setVisibility(View.INVISIBLE);
-        findViewById(R.id.textViewGoogleConnecting).setVisibility(View.VISIBLE);
-        findViewById(R.id.buttonCancelGoogleConnection).setVisibility(View.VISIBLE);
-        findViewById(R.id.progressBarGoogleConnection).setVisibility(View.VISIBLE);
+        mGoogleSingInButton.setVisibility(View.INVISIBLE);
+        mTextViewGoogleConnecting.setVisibility(View.VISIBLE);
+        mButtonCancelGoogleConnection.setVisibility(View.VISIBLE);
+        mProgressBarGoogleConnection.setVisibility(View.VISIBLE);
 
         mGoogleApiClient.connect();
     }
 
     private void disconnect(){
-        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-        findViewById(R.id.textViewGoogleConnecting).setVisibility(View.INVISIBLE);
-        findViewById(R.id.buttonCancelGoogleConnection).setVisibility(View.INVISIBLE);
-        findViewById(R.id.progressBarGoogleConnection).setVisibility(View.INVISIBLE);
+        mGoogleSingInButton.setVisibility(View.VISIBLE);
+        mTextViewGoogleConnecting.setVisibility(View.INVISIBLE);
+        mButtonCancelGoogleConnection.setVisibility(View.INVISIBLE);
+        mProgressBarGoogleConnection.setVisibility(View.INVISIBLE);
 
         mGoogleApiClient.disconnect();
     }
