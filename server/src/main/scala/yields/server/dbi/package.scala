@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 package object dbi {
   val uri = "remote:192.168.99.100:2424/orientdb"
 
-  lazy implicit val database: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "test")
+  lazy implicit val database: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "AEB2F0FCA414B253A76E235E96856BA436A00E2654B07825867B11060016011D")
   database.getEntityManager.registerEntityClasses("yields.server.models")
 
   def queryBySql[T](sql: String, params: AnyRef*)(implicit db: OObjectDatabaseTx): List[T] = {
@@ -17,31 +17,4 @@ package object dbi {
     val results: java.util.List[T] = db.query(new OSQLSynchQuery[T](sql), params4java: _*)
     results.asScala.toList
   }
-
-  // implicit val dbInstance = {
-  /* def executeAsync(osql: String, params: Map[String, String] = Map()): Future[List[ODocument]] = {
-      import scala.concurrent._
-      val p = promise[List[ODocument]]
-      val f = p.future
-      val req: OCommandRequest = database.command(
-        new OSQLAsynchQuery[ODocument]("select * from animal where name = 'Gipsy'",
-          new OCommandResultListener() {
-            var acc = List[ODocument]()
-
-            @Override
-            def result(iRecord: Any): Boolean = {
-              val doc = iRecord.asInstanceOf[ODocument]
-              acc = doc :: acc
-              true
-            }
-
-            @Override
-            def end() {
-              p.success(acc)
-            }
-          }))
-      req.execute()
-      f
-    } */
-  // }
 }
