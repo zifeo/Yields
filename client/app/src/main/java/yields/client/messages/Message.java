@@ -29,10 +29,8 @@ public class Message extends Node{
      */
     public Message(String nodeName, Id nodeID, User sender, Content content) {
         super(nodeName, nodeID);
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(content);
-        this.mSender = sender;
-        this.mContent = content;
+        this.mSender = Objects.requireNonNull(sender);
+        this.mContent = Objects.requireNonNull(content);
         this.mDate = new java.util.Date();
     }
 
