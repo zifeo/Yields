@@ -35,7 +35,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
  * Tests which test the MessageActivity (display and interaction).
  */
 @RunWith(AndroidJUnit4.class)
-@LargeTest
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
     private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<User>());
