@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ public class MessageActivity extends Activity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
+    private static EditText mInputField;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -80,6 +82,8 @@ public class MessageActivity extends Activity {
         ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
         listView.setAdapter(mAdapter);
 
+        mInputField = (EditText) findViewById(R.id.inputMessageField);
+
         if(mUser == null || mGroup == null) {
             int duration = Toast.LENGTH_SHORT;
             TextView groupName = (TextView) findViewById(R.id.groupName);
@@ -96,10 +100,9 @@ public class MessageActivity extends Activity {
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v) throws MessageActivityException {
-        TextView inputField = (TextView) findViewById(R.id.inputMessageField);
-        String inputMessage =  inputField.getText().toString();
+        String inputMessage =  mInputField.getText().toString();
 
-        inputField.setText("");
+        mInputField.setText("");
         Content content;
         if (mSendImage){
             content = new ImageContent(mImage, inputMessage);
