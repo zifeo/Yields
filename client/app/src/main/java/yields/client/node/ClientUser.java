@@ -32,7 +32,7 @@ public abstract class ClientUser extends User {
 
     public abstract void deleteGroup(Group group);
 
-    public abstract Map<User, String> getHistory(Date from);
+    public abstract Map<User, String> getHistory(Group group, Date from);
 
     public List<Group> getGroups() {
         return Collections.unmodifiableList(groups);

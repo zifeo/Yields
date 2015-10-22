@@ -23,7 +23,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final TextContent MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
+    private static final TextContent MOCK_TEXT_CONTENT_1 = MockFactory.generateFakeTextContent("Mock text.");
 
     public MessageClassTests() {
         super(MessageActivity.class);

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,7 +24,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final TextContent MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
+    private static final TextContent MOCK_TEXT_CONTENT_1 = MockFactory.generateFakeTextContent("Mock text.");
 
     public MessageClassTests() {
         super(MessageActivity.class);

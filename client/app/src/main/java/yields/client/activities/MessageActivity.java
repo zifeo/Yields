@@ -7,8 +7,9 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
-
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,13 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import yields.client.R;
-import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
-import yields.client.listadapter.ListAdapter;
+import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
@@ -43,10 +42,11 @@ public class MessageActivity extends Activity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
-    private static ListAdapter mAdapter;
+    private static ListAdapterMessages mAdapter;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
+    private static EditText mInputField;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -77,10 +77,12 @@ public class MessageActivity extends Activity {
         mSendImage = false;
 
 
-        mAdapter = new ListAdapter(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
+        mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
                 mMessages);
         ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
         listView.setAdapter(mAdapter);
+
+        mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
             int duration = Toast.LENGTH_SHORT;
@@ -98,33 +100,18 @@ public class MessageActivity extends Activity {
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v) throws MessageActivityException {
-        TextView inputField = (TextView) findViewById(R.id.inputMessageField);
-        String inputMessage =  inputField.getText().toString();
+        String inputMessage =  mInputField.getText().toString();
 
-        inputField.setText("");
+        mInputField.setText("");
         Content content;
         if (mSendImage){
-            if (mImage == null){
-                throw new MessageActivityException("Error, attempting to send a null image.");
-            }
-            try {
-                content = new ImageContent(mImage, inputMessage);
-            } catch (ContentException e) {
-                throw new MessageActivityException("Error im message activity, couldn't create ImageContent.");
-            }
+            content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
         }
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = null;
-        try {
-            message = new Message("message", new Id(1230), mUser, content);
-        } catch (MessageException e) {
-            throw new MessageActivityException("Error in message activity, couldn't create message");
-        } catch (NodeException e) {
-            throw new MessageActivityException("Error in message activity, couldn't create message");
-        }
+        Message message = new Message("message", new Id(1230), mUser, content);
         // TODO : take right name and right id.
         mMessages.add(message);
         //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
@@ -199,8 +186,7 @@ public class MessageActivity extends Activity {
                 Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
                 toast.show();
             } catch (IOException e) {
-                e.printStackTrace();
-
+                Log.d("Message Activity", "Couldn't add image to the message");
             }
         }
     }
@@ -222,33 +208,6 @@ public class MessageActivity extends Activity {
         @Override
         public List<Message> getGroupMessages(Group group) {
             ArrayList<Message> messageList =  new ArrayList<>();
-            /*
-            Message message1 = null;
-            Message message2 = null;
-            Message message3 = null;
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            Bitmap image2 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.jbouron);
-            Bitmap image3 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.tstocco);
-
-
-            try {
-                User user1 = new MockClientUser("Teo Stocco", new Id(1), "lol@jpg.com", image3);
-                Content content1 = new TextContent("This app is going to be sick ! Look at how "+
-                        "fast we're making progress !");
-                message1 = new Message("lol", new Id(1), user1, content1);
-                User user2 = new MockClientUser("Nicolas Roussel", new Id(1), "lol@jpg.com", image1);
-                Content content2 = new TextContent("Well, actually I can't really work, "+
-                " because I'm not sure the app will run on any given device.");
-                message2 = new Message("lol", new Id(1), user2, content2);
-                User user3 = new MockClientUser("Justinien Bouron", new Id(1), "lol@jpg.com", image2);
-                Content content3 = new TextContent("If only we could use Jenkins :/");
-                message3 = new Message("lol", new Id(1), user3, content3);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            messageList.add(message1);
-            messageList.add(message2);
-            messageList.add(message3);*/
             return messageList;
         }
 
@@ -263,7 +222,7 @@ public class MessageActivity extends Activity {
         }
 
         @Override
-        public Map<User, String> getHistory(Date from) {
+        public Map<User, String> getHistory(Group group, Date from) {
             return null;
         }
     }

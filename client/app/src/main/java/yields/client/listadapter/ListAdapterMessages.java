@@ -1,6 +1,7 @@
 package yields.client.listadapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -15,7 +16,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Adapter used for a ListView which allows it to display MessageViews as items.
  */
-public class ListAdapter extends ArrayAdapter<Message> {
+public class ListAdapterMessages extends ArrayAdapter<Message> {
 
     /**
      * Mains constructor, creates a ListAdapter from the Application's context,
@@ -24,7 +25,7 @@ public class ListAdapter extends ArrayAdapter<Message> {
      * @param resource The resource id for the ListView.
      * @param messages The List of Messages that will be displayed on the ListView.
      */
-    public ListAdapter(Context context, int resource, List<Message> messages) {
+    public ListAdapterMessages(Context context, int resource, List<Message> messages) {
         super(context, resource, messages);
     }
 
@@ -42,7 +43,7 @@ public class ListAdapter extends ArrayAdapter<Message> {
         try {
             messageView = new MessageView(YieldsApplication.getApplicationContext(), message);
         } catch (MessageViewException e) {
-            e.printStackTrace();
+            Log.d("ListAdapterMessages", "Couldn't add view to message list");
         }
         return messageView;
     }

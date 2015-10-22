@@ -35,9 +35,9 @@ public class RequestBuilder {
         public String getValue() { return name; }
     }
 
-    private final MessageKind kind;
-    private final Id sender;
-    private final Map<String, Object> constructingMap;
+    private final MessageKind mKind;
+    private final Id mSender;
+    private final Map<String, Object> mConstructingMap;
 
     public static Request UserUpdateRequest(Id sender, Map<Fields, String> args) {
         RequestBuilder builder = new RequestBuilder(
@@ -204,38 +204,38 @@ public class RequestBuilder {
     }
 
     private RequestBuilder(MessageKind kind, Id sender){
-        this.kind = kind;
-        this.sender = sender;
-        this.constructingMap = new ArrayMap<>();
+        this.mKind = kind;
+        this.mSender = sender;
+        this.mConstructingMap = new ArrayMap<>();
     }
 
     private void addField(Fields fieldType, String field) {
-        this.constructingMap.put(fieldType.getValue(), field);
+        this.mConstructingMap.put(fieldType.getValue(), field);
     }
 
     private void addField(Fields fieldType, List field) {
-        this.constructingMap.put(fieldType.getValue(), new JSONArray(field));
+        this.mConstructingMap.put(fieldType.getValue(), new JSONArray(field));
     }
 
     private void addField(Fields fieldType, Id field) {
-        this.constructingMap.put(fieldType.getValue(), field.getId());
+        this.mConstructingMap.put(fieldType.getValue(), field.getId());
     }
 
     private void addField(Fields fieldType, Date field) {
-        this.constructingMap.put(fieldType.getValue(), field.toString());
+        this.mConstructingMap.put(fieldType.getValue(), field.toString());
     }
 
     private Request request() {
         Map<String, Object> request = new ArrayMap<>();
-        request.put("kind", this.kind.name);
+        request.put("kind", mKind.name);
 
         Map<String, Object> metadata = new ArrayMap<>();
-        metadata.put("sender", sender.getId());
+        metadata.put("sender", mSender.getId());
         metadata.put("time", 0);
 
         request.put("metadata", new JSONObject(metadata));
 
-        request.put("message", new JSONObject(constructingMap));
+        request.put("message", new JSONObject(mConstructingMap));
 
         return new Request(new JSONObject(request));
     }

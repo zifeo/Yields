@@ -3,7 +3,7 @@ package yields.client.exceptions;
 /**
  * Exception class thrown by MessageView.
  */
-public class MessageViewException extends Exception{
+public class MessageViewException extends RuntimeException{
 
     public MessageViewException(){
         super();

@@ -3,13 +3,13 @@ package yields.client.serverconnection;
 import org.json.JSONObject;
 
 public class Request{
-    JSONObject request;
+    private JSONObject mRequest;
 
     public Request(JSONObject request){
-        this.request = request;
+        this.mRequest = request;
     }
 
     public String message() {
-        return request.toString();
+        return mRequest.toString();
     }
 }

@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Objects;
+
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageException;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -33,9 +35,7 @@ public class ImageContent implements Content{
      * @throws ContentException If the image is null.
      */
     public ImageContent(Bitmap img, String caption) throws ContentException {
-        if (img == null){
-            throw new ContentException("Error, passing null image to the ImageContent constructor.");
-        }
+        Objects.requireNonNull(img);
         mImage = Bitmap.createBitmap(img);
         mCaption = new String(caption);
     }

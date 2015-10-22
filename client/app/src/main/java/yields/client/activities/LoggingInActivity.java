@@ -1,9 +1,8 @@
 package yields.client.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 import yields.client.R;
 
@@ -21,8 +20,6 @@ public class LoggingInActivity extends AppCompatActivity {
 
     // Method called by clientUser when the server indicates that the account already exists
     public void goToGroupActivity(){
-        Log.i("Debug", "Kapoue");
-
         Intent intent = new Intent(this, GroupActivity.class);
         startActivity(intent);
     }

@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import yields.client.R;
-import yields.client.exceptions.ContentException;
-import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
@@ -30,59 +28,33 @@ public class MockFactory {
     private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
 
     public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
-        try {
-            return new Group(name, id, connectedUsers);
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return new Group(name, id, connectedUsers);
     }
 
     public static List<Message> generateMockMessages(int number){
         ArrayList<Message> messages = new ArrayList<>();
         for (int i = 0; i < number; i ++){
             Content content = generateFakeTextContent(i);
-            try {
-                Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-                messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "mock email", image1), content));
-            } catch (MessageException e) {
-                e.printStackTrace();
-            } catch (NodeException e) {
-                e.printStackTrace();
-            }
+            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+            messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "mock email", image1), content));
         }
         return messages;
     }
 
-    public static Content generateFakeTextContent(int i){
+    public static TextContent generateFakeTextContent(int i){
         return new TextContent("Mock message #" + (i));
     }
 
     public static User generateFakeUser(String name, Id id, String email, Bitmap img){
-        try {
             return new User(name, id, email, img);
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img){
-        try {
             return new FakeClientUser(name, id, email, img);
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static ImageContent generateFakeImageContent(Bitmap img, String caption){
-        try {
             return new ImageContent(img, caption);
-        } catch (ContentException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static TextContent generateFakeTextContent(String text){
@@ -90,14 +62,7 @@ public class MockFactory {
     }
 
     public static Message generateMockMessage(String nodeName, Id nodeID, User sender, Content content){
-        try {
             return new Message(nodeName, nodeID, sender, content);
-        } catch (MessageException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private static class FakeClientUser extends ClientUser {
@@ -126,7 +91,7 @@ public class MockFactory {
         }
 
         @Override
-        public Map<User, String> getHistory(Date from) {
+        public Map<User, String> getHistory(Group group, Date from) {
             return null;
         }
     }
