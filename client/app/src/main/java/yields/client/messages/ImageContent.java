@@ -35,7 +35,7 @@ public class ImageContent implements Content{
      * @throws ContentException If the image is null.
      */
     public ImageContent(Bitmap img, String caption) throws ContentException {
-        Objects.requireNonNull(mImage);
+        Objects.requireNonNull(img);
         mImage = Bitmap.createBitmap(img);
         mCaption = new String(caption);
     }
