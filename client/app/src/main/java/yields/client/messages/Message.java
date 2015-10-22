@@ -1,5 +1,7 @@
 package yields.client.messages;
 
+import java.util.Objects;
+
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
@@ -29,17 +31,11 @@ public class Message extends Node{
             throws MessageException, NodeException
     {
         super(nodeName, nodeID);
-        if (sender == null){
-            throw new MessageException("Error, null sender in Message constructor");
-        }
-        else if (content == null){
-            throw new MessageException("Error, null content in Message constructor");
-        }
-        else {
-            this.mSender = sender;
-            this.mContent = content;
-            this.mDate = new java.util.Date();
-        }
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(content);
+        this.mSender = sender;
+        this.mContent = content;
+        this.mDate = new java.util.Date();
     }
 
     /**

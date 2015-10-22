@@ -3,7 +3,6 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,15 +14,10 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
-import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.MessageException;
-import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
 import yields.client.listadapter.ListAdapter;
@@ -33,7 +27,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -60,17 +53,9 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
 
-        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
-        try {
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email", image1);
-            mGroup = createFakeGroup();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
 
         mMessages = new ArrayList<>();
         mImage = null;
@@ -104,27 +89,13 @@ public class MessageActivity extends Activity {
         inputField.setText("");
         Content content;
         if (mSendImage){
-            if (mImage == null){
-                throw new MessageActivityException("Error, attempting to send a null image.");
-            }
-            try {
-                content = new ImageContent(mImage, inputMessage);
-            } catch (ContentException e) {
-                throw new MessageActivityException("Error im message activity, couldn't create ImageContent.");
-            }
+            content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
         }
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = null;
-        try {
-            message = new Message("message", new Id(1230), mUser, content);
-        } catch (MessageException e) {
-            throw new MessageActivityException("Error in message activity, couldn't create message");
-        } catch (NodeException e) {
-            throw new MessageActivityException("Error in message activity, couldn't create message");
-        }
+        Message message = new Message("message", new Id(1230), mUser, content);
         // TODO : take right name and right id.
         mMessages.add(message);
         //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
@@ -203,76 +174,5 @@ public class MessageActivity extends Activity {
 
             }
         }
-    }
-
-    /**
-     * Mock Client user, only for presentation during the second sprint.
-     */
-    private class  MockClientUser extends ClientUser{
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
-        }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group) {
-            ArrayList<Message> messageList =  new ArrayList<>();
-            /*
-            Message message1 = null;
-            Message message2 = null;
-            Message message3 = null;
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            Bitmap image2 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.jbouron);
-            Bitmap image3 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.tstocco);
-
-
-            try {
-                User user1 = new MockClientUser("Teo Stocco", new Id(1), "lol@jpg.com", image3);
-                Content content1 = new TextContent("This app is going to be sick ! Look at how "+
-                        "fast we're making progress !");
-                message1 = new Message("lol", new Id(1), user1, content1);
-                User user2 = new MockClientUser("Nicolas Roussel", new Id(1), "lol@jpg.com", image1);
-                Content content2 = new TextContent("Well, actually I can't really work, "+
-                " because I'm not sure the app will run on any given device.");
-                message2 = new Message("lol", new Id(1), user2, content2);
-                User user3 = new MockClientUser("Justinien Bouron", new Id(1), "lol@jpg.com", image2);
-                Content content3 = new TextContent("If only we could use Jenkins :/");
-                message3 = new Message("lol", new Id(1), user3, content3);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            messageList.add(message1);
-            messageList.add(message2);
-            messageList.add(message3);*/
-            return messageList;
-        }
-
-        @Override
-        public void addNewGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * Create fake group for sake of the presentation.
-     * @return fake group.
-     */
-    private Group createFakeGroup() throws NodeException {
-        return new Group("Mock group", new Id(123), new ArrayList<User>());
     }
 }

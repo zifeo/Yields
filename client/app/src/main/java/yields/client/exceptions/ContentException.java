@@ -3,7 +3,7 @@ package yields.client.exceptions;
 /**
  * Exception class thrown by Content interface.
  */
-public class ContentException extends Exception {
+public class ContentException extends RuntimeException {
 
     public ContentException(){
         super();

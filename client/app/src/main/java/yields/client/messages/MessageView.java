@@ -110,15 +110,13 @@ public class MessageView extends LinearLayout{
 
 
     /**
-     *  Computes a circle shaped {@code Bitmap} image of the one passed as an argument.
+     *  Computes a circle shaped {@code Bitmap} image of the one passed as an argument (must be a square).
      *  The input image must have a square shape.
      * @param inputImage The image that is corped in a circle shape manner.
      * @param diameter The diameter of the the new image.
      * @return  A {@code Bitmap} image which has a circle shape.
-     * @throws IllegalArgumentException If the inputImage does not have the same width as height.
      */
     private static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter)
-            throws  IllegalArgumentException
     {
         if (inputImage.getWidth() != inputImage.getHeight()) {
             throw new IllegalArgumentException();

@@ -3,7 +3,7 @@ package yields.client.exceptions;
 /**
  * Exception class thrown by Nodes.
  */
-public class NodeException extends Exception {
+public class NodeException extends RuntimeException {
 
     public NodeException(){
         super();
