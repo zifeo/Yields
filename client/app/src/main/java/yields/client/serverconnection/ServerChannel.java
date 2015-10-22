@@ -3,6 +3,7 @@ package yields.client.serverconnection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Objects;
 
 public class ServerChannel implements CommunicationChannel {
     private PrintWriter mSender;
@@ -21,9 +22,8 @@ public class ServerChannel implements CommunicationChannel {
     public Response sendRequest(Request request)
             throws IOException {
 
-        if (request == null) {
-            throw new IllegalArgumentException();
-        }
+	Objects.requireNonNull(request);
+
         if (!mConnectionStatus.working()) {
             throw new IOException("Not connected to server");
         }
