@@ -7,7 +7,7 @@
     tools:context="yields.client.activities.GoogleLoginActivity">
 
     <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
+        android:id="@+id/googleSignInButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progressBarGoogleConnection"
-        android:layout_below="@+id/sign_in_button"
+        android:layout_below="@+id/googleSignInButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="34dp" />
 

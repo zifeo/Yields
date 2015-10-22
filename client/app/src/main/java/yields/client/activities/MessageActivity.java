@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +24,6 @@ import yields.client.exceptions.MessageActivityException;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-
 import yields.client.listadapter.ListAdapter;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
