@@ -13,27 +13,30 @@ import scala.language.implicitConversions
  * Actions to do on the db about groups
  */
 object GroupActions {
-  var uri = "remote:127.0.0.1/orientdbtest"
-
-  var db: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "test")
-  db.getEntityManager.registerEntityClasses("Group")
-
   val dateFormat: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
   val date: String = dateFormat.format(new Date())
 
   def createGroup(name: String): Group = {
-    db.queryBySql("insert into group Set date_creation = ?, group_name = ?", date, name).head
+    val res = queryBySql("insert into group Set date_creation = ?, group_name = ?", date, name)
+    res match {
+      case Nil => throw new NoSuchElementException
+      case head :: tail => res.head
+    }
   }
 
   def getUsersFromGroup(ridGroup: String): List[User] = {
-    db.queryBySql("select from E where in = ?", new ORecordId(ridGroup))
+    queryBySql("select from E where in = ?", new ORecordId(ridGroup))
   }
 
   def addMessage(ridGroup: String, ridSender: String, body: String) = {
-    db.queryBySql("update ? ADD messages = '{\"sender\":\"?\", \"time\":?, \"body\":\"?\"}'", new ORecordId(ridGroup), new ORecordId(ridSender), date, body)
+    queryBySql("""update ? ADD messages = '{"sender":"?", "time":?, "body":"?"}'""", new ORecordId(ridGroup), new ORecordId(ridSender), date, body)
   }
 
   def getGroupInfos(ridGroup: String): Group = {
-    db.queryBySql("select from ?", new ORecordId(ridGroup)).head
+    val res = queryBySql("select from ?", new ORecordId(ridGroup))
+    res match {
+      case Nil => throw new NoSuchElementException
+      case head :: tail => res.head
+    }
   }
 }

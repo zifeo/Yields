@@ -12,35 +12,40 @@ import scala.language.reflectiveCalls
  * Actions to do on the db about users
  */
 object UserActions {
-  var uri = "remote:127.0.0.1/orientdbtest"
-
-  var db: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "test")
-  db.getEntityManager.registerEntityClasses("User")
 
   // Create a date for now
   val dateFormat: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
   val date: String = dateFormat.format(new Date())
 
   def getUserByEmail(email: String): User = {
-    val user = db.queryBySql[User]("select from user where email = ?", email)
-    user.head
+    val user = queryBySql[User]("select from user where email = ?", email)
+    user match {
+      case Nil => throw new NoSuchElementException
+      case head :: tail => user.head
+    }
   }
 
   def getUserByRid(rid: String): User = {
-    val user = db.queryBySql[User]("select from user where @rid = ?", new ORecordId(rid))
-    user.head
+    val user = queryBySql[User]("select from user where @rid = ?", new ORecordId(rid))
+    user match {
+      case Nil => throw new NoSuchElementException
+      case head :: tail => user.head
+    }
   }
 
   def createUser(name: String, email: String): User = {
-    val user = db.queryBySql[User]("insert into user Set date_creation = ?, email = ?, name = ?", date, name, email)
-    user.head
+    val user = queryBySql[User]("insert into user Set date_creation = ?, email = ?, name = ?", date, name, email)
+    user match {
+      case Nil => throw new NoSuchElementException
+      case head :: tail => user.head
+    }
   }
 
-  def addUserToGroup(ridUser: String, ridGroup: String) = {
-    db.queryBySql("create edge from ? to ?", new ORecordId(ridUser), new ORecordId(ridGroup))
+  def addUserToGroup(ridUser: String, ridGroup: String): Unit = {
+    queryBySql("create edge from ? to ?", new ORecordId(ridUser), new ORecordId(ridGroup))
   }
 
-  def getGroupsFromUser(ridUser: String) = {
-    db.queryBySql[Group]("select from E where out = ?", new ORecordId(ridUser))
+  def getGroupsFromUser(ridUser: String):List[Group] = {
+    queryBySql[Group]("select from E where out = ?", new ORecordId(ridUser))
   }
 }

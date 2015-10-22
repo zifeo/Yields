@@ -13,5 +13,5 @@ class Group {
   var last_activity: java.util.Date = _
   var messages: java.util.List[String] = new java.util.ArrayList()
 
-  override def toString = "Group: " + this.id + ", name: " + group_name + ", creation: " + date_creation + ", last activity: " + last_activity
+  override def toString = s"Group: $id, name: $group_name , creation: $date_creation, last activity: $last_activity"
 }
