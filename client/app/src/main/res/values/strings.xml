@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Yields</string>
+    <string name="title_activity_message">MessageActivity</string>
+
+    <string name="inputMessageFieldHintString">Enter your message</string>
+    <string name="sendButtonString">Send</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_select_username">Select username</string>
+    <string name="textViewUserNameSelection">Select your username for Yields !</string>
+    <string name="editTextUsernameHint">Username</string>
+    <string name="buttonCreateAccount">Create Account !</string>
+    <string name="googleConnectionError">Could not connect to google services</string>
+    <string name="appName">Yields</string>
+    <string name="cancelText">Cancel</string>
+    <string name="googleConnectingText">Connecting to Google services</string>
+    <string name="textViewCreatingAccount">Creating account on Yields...</string>
+    <string name="textViewLoggingIn">Logging in ...</string>
+    <string name="messageUsernameTooShort">Username too short</string>
+    <string name="messageUsernameContainsSpaces">Username can\'t contain spaces</string>
 </resources>

@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
 
-  val config = Seq(
+  val typeSafe = Seq(
     "com.typesafe" % "config" % "1.3.0"
   )
 
@@ -10,15 +10,18 @@ object Dependencies {
     val version = "2.4.0"
     Seq(
       "com.typesafe.akka" %% "akka-actor" % version,
-      "com.typesafe.akka" %% "akka-testkit" % version,
-      "com.typesafe.akka" %% "akka-slf4j" % version
+      "com.typesafe.akka" %% "akka-slf4j" % version,
+      "com.typesafe.akka" %% "akka-testkit" % version % "test"
     )
   }
 
-  val akkaStream = Seq(
-    "com.typesafe.akka" %% "akka-stream-experimental" % "1.0"
-  )
-
+  val akkaStream = {
+    val version = "1.0"
+    Seq(
+      "com.typesafe.akka" %% "akka-stream-experimental" % version,
+      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % version
+    )
+  }
 
   val orientDB = {
     val version = "2.1.4"
@@ -28,5 +31,10 @@ object Dependencies {
       "com.orientechnologies" % "orientdb-graphdb" % version
     )
   }
+
+  val tests = Seq(
+    "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
+    "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+  )
 
 }

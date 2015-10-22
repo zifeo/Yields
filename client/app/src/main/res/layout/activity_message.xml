@@ -1,0 +1,109 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="yields.client.activities.MessageActivity"
+    android:background="#ffffff">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1"
+        android:id="@+id/bottomLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:divider="@drawable/messageseparator"
+        android:showDividers="beginning">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/inputFieldAndButtons"
+            android:weightSum="1">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/addImageButton"
+                android:src="@drawable/camera_icon"
+                android:background="#ffffff"
+                android:onClick="onClickAddImage"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:layout_margin="6dp" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/inputMessageField"
+                android:layout_weight="1"
+                android:nestedScrollingEnabled="true"
+                android:maxLines="4" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/sendButton"
+                android:src="@drawable/send_icon"
+                android:background="#ffffff"
+                android:layout_weight="0.15"
+                android:layout_margin="6dp"
+                android:onClick="onSendMessage" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/messageScrollLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/bottomLayout"
+        android:layout_below="@+id/topRow" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/topRow"
+        android:layout_alignParentStart="false"
+        android:divider="@drawable/messageseparator"
+        android:showDividers="end"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1"
+            android:id="@+id/clickableGroupName"
+            android:clickable="true">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:id="@+id/returnArrow"
+                android:src="@drawable/return_icon"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginTop="6dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/groupName"
+                android:textSize="25dp"
+                android:layout_margin="6dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
