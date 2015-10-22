@@ -5,28 +5,28 @@ tools:context="yields.client.activities.GroupActivity">
 
 
 
-    <item android:id="@+id/action_entourage"
+    <item android:id="@+id/actionEntourage"
         android:icon="@drawable/ic_group_black_24dp"
         android:title="@string/entourage"
         android:layout_gravity="center"
         app:showAsAction="always"
     />
 
-    <item android:id="@+id/action_discover"
+    <item android:id="@+id/actionDiscover"
         android:icon="@drawable/ic_explore_black_24dp"
         android:title="@string/discover"
         android:layout_gravity="center"
         app:showAsAction="always"
         />
 
-    <item android:id="@+id/action_create"
+    <item android:id="@+id/actionCreate"
         android:icon="@drawable/ic_add_black_24dp"
         android:title="@string/createGroup"
         android:layout_gravity="center"
         app:showAsAction="always"
         />
 
-    <item android:id="@+id/action_settings"
+    <item android:id="@+id/actionSettings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings"
         android:layout_gravity="center"

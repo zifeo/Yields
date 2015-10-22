@@ -1,12 +1,20 @@
 package yields.client.activities;
 
+import android.app.ListActivity;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,6 +37,9 @@ public class GroupActivity extends AppCompatActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
 
+    /* String used for debug log */
+    private static final String TAG = "GroupActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +48,76 @@ public class GroupActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
 
+        createFakeUserAndGroups();
+
+        mAdapterGroups = new ListAdapterGroups(getApplicationContext(), R.layout.group_layout, mGroups);
+
+        ListView listView = (ListView) findViewById(R.id.listViewGroups);
+
+        listView.setAdapter(mAdapterGroups);
+        listView.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                YieldsApplication.setGroup(mGroups.get(position));
+
+                Intent intent = new Intent(GroupActivity.this, MessageActivity.class);
+                startActivity(intent);
+            }
+        });
+        listView.setItemsCanFocus(false);
+
+        mAdapterGroups.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.menu_group, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = null;
+
+        switch (item.getItemId()) {
+            case R.id.actionCreate:
+                intent = new Intent(this, LoggingInActivity.class);
+            break;
+
+            case R.id.actionDiscover:
+                intent = new Intent(this, CreatingAccountActivity.class);
+            break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+        if (intent == null){
+            Log.d(TAG, "Error : intent should never be null at this point"); // maybe throw exception
+        }
+        else {
+            startActivity(intent);
+        }
+
+        return intent == null;
+    }
+
+    /**
+     * To be removed as soon as the logging is working
+     */
+    private void createFakeUserAndGroups() {
+        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.userpicture);
+
         try {
-            YieldsApplication.setUser(new MockClientUser("Mock User", new Id(117), "Mock Email", null));
+            YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
         } catch (NodeException e) {
             e.printStackTrace();
         }
@@ -54,18 +133,6 @@ public class GroupActivity extends AppCompatActivity {
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?")));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !")));
         mGroups.add(group2);
-
-        mAdapterGroups = new ListAdapterGroups(getApplicationContext(), R.layout.group_layout, mGroups);
-
-        ((ListView) findViewById(R.id.listViewGroups)).setAdapter(mAdapterGroups);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-
-        inflater.inflate(R.menu.menu_group, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
     private class MockClientUser extends ClientUser {

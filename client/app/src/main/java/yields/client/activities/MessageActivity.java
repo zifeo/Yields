@@ -61,19 +61,10 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
 
-        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
-        try {
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email", image1);
-            mGroup = createFakeGroup();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-
-        mMessages = new ArrayList<>();
+        mMessages = new ArrayList<>(mGroup.getCurrentMessages());
         mImage = null;
         mSendImage = false;
 
@@ -101,7 +92,9 @@ public class MessageActivity extends Activity {
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v) throws MessageActivityException {
-        String inputMessage =  mInputField.getText().toString();
+        String inputMessage =  mInputField.getText().toString(); // CAN CRASH IF USER CHOOSES TO SEND
+                                                                // A PICTURE BUT CANCELS AND SENDS
+                                                                // TEXT INSTEAD
 
         mInputField.setText("");
         Content content;

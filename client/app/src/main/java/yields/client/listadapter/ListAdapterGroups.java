@@ -40,4 +40,5 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
 
         return singleGroup;
     }
+
 }

@@ -50,6 +50,10 @@ public class Group extends Node {
         mCurrentMessages.add(newMessage);
     }
 
+    public List<Message> getCurrentMessages(){
+        return Collections.unmodifiableList(mCurrentMessages);
+    }
+
     public void setImage(Bitmap image){
         if (image == null){
             throw new IllegalArgumentException("Null image in setImage");
