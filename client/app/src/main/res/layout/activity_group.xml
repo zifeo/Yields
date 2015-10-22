@@ -8,20 +8,13 @@
     android:orientation="vertical"
     android:weightSum="1">
 
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/scrollView"
+        android:id="@+id/listViewGroups"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1.00" >
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </LinearLayout>
-    </ScrollView>
+    </ListView>
 
     <yields.client.gui.CenteredToolBar
         android:id="@+id/toolbar"

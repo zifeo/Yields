@@ -7,6 +7,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+/**
+ * A custom toolbar used for centered action icons
+ */
 public class CenteredToolBar extends Toolbar {
 
     public CenteredToolBar(Context context) {
