@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="yields.client.activities.GroupActivity">
+
+
+
+    <item android:id="@+id/actionAddContactToGroup"
+        android:icon="@drawable/ic_group_black_24dp"
+        android:title="@string/addContactToGroup"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+        />
+
+    <item android:id="@+id/actionAddNodeToGroup"
+        android:icon="@drawable/ic_share_black_24dp"
+        android:title="@string/addNodeToGroup"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+        />
+</menu>

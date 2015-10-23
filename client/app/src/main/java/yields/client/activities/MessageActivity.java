@@ -184,48 +184,4 @@ public class MessageActivity extends Activity {
             }
         }
     }
-
-    /**
-     * Mock Client user, only for presentation during the second sprint.
-     */
-    private class  MockClientUser extends ClientUser{
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
-        }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group) {
-            ArrayList<Message> messageList =  new ArrayList<>();
-            return messageList;
-        }
-
-        @Override
-        public void addNewGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * Create fake group for sake of the presentation.
-     * @return fake group.
-     */
-    private Group createFakeGroup() throws NodeException {
-        return new Group("Mock group", new Id(123), new ArrayList<Node>());
-    }
 }

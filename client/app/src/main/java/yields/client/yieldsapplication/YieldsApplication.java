@@ -2,6 +2,7 @@ package yields.client.yieldsapplication;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 
 import java.util.ConcurrentModificationException;
 
@@ -16,6 +17,8 @@ public class YieldsApplication {
     private static Context mApplicationContext;
     private static Resources mResources;
 
+    private static Bitmap mDefaultGroupImage;
+
     public static ClientUser getUser(){
         return mUser;
     }
@@ -26,6 +29,10 @@ public class YieldsApplication {
 
     public static Context getApplicationContext(){
         return mApplicationContext;
+    }
+
+    public static Bitmap getDefaultGroupImage(){
+        return mDefaultGroupImage;
     }
 
     public static void setResources(Resources r){
@@ -42,6 +49,10 @@ public class YieldsApplication {
 
     public static void setApplicationContext(Context c){
         mApplicationContext = c;
+    }
+
+    public static void setDefaultGroupImage(Bitmap b){
+        mDefaultGroupImage = b;
     }
 
     public static Resources getResources(){

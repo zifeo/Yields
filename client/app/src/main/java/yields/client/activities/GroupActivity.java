@@ -23,6 +23,7 @@ import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.NodeException;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterGroups;
 import yields.client.messages.Message;
@@ -87,11 +88,19 @@ public class GroupActivity extends AppCompatActivity {
         Intent intent = null;
 
         switch (item.getItemId()) {
-            case R.id.actionCreate:
-                intent = new Intent(this, LoggingInActivity.class);
+            case R.id.actionEntourage:
+                intent = new Intent(this, CreatingAccountActivity.class);
             break;
 
             case R.id.actionDiscover:
+                intent = new Intent(this, CreatingAccountActivity.class);
+            break;
+
+            case R.id.actionCreate:
+                intent = new Intent(this, CreateGroupActivity.class);
+            break;
+
+            case R.id.actionSettings:
                 intent = new Intent(this, CreatingAccountActivity.class);
             break;
 
@@ -121,6 +130,11 @@ public class GroupActivity extends AppCompatActivity {
         } catch (NodeException e) {
             e.printStackTrace();
         }
+
+        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(), R.drawable.default_group_image);
+
+        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
+        YieldsApplication.setDefaultGroupImage(GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
 
         mGroups = new ArrayList<>();
 

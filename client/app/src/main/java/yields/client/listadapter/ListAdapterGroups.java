@@ -1,6 +1,7 @@
 package yields.client.listadapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,9 @@ import android.widget.TextView;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class ListAdapterGroups extends ArrayAdapter<Group> {
     private Context mContext;
@@ -34,9 +37,20 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         TextView textViewGroupLastMessage = (TextView) singleGroup.findViewById(R.id.textViewGroupLastMessage);
         ImageView imageGroup = (ImageView) singleGroup.findViewById(R.id.imageGroup);
 
-        textViewGroupName.setText(mGroups.get(position).getName());
-        textViewGroupLastMessage.setText(mGroups.get(position).getPreviewOfLastMessage());
-        imageGroup.setImageResource(R.drawable.ic_explore_black_24dp);
+        Group group = mGroups.get(position);
+
+        textViewGroupName.setText(group.getName());
+        textViewGroupLastMessage.setText(group.getPreviewOfLastMessage());
+
+        Bitmap groupImage = group.getCircularImage();
+        if (groupImage == null){
+            imageGroup.setImageBitmap(YieldsApplication.getDefaultGroupImage());
+        }
+        else {
+            imageGroup.setImageBitmap(group.getCircularImage());
+        }
+
+
 
         return singleGroup;
     }

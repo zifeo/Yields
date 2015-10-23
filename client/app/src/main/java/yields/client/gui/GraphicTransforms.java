@@ -6,12 +6,16 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.util.Log;
 
 /**
  * Class which contains static methods to transform graphical elements
  */
 public class GraphicTransforms {
 
+    /**
+     * Class cannot be instantiated
+     */
     private GraphicTransforms(){
     }
 
@@ -22,8 +26,7 @@ public class GraphicTransforms {
      * @param diameter The diameter of the the new image.
      * @return  A {@code Bitmap} image which has a circle shape.
      */
-    public static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter)
-    {
+    public static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter){
         if (inputImage.getWidth() != inputImage.getHeight()) {
             throw new IllegalArgumentException("Image should be squared.");
         }

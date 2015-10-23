@@ -8,7 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import yields.client.R;
 import yields.client.exceptions.NodeException;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 
@@ -19,23 +21,32 @@ public class Group extends Node {
                                             // the ones that are currently in the listView
 
 
-    /** Constructor for groups
+
+     /** Constructor for groups
      *
      * @param name The name of the group
      * @param id The id of the group
      * @param nodes The current nodes of the group
      * @param image The current image of the group, can be null
+     * @param isImageCircle Indicates if the image given is already circular
      * @throws NodeException If nodes is null
      */
-    public Group(String name, Id id, List<Node> nodes, Bitmap image) throws NodeException {
+    public Group(String name, Id id, List<Node> nodes, Bitmap image, boolean isImageCircle) throws NodeException {
         super(name, id);
         mNodes = new ArrayList<>(Objects.requireNonNull(nodes));
-        mImage = image;
         mCurrentMessages = new ArrayList<>();
+
+        if (image != null && !isImageCircle){
+            mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
+        }
+    }
+
+    public Group(String name, Id id, List<Node> nodes, Bitmap image) throws NodeException {
+        this(name, id, nodes, image, false);
     }
 
     public Group(String name, Id id, List<Node> nodes) throws NodeException {
-        this(name, id, nodes, null);
+        this(name, id, nodes, null, false);
     }
 
     public void addNode(Node newNode) {
@@ -52,8 +63,21 @@ public class Group extends Node {
         return Collections.unmodifiableList(mCurrentMessages);
     }
 
+    /**
+     * Set the image to the group
+     * @param image A squared image which this method will make circular
+     */
     public void setImage(Bitmap image){
-        mImage = Objects.requireNonNull(image);
+        Objects.requireNonNull(image);
+        mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
+    }
+
+    /**
+     * Returns the circular version of the group's image
+     * @return the circular version of the group's image, or null if none has been set
+     */
+    public Bitmap getCircularImage(){
+        return mImage;
     }
 
     public List<Node> getUsers() {
