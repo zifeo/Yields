@@ -1,13 +1,12 @@
-package yields.server.io
+package yields.server.actions
 
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.{Arbitrary, Gen}
+import yields.server.actions.exceptions.SerializationException
+import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
+import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
 import yields.server.models._
-import yields.server.actions.exceptions.SerializationActionException
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.actions.Action
-import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
-trait MessageGenerators {
+trait ActionGenerators {
 
   import Arbitrary.arbitrary
   import Gen.oneOf
@@ -68,13 +67,13 @@ trait MessageGenerators {
     } yield UserGroupList(uid)
   }
 
-  implicit lazy val serializationMessageExceptionArb: Arbitrary[SerializationActionException] = Arbitrary {
+  implicit lazy val serializationExceptionArb: Arbitrary[SerializationException] = Arbitrary {
     for {
       message <- arbitrary[String]
-    } yield SerializationActionException(avoidEOI(message))
+    } yield SerializationException(avoidEOI(message))
   }
 
-  implicit lazy val messageArb: Arbitrary[Action] = Arbitrary {
+  implicit lazy val actionArb: Arbitrary[Action] = Arbitrary {
     val arbs = Seq(groupCreateArb, groupUpdateArb, groupMessageArb, groupHistoryArb, userUpdateArb, userConnectArb)
     val gens = arbs.map(_.arbitrary)
     oneOf(gens.head, gens.tail.head, gens.drop(2): _*) // requires at least 2 brute entries

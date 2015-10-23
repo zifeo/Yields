@@ -7,9 +7,9 @@ import yields.server.io._
 import yields.server.actions.Action
 
 /**
- * Parse every incoming and outgoing items from and to Yields message.
+ * Parse every incoming and outgoing items from and to actions.
  */
-class ParserModule(logger: LoggingAdapter) extends Module[ByteString, Action, Action, ByteString] {
+class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Action, Action, ByteString] {
 
   /** Incoming log with given channel. */
   override val incoming = { raw: ByteString =>
@@ -18,17 +18,17 @@ class ParserModule(logger: LoggingAdapter) extends Module[ByteString, Action, Ac
   }
 
   /** Outgoing log with given channel. */
-  override val outgoing = { message: Action =>
-    val json = message.toJson
+  override val outgoing = { result: Action =>
+    val json = result.toJson
     ByteString(json.toString())
   }
 
 }
 
-/** [[ParserModule]] companion object. */
-object ParserModule {
+/** [[SerializationModule]] companion object. */
+object SerializationModule {
 
   /** Shortcut for creating a new logging module. */
-  def apply()(implicit logger: LoggingAdapter) = new ParserModule(logger).create
+  def apply()(implicit logger: LoggingAdapter) = new SerializationModule(logger).create
 
 }

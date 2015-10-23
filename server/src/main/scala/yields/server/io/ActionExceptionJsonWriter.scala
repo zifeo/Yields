@@ -1,13 +1,13 @@
 package yields.server.io
 
 import spray.json._
-import yields.server.actions.exceptions.{SerializationActionException, ActionException}
+import yields.server.actions.exceptions.{SerializationException, ActionResultException}
 
-/** Json writer for [[ActionException]]. */
-object ActionExceptionJsonWriter extends RootJsonWriter[ActionException] {
+/** Json writer for [[ActionResultException]]. */
+object ActionExceptionJsonWriter extends RootJsonWriter[ActionResultException] {
 
-  override def write(obj: ActionException): JsValue = obj match {
-    case x: SerializationActionException => x.toJson
+  override def write(obj: ActionResultException): JsValue = obj match {
+    case x: SerializationException => x.toJson
   }
 
 }

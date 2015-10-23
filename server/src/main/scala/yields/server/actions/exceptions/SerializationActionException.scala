@@ -1,7 +1,7 @@
 package yields.server.actions.exceptions
 
 /**
- * Represents a message unable to be (un)serialized by the [[yields.server.pipeline.ParserModule]].
+ * Represents an action (un)serializable by the [[yields.server.pipeline.SerializationModule]].
  * @param message description
  */
-case class SerializationActionException(message: String) extends ActionException
+case class SerializationException(message: String) extends ActionResultException

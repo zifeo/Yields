@@ -6,7 +6,7 @@ import yields.server.models.UID
 /**
  * Base class of every exception related to an action and happening in the pipeline.
  */
-trait ActionException extends Exception with Action with Result {
+trait ActionResultException extends Exception with Action with Result {
 
   /** Description. */
   val message: String

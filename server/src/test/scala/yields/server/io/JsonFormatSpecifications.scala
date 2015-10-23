@@ -2,12 +2,11 @@ package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
 import spray.json._
-import yields.server.actions.exceptions.SerializationActionException
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.actions.Action
-import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
+import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
+import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
+import yields.server.actions.{Action, ActionGenerators}
 
-object JsonFormatSpecifications extends Properties("CustomJsonFormat") with MessageGenerators {
+object JsonFormatSpecifications extends Properties("CustomJsonFormat") with ActionGenerators {
 
   import Prop.forAll
 
@@ -39,10 +38,6 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
   }
 
   property("UserGroupList") = forAll { (x: UserGroupList) =>
-    toAndFromJson(x) == x
-  }
-
-  property("SerializationMessageException") = forAll { (x: SerializationActionException) =>
     toAndFromJson(x) == x
   }
 

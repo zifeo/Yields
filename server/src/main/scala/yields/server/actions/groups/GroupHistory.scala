@@ -4,7 +4,7 @@ import yields.server.models.{Node, UID, DateTime, GID}
 import yields.server.actions.{Result, Action}
 
 /**
- * Fetch each group message between two dates with time.
+ * Fetch each group node between two dates with time.
  * @param gid group id
  * @param from start date
  * @param to end date
