@@ -25,7 +25,10 @@
         android:minHeight="?attr/actionBarSize"
         android:background="#9C9CB8"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:paddingLeft="60sp"
+        android:paddingRight="70sp"
+        >
     </yields.client.gui.CenteredToolBar>
 
 </LinearLayout>

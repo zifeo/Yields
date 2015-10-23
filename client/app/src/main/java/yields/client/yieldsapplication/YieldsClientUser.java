@@ -34,7 +34,7 @@ public class YieldsClientUser extends ClientUser{
         mServerChannel = (ServerChannel) mConnectionManager.getCommunicationChannel();
     }
 
-    public void createInstance(String name, Id id, String email, Bitmap img) throws InstantiationException, IOException {
+    public static void createInstance(String name, Id id, String email, Bitmap img) throws InstantiationException, IOException {
         if (mInstance == null){
             mInstance = new YieldsClientUser(name, id, email, img);
             YieldsApplication.setUser(mInstance);
