@@ -47,6 +47,11 @@
             android:name=".activities.CreateGroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".activities.CreateGroupSelectUsersActivity"
+            android:label="@string/title_activity_create_group_select_users"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>

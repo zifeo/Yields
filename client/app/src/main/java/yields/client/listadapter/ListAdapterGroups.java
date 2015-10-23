@@ -47,7 +47,7 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
             imageGroup.setImageBitmap(YieldsApplication.getDefaultGroupImage());
         }
         else {
-            imageGroup.setImageBitmap(group.getCircularImage());
+            imageGroup.setImageBitmap(groupImage);
         }
 
 

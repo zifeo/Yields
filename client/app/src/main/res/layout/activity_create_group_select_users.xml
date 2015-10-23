@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="yields.client.activities.CreateGroupActivity"
+    tools:context="yields.client.activities.CreateGroupSelectUsersActivity"
     android:orientation="vertical"
     android:weightSum="1"
     >
@@ -23,7 +23,7 @@
     <yields.client.gui.CenteredToolBar
         android:id="@+id/toolbar"
         android:minHeight="?attr/actionBarSize"
-        android:background="#9C9CB8"
+        android:background="#4FC880"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="0sp"

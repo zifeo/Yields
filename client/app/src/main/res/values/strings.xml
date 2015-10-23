@@ -27,4 +27,6 @@
     <string name="addNewNode">Add new Node</string>
     <string name="addContactToGroup">Add contact</string>
     <string name="addNodeToGroup">Add node</string>
+    <string name="title_activity_create_group_select_users">CreateGroupSelectUsersActivity</string>
+    <string name="done">Done</string>
 </resources>

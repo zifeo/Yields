@@ -20,6 +20,7 @@ public class YieldsApplication {
     private static Resources mResources;
 
     private static Bitmap mDefaultGroupImage;
+    private static Bitmap mDefaultUserImage;
 
     private static GoogleApiClient mGoogleApiClient;
 
@@ -37,6 +38,10 @@ public class YieldsApplication {
 
     public static Bitmap getDefaultGroupImage(){
         return mDefaultGroupImage;
+    }
+
+    public static Bitmap getDefaultUserImage(){
+        return mDefaultUserImage;
     }
 
     public static GoogleApiClient getGoogleApiClient(){
@@ -65,6 +70,10 @@ public class YieldsApplication {
 
     public static void setDefaultGroupImage(Bitmap b){
         mDefaultGroupImage = b;
+    }
+
+    public static void setDefaultUserImage(Bitmap b){
+        mDefaultUserImage = b;
     }
 
     public static Resources getResources(){

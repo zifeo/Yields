@@ -123,7 +123,8 @@ public class GroupActivity extends AppCompatActivity {
      * To be removed as soon as the logging is working
      */
     private void createFakeUserAndGroups() {
-        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.userpicture);
+        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
+        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
 
         try {
             YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
@@ -143,7 +144,7 @@ public class GroupActivity extends AppCompatActivity {
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !")));
         mGroups.add(group1);
 
-        Group group2 = new Group("Answer to the Ultimate Question of Life, the Universe, and Everything", new Id(42), new ArrayList<User>());
+        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?")));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !")));
         mGroups.add(group2);
