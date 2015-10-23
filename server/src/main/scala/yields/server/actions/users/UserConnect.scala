@@ -14,7 +14,7 @@ case class UserConnect(email: Email) extends Action {
    * @param sender action requester
    * @return action result
    */
-  def run(sender: UID): Result = {
+  override def run(sender: UID): Result = {
     UserConnectRes(sender)
   }
 

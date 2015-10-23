@@ -15,7 +15,7 @@ case class GroupMessage(gid: GID, content: String) extends Action {
    * @param sender action requester
    * @return action result
    */
-  def run(sender: UID): Result = {
+  override def run(sender: UID): Result = {
     GroupMessageRes()
   }
   

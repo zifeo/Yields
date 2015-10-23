@@ -22,7 +22,7 @@ package object models {
   /** Represents a byte array. */
   type Blob = String
 
-  /** Represents a date with time. */
-  type DateTime = Int
+  /** Represents a node. */
+  type Node = String
 
 }

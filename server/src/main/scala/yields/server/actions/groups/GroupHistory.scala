@@ -1,7 +1,9 @@
 package yields.server.actions.groups
 
-import yields.server.models.{Node, UID, DateTime, GID}
-import yields.server.actions.{Result, Action}
+import java.time.OffsetDateTime
+
+import yields.server.actions.{Action, Result}
+import yields.server.models.{GID, Node, UID}
 
 /**
  * Fetch each group node between two dates with time.
@@ -9,14 +11,14 @@ import yields.server.actions.{Result, Action}
  * @param from start date
  * @param to end date
  */
-case class GroupHistory(gid: GID, from: DateTime, to: DateTime) extends Action {
+case class GroupHistory(gid: GID, from: OffsetDateTime, to: OffsetDateTime) extends Action {
 
   /**
    * Run the action given the sender.
    * @param sender action requester
    * @return action result
    */
-  def run(sender: UID): Result = {
+  override def run(sender: UID): Result = {
     GroupHistoryRes(Seq.empty)
   }
 

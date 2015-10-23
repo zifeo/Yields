@@ -15,7 +15,7 @@ case class GroupCreate(name: String, nodes: Seq[NID]) extends Action {
    * @param sender action requester
    * @return action result
    */
-  def run(sender: UID): Result = {
+  override def run(sender: UID): Result = {
     GroupCreateRes(1)
   }
 

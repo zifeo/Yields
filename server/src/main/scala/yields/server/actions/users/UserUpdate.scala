@@ -1,9 +1,7 @@
 package yields.server.actions.users
 
-import spray.json.JsonFormat
-import yields.server.models.{DateTime, Blob, Email, UID}
-import yields.server.actions.{Result, Action}
-import spray.json.DefaultJsonProtocol._
+import yields.server.actions.{Action, Result}
+import yields.server.models.{Blob, Email, UID}
 
 /**
  * Update an user given optional fields.
@@ -19,7 +17,7 @@ case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], imag
    * @param sender action requester
    * @return action result
    */
-  def run(sender: UID): Result = {
+  override def run(sender: UID): Result = {
     UserUpdateRes()
   }
 

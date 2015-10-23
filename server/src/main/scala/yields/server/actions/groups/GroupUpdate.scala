@@ -16,7 +16,7 @@ case class GroupUpdate(gid: GID, name: Option[String], pic: Option[Blob]) extend
    * @param sender action requester
    * @return action result
    */
-  def run(sender: UID): Result = {
+  override def run(sender: UID): Result = {
     GroupUpdateRes()
   }
 

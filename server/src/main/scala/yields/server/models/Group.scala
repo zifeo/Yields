@@ -1,6 +1,6 @@
 package yields.server.models
 
-import java.text.{SimpleDateFormat, DateFormat}
+import java.text.{DateFormat, SimpleDateFormat}
 import java.util.Date
 import javax.persistence.{Id, Version}
 
