@@ -28,7 +28,7 @@ public class MockFactory {
 
     private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
 
-    public static Group createMockGroup(String name, Id id, List<Node> connectedUsers){
+    public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
         return new Group(name, id, connectedUsers);
     }
 

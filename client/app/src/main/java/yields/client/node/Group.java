@@ -15,7 +15,7 @@ import yields.client.id.Id;
 import yields.client.messages.Message;
 
 public class Group extends Node {
-    private List<Node> mNodes; // for now, just users
+    private List<User> mUsers; // for now, just users
     private Bitmap mImage;
     private List<Message> mCurrentMessages; // not all the messages the group has ever sent, just
                                             // the ones that are currently in the listView
@@ -31,9 +31,9 @@ public class Group extends Node {
      * @param isImageCircle Indicates if the image given is already circular
      * @throws NodeException If nodes is null
      */
-    public Group(String name, Id id, List<Node> nodes, Bitmap image, boolean isImageCircle) throws NodeException {
+    public Group(String name, Id id, List<User> users, Bitmap image, boolean isImageCircle) throws NodeException {
         super(name, id);
-        mNodes = new ArrayList<>(Objects.requireNonNull(nodes));
+        mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mCurrentMessages = new ArrayList<>();
 
         if (image != null && !isImageCircle){
@@ -41,18 +41,18 @@ public class Group extends Node {
         }
     }
 
-    public Group(String name, Id id, List<Node> nodes, Bitmap image) throws NodeException {
-        this(name, id, nodes, image, false);
+    public Group(String name, Id id, List<User> users, Bitmap image) throws NodeException {
+        this(name, id, users, image, false);
     }
 
-    public Group(String name, Id id, List<Node> nodes) throws NodeException {
-        this(name, id, nodes, null, false);
+    public Group(String name, Id id, List<User> users) throws NodeException {
+        this(name, id, users, null, false);
     }
 
-    public void addNode(Node newNode) {
+    public void addUser(User newUser) {
         // TODO : Check if node is not a message
 
-        mNodes.add(newNode);
+        mUsers.add(newUser);
     }
 
     public void addMessage(Message newMessage) {
@@ -80,8 +80,8 @@ public class Group extends Node {
         return mImage;
     }
 
-    public List<Node> getUsers() {
-        return Collections.unmodifiableList(mNodes);
+    public List<User> getUsers() {
+        return Collections.unmodifiableList(mUsers);
     }
 
     /**

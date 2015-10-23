@@ -15,7 +15,7 @@ public class LoggingInActivity extends AppCompatActivity {
 
         // Client user call
 
-        // clientUser.isEmailValid(googleApiClient.getEmail(), this);
+        // sEmailValid(googleApiClient.getEmail(), this);
     }
 
     // Method called by clientUser when the server indicates that the account already exists

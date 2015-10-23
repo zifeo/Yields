@@ -84,7 +84,11 @@ public class MessageActivity extends Activity {
             toast.show();
         }else {
             setHeaderBar();
-            retrieveGroupMessages();
+            try {
+                retrieveGroupMessages();
+            } catch (IOException e) {
+                throw new MessageActivityException("Could not retrieve messages");
+            }
         }
     }
 
@@ -135,7 +139,7 @@ public class MessageActivity extends Activity {
     /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
-    private void retrieveGroupMessages(){
+    private void retrieveGroupMessages() throws IOException {
         for(Message m : mUser.getGroupMessages(mGroup)){
             mMessages.add(m);
         }

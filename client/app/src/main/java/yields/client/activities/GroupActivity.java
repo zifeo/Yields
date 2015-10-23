@@ -138,12 +138,12 @@ public class GroupActivity extends AppCompatActivity {
 
         mGroups = new ArrayList<>();
 
-        Group group1 = new Group("SWENG", new Id(666), new ArrayList<Node>());
+        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
         group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !")));
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !")));
         mGroups.add(group1);
 
-        Group group2 = new Group("Answer to the Ultimate Question of Life, the Universe, and Everything", new Id(42), new ArrayList<Node>());
+        Group group2 = new Group("Answer to the Ultimate Question of Life, the Universe, and Everything", new Id(42), new ArrayList<User>());
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?")));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !")));
         mGroups.add(group2);
