@@ -18,6 +18,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 
 import yields.client.R;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class GoogleLoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -63,6 +64,8 @@ public class GoogleLoginActivity extends AppCompatActivity implements
                 .addScope(new Scope(Scopes.PROFILE))
                 .addScope(new Scope(Scopes.EMAIL))
                 .build();
+
+        YieldsApplication.setGoogleApiClient(mGoogleApiClient);
 
         mGoogleSingInButton = (SignInButton) findViewById(R.id.googleSignInButton);
         mButtonCancelGoogleConnection = (Button) findViewById(R.id.buttonCancelGoogleConnection);

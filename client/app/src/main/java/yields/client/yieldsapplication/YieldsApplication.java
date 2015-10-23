@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+
 import java.util.ConcurrentModificationException;
 
 import yields.client.node.ClientUser;
@@ -19,6 +21,8 @@ public class YieldsApplication {
 
     private static Bitmap mDefaultGroupImage;
 
+    private static GoogleApiClient mGoogleApiClient;
+
     public static ClientUser getUser(){
         return mUser;
     }
@@ -33,6 +37,14 @@ public class YieldsApplication {
 
     public static Bitmap getDefaultGroupImage(){
         return mDefaultGroupImage;
+    }
+
+    public static GoogleApiClient getGoogleApiClient(){
+        return mGoogleApiClient;
+    }
+
+    public static void setGoogleApiClient(GoogleApiClient gac){
+        mGoogleApiClient = gac;
     }
 
     public static void setResources(Resources r){
