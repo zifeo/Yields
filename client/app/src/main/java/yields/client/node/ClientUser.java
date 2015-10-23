@@ -27,7 +27,7 @@ public abstract class ClientUser extends User {
 
     public abstract void sendMessage(Group group, Message message) throws IOException;
 
-    public abstract List<Message> getGroupMessages(Group group);
+    public abstract List<Message> getGroupMessages(Group group) throws IOException;
 
     public abstract void addNewGroup(Group group);
 

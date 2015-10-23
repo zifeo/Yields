@@ -60,8 +60,12 @@ public class YieldsClientUser extends ClientUser{
     }
 
     @Override
-    public List<Message> getGroupMessages(Group group) {
+    public List<Message> getGroupMessages(Group group) throws IOException {
+        final int MESSAGE_COUNT = 100;
+        Request groupHistoryRequest = RequestBuilder.GroupHistoryRequest(this.getId(), MESSAGE_COUNT);
+        mServerChannel.sendRequest(groupHistoryRequest);
         return null;
+        // TODO : return the parsed messages.
     }
 
     @Override
