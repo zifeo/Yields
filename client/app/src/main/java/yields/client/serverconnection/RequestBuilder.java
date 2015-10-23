@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import yields.client.id.Id;
 
@@ -40,6 +41,8 @@ public class RequestBuilder {
     private final Map<String, Object> mConstructingMap;
 
     public static Request UserUpdateRequest(Id sender, Map<Fields, String> args) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(args);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
 
@@ -57,6 +60,7 @@ public class RequestBuilder {
     }
 
     public static Request userGroupListRequest(Id sender) {
+        Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERGROUPLIST, sender);
 
@@ -64,6 +68,8 @@ public class RequestBuilder {
     }
 
     public static Request userEntourageAddRequest(Id sender, String email) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERENTOURAGEADD, sender);
 
@@ -73,7 +79,8 @@ public class RequestBuilder {
     }
 
     public static Request userEntourageRemoveRequest(Id sender, String email) {
-
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERENTOURAGEREMOVE, sender);
 
@@ -83,6 +90,8 @@ public class RequestBuilder {
     }
 
     public static Request userConnectRequest(Id sender, String email) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERCONNECT, sender);
 
@@ -92,6 +101,7 @@ public class RequestBuilder {
     }
 
     public static Request userUpdateRequest(Id sender) {
+        Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERSTATUS, sender);
 
@@ -100,6 +110,12 @@ public class RequestBuilder {
 
     public static Request GroupCreateRequest(Id sender, String name,
                                              List<Id> nodes) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(nodes);
+
+        if(nodes.size() < 1)
+            throw new IllegalArgumentException();
 
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.GROUPCREATE, sender);
@@ -112,6 +128,9 @@ public class RequestBuilder {
 
     public static Request GroupUpdateRequest(Id sender, Id groupId,
                                              Map<Fields, String> args) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(args);
 
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
@@ -130,6 +149,9 @@ public class RequestBuilder {
 
 
     public static Request GroupAddRequest(Id sender, Map<Fields, String> args) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(args);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
 
@@ -147,6 +169,9 @@ public class RequestBuilder {
     }
 
     public static Request GroupRemoveRequest(Id sender, Map<Fields, String> args) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(args);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
 
@@ -165,6 +190,11 @@ public class RequestBuilder {
 
     public static Request GroupMessageRequest(Id sender, Id groupId,
                                               String kind, String content) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(kind);
+        Objects.requireNonNull(content);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.GROUPMESSAGE, sender);
 
@@ -176,6 +206,9 @@ public class RequestBuilder {
     }
 
     public static Request GroupHistoryRequest(Id sender, Date from) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(from);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
 
@@ -194,6 +227,10 @@ public class RequestBuilder {
     }
 
     public static Request GroupHistoryRequest(Id sender, Date from, Date to) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(from);
+        Objects.requireNonNull(to);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
 
@@ -204,6 +241,8 @@ public class RequestBuilder {
     }
 
     public static Request simpleRequest(String content) {
+        Objects.requireNonNull(content);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.PING, new Id(0l));
 

@@ -22,7 +22,7 @@ public class ServerChannel implements CommunicationChannel {
     public Response sendRequest(Request request)
             throws IOException {
 
-	Objects.requireNonNull(request);
+        Objects.requireNonNull(request);
 
         if (!mConnectionStatus.working()) {
             throw new IOException("Not connected to server");
