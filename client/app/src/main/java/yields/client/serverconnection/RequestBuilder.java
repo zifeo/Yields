@@ -25,7 +25,7 @@ public class RequestBuilder {
         MessageKind(String name) { this.name = name; }
         public String getValue() { return name; }
     }
-    private enum Fields {
+    public enum Fields {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
         FROM("from"), TO("to"), COUNT("count");

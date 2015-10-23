@@ -3,8 +3,9 @@ package yields.client.yieldsapplication;
 import android.graphics.Bitmap;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
+import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
@@ -69,8 +71,14 @@ public class YieldsClientUser extends ClientUser{
     }
 
     @Override
-    public void addNewGroup(Group group) {
-
+    public void addNewGroup(Group group) throws IOException {
+        HashMap<RequestBuilder.Fields, String> memberEmails = new HashMap<>();
+        List<User> members = group.getUsers();
+        for (User u : members){
+            memberEmails.put(RequestBuilder.Fields.EMAIL, u.getEmail());
+        }
+        Request groupAddRequest = RequestBuilder.GroupAddRequest(this.getId(), memberEmails);
+        mServerChannel.sendRequest(groupAddRequest);
     }
 
     @Override
