@@ -3,12 +3,10 @@ package yields.client.yieldsapplication;
 import android.graphics.Bitmap;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
@@ -16,7 +14,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
@@ -37,14 +34,10 @@ public class YieldsClientUser extends ClientUser{
         mServerChannel = (ServerChannel) mConnectionManager.getCommunicationChannel();
     }
 
-    public ClientUser getInstance() {
-        Objects.requireNonNull(mInstance, "Singleton YieldsClientUser has not been instanced yet.");
-        return mInstance;
-    }
-
     public void createInstance(String name, Id id, String email, Bitmap img) throws InstantiationException, IOException {
         if (mInstance == null){
             mInstance = new YieldsClientUser(name, id, email, img);
+            YieldsApplication.setUser(mInstance);
         }
         else{
             throw new InstantiationException("YieldsClientUser is already instanced.");
