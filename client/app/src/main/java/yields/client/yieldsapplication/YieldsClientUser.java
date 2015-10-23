@@ -3,6 +3,7 @@ package yields.client.yieldsapplication;
 import android.graphics.Bitmap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
+import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -18,6 +20,7 @@ import yields.client.node.User;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
+import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 
@@ -27,14 +30,16 @@ public class YieldsClientUser extends ClientUser{
     private static ConnectionManager mConnectionManager;
     private static ServerChannel mServerChannel;
 
-    private YieldsClientUser(String name, Id id, String email, Bitmap img) throws NodeException, IOException {
+    private YieldsClientUser(String name, Id id, String email, Bitmap img)
+            throws NodeException, IOException {
         super(name, id, email, img);
         mSocketProvider = new YieldEmulatorSocketProvider();
         mConnectionManager = new ConnectionManager(mSocketProvider);
         mServerChannel = (ServerChannel) mConnectionManager.getCommunicationChannel();
     }
 
-    public void createInstance(String name, Id id, String email, Bitmap img) throws InstantiationException, IOException {
+    public void createInstance(String name, Id id, String email, Bitmap img)
+            throws InstantiationException, IOException {
         if (mInstance == null){
             mInstance = new YieldsClientUser(name, id, email, img);
             YieldsApplication.setUser(mInstance);
@@ -46,18 +51,37 @@ public class YieldsClientUser extends ClientUser{
 
     @Override
     public void sendMessage(Group group, Message message) throws IOException {
-        if (message.getContent().getType() == "image"){
-            throw new UnsupportedOperationException("Error, sending image messages is not yet supported.");
+        Request groupMessageReq = null;
+
+        switch (message.getContent().getType()) {
+            case "image":
+                groupMessageReq = RequestBuilder
+                        .GroupImageMessageRequest(this.getId(), group.getId(),
+                                "text", (ImageContent) message.getContent());
+                break;
+            case "text":
+                groupMessageReq = RequestBuilder
+                        .GroupMessageRequest(this.getId(), group.getId(),
+                                "text", ((TextContent) message
+                                        .getContent()).getText());
+                break;
+            default : throw new IllegalArgumentException("type unknown");
         }
-        TextContent content = (TextContent) message.getContent();
-        Request groupMessageReq = RequestBuilder.GroupMessageRequest(this.getId(), group.getId(), "text", content.getText());
-        mServerChannel.sendRequest(groupMessageReq);
+
+        Response response = mServerChannel.sendRequest(groupMessageReq);
     }
 
     @Override
     public List<Message> getGroupMessages(Group group) throws IOException {
         final int MESSAGE_COUNT = 100;
-        Request groupHistoryRequest = RequestBuilder.GroupHistoryRequest(this.getId(), MESSAGE_COUNT);
+        Id lastMessage = null;
+
+        if (group.getMessages() != null){
+            lastMessage = group.getLastMessage().getId();
+        }
+
+        Request groupHistoryRequest = RequestBuilder
+                .GroupHistoryRequest(this.getId(), lastMessage, MESSAGE_COUNT);
         mServerChannel.sendRequest(groupHistoryRequest);
         return null;
         // TODO : return the parsed messages.
@@ -65,13 +89,14 @@ public class YieldsClientUser extends ClientUser{
 
     @Override
     public void addNewGroup(Group group) throws IOException {
-        HashMap<RequestBuilder.Fields, String> memberEmails = new HashMap<>();
+        List<Id> memberIDs = new ArrayList<>();
         List<User> members = group.getUsers();
         for (User u : members){
-            memberEmails.put(RequestBuilder.Fields.EMAIL, u.getEmail());
+            memberIDs.add(u.getId());
         }
-        Request groupAddRequest = RequestBuilder.GroupAddRequest(this.getId(), memberEmails);
-        mServerChannel.sendRequest(groupAddRequest);
+        Request groupAddRequest = RequestBuilder
+                .GroupCreateRequest(this.getId(), group.getName(), memberIDs);
+        Response response = mServerChannel.sendRequest(groupAddRequest);
     }
 
     @Override

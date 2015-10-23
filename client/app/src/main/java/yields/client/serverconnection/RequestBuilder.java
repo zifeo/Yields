@@ -205,6 +205,24 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    public static Request GroupImageMessageRequest(Id sender, Id groupId,
+                                                   String kind,
+                                                   ImageContent content) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(kind);
+        Objects.requireNonNull(content);
+
+        RequestBuilder builder = new RequestBuilder(
+                MessageKind.GROUPMESSAGE, sender);
+
+        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.KIND, kind);
+        builder.addField(Fields.IMAGE, content.getImage());
+
+        return builder.request();
+    }
+
     public static Request GroupHistoryRequest(Id sender, Id last,
                                               int messageCount) {
         Objects.requireNonNull(sender);
