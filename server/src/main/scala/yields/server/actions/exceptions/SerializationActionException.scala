@@ -1,7 +1,7 @@
-package yields.server.mpi.exceptions
+package yields.server.actions.exceptions
 
 /**
  * Represents a message unable to be (un)serialized by the [[yields.server.pipeline.ParserModule]].
  * @param message description
  */
-case class SerializationMessageException(message: String) extends MessageException
+case class SerializationActionException(message: String) extends ActionException

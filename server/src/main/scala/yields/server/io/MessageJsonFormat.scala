@@ -1,16 +1,17 @@
-package yields.server.mpi.io
+package yields.server.io
 
 import spray.json.DefaultJsonProtocol._
 import spray.json._
-import yields.server.mpi._
-import yields.server.mpi.exceptions.{SerializationMessageException, MessageException}
-import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
+import yields.server.io._
+import yields.server.actions._
+import yields.server.actions.exceptions.{SerializationActionException, ActionException}
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
 import scala.util.{Failure, Success, Try}
 
-/** Json format for [[Message]]. */
-object MessageJsonFormat extends RootJsonFormat[Message] {
+/** Json format for [[Action]]. */
+object MessageJsonFormat extends RootJsonFormat[Action] {
 
   private val kindFld = "kind"
   private val messageFld = "message"
@@ -29,37 +30,37 @@ object MessageJsonFormat extends RootJsonFormat[Message] {
       metadataFld -> JsNull // TODO : handle metadata
     )
 
-  override def write(obj: Message): JsValue = obj match {
+  override def write(obj: Action): JsValue = obj match {
     case x: GroupCreate => packWithKind(x)
     case x: GroupUpdate => packWithKind(x)
-    case x: GroupMessage => packWithKind(x)
+    case x: GroupAction => packWithKind(x)
     case x: GroupHistory => packWithKind(x)
     case x: UserConnect => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
     case x: UserGroupList => packWithKind(x)
-    case x: MessageException => packWithKind(x)
-    case x => packWithKind(SerializationMessageException(s"unknown message: $x"))
+    case x: ActionException => packWithKind(x)
+    case x => packWithKind(SerializationActionException(s"unknown message: $x"))
   }
 
-  override def read(json: JsValue): Message = Try(json.asJsObject.fields) match {
+  override def read(json: JsValue): Action = Try(json.asJsObject.fields) match {
     case Success(flds) if flds.contains(kindFld) && flds.contains(messageFld) && flds.contains(metadataFld) =>
       val raw = flds(messageFld)
       flds(kindFld) match {
         case JsString("GroupCreate") => raw.convertTo[GroupCreate]
         case JsString("GroupUpdate") => raw.convertTo[GroupUpdate]
-        case JsString("GroupMessage") => raw.convertTo[GroupMessage]
+        case JsString("GroupMessage") => raw.convertTo[GroupAction]
         case JsString("GroupHistory") => raw.convertTo[GroupHistory]
         case JsString("UserConnect") => raw.convertTo[UserConnect]
         case JsString("UserUpdate") => raw.convertTo[UserUpdate]
         case JsString("UserGroupList") => raw.convertTo[UserGroupList]
-        case other => SerializationMessageException(s"unknown message kind: $other")
+        case other => SerializationActionException(s"unknown message kind: $other")
       }
     // TODO : handle metadata
     case Success(_) =>
-      SerializationMessageException("message object malformed")
+      SerializationActionException("message object malformed")
     case Failure(exception) =>
       val message = exception.getMessage
-      SerializationMessageException(s"bad message format: $message")
+      SerializationActionException(s"bad message format: $message")
   }
 
 }

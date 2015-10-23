@@ -1,11 +1,11 @@
-package yields.server.mpi.io
+package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
 import spray.json._
-import yields.server.mpi.exceptions.SerializationMessageException
-import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.mpi.Message
-import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
+import yields.server.actions.exceptions.SerializationActionException
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.Action
+import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
 object JsonFormatSpecifications extends Properties("CustomJsonFormat") with MessageGenerators {
 
@@ -22,7 +22,7 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
     toAndFromJson(x) == x
   }
 
-  property("GroupMessage") = forAll { (x: GroupMessage) =>
+  property("GroupMessage") = forAll { (x: GroupAction) =>
     toAndFromJson(x) == x
   }
 
@@ -42,11 +42,11 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
     toAndFromJson(x) == x
   }
 
-  property("SerializationMessageException") = forAll { (x: SerializationMessageException) =>
+  property("SerializationMessageException") = forAll { (x: SerializationActionException) =>
     toAndFromJson(x) == x
   }
 
-  property("Message") = forAll { (x: Message) =>
+  property("Message") = forAll { (x: Action) =>
     toAndFromJson(x) == x
   }
 

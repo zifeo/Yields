@@ -3,22 +3,22 @@ package yields.server.pipeline
 import akka.event.LoggingAdapter
 import akka.util.ByteString
 import spray.json._
-import yields.server.mpi.io._
-import yields.server.mpi.Message
+import yields.server.io._
+import yields.server.actions.Action
 
 /**
  * Parse every incoming and outgoing items from and to Yields message.
  */
-class ParserModule(logger: LoggingAdapter) extends Module[ByteString, Message, Message, ByteString] {
+class ParserModule(logger: LoggingAdapter) extends Module[ByteString, Action, Action, ByteString] {
 
   /** Incoming log with given channel. */
   override val incoming = { raw: ByteString =>
     val json = raw.utf8String.parseJson
-    json.convertTo[Message]
+    json.convertTo[Action]
   }
 
   /** Outgoing log with given channel. */
-  override val outgoing = { message: Message =>
+  override val outgoing = { message: Action =>
     val json = message.toJson
     ByteString(json.toString())
   }

@@ -1,11 +1,11 @@
-package yields.server.mpi.io
+package yields.server.io
 
 import org.scalacheck.{Gen, Arbitrary}
 import yields.server.models._
-import yields.server.mpi.exceptions.SerializationMessageException
-import yields.server.mpi.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.mpi.Message
-import yields.server.mpi.users.{UserGroupList, UserConnect, UserUpdate}
+import yields.server.actions.exceptions.SerializationActionException
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.Action
+import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
 trait MessageGenerators {
 
@@ -31,11 +31,11 @@ trait MessageGenerators {
     } yield GroupUpdate(gid, name.map(avoidEOI), image)
   }
 
-  implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
+  implicit lazy val groupMessageArb: Arbitrary[GroupAction] = Arbitrary {
     for {
       gid <- arbitrary[GID]
       content <- arbitrary[String]
-    } yield GroupMessage(gid, avoidEOI(content))
+    } yield GroupAction(gid, avoidEOI(content))
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
@@ -68,13 +68,13 @@ trait MessageGenerators {
     } yield UserGroupList(uid)
   }
 
-  implicit lazy val serializationMessageExceptionArb: Arbitrary[SerializationMessageException] = Arbitrary {
+  implicit lazy val serializationMessageExceptionArb: Arbitrary[SerializationActionException] = Arbitrary {
     for {
       message <- arbitrary[String]
-    } yield SerializationMessageException(avoidEOI(message))
+    } yield SerializationActionException(avoidEOI(message))
   }
 
-  implicit lazy val messageArb: Arbitrary[Message] = Arbitrary {
+  implicit lazy val messageArb: Arbitrary[Action] = Arbitrary {
     val arbs = Seq(groupCreateArb, groupUpdateArb, groupMessageArb, groupHistoryArb, userUpdateArb, userConnectArb)
     val gens = arbs.map(_.arbitrary)
     oneOf(gens.head, gens.tail.head, gens.drop(2): _*) // requires at least 2 brute entries
