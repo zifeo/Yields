@@ -1,15 +1,20 @@
 package yields.client.serverconnection;
 
+import android.graphics.Bitmap;
 import android.util.ArrayMap;
+import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import yields.client.id.Id;
+import yields.client.messages.ImageContent;
 
 public class RequestBuilder {
 
@@ -28,7 +33,8 @@ public class RequestBuilder {
     public enum Fields {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
-        FROM("from"), TO("to"), COUNT("count");
+        LAST("last"), TO("to"), COUNT("count"),
+        IMAGE("image"), NID("nid"), HOWMANY("how-many");
 
         private final String name;
         Fields(String name) { this.name = name; }
@@ -40,6 +46,8 @@ public class RequestBuilder {
     private final Map<String, Object> mConstructingMap;
 
     public static Request UserUpdateRequest(Id sender, Map<Fields, String> args) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(args);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
 
@@ -57,6 +65,7 @@ public class RequestBuilder {
     }
 
     public static Request userGroupListRequest(Id sender) {
+        Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERGROUPLIST, sender);
 
@@ -64,6 +73,8 @@ public class RequestBuilder {
     }
 
     public static Request userEntourageAddRequest(Id sender, String email) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERENTOURAGEADD, sender);
 
@@ -73,7 +84,8 @@ public class RequestBuilder {
     }
 
     public static Request userEntourageRemoveRequest(Id sender, String email) {
-
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERENTOURAGEREMOVE, sender);
 
@@ -83,6 +95,8 @@ public class RequestBuilder {
     }
 
     public static Request userConnectRequest(Id sender, String email) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERCONNECT, sender);
 
@@ -92,6 +106,7 @@ public class RequestBuilder {
     }
 
     public static Request userUpdateRequest(Id sender) {
+        Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERSTATUS, sender);
 
@@ -100,6 +115,13 @@ public class RequestBuilder {
 
     public static Request GroupCreateRequest(Id sender, String name,
                                              List<Id> nodes) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(nodes);
+
+        if(nodes.size() < 1) {
+            throw new IllegalArgumentException();
+        }
 
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.GROUPCREATE, sender);
@@ -111,60 +133,68 @@ public class RequestBuilder {
     }
 
     public static Request GroupUpdateRequest(Id sender, Id groupId,
-                                             Map<Fields, String> args) {
+                                             String newName,
+                                             ImageContent newImage) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+
+        if (newName == null && newImage == null) {
+            throw new IllegalArgumentException();
+        }
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
+                MessageKind.GROUPUPDATE, sender);
 
         builder.addField(Fields.GID, groupId);
 
-        if (args.containsKey(Fields.NAME)) {
-            builder.addField(Fields.NAME, args.get(Fields.NAME));
+        if (newName != null) {
+            builder.addField(Fields.NAME, newName);
         }
-        /* PIC if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }*/
+        if (newImage != null) {
+            builder.addField(Fields.IMAGE, newImage.getImage());
+        }
 
         return builder.request();
     }
 
 
-    public static Request GroupAddRequest(Id sender, Map<Fields, String> args) {
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
+    public static Request GroupAddRequest(Id sender, Id groupId,
+                                          Id newUser) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newUser);
 
-        if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }
-        if (args.containsKey(Fields.NAME)) {
-            builder.addField(Fields.NAME, args.get(Fields.NAME));
-        }
-        /* PIC if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }*/
+        RequestBuilder builder = new RequestBuilder(
+                MessageKind.GROUPADD, sender);
+
+        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, newUser);
 
         return builder.request();
     }
 
-    public static Request GroupRemoveRequest(Id sender, Map<Fields, String> args) {
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
+    public static Request GroupRemoveRequest(Id sender, Id groupId,
+                                             Id newUser ) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newUser);
 
-        if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }
-        if (args.containsKey(Fields.NAME)) {
-            builder.addField(Fields.NAME, args.get(Fields.NAME));
-        }
-        /* PIC if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }*/
+        RequestBuilder builder = new RequestBuilder(
+                MessageKind.GROUPREMOVE, sender);
+
+        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, newUser);
 
         return builder.request();
     }
 
     public static Request GroupMessageRequest(Id sender, Id groupId,
                                               String kind, String content) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(kind);
+        Objects.requireNonNull(content);
+
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.GROUPMESSAGE, sender);
 
@@ -175,35 +205,24 @@ public class RequestBuilder {
         return builder.request();
     }
 
-    public static Request GroupHistoryRequest(Id sender, Date from) {
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
+    public static Request GroupHistoryRequest(Id sender, Id last,
+                                              int messageCount) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(last);
+        Objects.requireNonNull(messageCount);
 
-        builder.addField(Fields.FROM, from);
+        RequestBuilder builder = new RequestBuilder(
+                MessageKind.GROUPHISTORY, sender);
+
+        builder.addField(Fields.LAST, last);
+        builder.addField(Fields.COUNT, last);
 
         return builder.request();
     }
 
-    public static Request GroupHistoryRequest(Id sender, int messageCount) {
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
+    public static Request pingRequest(String content) {
+        Objects.requireNonNull(content);
 
-        builder.addField(Fields.COUNT, messageCount);
-
-        return builder.request();
-    }
-
-    public static Request GroupHistoryRequest(Id sender, Date from, Date to) {
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
-
-        builder.addField(Fields.FROM, from);
-        builder.addField(Fields.TO, to);
-
-        return builder.request();
-    }
-
-    public static Request simpleRequest(String content) {
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.PING, new Id(0l));
 
@@ -236,6 +255,17 @@ public class RequestBuilder {
 
     private void addField(Fields fieldType, int field) {
         this.mConstructingMap.put(fieldType.getValue(), field);
+    }
+
+    private void addField(Fields fieldType, Bitmap field) {
+        int size     = field.getRowBytes() * field.getHeight();
+        ByteBuffer b = ByteBuffer.allocate(size);
+
+        field.copyPixelsToBuffer(b);
+
+        byte[] byteImage = b.array();
+        this.mConstructingMap.put(fieldType.getValue(), Base64
+                .encodeToString(byteImage, Base64.DEFAULT));
     }
 
     private Request request() {

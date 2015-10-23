@@ -7,11 +7,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Objects;
 
 public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
     private Socket mSocket;
 
     public ConnectionManager(SocketProvider socketProvider) throws IOException{
+        Objects.requireNonNull(socketProvider);
         mSocket = socketProvider.getConnection();
     }
 
