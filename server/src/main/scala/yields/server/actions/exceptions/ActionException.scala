@@ -12,6 +12,6 @@ trait ActionException extends Exception with Action with Result {
   val message: String
 
   /** An exception stays an exception as it is run. */
-  final def run(uid: UID): Result = this
+  final def run(ignored: UID): Result = this
 
 }
