@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.UnknownHostException;
 
 public class ServerChannelTest {
     private final static String FAKE_RESPONSE = "{" +
@@ -40,7 +39,7 @@ public class ServerChannelTest {
 
     @Test
     public void testWorkingSendRequestAndReadResponse() throws JSONException{
-        Request simpleRequest = RequestBuilder.simpleRequest("test");
+        Request simpleRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -63,7 +62,7 @@ public class ServerChannelTest {
 
     @Test
     public void testNonWorkingConnection() throws IOException{
-        Request simpleRequest = RequestBuilder.simpleRequest("test");
+        Request simpleRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
