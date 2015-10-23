@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
@@ -28,10 +29,7 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<Node> nodes, Bitmap image) throws NodeException {
         super(name, id);
-        if (nodes == null){
-            throw new NodeException("Error, null list in Group constructor");
-        }
-        mNodes = new ArrayList<>(nodes);
+        mNodes = new ArrayList<>(Objects.requireNonNull(nodes));
         mImage = image;
         mCurrentMessages = new ArrayList<>();
     }
@@ -55,11 +53,7 @@ public class Group extends Node {
     }
 
     public void setImage(Bitmap image){
-        if (image == null){
-            throw new IllegalArgumentException("Null image in setImage");
-        }
-
-        mImage = image;
+        mImage = Objects.requireNonNull(image);
     }
 
     public List<Node> getUsers() {
