@@ -5,7 +5,7 @@ import spray.json._
 import yields.server.io._
 import yields.server.actions._
 import yields.server.actions.exceptions.{SerializationActionException, ActionException}
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
 import scala.util.{Failure, Success, Try}
@@ -33,7 +33,7 @@ object MessageJsonFormat extends RootJsonFormat[Action] {
   override def write(obj: Action): JsValue = obj match {
     case x: GroupCreate => packWithKind(x)
     case x: GroupUpdate => packWithKind(x)
-    case x: GroupAction => packWithKind(x)
+    case x: GroupMessage => packWithKind(x)
     case x: GroupHistory => packWithKind(x)
     case x: UserConnect => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
@@ -48,7 +48,7 @@ object MessageJsonFormat extends RootJsonFormat[Action] {
       flds(kindFld) match {
         case JsString("GroupCreate") => raw.convertTo[GroupCreate]
         case JsString("GroupUpdate") => raw.convertTo[GroupUpdate]
-        case JsString("GroupMessage") => raw.convertTo[GroupAction]
+        case JsString("GroupMessage") => raw.convertTo[GroupMessage]
         case JsString("GroupHistory") => raw.convertTo[GroupHistory]
         case JsString("UserConnect") => raw.convertTo[UserConnect]
         case JsString("UserUpdate") => raw.convertTo[UserUpdate]

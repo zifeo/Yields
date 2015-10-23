@@ -6,7 +6,7 @@ import akka.stream.scaladsl.{Flow, Tcp}
 import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 import yields.server.actions.Action
-import yields.server.actions.groups.GroupAction
+import yields.server.actions.groups.GroupMessage
 import yields.server.pipeline.{ParserModule, LoggerModule}
 
 /**
@@ -28,7 +28,7 @@ object Yields extends App {
   val parserModule = ParserModule()
   val mockExecuteStep =
     Flow[Action].mapAsync {
-      case GroupAction(gid, mess) => GroupAction(gid, "answered")
+      case GroupMessage(gid, mess) => GroupMessage(gid, "answered")
       case x => x
     }
 

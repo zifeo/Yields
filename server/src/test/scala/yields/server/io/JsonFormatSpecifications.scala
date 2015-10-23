@@ -3,7 +3,7 @@ package yields.server.io
 import org.scalacheck.{Prop, Properties}
 import spray.json._
 import yields.server.actions.exceptions.SerializationActionException
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.actions.Action
 import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
@@ -22,7 +22,7 @@ object JsonFormatSpecifications extends Properties("CustomJsonFormat") with Mess
     toAndFromJson(x) == x
   }
 
-  property("GroupMessage") = forAll { (x: GroupAction) =>
+  property("GroupMessage") = forAll { (x: GroupMessage) =>
     toAndFromJson(x) == x
   }
 

@@ -2,7 +2,7 @@ package yields.server
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.exceptions.SerializationActionException
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 import yields.server.io.{ActionExceptionJsonWriter, MessageJsonFormat}
 
@@ -17,7 +17,7 @@ package object io {
   // Message subclasses (do not forgot to add class/name binding in message json format superclass)
   implicit val groupCreateJsonFormat = jsonFormat2(GroupCreate)
   implicit val groupUpdateJsonFormat = jsonFormat3(GroupUpdate)
-  implicit val groupMessageJsonFormat = jsonFormat2(GroupAction)
+  implicit val groupMessageJsonFormat = jsonFormat2(GroupMessage)
   implicit val groupHistoryJsonFormat = jsonFormat3(GroupHistory)
 
   implicit val userConnectJsonFormat = jsonFormat1(UserConnect)

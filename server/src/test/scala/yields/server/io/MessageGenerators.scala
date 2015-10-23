@@ -3,7 +3,7 @@ package yields.server.io
 import org.scalacheck.{Gen, Arbitrary}
 import yields.server.models._
 import yields.server.actions.exceptions.SerializationActionException
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupAction}
+import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
 import yields.server.actions.Action
 import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
 
@@ -31,11 +31,11 @@ trait MessageGenerators {
     } yield GroupUpdate(gid, name.map(avoidEOI), image)
   }
 
-  implicit lazy val groupMessageArb: Arbitrary[GroupAction] = Arbitrary {
+  implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
       gid <- arbitrary[GID]
       content <- arbitrary[String]
-    } yield GroupAction(gid, avoidEOI(content))
+    } yield GroupMessage(gid, avoidEOI(content))
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
