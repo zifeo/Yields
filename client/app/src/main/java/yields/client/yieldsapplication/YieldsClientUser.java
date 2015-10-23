@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
@@ -34,8 +35,10 @@ public class YieldsClientUser extends ClientUser{
         mServerChannel = (ServerChannel) mConnectionManager.getCommunicationChannel();
     }
 
-    public void createInstance(String name, Id id, String email, Bitmap img) throws InstantiationException, IOException {
+    public static void createInstance(String name, Id id, String email, Bitmap img) throws InstantiationException, IOException {
         if (mInstance == null){
+            Objects.requireNonNull(id);
+            Objects.requireNonNull(img);
             mInstance = new YieldsClientUser(name, id, email, img);
             YieldsApplication.setUser(mInstance);
         }
