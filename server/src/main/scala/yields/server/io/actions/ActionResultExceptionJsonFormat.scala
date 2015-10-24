@@ -1,4 +1,4 @@
-package yields.server.io
+package yields.server.io.actions
 
 import spray.json._
 import yields.server.actions.exceptions.{ActionResultException, SerializationException}
