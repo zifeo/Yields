@@ -10,11 +10,18 @@
         android:title="@string/addContactToGroup"
         android:layout_gravity="center"
         app:showAsAction="withText|ifRoom"
-        />
+    />
 
     <item android:id="@+id/actionAddNodeToGroup"
         android:title="@string/addNodeToGroup"
         android:layout_gravity="center"
         app:showAsAction="withText|ifRoom"
-        />
+    />
+
+    <item android:id="@+id/actionDoneCreateGroup"
+        android:icon="@drawable/ic_arrow_forward_black_24dp"
+        android:title="@string/done"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+    />
 </menu>

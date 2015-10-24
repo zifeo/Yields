@@ -128,6 +128,11 @@ public class GroupActivity extends AppCompatActivity {
 
         try {
             YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico1", new Id(2), "m@m.es", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Teo", new Id(3), "m@m.fr", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Justinien", new Id(4), "m@m.cn", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico2", new Id(5), "m@m.jpp", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Jeremy", new Id(6), "m@m.ch", imageUser));
         } catch (NodeException e) {
             e.printStackTrace();
         }

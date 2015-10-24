@@ -104,7 +104,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
-        Intent intent = new Intent(this, SelectUsernameActivity.class);
+        Intent intent = new Intent(this, LoggingInActivity.class);
         startActivity(intent);
     }
 

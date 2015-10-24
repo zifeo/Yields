@@ -1,25 +1,33 @@
 package yields.client.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.ArrayAdapter;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import yields.client.R;
-import yields.client.listadapter.ListAdapterUsers;
-import yields.client.node.Node;
+import yields.client.gui.PairUserBoolean;
+import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class CreateGroupActivity extends AppCompatActivity {
-    private ListAdapterUsers mAdapterUsers;
-    private List<User> mUsers;
+    private ListAdapterUsersCheckBox mAdapterUsersCheckBox;
+    private List<PairUserBoolean> mUsers;
+    private ListView mListView;
+
+    private static final String TAG = "CreateGroupActivity";
+    private static final int REQUEST_ADD_CONTACT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,16 +39,30 @@ public class CreateGroupActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(null);
 
         mUsers = new ArrayList<>();
-        mUsers.add(YieldsApplication.getUser());
+        mUsers.add(new PairUserBoolean(YieldsApplication.getUser(), true));
 
-        mAdapterUsers = new ListAdapterUsers(getApplicationContext(), R.layout.add_user_layout, mUsers);
+        mAdapterUsersCheckBox = new ListAdapterUsersCheckBox(getApplicationContext(),
+                R.layout.add_user_layout, mUsers, true);
 
-        ListView listView = (ListView) findViewById(R.id.listViewCreateGroup);
+        mListView = (ListView) findViewById(R.id.listViewCreateGroup);
 
-        listView.setAdapter(mAdapterUsers);
-        listView.setItemsCanFocus(false);
+        mListView.setAdapter(mAdapterUsersCheckBox);
 
-        mAdapterUsers.notifyDataSetChanged();
+        mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkboxUser);
+
+                boolean b = mUsers.get(position).getBoolean();
+
+                checkBox.setChecked(!b);
+                mUsers.get(position).setBoolean(!b);
+            }
+        });
+
+        mListView.setItemsCanFocus(false);
+
+        mAdapterUsersCheckBox.notifyDataSetChanged();
     }
 
     @Override
@@ -50,4 +72,69 @@ public class CreateGroupActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_create_group, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionAddContactToGroup:
+                ArrayList<String> emailList = new ArrayList<>();
+
+                for (int i = 0; i < mUsers.size(); i++){
+                    emailList.add(mUsers.get(i).getUser().getEmail());
+                }
+
+                Intent intentSelectUsers = new Intent(this, CreateGroupSelectUsersActivity.class);
+                intentSelectUsers.putStringArrayListExtra(CreateGroupSelectUsersActivity.
+                        EMAIL_LIST_INPUT_KEY, emailList);
+
+                startActivityForResult(intentSelectUsers, REQUEST_ADD_CONTACT);
+            break;
+
+            case R.id.actionDiscover:
+
+            break;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {
+
+            ArrayList<String> emailList = data.getStringArrayListExtra(
+                    CreateGroupSelectUsersActivity.EMAIL_LIST_KEY);
+
+            List<User> entourage = YieldsApplication.getUser().getEntourage();
+            for (int i = 0; i < emailList.size(); i++){
+
+                boolean found = false;
+                for (int j = 0; j < mUsers.size(); j++){ // check if user is already present
+                    if (mUsers.get(j).getUser().getEmail().equals(emailList.get(i))){
+                        found = true;
+                    }
+                }
+
+                if (!found){
+                    for (int j = 0; j < entourage.size(); j++){ // find the user from its email
+                        if (entourage.get(j).getEmail().equals(emailList.get(i))){
+                            mUsers.add(new PairUserBoolean(entourage.get(j), true));
+                        }
+                    }
+                }
+            }
+
+            mAdapterUsersCheckBox.notifyDataSetChanged();
+        }
+    }
+
 }
