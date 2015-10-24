@@ -31,12 +31,11 @@
         android:layout_height="fill_parent"
         android:layout_toRightOf="@id/imageUser"
         android:singleLine="true"
-        android:text="Arnaud"
-        android:textSize="30sp"
+        android:textSize="26sp"
         android:textColor="#000000"
         android:maxLines="1"
         android:paddingLeft="15sp"
-        android:paddingTop="5sp"
-        />
+        android:paddingTop="8sp"
+        android:text="Username" />
 
 </RelativeLayout>

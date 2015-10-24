@@ -26,6 +26,9 @@ public class CreateGroupActivity extends AppCompatActivity {
     private List<PairUserBoolean> mUsers;
     private ListView mListView;
 
+    private String mGroupName;
+    private int mGroupType;
+
     private static final String TAG = "CreateGroupActivity";
     private static final int REQUEST_ADD_CONTACT = 1;
 
@@ -37,6 +40,10 @@ public class CreateGroupActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
+
+        mGroupName = getIntent().getStringExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY);
+        mGroupType = getIntent().getIntExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY,
+                CreateGroupSelectNameActivity.PUBLIC_GROUP);
 
         mUsers = new ArrayList<>();
         mUsers.add(new PairUserBoolean(YieldsApplication.getUser(), true));
@@ -81,6 +88,10 @@ public class CreateGroupActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.actionCancelCreateGroup:
+                finish();
+            break;
+
             case R.id.actionAddContactToGroup:
                 ArrayList<String> emailList = new ArrayList<>();
 

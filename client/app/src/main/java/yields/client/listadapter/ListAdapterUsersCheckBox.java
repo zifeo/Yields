@@ -67,6 +67,10 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<PairUserBoolean> {
                     mUsers.remove(pos);
                     ListAdapterUsersCheckBox.this.notifyDataSetChanged();
                 }
+
+                if (mRemoveWhenUnchecked  && pos==0){
+                    buttonView.setChecked(!isChecked);
+                }
             }
         });
 

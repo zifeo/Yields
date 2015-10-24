@@ -26,7 +26,7 @@ public class Group extends Node {
      *
      * @param name The name of the group
      * @param id The id of the group
-     * @param nodes The current nodes of the group
+     * @param users The current users of the group
      * @param image The current image of the group, can be null
      * @param isImageCircle Indicates if the image given is already circular
      * @throws NodeException If nodes is null

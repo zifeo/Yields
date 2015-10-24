@@ -26,8 +26,8 @@
         android:background="#9C9CB8"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="0sp"
-        android:paddingRight="10sp"
+        android:paddingLeft="-18sp"
+        android:paddingRight="0sp"
         >
     </yields.client.gui.CenteredToolBar>
 

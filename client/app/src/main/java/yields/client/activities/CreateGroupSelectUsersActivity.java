@@ -82,8 +82,6 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
             }
         }
 
-        Log.i("Kapoue", " Size : " + emailList.size());
-
         Intent returnIntent = new Intent();
         returnIntent.putStringArrayListExtra(EMAIL_LIST_KEY, emailList);
 

@@ -97,7 +97,7 @@ public class GroupActivity extends AppCompatActivity {
             break;
 
             case R.id.actionCreate:
-                intent = new Intent(this, CreateGroupActivity.class);
+                intent = new Intent(this, CreateGroupSelectNameActivity.class);
             break;
 
             case R.id.actionSettings:
