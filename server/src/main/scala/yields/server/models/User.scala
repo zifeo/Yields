@@ -22,10 +22,6 @@ final class User {
 
 object User {
 
-  // Create a date for now
-  val dateFormat: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-  val date: String = dateFormat.format(new Date())
-
   def getUserByEmail(email: String): User = {
     val user = queryBySql[User]("select from user where email = ?", email)
     user match {
@@ -43,7 +39,8 @@ object User {
   }
 
   def createUser(name: String, email: String): User = {
-    val user = queryBySql[User]("insert into user Set date_creation = ?, email = ?, name = ?", date, name, email)
+    val user = queryBySql[User]("insert into user Set date_creation = ?, email = ?, name = ?", databaseDateTime,
+    name, email)
     user match {
       case Nil => throw new NoSuchElementException
       case head :: tail => user.head

@@ -22,11 +22,9 @@ final class Group {
 }
 
 object Group {
-  val dateFormat: DateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-  val date: String = dateFormat.format(new Date())
 
   def createGroup(name: String): Group = {
-    val res = queryBySql("insert into group Set date_creation = ?, group_name = ?", date, name)
+    val res = queryBySql("insert into group Set date_creation = ?, group_name = ?", databaseDateTime, name)
     res match {
       case Nil => throw new NoSuchElementException
       case head :: tail => res.head
@@ -38,7 +36,8 @@ object Group {
   }
 
   def addMessage(ridGroup: String, ridSender: String, body: String) = {
-    queryBySql("""update ? ADD messages = '{"sender":"?", "time":?, "body":"?"}'""", new ORecordId(ridGroup), new ORecordId(ridSender), date, body)
+    queryBySql("""update ? ADD messages = '{"sender":"?", "time":?, "body":"?"}'""", new ORecordId(ridGroup),
+      new ORecordId(ridSender), databaseDateTime, body)
   }
 
   def getGroupInfos(ridGroup: String): Group = {
@@ -48,4 +47,5 @@ object Group {
       case head :: tail => res.head
     }
   }
+
 }

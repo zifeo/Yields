@@ -2,20 +2,27 @@ package yields.server.io.mpi
 
 import spray.json._
 import yields.server.actions.Result
+import yields.server.actions.exceptions.SerializationException
+import yields.server.io._
 import yields.server.mpi.{Metadata, Response}
 
 /** Json format for [[Response]]. */
 object ResponseJsonFormat extends RootJsonFormat[Response] {
 
+  private val metadataFld = "metadata"
+
   override def write(obj: Response): JsValue = {
     val resultJson = obj.result.toJson.asJsObject
-    val metadataJson = obj.metadata.toJson.asJsObject
-    JsObject(resultJson.fields ++ metadataJson.fields)
+    val metadataJson = obj.metadata.toJson
+    JsObject(resultJson.fields + (metadataFld -> metadataJson))
   }
 
   override def read(json: JsValue): Response = {
     val result = json.convertTo[Result]
-    val metadata = json.convertTo[Metadata]
+    val metadata = json.asJsObject.getFields(metadataFld) match {
+      case Seq(md) => md.convertTo[Metadata]
+      case _ => throw SerializationException(s"unknown metadata")
+    }
     Response(result, metadata)
   }
 

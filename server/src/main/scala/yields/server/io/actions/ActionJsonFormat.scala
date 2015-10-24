@@ -6,13 +6,13 @@ import yields.server.actions._
 import yields.server.actions.exceptions.SerializationException
 import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
 import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
+import yields.server.io._
 
 /** Json format for [[Action]]. */
 object ActionJsonFormat extends RootJsonFormat[Action] {
 
   private val kindFld = "kind"
   private val messageFld = "message"
-  private val metadataFld = "metadata"
 
   /**
    * Format the message with its message type.
@@ -22,8 +22,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
    */
   def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
     kindFld -> obj.getClass.getSimpleName.toJson,
-    messageFld -> obj.toJson,
-    metadataFld -> JsNull // TODO : handle metadata
+    messageFld -> obj.toJson
   )
 
   override def write(obj: Action): JsValue = {
@@ -43,8 +42,8 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   }
 
   override def read(json: JsValue): Action =
-    json.asJsObject.getFields(kindFld, messageFld, metadataFld) match {
-      case Seq(JsString(kind), message, metadata) =>
+    json.asJsObject.getFields(kindFld, messageFld) match {
+      case Seq(JsString(kind), message) =>
         kind match {
           case "GroupCreate" => message.convertTo[GroupCreate]
           case "GroupUpdate" => message.convertTo[GroupUpdate]
@@ -57,7 +56,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
 
           case _ => throw SerializationException(s"unregistered action kind: $kind")
         }
-      case other => throw SerializationException(s"bad action format: $other")
+      case _ => throw SerializationException(s"bad action format: $json")
     }
 
 }

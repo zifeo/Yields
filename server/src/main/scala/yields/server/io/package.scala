@@ -4,8 +4,8 @@ import spray.json.DefaultJsonProtocol._
 import yields.server.actions.exceptions.SerializationException
 import yields.server.actions.groups._
 import yields.server.actions.users._
-import yields.server.io.actions.{ActionResultExceptionJsonFormat, ActionJsonFormat}
-import yields.server.io.models.{UserJsonFormat, GroupJsonFormat}
+import yields.server.io.actions.{ActionJsonFormat, ActionResultExceptionJsonFormat, ResultJsonFormat}
+import yields.server.io.models.{GroupJsonFormat, UserJsonFormat}
 import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -24,6 +24,7 @@ package object io {
   /***** Actions  *****/
 
   implicit lazy val actionJF = ActionJsonFormat
+  implicit lazy val resultJF = ResultJsonFormat
 
   // Exceptions
 
