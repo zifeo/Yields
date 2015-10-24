@@ -7,12 +7,20 @@ import yields.server.models.User
 /** Json writer for [[yields.server.models.User]]. */
 object UserJsonFormat extends RootJsonFormat[User] {
 
-  @deprecated("spray-json#116", "always")
-  override def read(ignored: JsValue): User = new User
+  private val uidFld = "uid"
+  private val nameFld = "name"
+
+  override def read(json: JsValue): User = json.asJsObject.getFields(uidFld, nameFld) match {
+    case Seq(JsString(uid), JsString(name)) =>
+      val u = new User
+      u.id = uid
+      u.name = name
+      u
+  }
 
   override def write(obj: User): JsValue = JsObject(
-    "uid" -> obj.id.toJson,
-    "name" -> obj.name.toJson
+    uidFld-> obj.id.toJson,
+    nameFld -> obj.name.toJson
   )
 
 }

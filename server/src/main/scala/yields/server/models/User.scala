@@ -1,7 +1,7 @@
 package yields.server.models
 
 import java.text.{SimpleDateFormat, DateFormat}
-import java.util.Date
+import java.util.{Objects, Date}
 import javax.persistence.{Version, Id}
 
 import com.orientechnologies.orient.core.id.ORecordId

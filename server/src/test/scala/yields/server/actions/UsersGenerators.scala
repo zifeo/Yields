@@ -5,7 +5,7 @@ import yields.server._
 import yields.server.actions.users._
 import yields.server.models._
 
-trait UsersGenerators {
+trait UsersGenerators extends ModelsGenerators {
 
   import Arbitrary.arbitrary
 
@@ -42,7 +42,7 @@ trait UsersGenerators {
 
   implicit lazy val userGroupListResArb: Arbitrary[UserGroupListRes] = Arbitrary {
     for {
-      groups <- arbitrary[Seq[Group]]
+      groups <- arbitrary[List[Group]]
     } yield UserGroupListRes(groups)
   }
 
