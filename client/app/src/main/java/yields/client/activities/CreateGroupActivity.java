@@ -12,12 +12,15 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import yields.client.R;
 import yields.client.gui.PairUserBoolean;
+import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
+import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -106,8 +109,29 @@ public class CreateGroupActivity extends AppCompatActivity {
                 startActivityForResult(intentSelectUsers, REQUEST_ADD_CONTACT);
             break;
 
-            case R.id.actionDiscover:
+            case R.id.actionAddNodeToGroup:
 
+            break;
+
+            case R.id.actionDoneCreateGroup:
+                List<User> userList = new ArrayList<>();
+
+                for (int i = 0; i < mUsers.size(); i++){
+                    userList.add(mUsers.get(i).getUser());
+                }
+
+                Group group = new Group(mGroupName, new Id(1), userList);
+
+                try {
+                    YieldsApplication.getUser().addNewGroup(group);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent createGroupIntent = new Intent(this, GroupActivity.class);
+                createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                startActivity(createGroupIntent);
             break;
 
             default:

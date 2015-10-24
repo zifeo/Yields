@@ -1,6 +1,7 @@
 package yields.client.activities;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -119,6 +120,16 @@ public class GroupActivity extends AppCompatActivity {
         return intent == null;
     }
 
+
+    @Override
+    protected void onNewIntent(Intent intent){
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast mToast = Toast.makeText(context, "Kapoue", duration);
+        mToast.show();
+    }
+
     /**
      * To be removed as soon as the logging is working
      */
@@ -174,7 +185,8 @@ public class GroupActivity extends AppCompatActivity {
 
         @Override
         public void addNewGroup(Group group) {
-            /* Nothing */
+            mGroups.add(group);
+            mAdapterGroups.notifyDataSetChanged();
         }
 
         @Override
