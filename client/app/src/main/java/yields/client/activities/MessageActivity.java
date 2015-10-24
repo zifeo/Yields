@@ -112,6 +112,7 @@ public class MessageActivity extends Activity {
         Message message = new Message("message", new Id(1230), mUser, content);
         // TODO : take right name and right id.
         mMessages.add(message);
+        mGroup.addMessage(message); // temporary
         //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);

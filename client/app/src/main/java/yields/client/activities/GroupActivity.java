@@ -68,7 +68,7 @@ public class GroupActivity extends AppCompatActivity {
         });
         listView.setItemsCanFocus(false);
 
-        mAdapterGroups.notifyDataSetChanged();
+
     }
 
     @Override
@@ -122,12 +122,10 @@ public class GroupActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onNewIntent(Intent intent){
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
+    protected void onStart(){
+        super.onStart();
 
-        Toast mToast = Toast.makeText(context, "Kapoue", duration);
-        mToast.show();
+        mAdapterGroups.notifyDataSetChanged();
     }
 
     /**
