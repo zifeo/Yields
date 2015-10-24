@@ -1,7 +1,7 @@
 package yields.server.actions.users
 
 import yields.server.actions.{Action, Result}
-import yields.server.models.{Blob, Email, UID}
+import yields.server.dbi.models.{Blob, Email, UID}
 
 /**
  * Update an user given optional fields.

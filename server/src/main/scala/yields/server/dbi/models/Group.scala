@@ -1,7 +1,5 @@
-package yields.server.models
+package yields.server.dbi.models
 
-import java.text.{DateFormat, SimpleDateFormat}
-import java.util.Date
 import javax.persistence.{Id, Version}
 
 import com.orientechnologies.orient.core.id.ORecordId
@@ -19,6 +17,7 @@ final class Group {
   var messages: java.util.List[String] = new java.util.ArrayList()
 
   override def toString = s"Group: $id, name: $group_name , creation: $date_creation, last activity: $last_activity"
+
 }
 
 object Group {

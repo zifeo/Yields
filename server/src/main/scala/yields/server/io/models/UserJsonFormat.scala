@@ -2,9 +2,9 @@ package yields.server.io.models
 
 import spray.json._
 import spray.json.DefaultJsonProtocol._
-import yields.server.models.User
+import yields.server.dbi.models.User
 
-/** Json writer for [[yields.server.models.User]]. */
+/** Json writer for [[yields.server.dbi.models.User]]. */
 object UserJsonFormat extends RootJsonFormat[User] {
 
   private val uidFld = "uid"

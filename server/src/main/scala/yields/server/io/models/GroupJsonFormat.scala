@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.io._
-import yields.server.models.Group
+import yields.server.dbi.models.Group
 import yields.server.utils.Converters
 
 /** Json writer for [[Group]]. */

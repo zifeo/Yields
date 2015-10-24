@@ -1,8 +1,6 @@
-package yields.server.models
+package yields.server.dbi.models
 
-import java.text.{SimpleDateFormat, DateFormat}
-import java.util.{Objects, Date}
-import javax.persistence.{Version, Id}
+import javax.persistence.{Id, Version}
 
 import com.orientechnologies.orient.core.id.ORecordId
 import yields.server.dbi._
@@ -17,6 +15,7 @@ final class User {
   var date_creation: java.util.Date = _
 
   override def toString = s"User: $id, name: $name, creation: $date_creation"
+
 }
 
 
@@ -54,4 +53,5 @@ object User {
   def getGroupsFromUser(ridUser: String):List[Group] = {
     queryBySql[Group]("select from E where out = ?", new ORecordId(ridUser))
   }
+
 }

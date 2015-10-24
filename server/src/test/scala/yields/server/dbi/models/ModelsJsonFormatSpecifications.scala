@@ -1,4 +1,4 @@
-package yields.server.models
+package yields.server.dbi.models
 
 import spray.json._
 import yields.server.io._

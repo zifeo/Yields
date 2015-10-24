@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
 import yields.server.actions.{Action, ActionsGenerators, Result}
-import yields.server.models.UID
+import yields.server.dbi.models.UID
 
 trait MessagesGenerators extends ActionsGenerators {
 

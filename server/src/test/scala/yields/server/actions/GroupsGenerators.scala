@@ -3,7 +3,7 @@ package yields.server.actions
 import org.scalacheck.Arbitrary
 import yields.server._
 import yields.server.actions.groups._
-import yields.server.models._
+import yields.server.dbi.models._
 
 trait GroupsGenerators extends DefaultsGenerators {
 

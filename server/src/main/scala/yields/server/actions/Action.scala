@@ -1,6 +1,6 @@
 package yields.server.actions
 
-import yields.server.models.UID
+import yields.server.dbi.models.UID
 
 /**
  * Every action happening in the pipeline.

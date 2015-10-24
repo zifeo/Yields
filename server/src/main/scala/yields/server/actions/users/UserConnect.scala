@@ -1,6 +1,6 @@
 package yields.server.actions.users
 
-import yields.server.models.{UID, Email}
+import yields.server.dbi.models.{UID, Email}
 import yields.server.actions.{Result, Action}
 
 /**

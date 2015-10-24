@@ -1,7 +1,7 @@
 package yields.server.actions.exceptions
 
 import yields.server.actions.{Result, Action}
-import yields.server.models.UID
+import yields.server.dbi.models.UID
 
 /**
  * Base class of every exception related to an action and happening in the pipeline.

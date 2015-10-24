@@ -1,7 +1,7 @@
 package yields.server.actions.groups
 
 import yields.server.actions.{Action, Result}
-import yields.server.models.{GID, NID, Node, UID}
+import yields.server.dbi.models.{GID, NID, Node, UID}
 
 /**
  * Fetch each group node between two dates with time.

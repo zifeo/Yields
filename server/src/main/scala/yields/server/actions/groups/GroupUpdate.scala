@@ -1,6 +1,6 @@
 package yields.server.actions.groups
 
-import yields.server.models.{UID, Blob, GID}
+import yields.server.dbi.models.{UID, Blob, GID}
 import yields.server.actions.{Result, Action}
 
 /**

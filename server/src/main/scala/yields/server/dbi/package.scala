@@ -9,10 +9,10 @@ import scala.language.implicitConversions
 
 package object dbi {
 
-  lazy implicit val database: OObjectDatabaseTx = {
+  private[dbi] lazy implicit val database: OObjectDatabaseTx = {
     val db = new OObjectDatabaseTx(Config.getString("database.uri"))
     db.open(Config.getString("database.user"), Config.getString("database.pass"))
-    db.getEntityManager.registerEntityClasses("yields.server.models")
+    db.getEntityManager.registerEntityClasses("yields.server.dbi.models")
     db
   }
 

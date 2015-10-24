@@ -1,4 +1,4 @@
-package yields.server
+package yields.server.dbi
 
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
