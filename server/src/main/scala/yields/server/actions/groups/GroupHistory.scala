@@ -1,17 +1,15 @@
 package yields.server.actions.groups
 
-import java.time.OffsetDateTime
-
 import yields.server.actions.{Action, Result}
-import yields.server.models.{GID, Node, UID}
+import yields.server.models.{GID, NID, Node, UID}
 
 /**
  * Fetch each group node between two dates with time.
  * @param gid group id
- * @param from start date
- * @param to end date
+ * @param lastNid last node id
+ * @param count number of node wanted
  */
-case class GroupHistory(gid: GID, from: OffsetDateTime, to: OffsetDateTime) extends Action {
+case class GroupHistory(gid: GID, lastNid: NID, count: Int) extends Action {
 
   /**
    * Run the action given the sender.
