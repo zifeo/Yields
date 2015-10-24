@@ -3,11 +3,9 @@ package yields.server.io
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
-import yields.server.actions.exceptions.{SerializationException, ActionResultException}
-import yields.server.actions.groups.{GroupHistory, GroupUpdate, GroupCreate, GroupMessage}
-import yields.server.actions.users.{UserGroupList, UserConnect, UserUpdate}
-
-import scala.util.{Failure, Success, Try}
+import yields.server.actions.exceptions.SerializationException
+import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
+import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
 
 /** Json format for [[Action]]. */
 object ActionJsonFormat extends RootJsonFormat[Action] {
@@ -17,49 +15,49 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   private val metadataFld = "metadata"
 
   /**
-   * Format the action with its type.
-   * @param obj action to pack
-   * @tparam T action type
-   * @return packed action json format
+   * Format the message with its message type.
+   * @param obj message to pack
+   * @tparam T message type
+   * @return packed message json format
    */
-  def packWithKind[T: JsonWriter](obj: T): JsValue =
-    JsObject(
-      kindFld -> obj.getClass.getSimpleName.toJson,
-      messageFld -> obj.toJson,
-      metadataFld -> JsNull // TODO : handle metadata
-    )
+  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
+    kindFld -> obj.getClass.getSimpleName.toJson,
+    messageFld -> obj.toJson,
+    metadataFld -> JsNull // TODO : handle metadata
+  )
 
-  override def write(obj: Action): JsValue = obj match {
-    case x: GroupCreate => packWithKind(x)
-    case x: GroupUpdate => packWithKind(x)
-    case x: GroupMessage => packWithKind(x)
-    case x: GroupHistory => packWithKind(x)
-    case x: UserConnect => packWithKind(x)
-    case x: UserUpdate => packWithKind(x)
-    case x: UserGroupList => packWithKind(x)
-    case x: ActionResultException => packWithKind(x)
-    case x => packWithKind(SerializationException(s"unknown action: $x"))
+  override def write(obj: Action): JsValue = {
+    val kind = obj.getClass.getSimpleName
+    obj match {
+      case x: GroupCreate => packWithKind(x)
+      case x: GroupUpdate => packWithKind(x)
+      case x: GroupMessage => packWithKind(x)
+      case x: GroupHistory => packWithKind(x)
+
+      case x: UserConnect => packWithKind(x)
+      case x: UserUpdate => packWithKind(x)
+      case x: UserGroupList => packWithKind(x)
+
+      case _ => throw SerializationException(s"unregistered action kind: $kind")
+    }
   }
 
-  override def read(json: JsValue): Action = Try(json.asJsObject.fields) match {
-    case Success(flds) if flds.contains(kindFld) && flds.contains(messageFld) && flds.contains(metadataFld) =>
-      val raw = flds(messageFld)
-      flds(kindFld) match {
-        case JsString("GroupCreate") => raw.convertTo[GroupCreate]
-        case JsString("GroupUpdate") => raw.convertTo[GroupUpdate]
-        case JsString("GroupMessage") => raw.convertTo[GroupMessage]
-        case JsString("GroupHistory") => raw.convertTo[GroupHistory]
-        case JsString("UserConnect") => raw.convertTo[UserConnect]
-        case JsString("UserUpdate") => raw.convertTo[UserUpdate]
-        case JsString("UserGroupList") => raw.convertTo[UserGroupList]
-        case other => SerializationException(s"unknown action kind: $other")
-      }
-    // TODO : handle metadata
-    case Success(_) =>
-      SerializationException("action type malformed")
-    case Failure(exception) =>
-      val message = exception.getMessage
-      SerializationException(s"bad action format: $message")
-  }
+  override def read(json: JsValue): Action =
+    json.asJsObject.getFields(kindFld, messageFld, metadataFld) match {
+      case Seq(JsString(kind), message, metadata) =>
+        kind match {
+          case "GroupCreate" => message.convertTo[GroupCreate]
+          case "GroupUpdate" => message.convertTo[GroupUpdate]
+          case "GroupMessage" => message.convertTo[GroupMessage]
+          case "GroupHistory" => message.convertTo[GroupHistory]
+
+          case "UserConnect" => message.convertTo[UserConnect]
+          case "UserUpdate" => message.convertTo[UserUpdate]
+          case "UserGroupList" => message.convertTo[UserGroupList]
+
+          case _ => throw SerializationException(s"unregistered action kind: $kind")
+        }
+      case other => throw SerializationException(s"bad action format: $other")
+    }
 
 }

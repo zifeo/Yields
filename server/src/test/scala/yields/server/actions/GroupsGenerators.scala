@@ -14,7 +14,7 @@ trait GroupsGenerators extends DefaultsGenerators {
   implicit lazy val groupCreateArb: Arbitrary[GroupCreate] = Arbitrary {
     for {
       name <- cleanStringGen
-      nodes <- arbitrary[Seq[NID]]
+      nodes <- arbitrary[List[NID]]
     } yield GroupCreate(name, nodes)
   }
 
