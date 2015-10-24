@@ -23,6 +23,6 @@ package object models {
   type Blob = String
 
   /** Represents a node. */
-  type Node = String
+  type Node = Int
 
 }

@@ -57,7 +57,7 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
     for {
-      nodes <- arbitrary[Seq[Node]]
+      nodes <- arbitrary[List[Node]]
     } yield GroupHistoryRes(nodes)
   }
 
