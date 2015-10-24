@@ -33,14 +33,17 @@ public class YieldsClientUser extends ClientUser{
 
     private YieldsClientUser(String name, Id id, String email, Bitmap img)
             throws NodeException, IOException {
+
         super(name, id, email, img);
         mSocketProvider = new YieldEmulatorSocketProvider();
         mConnectionManager = new ConnectionManager(mSocketProvider);
-        mServerChannel = (ServerChannel) mConnectionManager.getCommunicationChannel();
+        mServerChannel = (ServerChannel) mConnectionManager
+                .getCommunicationChannel();
     }
 
     public void createInstance(String name, Id id, String email, Bitmap img)
             throws InstantiationException, IOException {
+
         if (mInstance == null){
             Objects.requireNonNull(id);
             Objects.requireNonNull(img);
@@ -48,7 +51,8 @@ public class YieldsClientUser extends ClientUser{
             YieldsApplication.setUser(mInstance);
         }
         else{
-            throw new InstantiationException("YieldsClientUser is already instanced.");
+            throw new InstantiationException(
+                    "YieldsClientUser is already instanced.");
         }
     }
 

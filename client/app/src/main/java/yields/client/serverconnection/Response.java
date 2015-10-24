@@ -6,18 +6,18 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 public class Response{
-    private final String mRawResponse;
+    private final JSONObject mRawResponse;
 
-    public Response(String rawResponse) {
+    public Response(String rawResponse) throws JSONException {
         Objects.requireNonNull(rawResponse);
-        this.mRawResponse = rawResponse;
+        this.mRawResponse = new JSONObject(rawResponse);
     }
 
-    public JSONObject object() throws JSONException {
-        return new JSONObject(mRawResponse);
+    public JSONObject object() {
+        return mRawResponse;
     }
 
     protected String rawResponse(){
-        return mRawResponse;
+        return mRawResponse.toString();
     }
 }

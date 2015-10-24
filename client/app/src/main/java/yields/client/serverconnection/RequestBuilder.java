@@ -8,10 +8,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
@@ -33,8 +36,8 @@ public class RequestBuilder {
     public enum Fields {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
-        LAST("last"), TO("to"), COUNT("count"),
-        IMAGE("image"), NID("nid"), HOWMANY("how-many");
+        LAST("lastNid"), TO("to"), COUNT("count"),
+        IMAGE("image"), NID("nid");
 
         private final String name;
         Fields(String name) { this.name = name; }
@@ -45,7 +48,8 @@ public class RequestBuilder {
     private final Id mSender;
     private final Map<String, Object> mConstructingMap;
 
-    public static Request UserUpdateRequest(Id sender, Map<Fields, String> args) {
+    public static Request UserUpdateRequest(Id sender,
+                                            Map<Fields, String> args) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(args);
         RequestBuilder builder = new RequestBuilder(
@@ -267,10 +271,6 @@ public class RequestBuilder {
         this.mConstructingMap.put(fieldType.getValue(), field.getId());
     }
 
-    private void addField(Fields fieldType, Date field) {
-        this.mConstructingMap.put(fieldType.getValue(), field.toString());
-    }
-
     private void addField(Fields fieldType, int field) {
         this.mConstructingMap.put(fieldType.getValue(), field);
     }
@@ -292,7 +292,15 @@ public class RequestBuilder {
 
         Map<String, Object> metadata = new ArrayMap<>();
         metadata.put("sender", mSender.getId());
-        metadata.put("time", 0);
+
+        SimpleDateFormat dateFormatISO6101 =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        dateFormatISO6101.setTimeZone(TimeZone.getDefault());
+
+        String formattedDate = dateFormatISO6101
+                .format(new Date(System.currentTimeMillis()));
+
+        metadata.put("date-time", formattedDate);
 
         request.put("metadata", new JSONObject(metadata));
 

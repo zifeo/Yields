@@ -1,5 +1,7 @@
 package yields.client.serverconnection;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,9 +37,9 @@ public class ServerChannel implements CommunicationChannel {
 
         String rawResponse = mReceiver.readLine();
 
-        if (isValid(rawResponse)) {
+        try {
             response = new Response(rawResponse);
-        } else {
+        } catch (JSONException e){
             throw new IOException("Invalid response");
         }
 
