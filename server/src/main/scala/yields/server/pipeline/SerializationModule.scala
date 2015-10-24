@@ -3,22 +3,25 @@ package yields.server.pipeline
 import akka.event.LoggingAdapter
 import akka.util.ByteString
 import spray.json._
+import yields.server.actions.exceptions.ActionResultException
 import yields.server.io._
 import yields.server.actions.Action
+import yields.server.io.actions.ActionResultExceptionJsonFormat
+import yields.server.mpi.{Request, Response}
 
 /**
  * Parse every incoming and outgoing items from and to actions.
  */
-class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Action, Action, ByteString] {
+class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Request, Response, ByteString] {
 
   /** Incoming log with given channel. */
   override val incoming = { raw: ByteString =>
     val json = raw.utf8String.parseJson
-    json.convertTo[Action]
+    json.convertTo[Request]
   }
 
   /** Outgoing log with given channel. */
-  override val outgoing = { result: Action =>
+  override val outgoing = { result: Response =>
     val json = result.toJson
     ByteString(json.toString())
   }
