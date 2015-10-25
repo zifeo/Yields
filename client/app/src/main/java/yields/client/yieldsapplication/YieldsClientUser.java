@@ -88,7 +88,6 @@ public class YieldsClientUser extends ClientUser{
         }
 
         return messageList;
-        // TODO : return the parsed messages.
     }
 
     @Override

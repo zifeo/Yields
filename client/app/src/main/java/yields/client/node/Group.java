@@ -47,7 +47,7 @@ public class Group extends Node {
         Date farthestDate;
 
         if (message == null) {
-            farthestDate = new Date(System.currentTimeMillis());
+            farthestDate = new Date();
         } else {
             farthestDate = message.getKey();
         }

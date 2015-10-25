@@ -298,7 +298,7 @@ public class RequestBuilder {
         metadata.put("sender", mSender.getId());
 
         metadata.put("date-time", formatDate(
-                new Date(System.currentTimeMillis())));
+                new Date()));
 
         request.put("metadata", new JSONObject(metadata));
 
