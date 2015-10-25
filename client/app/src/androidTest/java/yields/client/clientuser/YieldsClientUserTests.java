@@ -8,10 +8,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
+import yields.client.activities.MockFactory;
 import yields.client.id.Id;
+import yields.client.messages.ImageContent;
+import yields.client.messages.Message;
+import yields.client.messages.TextContent;
+import yields.client.node.Group;
+import yields.client.node.User;
+import yields.client.serverconnection.Request;
 import yields.client.yieldsapplication.YieldsApplication;
 import yields.client.yieldsapplication.YieldsClientUser;
 
@@ -46,5 +54,25 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testTextMessageRequestIsCorrectlyParsed(){
+        Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(117), new ArrayList<User>());
+        TextContent mockContent = MockFactory.generateFakeTextContent("Hi, how are you ?");
+        Message message = MockFactory.generateMockMessage("node name", new Id(2), YieldsApplication.getUser(), mockContent);
+
+        Request req = YieldsClientUser.createRequestForMessageToSend(mockGroup, message);
+        // TODO : verify the parsed json ...
+    }
+
+    @Test
+    public void testImageMessageRequestIsCorrectlyParsed(){
+        Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(117), new ArrayList<User>());
+        ImageContent mockContent = MockFactory.generateFakeImageContent(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture), "Caption");
+        Message message = MockFactory.generateMockMessage("node name", new Id(2), YieldsApplication.getUser(), mockContent);
+
+        Request req = YieldsClientUser.createRequestForMessageToSend(mockGroup, message);
+        // TODO : verify the parsed json ...
     }
 }

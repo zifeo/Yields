@@ -40,7 +40,7 @@ public class YieldsClientUser extends ClientUser{
                 .getCommunicationChannel();
     }
 
-    public void createInstance(String name, Id id, String email, Bitmap img)
+    public static void createInstance(String name, Id id, String email, Bitmap img)
             throws InstantiationException, IOException {
 
         if (mInstance == null){
@@ -97,19 +97,25 @@ public class YieldsClientUser extends ClientUser{
         return null;
     }
 
-    private Request createRequestForMessageToSend(Group group, Message message){
+    /**
+     * Create a request for the corresponding message to send to the server.
+     * @param group Group to send the message.
+     * @param message   The message itself.
+     * @return  The correct request, ready to be sent.
+     */
+    public static Request createRequestForMessageToSend(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
         Request req;
         switch (message.getContent().getType()) {
             case "image":
                 req = RequestBuilder
-                        .GroupImageMessageRequest(this.getId(), group.getId(),
+                        .GroupImageMessageRequest(message.getSender().getId(), group.getId(),
                                 "text", (ImageContent) message.getContent());
                 break;
             case "text":
                 req = RequestBuilder
-                        .GroupMessageRequest(this.getId(), group.getId(),
+                        .GroupMessageRequest(message.getSender().getId(), group.getId(),
                                 "text", ((TextContent) message
                                         .getContent()).getText());
                 break;
