@@ -1,5 +1,6 @@
 package yields.client.cache;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -22,7 +23,7 @@ import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 
-public class YieldsDatabaseHelper extends SQLiteOpenHelper {
+public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "yields.db";
@@ -33,14 +34,17 @@ public class YieldsDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String KEY_ID = "id";
 
+    private static final String KEY_USER_NODEID = "nodeID";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_IMAGE = "userImage";
 
+    private static final String KEY_GROUP_NODEID = "nodeID";
     private static final String KEY_GROUP_NAME = "groupName";
-    private static final String KEY_GROUP_USERS = "group";
+    private static final String KEY_GROUP_USERS = "groupUsers";
     private static final String KEY_GROUP_IMAGE = "groupImage";
 
+    private static final String KEY_MESSAGE_NODEID = "nodeID";
     private static final String KEY_MESSAGE_GROUPID = "messageGroup";
     private static final String KEY_MESSAGE_SENDERID = "messageSender";
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
@@ -48,19 +52,21 @@ public class YieldsDatabaseHelper extends SQLiteOpenHelper {
 
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NAME + " TEXT,"
-            + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE + " BLOB" + ")";
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," +KEY_USER_NODEID + " INTEGER,"
+            + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
+            + " BLOB" + ")";
 
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NAME + " TEXT,"
-            + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE + " BLOB" + ")";
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " INTEGER,"
+            + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
+            + " BLOB" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_GROUPID
-            + " INTEGER," + KEY_MESSAGE_SENDERID + " ," + KEY_MESSAGE_CONTENT
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " INTEGER,"
+            + KEY_MESSAGE_GROUPID + " INTEGER," + KEY_MESSAGE_SENDERID + " ," + KEY_MESSAGE_CONTENT
             + " BLOB," + KEY_MESSAGE_DATE + " DATETIME" + ")";
 
-    public YieldsDatabaseHelper() {
+    public CacheDatabaseHelper() {
         super(YieldsApplication.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -77,6 +83,29 @@ public class YieldsDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GROUPS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
         onCreate(db);
+    }
+
+
+    public void addGroup(Group group){
+        SQLiteDatabase database = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        byte[] array = {};
+        values.put(KEY_GROUP_NODEID, group.getId().getId());
+        values.put(KEY_GROUP_IMAGE, array);
+        values.put(KEY_GROUP_NAME, group.getName());
+        StringBuilder userIDS = new StringBuilder();
+        List<User> users = group.getUsers();
+
+        for(User user : users){
+            userIDS.append(user.getId().getId() + ",");
+        }
+        if(users.size() != 0){
+            userIDS.deleteCharAt(userIDS.length() -1);
+        }
+
+        values.put(KEY_GROUP_USERS, userIDS.toString());
+        database.insert(TABLE_GROUPS, null, values);
     }
 
     public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
@@ -97,7 +126,7 @@ public class YieldsDatabaseHelper extends SQLiteOpenHelper {
         }
         else{
             do {
-                Id id  = new Id(cursor.getLong(cursor.getColumnIndex(KEY_ID)));
+                Id id  = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODEID)));
                 String name = ""; //TODO: Define message's Node name attribute
 
                 List<User> users = group.getUsers();
