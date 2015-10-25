@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
@@ -78,17 +79,15 @@ public class MessageActivity extends Activity {
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            int duration = Toast.LENGTH_SHORT;
+            showErrorToast("Couldn't get group informations.");
             TextView groupName = (TextView) findViewById(R.id.groupName);
             groupName.setText("Unknown group");
-            Toast toast = Toast.makeText(this, "Impossible to load group info", duration);
-            toast.show();
         }else {
             setHeaderBar();
             try {
                 retrieveGroupMessages();
             } catch (IOException e) {
-                throw new MessageActivityException("could not retrieve messages.");
+                showErrorToast("Couldn't retrieve messages.");
             }
         }
     }
@@ -136,12 +135,43 @@ public class MessageActivity extends Activity {
     }
 
     /**
+     * Is called once the image picking is finished. It displays a toast informing the
+     * user that he added a message to his message.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+
+            try {
+                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
+                toast.show();
+            } catch (IOException e) {
+                Log.d("Message Activity", "Couldn't add image to the message");
+            }
+        }
+    }
+
+    /**
+     * Show an error message in a toast.
+     * @param errorMsg The error message to be displayed.
+     */
+    private void showErrorToast(String errorMsg){
+        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
     private void retrieveGroupMessages() throws IOException {
-        List<Message> messages = mUser.getGroupMessages(mGroup);
-        for(Message m : messages){
-            mMessages.add(m);
+        SortedMap<Date, Message> messagesTree = mGroup.getMessages();
+        for(Map.Entry<Date, Message> entry : messagesTree.entrySet()){
+            mMessages.add(entry.getValue());
         }
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
@@ -165,27 +195,5 @@ public class MessageActivity extends Activity {
     private void setHeaderBar(){
         TextView groupNameField = (TextView) findViewById(R.id.groupName);
         groupNameField.setText(mGroup.getName());
-    }
-
-    /**
-     * Is called once the image picking is finished. It displays a toast informing the
-     * user that he added a message to his message.
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-
-            Uri uri = data.getData();
-
-            try {
-                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
-                toast.show();
-            } catch (IOException e) {
-                Log.d("Message Activity", "Couldn't add image to the message");
-            }
-        }
     }
 }
