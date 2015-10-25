@@ -8,7 +8,6 @@ import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
 import yields.server.utils.{Helpers, Config}
 
 import scala.collection.JavaConverters._
-import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 
 package object dbi {
