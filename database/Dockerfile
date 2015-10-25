@@ -1,6 +1,7 @@
 ############################################################
 # Dockerfile to run an OrientDB (Graph) Container
 ############################################################
+# From: https://github.com/orientechnologies/orientdb-docker/blob/master/2.1/Dockerfile
 
 FROM java:8-jdk
 
