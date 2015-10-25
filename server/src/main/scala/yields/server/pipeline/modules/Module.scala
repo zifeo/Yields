@@ -1,4 +1,4 @@
-package yields.server.pipeline
+package yields.server.pipeline.modules
 
 import akka.stream.scaladsl.BidiFlow
 

@@ -1,4 +1,4 @@
-package yields.server.pipeline
+package yields.server.pipeline.modules
 
 import akka.event.LoggingAdapter
 import akka.util.ByteString

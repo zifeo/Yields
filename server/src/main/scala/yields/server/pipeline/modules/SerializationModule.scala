@@ -1,12 +1,9 @@
-package yields.server.pipeline
+package yields.server.pipeline.modules
 
 import akka.event.LoggingAdapter
 import akka.util.ByteString
 import spray.json._
-import yields.server.actions.exceptions.ActionResultException
 import yields.server.io._
-import yields.server.actions.Action
-import yields.server.io.actions.ActionResultExceptionJsonFormat
 import yields.server.mpi.{Request, Response}
 
 /**
