@@ -18,4 +18,6 @@
     <string name="textViewLoggingIn">Logging in ...</string>
     <string name="messageUsernameTooShort">Username too short</string>
     <string name="messageUsernameContainsSpaces">Username can\'t contain spaces</string>
+
+
 </resources>
