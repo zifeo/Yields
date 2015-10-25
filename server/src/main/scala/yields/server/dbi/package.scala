@@ -1,11 +1,12 @@
 package yields.server
 
-import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
+import com.orientechnologies.common.log.OLogManager
 import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
-import yields.server.utils.{Helpers, Config}
+import yields.server.utils.{Config, Helpers}
 
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
@@ -19,7 +20,10 @@ package object dbi {
     db
   }
 
-  private val databaseDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  private val databaseDateTimeFormat = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+
+  /** Terminates database connection. */
+  def closeDatabase(): Unit = database.close()
 
   def queryBySql[T](sql: String, params: AnyRef*)(implicit db: OObjectDatabaseTx): List[T] = {
     val params4java = params.toArray
@@ -31,6 +35,6 @@ package object dbi {
   def databaseDateTime: String = databaseDateTime(Helpers.currentDatetime)
 
   /** Returns given database formatted date and time. */
-  def databaseDateTime(datetime: OffsetDateTime): String =  databaseDateTimeFormat.format(datetime)
+  def databaseDateTime(datetime: OffsetDateTime): String = databaseDateTimeFormat.format(datetime)
 
 }

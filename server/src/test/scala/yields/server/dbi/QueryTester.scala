@@ -1,10 +1,10 @@
-package yields.server.dbi.models
+package yields.server.dbi
 
 import org.scalatest._
+import yields.server.dbi.models.{Group, User}
 
-class QueryTester extends FlatSpec with Matchers{
+class QueryTester extends FlatSpec with Matchers {
 
-  /** User creation test */
   "Query createUser" should "return the user newly created" in {
     val u:User = User.createUser("Query Tester", "query@tester.com")
 
@@ -12,7 +12,6 @@ class QueryTester extends FlatSpec with Matchers{
     u.email should be ("query@tester.com")
   }
 
-  /** Retrieve users info by email */
   "Query getUserByEmail " should "return the right user" in {
     val userCreated = User.createUser("John", "john@test.com")
     val u:User = User.getUserByEmail(userCreated.email)
@@ -22,7 +21,6 @@ class QueryTester extends FlatSpec with Matchers{
     u.date_creation should be (userCreated.date_creation)
   }
 
-  /** Retrieve users info by rid */
   "Query getUserByRid" should "return the right user" in {
     val userCreated = User.createUser("Paul", "paul@test.com")
     val u:User = User.getUserByRid(userCreated.id)
@@ -32,7 +30,6 @@ class QueryTester extends FlatSpec with Matchers{
     u.date_creation should be (userCreated.date_creation)
   }
 
-  /** Creates a user then add him to groups and test the group list got from the user */
   "Adding a user to groups and querying them" should "return the list of groups the user is in" in {
     val user = User.createUser("Bob", "bob@test.com")
     val g:Group = Group.createGroup("test1")
@@ -49,7 +46,6 @@ class QueryTester extends FlatSpec with Matchers{
     list.length should be (3)
   }
 
-  /** Group creation test */
   "Creating a group" should "return the group newly created" in {
     val name = "A group name"
     val group = Group.createGroup(name)
