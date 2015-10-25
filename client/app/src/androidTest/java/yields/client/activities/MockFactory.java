@@ -3,6 +3,7 @@ package yields.client.activities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -76,8 +77,8 @@ public class MockFactory {
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group) {
-            return MOCK_MESSAGES;
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            return null;
         }
 
         @Override

@@ -79,7 +79,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group) throws IOException {
+        public List<Message> getGroupMessages(Group group, Date last) throws IOException {
             List<Message> messages = new ArrayList<>();
             for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
                 TextContent mockContent = MockFactory.generateFakeTextContent("Mock message " + i);

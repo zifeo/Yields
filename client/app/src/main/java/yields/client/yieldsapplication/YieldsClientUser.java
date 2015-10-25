@@ -2,6 +2,9 @@ package yields.client.yieldsapplication;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,18 +63,31 @@ public class YieldsClientUser extends ClientUser{
     }
 
     @Override
-    public List<Message> getGroupMessages(Group group) throws IOException {
-        final int MESSAGE_COUNT = 100;
-        Id lastMessage = null;
+    public List<Message> getGroupMessages(Group group,
+                                          Date lastDate)
+            throws IOException {
 
-        if (group.getLastMessages() != null){
-            lastMessage = group.getLastMessage().getId();
-        }
+        final int MESSAGE_COUNT = 20;
 
         Request groupHistoryRequest = RequestBuilder
-                .GroupHistoryRequest(this.getId(), lastMessage, MESSAGE_COUNT);
-        mServerChannel.sendRequest(groupHistoryRequest);
-        return null;
+                .GroupHistoryRequest(this.getId(), lastDate, MESSAGE_COUNT);
+        Response response = mServerChannel.sendRequest(groupHistoryRequest);
+
+        List<Message> messageList = new ArrayList<>();
+
+        try {
+            JSONArray responseArray = response.object()
+                    .getJSONObject("message").getJSONArray("nodes");
+
+            for (int i = 0; i < responseArray.length(); i++) {
+                messageList.add(new Message(responseArray.getJSONObject(i)));
+            }
+
+        } catch (JSONException e) {
+            throw new IOException();
+        }
+
+        return messageList;
         // TODO : return the parsed messages.
     }
 

@@ -1,5 +1,7 @@
 package yields.client.node;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,22 +44,25 @@ public class Group extends Node {
     }
 
     public SortedMap<Date, Message> getLastMessages() throws IOException{
-        Map.Entry<Date, Message> lastMessage = mMessages.lastEntry();
+        Map.Entry<Date, Message> message = mMessages.firstEntry();
+
+        Date farthestDate;
+
+        if (message == null) {
+            farthestDate = new Date(System.currentTimeMillis());
+        } else {
+            farthestDate = message.getKey();
+        }
 
         List<Message> messages = YieldsApplication.getUser()
-                .getGroupMessages(this);
+                .getGroupMessages(this, farthestDate);
 
         for(Message m : messages){
             mMessages.put(m.getDate(),m);
         }
-
-        if (lastMessage != null) {
-            return Collections
-                    .unmodifiableSortedMap(mMessages
-                            .tailMap(lastMessage.getKey(), false));
-        } else {
-            return Collections.unmodifiableSortedMap(mMessages);
-        }
+        Log.d("TESEEEEEDST", mMessages.toString());
+        return Collections.unmodifiableSortedMap(mMessages
+                .tailMap(farthestDate));
     }
 
     public Message getLastMessage(){
