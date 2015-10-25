@@ -35,7 +35,7 @@ public class RequestBuilder {
     public enum Fields {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
-        LAST("lastNid"), TO("to"), COUNT("count"),
+        LAST("dateLast"), TO("to"), COUNT("count"),
         IMAGE("image"), NID("nid");
 
         private final String name;
@@ -226,7 +226,7 @@ public class RequestBuilder {
         return builder.request();
     }
 
-    public static Request GroupHistoryRequest(Id sender, Id last,
+    public static Request GroupHistoryRequest(Id sender, Date last,
                                               int messageCount) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(last);
@@ -236,7 +236,7 @@ public class RequestBuilder {
                 MessageKind.GROUPHISTORY, sender);
 
         builder.addField(Fields.LAST, last);
-        builder.addField(Fields.COUNT, last);
+        builder.addField(Fields.COUNT, messageCount);
 
         return builder.request();
     }
@@ -274,6 +274,11 @@ public class RequestBuilder {
         this.mConstructingMap.put(fieldType.getValue(), field);
     }
 
+    private void addField(Fields fieldType, Date field) {
+        this.mConstructingMap.put(fieldType.getValue(),
+                formatDate(field));
+    }
+
     private void addField(Fields fieldType, Bitmap field) {
         int size     = field.getRowBytes() * field.getHeight();
         ByteBuffer b = ByteBuffer.allocate(size);
@@ -292,19 +297,21 @@ public class RequestBuilder {
         Map<String, Object> metadata = new ArrayMap<>();
         metadata.put("sender", mSender.getId());
 
-        SimpleDateFormat dateFormatISO6101 =
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        dateFormatISO6101.setTimeZone(TimeZone.getDefault());
-
-        String formattedDate = dateFormatISO6101
-                .format(new Date(System.currentTimeMillis()));
-
-        metadata.put("date-time", formattedDate);
+        metadata.put("date-time", formatDate(
+                new Date(System.currentTimeMillis())));
 
         request.put("metadata", new JSONObject(metadata));
 
         request.put("message", new JSONObject(mConstructingMap));
 
         return new Request(new JSONObject(request));
+    }
+
+    private String formatDate(Date date) {
+        SimpleDateFormat dateFormatISO6101 =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        dateFormatISO6101.setTimeZone(TimeZone.getDefault());
+
+        return dateFormatISO6101.format(date);
     }
 }

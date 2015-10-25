@@ -60,16 +60,14 @@ public class YieldsClientUser extends ClientUser{
     }
 
     @Override
-    public List<Message> getGroupMessages(Group group) throws IOException {
-        final int MESSAGE_COUNT = 100;
-        Id lastMessage = null;
+    public List<Message> getGroupMessages(Group group,
+                                          Date lastDate)
+            throws IOException {
 
-        if (group.getMessages() != null){
-            lastMessage = group.getLastMessage().getId();
-        }
+        final int MESSAGE_COUNT = 20;
 
         Request groupHistoryRequest = RequestBuilder
-                .GroupHistoryRequest(this.getId(), lastMessage, MESSAGE_COUNT);
+                .GroupHistoryRequest(this.getId(), lastDate, MESSAGE_COUNT);
         mServerChannel.sendRequest(groupHistoryRequest);
         return null;
         // TODO : return the parsed messages.
