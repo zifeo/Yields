@@ -33,7 +33,6 @@ public class YieldsClientUser extends ClientUser{
 
     private YieldsClientUser(String name, Id id, String email, Bitmap img)
             throws NodeException, IOException {
-
         super(name, id, email, img);
         mSocketProvider = new YieldEmulatorSocketProvider();
         mConnectionManager = new ConnectionManager(mSocketProvider);
@@ -45,8 +44,6 @@ public class YieldsClientUser extends ClientUser{
             throws InstantiationException, IOException {
 
         if (mInstance == null){
-            Objects.requireNonNull(id);
-            Objects.requireNonNull(img);
             mInstance = new YieldsClientUser(name, id, email, img);
             YieldsApplication.setUser(mInstance);
         }
