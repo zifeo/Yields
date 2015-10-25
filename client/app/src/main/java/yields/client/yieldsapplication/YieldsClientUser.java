@@ -55,23 +55,7 @@ public class YieldsClientUser extends ClientUser{
 
     @Override
     public void sendMessage(Group group, Message message) throws IOException {
-        Request groupMessageReq = null;
-
-        switch (message.getContent().getType()) {
-            case "image":
-                groupMessageReq = RequestBuilder
-                        .GroupImageMessageRequest(this.getId(), group.getId(),
-                                "text", (ImageContent) message.getContent());
-                break;
-            case "text":
-                groupMessageReq = RequestBuilder
-                        .GroupMessageRequest(this.getId(), group.getId(),
-                                "text", ((TextContent) message
-                                        .getContent()).getText());
-                break;
-            default : throw new IllegalArgumentException("type unknown");
-        }
-
+        Request groupMessageReq = createRequestForMessageToSend(group, message);
         Response response = mServerChannel.sendRequest(groupMessageReq);
     }
 
@@ -111,5 +95,26 @@ public class YieldsClientUser extends ClientUser{
     @Override
     public Map<User, String> getHistory(Group group, Date from) {
         return null;
+    }
+
+    private Request createRequestForMessageToSend(Group group, Message message){
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(message);
+        Request req;
+        switch (message.getContent().getType()) {
+            case "image":
+                req = RequestBuilder
+                        .GroupImageMessageRequest(this.getId(), group.getId(),
+                                "text", (ImageContent) message.getContent());
+                break;
+            case "text":
+                req = RequestBuilder
+                        .GroupMessageRequest(this.getId(), group.getId(),
+                                "text", ((TextContent) message
+                                        .getContent()).getText());
+                break;
+            default : throw new IllegalArgumentException("type unknown");
+        }
+        return req;
     }
 }
