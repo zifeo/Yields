@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-object Yields extends Build {
+object YieldsServer extends Build {
 
   lazy val server = (project in file(".")).settings(
 
