@@ -64,7 +64,7 @@ public class YieldsClientUser extends ClientUser{
         final int MESSAGE_COUNT = 100;
         Id lastMessage = null;
 
-        if (group.getMessages() != null){
+        if (group.getLastMessages() != null){
             lastMessage = group.getLastMessage().getId();
         }
 

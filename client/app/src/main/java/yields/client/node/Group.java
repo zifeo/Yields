@@ -36,7 +36,7 @@ public class Group extends Node {
     }
 
     public void appendUsers(Collection<User> users) throws NodeException {
-        for (User user: users ) {
+        for (User user: users) {
             connectUser(user);
         }
     }
