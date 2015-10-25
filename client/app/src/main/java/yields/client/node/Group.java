@@ -1,5 +1,6 @@
 package yields.client.node;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,15 +14,19 @@ import java.util.TreeMap;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
     private List<User> mConnectedUsers;
     private TreeMap<Date, Message> mMessages;
+    private boolean mConsumed;
 
     public Group(String name, Id id, List<User> connectedUsers){
         super(name, id);
         Objects.requireNonNull(connectedUsers);
         this.mConnectedUsers = new ArrayList<>(connectedUsers);
+        this.mMessages = new TreeMap<>();
+        mConsumed = false;
     }
 
     private void connectUser(User user) throws NodeException {
@@ -36,16 +41,27 @@ public class Group extends Node {
         }
     }
 
-    public SortedMap<Date, Message> getMessages(){
-        return Collections.unmodifiableSortedMap(mMessages);
+    public SortedMap<Date, Message> getLastMessages() throws IOException{
+        Map.Entry<Date, Message> lastMessage = mMessages.lastEntry();
+
+        List<Message> messages = YieldsApplication.getUser()
+                .getGroupMessages(this);
+
+        for(Message m : messages){
+            mMessages.put(m.getDate(),m);
+        }
+
+        if (lastMessage != null) {
+            return Collections
+                    .unmodifiableSortedMap(mMessages
+                            .tailMap(lastMessage.getKey(), false));
+        } else {
+            return Collections.unmodifiableSortedMap(mMessages);
+        }
     }
 
     public Message getLastMessage(){
         return mMessages.firstEntry().getValue();
-    }
-
-    public void appendMessages(Map<Date, Message> messageMap){
-        mMessages.putAll(messageMap);
     }
 
     public List<User> getUsers() {
