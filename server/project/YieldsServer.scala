@@ -23,7 +23,8 @@ object YieldsServer extends Build {
       typeSafe ++ akka ++ akkaStream ++ orientDB ++ tests
     },
 
-    cancelable in Global := true
+    cancelable in Global := true,
+    fork := true
 
   )
 
