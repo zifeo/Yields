@@ -170,8 +170,8 @@ public class MessageActivity extends Activity {
      */
     private void retrieveGroupMessages() throws IOException {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
-        for(Map.Entry<Date, Message> entry : messagesTree.entrySet()){
-            mMessages.add(entry.getValue());
+        for(Message message : messagesTree.values()){
+            mMessages.add(message);
         }
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
