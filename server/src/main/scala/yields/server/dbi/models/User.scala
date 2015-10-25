@@ -13,8 +13,9 @@ final class User {
   @Version var version: String = _
   var name: String = _
   var date_creation: java.util.Date = _
+  var email: String = _
 
-  override def toString = s"User: $id, name: $name, creation: $date_creation"
+  override def toString = s"User: $id, name: $name, email: $email,creation: $date_creation"
 
 }
 
