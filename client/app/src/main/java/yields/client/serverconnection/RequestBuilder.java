@@ -308,10 +308,7 @@ public class RequestBuilder {
     }
 
     private String formatDate(Date date) {
-        SimpleDateFormat dateFormatISO6101 =
-                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        dateFormatISO6101.setTimeZone(TimeZone.getDefault());
 
-        return dateFormatISO6101.format(date);
+        return DateSerialization.toString(date);
     }
 }

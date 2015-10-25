@@ -169,7 +169,7 @@ public class MessageActivity extends Activity {
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
     private void retrieveGroupMessages() throws IOException {
-        SortedMap<Date, Message> messagesTree = mGroup.getMessages();
+        SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
         for(Map.Entry<Date, Message> entry : messagesTree.entrySet()){
             mMessages.add(entry.getValue());
         }
