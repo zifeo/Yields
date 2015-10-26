@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import yields.client.exceptions.CacheDatabaseException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.Message;
@@ -128,16 +129,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param message The Message to the database.
      * @throws IOException If the Message Content could not be serialized.
      */
-    public void addMessage(Message message) throws IOException {
+    public void addMessage(Message message) {
         deleteMessage(message);
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_MESSAGE_NODEID, message.getId().getId());
-        values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
-        values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
-        values.put(KEY_MESSAGE_CONTENT, serialize(message.getContent()));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
+        try{
+            ContentValues values = new ContentValues();
+            values.put(KEY_MESSAGE_NODEID, message.getId().getId());
+            values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
+            values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
+            values.put(KEY_MESSAGE_CONTENT, serialize(message.getContent()));
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
 
         mDatabase.insert(TABLE_MESSAGES, null, values);
     }
@@ -340,7 +342,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @throws ClassNotFoundException If some information could not be deserialized.
      */
     public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
-            throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException
+    {
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUPID + " = " + group.getId().getId() + " ORDER BY "
                 + "datetime(" + KEY_MESSAGE_DATE + ")" + " DESC LIMIT" + lowerBoundary
@@ -354,7 +357,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         } else {
             do {
                 Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODEID)));
-                String name = ""; //TODO: Define message's Node name attribute
+                String nodeName = ""; //TODO: Define message's Node name attribute
 
                 List<User> users = group.getUsers();
                 Iterator iterator = users.iterator();
@@ -380,7 +383,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 try {
                     date = dateFormat.parse(dateAsString);
                     if (messageSender != null && content != null) {
-                        messages.add(new Message(name, id, messageSender, content, date, group));
+                        messages.add(new Message(nodeName, id, messageSender, content, date, group));
                     }
                 } catch (ParseException e) {
                     //TODO : Define what should happen if date could not be parsed.
@@ -404,12 +407,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param object The Object to be serialized.
      * @return The serialized version of the Object.
-     * @throws IOException If the Object could not be serialized.
+     * @throws CacheDatabaseException If the Object could not be serialized.
      */
-    private static byte[] serialize(Object object) throws IOException {
+    private static byte[] serialize(Object object) throws CacheDatabaseException {
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream o = new ObjectOutputStream(byteOutputStream);
-        o.writeObject(object);
+        ObjectOutputStream o = null;
+        try {
+            o = new ObjectOutputStream(byteOutputStream);
+            o.writeObject(object);
+        } catch (IOException e) {
+            throw new CacheDatabaseException("Could not serialize Object !");
+        }
         return byteOutputStream.toByteArray();
     }
 
@@ -420,11 +428,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @throws IOException If the deserialization was not done correctly.
      * @throws ClassNotFoundException If the deserialization was not done correctly.
      */
-    private static Bitmap deserializeBitmap(byte[] bytes)
-            throws IOException, ClassNotFoundException {
+    private static Bitmap deserializeBitmap(byte[] bytes) throws CacheDatabaseException {
         ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
-        return (Bitmap) objectInputStream.readObject();
+        Bitmap bitmap;
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
+            return (Bitmap) objectInputStream.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new CacheDatabaseException("Could not deserialize Bitmap !");
+        } catch (IOException e) {
+            throw new CacheDatabaseException("Could not deserialize Bitmap !");
+        }
     }
 
     /**
