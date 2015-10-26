@@ -18,18 +18,25 @@ import yields.client.messages.Message;
  *
  */
 public abstract class ClientUser extends User {
-    List<Group> groups;
+    private List<Group> groups;
+    private boolean isInstantiated;
 
-    public  ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+    protected ClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
+
         super(name, id, email,img);
         this.groups = new ArrayList<>();
+        if(isInstantiated) {
+            throw new InstantiationException();
+        }else {
+            isInstantiated = true;
+        }
     }
 
     public abstract void sendMessage(Group group, Message message) throws IOException;
 
     public abstract List<Message> getGroupMessages(Group group, Date lastDate) throws IOException;
 
-    public abstract void addNewGroup(Group group) throws IOException;
+    public abstract void createNewGroup(Group group) throws IOException;
 
     public abstract void deleteGroup(Group group);
 

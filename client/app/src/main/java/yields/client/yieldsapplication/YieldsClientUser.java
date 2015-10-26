@@ -21,6 +21,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
@@ -29,14 +30,19 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 
+/**
+ * The User who does the communication with the server
+ * Represents also the client user itself
+ */
 public class YieldsClientUser extends ClientUser{
     private static YieldsClientUser mInstance;
     private static YieldEmulatorSocketProvider mSocketProvider;
     private static ConnectionManager mConnectionManager;
     private static ServerChannel mServerChannel;
 
+
     private YieldsClientUser(String name, Id id, String email, Bitmap img)
-            throws NodeException, IOException {
+            throws NodeException, InstantiationException, IOException {
         super(name, id, email, img);
         mSocketProvider = new YieldEmulatorSocketProvider();
         mConnectionManager = new ConnectionManager(mSocketProvider);
@@ -44,19 +50,29 @@ public class YieldsClientUser extends ClientUser{
                 .getCommunicationChannel();
     }
 
+    /**
+     * Creates an instance of YieldClientUser (which is unique)
+     *
+     * @param name The name of the current User
+     * @param id The id of the current User
+     * @param email The e-mail of the current User
+     * @param img The profile picture of the current User
+     * @throws InstantiationException In case there already exists another YieldClientUser
+     * @throws IOException If we have trouble creating the server connection
+     */
     public static void createInstance(String name, Id id, String email, Bitmap img)
             throws InstantiationException, IOException {
 
-        if (mInstance == null){
-            mInstance = new YieldsClientUser(name, id, email, img);
-            YieldsApplication.setUser(mInstance);
-        }
-        else{
-            throw new InstantiationException(
-                    "YieldsClientUser is already instanced.");
-        }
+        mInstance = new YieldsClientUser(name, id, email, img);
+        YieldsApplication.setUser(mInstance);
     }
 
+    /**
+     * Sends a message to the server
+     * @param group The group to which is linked the message
+     * @param message The message itself
+     * @throws IOException in case of communication errors
+     */
     @Override
     public void sendMessage(Group group, Message message) throws IOException {
         Request groupMessageReq = createRequestForMessageToSend(group, message);
@@ -65,6 +81,13 @@ public class YieldsClientUser extends ClientUser{
         // TODO : Check response.
     }
 
+    /**
+     * Get older group messages.
+     * @param group The group you want to get messages from
+     * @param lastDate The lastDate of the last message retrieved
+     * @return a list of the older messages
+     * @throws IOException In case of communication error
+     */
     @Override
     public List<Message> getGroupMessages(Group group,
                                           Date lastDate)
@@ -93,8 +116,13 @@ public class YieldsClientUser extends ClientUser{
         return messageList;
     }
 
+    /**
+     * Creates a new group on the server.
+     * @param group The group to be created
+     * @throws IOException in case of connexion error
+     */
     @Override
-    public void addNewGroup(Group group) throws IOException {
+    public void createNewGroup(Group group) throws IOException {
         List<Id> memberIDs = new ArrayList<>();
         List<User> members = group.getUsers();
         for (User u : members){

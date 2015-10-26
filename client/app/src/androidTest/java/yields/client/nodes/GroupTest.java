@@ -50,7 +50,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
     }
 
     @Test
-    public void testTextMessagesAreCorrectlySortedByDate() throws IOException {
+    public void testTextMessagesAreCorrectlySortedByDate() throws IOException, InstantiationException {
         ClientUser lastUser = YieldsApplication.getUser();
         YieldsApplication.setUser(new FakeUserGroupTest("wqef", new Id(2), "d",BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.send_icon) ));
 
@@ -70,7 +70,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
 
     private class FakeUserGroupTest extends ClientUser{
 
-        public FakeUserGroupTest(String name, Id id, String email, Bitmap img) throws NodeException {
+        public FakeUserGroupTest(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
             super(name, id, email, img);
         }
 
@@ -96,7 +96,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         }
 
         @Override
-        public void addNewGroup(Group group) throws IOException {
+        public void createNewGroup(Group group) throws IOException {
 
         }
 
