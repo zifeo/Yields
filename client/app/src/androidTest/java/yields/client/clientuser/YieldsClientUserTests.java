@@ -39,8 +39,8 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
     @Before
     public void setUp() throws Exception {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
-        getInstrumentation().getContext().getResources();
+        YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
+        YieldsApplication.setResources(getInstrumentation().getContext().getResources());
         YieldsClientUser.createInstance("Mock Client User", new Id(117), "Mock email", BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture));
     }
 
