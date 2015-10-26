@@ -29,15 +29,25 @@ public class MockFactory {
     private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
 
     public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
-        return new Group(name, id, connectedUsers);
+        return new FakeGroup(name, id, connectedUsers);
+    }
+
+    private static class FakeGroup extends Group{
+
+        public FakeGroup(String name, Id id, List<User> users) throws NodeException {
+            super(name, id, users);
+        }
+
+        public void addMessage(Message newMessage){
+        }
     }
 
     public static List<Message> generateMockMessages(int number){
         ArrayList<Message> messages = new ArrayList<>();
         for (int i = 0; i < number; i ++){
             Content content = generateFakeTextContent(i);
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "mock email", image1), content));
+            Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+            messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "Mock email " + i, image1), content));
         }
         return messages;
     }

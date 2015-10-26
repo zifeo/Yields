@@ -8,6 +8,8 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.Log;
 
+import java.util.Objects;
+
 /**
  * Class which contains static methods to transform graphical elements
  */
@@ -27,6 +29,7 @@ public class GraphicTransforms {
      * @return  A {@code Bitmap} image which has a circle shape.
      */
     public static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter){
+        Objects.requireNonNull(inputImage);
         if (inputImage.getWidth() != inputImage.getHeight()) {
             throw new IllegalArgumentException("Image should be squared.");
         }
