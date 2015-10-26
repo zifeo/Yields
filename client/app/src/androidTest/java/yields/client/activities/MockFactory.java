@@ -67,6 +67,7 @@ public class MockFactory {
         @Override
         public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
             return new ArrayList<>();
+
         }
 
         @Override
