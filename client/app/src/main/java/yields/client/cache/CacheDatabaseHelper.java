@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
-import android.graphics.BitmapRegionDecoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -76,7 +75,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private final SQLiteDatabase mDatabase;
 
     /**
-     * Main constuctore, creates the database.
+     * Main constructor, creates the database.
      */
     public CacheDatabaseHelper() {
         super(YieldsApplication.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
@@ -91,9 +90,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        mDatabase.execSQL(CREATE_TABLE_USERS);
-        mDatabase.execSQL(CREATE_TABLE_GROUPS);
-        mDatabase.execSQL(CREATE_TABLE_MESSAGES);
+        db.execSQL(CREATE_TABLE_USERS);
+        db.execSQL(CREATE_TABLE_GROUPS);
+        db.execSQL(CREATE_TABLE_MESSAGES);
     }
 
     /**
@@ -137,7 +136,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
         values.put(KEY_MESSAGE_CONTENT, serialize(message.getContent()));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
 
         mDatabase.insert(TABLE_MESSAGES, null, values);
@@ -195,6 +194,30 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Bitmap userImage = deserializeBitmap(userCursor.getBlob
                     (userCursor.getColumnIndex(KEY_USER_IMAGE)));
             return new User(userName, userID, userEmail, userImage);
+        }
+    }
+
+    /**
+     * Returns all Users currently in the database.
+     *
+     * @return An exhaustive List of all Users in the database.
+     * @throws IOException            If some User information was not correctly extracted
+     *                                from the database.
+     * @throws ClassNotFoundException If some User information was not correctly extracted
+     *                                from the database.
+     */
+    public List<User> getAllUsers() throws IOException, ClassNotFoundException {
+        String selectAllUsersQuery = "SELECT * FROM " + TABLE_USERS;
+        Cursor cursor = mDatabase.rawQuery(selectAllUsersQuery, null);
+        List<User> users = new ArrayList<>();
+        if (!cursor.moveToFirst()) {
+            return users;
+        } else {
+            do {
+                Id userId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_USER_NODEID)));
+                users.add(getUser(userId));
+            } while (cursor.moveToNext());
+            return users;
         }
     }
 
@@ -280,7 +303,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Returns all Groups currently in the database.
      *
-     * @return An exhautive List of all Groups in the database.
+     * @return An exhaustive List of all Groups in the database.
      * @throws IOException            If some Group information was not correctly extracted
      *                                from the database.
      * @throws ClassNotFoundException If some Group information was not correctly extracted
@@ -352,7 +375,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 Content content = (Content) objectInputStream.readObject();
 
                 String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                 Date date = null;
                 try {
                     date = dateFormat.parse(dateAsString);
