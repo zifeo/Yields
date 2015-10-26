@@ -40,7 +40,12 @@ public class MockFactory {
     }
 
     public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img){
+        try {
             return new FakeClientUser(name, id, email, img);
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
     }
 
     public static ImageContent generateFakeImageContent(Bitmap img, String caption){
@@ -56,7 +61,7 @@ public class MockFactory {
     }
 
     private static class FakeClientUser extends ClientUser {
-        public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+        public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
             super(name, id, email, img);
         }
 
