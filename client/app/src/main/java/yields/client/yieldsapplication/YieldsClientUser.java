@@ -79,6 +79,13 @@ public class YieldsClientUser extends ClientUser{
         // TODO : Check response.
     }
 
+    /**
+     * Get older group messages.
+     * @param group The group you want to get messages from
+     * @param lastDate The lastDate of the last message retrieved
+     * @return a list of the older messages
+     * @throws IOException In case of communication error
+     */
     @Override
     public List<Message> getGroupMessages(Group group,
                                           Date lastDate)
@@ -107,8 +114,13 @@ public class YieldsClientUser extends ClientUser{
         return messageList;
     }
 
+    /**
+     * Creates a new group on the server.
+     * @param group The group to be created
+     * @throws IOException in case of connexion error
+     */
     @Override
-    public void addNewGroup(Group group) throws IOException {
+    public void createNewGroup(Group group) throws IOException {
         List<Id> memberIDs = new ArrayList<>();
         List<User> members = group.getUsers();
         for (User u : members){

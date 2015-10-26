@@ -96,7 +96,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         }
 
         @Override
-        public void addNewGroup(Group group) throws IOException {
+        public void createNewGroup(Group group) throws IOException {
 
         }
 

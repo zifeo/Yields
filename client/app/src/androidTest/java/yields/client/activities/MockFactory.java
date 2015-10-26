@@ -71,7 +71,7 @@ public class MockFactory {
         }
 
         @Override
-        public void addNewGroup(Group group) {
+        public void createNewGroup(Group group) {
 
 
         }
