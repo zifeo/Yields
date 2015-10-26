@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapRegionDecoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -174,6 +176,29 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Retrieves a User according to his Id, returns null if such a User is not in the database.
+     *
+     * @param userID The Id of the wanted User.
+     * @return The User which has userID as his Id or null if there is no such User in the
+     * database.
+     */
+    public User getUser(Id userID) throws IOException, ClassNotFoundException {
+        String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
+                + KEY_USER_NODEID + " = ?";
+        Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
+                new String[]{userID.getId().toString()});
+        if (!userCursor.moveToFirst()) {
+            return null;
+        } else {
+            String userName = userCursor.getString(userCursor.getColumnIndex(KEY_USER_NAME));
+            String userEmail = userCursor.getString(userCursor.getColumnIndex(KEY_USER_EMAIL));
+            Bitmap userImage = deserializeBitmap(userCursor.getBlob
+                    (userCursor.getColumnIndex(KEY_USER_IMAGE)));
+            return new User(userName, userID, userEmail, userImage);
+        }
+    }
+
+    /**
      * Deletes the Group and all it's Messages from the database.
      *
      * @param group The Group to be deleted.
@@ -186,7 +211,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Adds the Group to the database.
+     * Adds the Group to the database and all the Users it contains if they
+     * are not in the database already.
      *
      * @param group The Group to be added.
      * @throws IOException if the Group image could not be serialized.
@@ -195,6 +221,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         deleteGroup(group);
         ContentValues values = createContentValuesForGroup(group);
         mDatabase.insert(TABLE_GROUPS, null, values);
+        for(User user : group.getUsers()){
+            addUser(user);
+        }
     }
 
     /**
@@ -207,6 +236,73 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = createContentValuesForGroup(group);
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                 new String[]{String.valueOf(group.getId().getId())});
+    }
+
+    /**
+     * Retrieves a Group according to his Id, returns null if such a Group is not in the database.
+     *
+     * @param groupID The Id of the wanted Group.
+     * @return The Group which has groupID as its Id or null if there is no such Group
+     * in the database.
+     * @throws IOException            If some Group information was not correctly extracted
+     *                                from the database.
+     * @throws ClassNotFoundException If some Group information was not correctly extracted
+     *                                from the database.
+     */
+    public Group getGroup(Id groupID) throws IOException, ClassNotFoundException {
+        String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
+                + KEY_GROUP_NODEID + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectQuery,
+                new String[]{groupID.getId().toString()});
+        if (!cursor.moveToFirst()) {
+            return null;
+        } else {
+            Id groupId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_GROUP_NODEID)));
+            String groupName = cursor.getString(cursor.getColumnIndex(KEY_GROUP_NAME));
+            Bitmap groupImage = deserializeBitmap(
+                    cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
+
+            String allUsers = cursor.getString(cursor.getColumnIndex(KEY_GROUP_USERS));
+            List<User> groupUsers = new ArrayList<>();
+            if (!allUsers.equals("")) {
+                String[] usersIDs = allUsers.split(",");
+                for (String userID : usersIDs) {
+                    User user = getUser(new Id(Long.parseLong(userID)));
+                    if (user != null) {
+                        groupUsers.add(user);
+                    }
+                }
+            }
+            return new Group(groupName, groupId, groupUsers, groupImage);
+        }
+    }
+
+    /**
+     * Returns all Groups currently in the database.
+     *
+     * @return An exhautive List of all Groups in the database.
+     * @throws IOException            If some Group information was not correctly extracted
+     *                                from the database.
+     * @throws ClassNotFoundException If some Group information was not correctly extracted
+     *                                from the database.
+     */
+    public List<Group> getAllGroups() throws IOException, ClassNotFoundException {
+        String selectQuery = "SELECT * FROM " + TABLE_GROUPS;
+        Cursor groupCursor = mDatabase.rawQuery(selectQuery, null);
+
+        List<Group> groups = new ArrayList<>();
+        if (!groupCursor.moveToFirst()) {
+            return groups;
+        } else {
+            do {
+                Id groupId = new Id(groupCursor.getLong(groupCursor.getColumnIndex(KEY_GROUP_NODEID)));
+                Group group = getGroup(groupId);
+                if (group != null) {
+                    groups.add(group);
+                }
+            } while (groupCursor.moveToNext());
+            return groups;
+        }
     }
 
     /**
@@ -264,7 +360,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                         messages.add(new Message(name, id, messageSender, content, date, group));
                     }
                 } catch (ParseException e) {
-                    //TODO : Define what should happen
+                    //TODO : Define what should happen if date could not be parsed.
                 }
             } while (cursor.moveToNext());
             return messages;
@@ -292,6 +388,20 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ObjectOutputStream o = new ObjectOutputStream(byteOutputStream);
         o.writeObject(object);
         return byteOutputStream.toByteArray();
+    }
+
+    /**
+     * Deserializes a Byte array into a Bitmap.
+     * @param bytes The bytes to be deserialized.
+     * @return The deserialized array as a Bitmap object.
+     * @throws IOException If the deserialization was not done correctly.
+     * @throws ClassNotFoundException If the deserialization was not done correctly.
+     */
+    private static Bitmap deserializeBitmap(byte[] bytes)
+            throws IOException, ClassNotFoundException {
+        ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
+        return (Bitmap) objectInputStream.readObject();
     }
 
     /**

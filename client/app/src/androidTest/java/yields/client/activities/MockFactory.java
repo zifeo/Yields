@@ -53,7 +53,7 @@ public class MockFactory {
 
     public static List<Group> generateMockGroups(int number){
         ArrayList<Group> groups = new ArrayList<>();
-        for (int i = 1; i < number; i ++){
+        for (int i = 0; i < number; i ++){
             groups.add(createMockGroup("Mock group name " + i, new Id(-i), generateMockUsers(i)));
         }
         return groups;
