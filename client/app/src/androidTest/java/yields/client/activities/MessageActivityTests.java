@@ -50,7 +50,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
+        YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
+        YieldsApplication.setResources(getInstrumentation().getTargetContext().getResources());
         YieldsApplication.setGroup(MOCK_GROUP);
         Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
         ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user", new Id(117), "Mock email client user", image1);
