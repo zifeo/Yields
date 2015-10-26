@@ -1,6 +1,7 @@
 package yields.client.yieldsapplication;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +60,7 @@ public class YieldsClientUser extends ClientUser{
     @Override
     public void sendMessage(Group group, Message message) throws IOException {
         Request groupMessageReq = createRequestForMessageToSend(group, message);
+        Log.d("REQUEST", "sendMessage = " + groupMessageReq.message());
         Response response = mServerChannel.sendRequest(groupMessageReq);
         // TODO : Check response.
     }
@@ -67,13 +69,12 @@ public class YieldsClientUser extends ClientUser{
     public List<Message> getGroupMessages(Group group,
                                           Date lastDate)
             throws IOException {
-
         final int MESSAGE_COUNT = 20;
 
         Request groupHistoryRequest = RequestBuilder
                 .GroupHistoryRequest(group.getId(), lastDate, MESSAGE_COUNT);
         Response response = mServerChannel.sendRequest(groupHistoryRequest);
-
+        Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
         List<Message> messageList = new ArrayList<>();
 
         try {
@@ -82,6 +83,7 @@ public class YieldsClientUser extends ClientUser{
 
             for (int i = 0; i < responseArray.length(); i++) {
                 messageList.add(new Message(responseArray.getJSONObject(i)));
+                Log.d("REQUEST", "    Message " + i + " : " + ((TextContent) messageList.get(i).getContent()).getText());
             }
 
         } catch (JSONException e) {
@@ -100,6 +102,7 @@ public class YieldsClientUser extends ClientUser{
         }
         Request groupAddRequest = RequestBuilder
                 .GroupCreateRequest(this.getId(), group.getName(), memberIDs);
+        Log.d("REQUEST", "Add new group");
         Response response = mServerChannel.sendRequest(groupAddRequest);
         // TODO : Check response
     }
