@@ -37,7 +37,7 @@ public class Group extends Node {
         mCurrentMessages = new ArrayList<>();
 
         if (image != null && !isImageCircle){
-            mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
+            mImage = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         }
     }
 

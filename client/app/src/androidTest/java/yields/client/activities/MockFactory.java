@@ -26,17 +26,13 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MockFactory {
 
-    private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
-
     public static List<Message> generateMockMessages(int number){
         ArrayList<Message> messages = new ArrayList<>();
         for (int i = 0; i < number; i ++){
             Content content = generateFakeTextContent(i);
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                    R.drawable.userpicture);
             messages.add(generateMockMessage("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i,
-                            new Id(123), "mock email", image1), content,
-                    createMockGroup("Mock group", new Id(123), new ArrayList<User>())));
+                            new Id(123), "mock email"), content,
+                    createMockGroup("Mock group " + number, new Id(123), new ArrayList<User>())));
         }
         return messages;
     }
@@ -44,9 +40,7 @@ public class MockFactory {
     public static List<User> generateMockUsers(int number){
         ArrayList<User> users = new ArrayList<>();
         for (int i = 0; i < number; i ++){
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                    R.drawable.userpicture);
-            users.add(generateFakeUser("Mock user name " + i, new Id(-i), "Mock email " + i, image1));
+            users.add(generateFakeUser("Mock user name " + i, new Id(-i), "Mock email " + i));
         }
         return users;
     }
@@ -61,7 +55,8 @@ public class MockFactory {
 
 
     public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
-        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
+        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                R.drawable.userpicture);
         return new Group(name, id, connectedUsers, image1);
     }
 
@@ -74,8 +69,10 @@ public class MockFactory {
         return new TextContent("Mock message #" + (i));
     }
 
-    public static User generateFakeUser(String name, Id id, String email, Bitmap img){
-            return new User(name, id, email, img);
+    public static User generateFakeUser(String name, Id id, String email){
+        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                R.drawable.userpicture);
+            return new User(name, id, email, image1);
     }
 
     public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img){
@@ -102,7 +99,7 @@ public class MockFactory {
 
         @Override
         public List<Message> getGroupMessages(Group group) {
-            return MOCK_MESSAGES;
+            return  generateMockMessages(4);
         }
 
         @Override
