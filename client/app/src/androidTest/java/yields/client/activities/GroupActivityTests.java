@@ -2,30 +2,18 @@ package yields.client.activities;
 
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.util.List;
+import org.junit.Test;
 
 import yields.client.R;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupActivity> {
     public GroupActivityTests() {
@@ -38,7 +26,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
     }
 
-    /*@LargeTest
+    @Test
     public void testGroupCreation(){
         getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
@@ -61,9 +49,9 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         }
 
         assertTrue("Group not found in list", found);
-    }*/
+    }
 
-    @LargeTest
+    @Test
     public void testGroupCreationWithContactAdded(){
         getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
