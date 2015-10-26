@@ -2,6 +2,7 @@ package yields.client.messages;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,12 +51,16 @@ public class Message extends Node{
     public Message(JSONObject object) throws JSONException{
         super(object.getString("datetime") + object.getString("user"),
                 new Id(object.getString("id")));
+
         Id idUser = new Id(object.getString("user"));
-        User sender = new User("toto", idUser, "",
-                BitmapFactory.decodeResource(YieldsApplication.getResources(),
+        /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
+        // TODO : The same apply for the profil pic and the email.
+        User sender = new User(idUser.getId() , idUser, "",
+                BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
                         R.drawable.userpicture));
 
         this.mSender = sender;
+        // TODO : Implement images !!!
         this.mContent = new TextContent(object.getString("text"));
 
         try {
