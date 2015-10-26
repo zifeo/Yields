@@ -60,6 +60,7 @@ public class YieldsClientUser extends ClientUser{
     public void sendMessage(Group group, Message message) throws IOException {
         Request groupMessageReq = createRequestForMessageToSend(group, message);
         Response response = mServerChannel.sendRequest(groupMessageReq);
+        // TODO : Check response.
     }
 
     @Override
@@ -70,7 +71,7 @@ public class YieldsClientUser extends ClientUser{
         final int MESSAGE_COUNT = 20;
 
         Request groupHistoryRequest = RequestBuilder
-                .GroupHistoryRequest(this.getId(), lastDate, MESSAGE_COUNT);
+                .GroupHistoryRequest(group.getId(), lastDate, MESSAGE_COUNT);
         Response response = mServerChannel.sendRequest(groupHistoryRequest);
 
         List<Message> messageList = new ArrayList<>();
@@ -100,11 +101,12 @@ public class YieldsClientUser extends ClientUser{
         Request groupAddRequest = RequestBuilder
                 .GroupCreateRequest(this.getId(), group.getName(), memberIDs);
         Response response = mServerChannel.sendRequest(groupAddRequest);
+        // TODO : Check response
     }
 
     @Override
     public void deleteGroup(Group group) {
-
+        // TODO : See with the server side how to implement it.
     }
 
     @Override
