@@ -4,5 +4,5 @@
 eval "$(docker-machine env --shell bash default)"
 
 # Stop
-docker stop orientdb
+docker stop redis
 

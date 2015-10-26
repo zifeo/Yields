@@ -23,14 +23,9 @@ object Dependencies {
     )
   }
 
-  val orientDB = {
-    val version = "2.1.4"
-    Seq(
-      "com.orientechnologies" % "orientdb-core" % version,
-      "com.orientechnologies" % "orientdb-client" % version,
-      "com.orientechnologies" % "orientdb-graphdb" % version
-    )
-  }
+  val redis = Seq(
+    "net.debasishg" %% "redisclient" % "3.0"
+  )
 
   val tests = Seq(
     "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",

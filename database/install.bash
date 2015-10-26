@@ -5,16 +5,12 @@ docker-machine start default
 eval "$(docker-machine env --shell bash default)"
 
 # Build docker
-docker build -t yields/orientdb-2.1 .
+docker build -t yields/redis .
 
 # Create bind folders
-path=$(pwd)
-echo "Binds in $path"
-config="$path/config"
-database="$path/databases"
-mkdir -p $config
-mkdir -p $database
+data="$(pwd)/data"
+mkdir -p $data
 
 # Create container
-docker create --name orientdb -v "$config:/orientdb/config" -v "$database:/orientdb/databases" -p 2424:2424 -p 2480:2480 yields/orientdb-2.1
+docker create --name redis -p 6379:6379 -v "$data:/data" yields/redis
 
