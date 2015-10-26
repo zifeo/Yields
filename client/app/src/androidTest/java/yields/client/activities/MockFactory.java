@@ -76,7 +76,8 @@ public class MockFactory {
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group) {
+        public List<Message> getGroupMessages(Group group,
+                                              Date lastDate) {
             return MOCK_MESSAGES;
         }
 

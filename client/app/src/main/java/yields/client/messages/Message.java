@@ -47,7 +47,7 @@ public class Message extends Node{
     }
 
     //TODO: create exception
-    public Message(JSONObject object) throws JSONException{
+    public Message(JSONObject object ) throws JSONException{
         super(object.getString("datetime") + object.getString("user"),
                 new Id(object.getString("id")));
         Id idUser = new Id(object.getString("user"));
