@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.gui.PairUserBoolean;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.User;
@@ -39,7 +40,14 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
 
-        ArrayList<String> inputEmailList = getIntent().getStringArrayListExtra(EMAIL_LIST_INPUT_KEY);
+        Intent intent = getIntent();
+
+        if (!intent.hasExtra(EMAIL_LIST_INPUT_KEY)){
+            throw new MissingIntentExtraException(
+                    "Email list extra is missing from intent in CreateGroupSelectUsersActivity");
+        }
+
+        ArrayList<String> inputEmailList = intent.getStringArrayListExtra(EMAIL_LIST_INPUT_KEY);
 
         mEntourageChecked = new ArrayList<>();
         List<User> entourage = YieldsApplication.getUser().getEntourage();
@@ -55,7 +63,6 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.listViewCreateGroupSelectUsers);
 
         mListView.setAdapter(mAdapterEntourage);
-        //mListView.setItemsCanFocus(false);
 
         mAdapterEntourage.notifyDataSetChanged();
     }

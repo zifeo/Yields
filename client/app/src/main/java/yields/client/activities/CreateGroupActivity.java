@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.gui.PairUserBoolean;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
@@ -30,7 +31,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private ListView mListView;
 
     private String mGroupName;
-    private int mGroupType;
+    private int mGroupType; // maybe useful later
 
     private static final String TAG = "CreateGroupActivity";
     private static final int REQUEST_ADD_CONTACT = 1;
@@ -44,8 +45,20 @@ public class CreateGroupActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
 
-        mGroupName = getIntent().getStringExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY);
-        mGroupType = getIntent().getIntExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY,
+        Intent intent = getIntent();
+
+        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY)){
+            throw new MissingIntentExtraException(
+                    "Group name extra is missing from intent in CreateGroupActivity");
+        }
+
+        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY)){
+            throw new MissingIntentExtraException(
+                    "Group type extra is missing from intent in CreateGroupActivity");
+        }
+
+        mGroupName = intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY);
+        mGroupType = intent.getIntExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY,
                 CreateGroupSelectNameActivity.PUBLIC_GROUP);
 
         mUsers = new ArrayList<>();

@@ -27,7 +27,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
     private static Toast mToast = null;
 
     private EditText mEditText;
-    private RadioButton mRadioPublic;
+    private RadioButton mRadioPublic; // maybe useful later
     private RadioButton mRadioPrivate;
 
     @Override
