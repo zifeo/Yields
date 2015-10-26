@@ -38,7 +38,10 @@ public class Group extends Node {
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mCurrentMessages = new ArrayList<>();
 
-        if (image!=null && !isImageCircle){
+        if (image == null){
+            mImage = YieldsApplication.getDefaultGroupImage();
+        }
+        else if (image!=null && !isImageCircle){
             mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
         }
     }
@@ -75,11 +78,7 @@ public class Group extends Node {
      * @return the circular version of the group's image, or the default one if none has been set
      */
     public Bitmap getCircularImage(){
-        if (mImage != null){
-            return mImage;
-        }
-
-        return YieldsApplication.getDefaultGroupImage();
+        return mImage;
     }
 
     public List<User> getUsers() {

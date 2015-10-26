@@ -3,7 +3,6 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,15 +15,11 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
@@ -32,8 +27,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.Node;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
