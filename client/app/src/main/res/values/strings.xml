@@ -19,5 +19,22 @@
     <string name="messageUsernameTooShort">Username too short</string>
     <string name="messageUsernameContainsSpaces">Username can\'t contain spaces</string>
 
+    <string name="entourage">Entourage</string>
+    <string name="createGroup">Create group</string>
+    <string name="settings">Settings</string>
+    <string name="discover">Discover</string>
+    <string name="title_activity_create_group">Create new group</string>
+    <string name="addNewContact">Add new Contact</string>
+    <string name="addNewNode">Add new Node</string>
+    <string name="addContactToGroup">Add contact</string>
+    <string name="addNodeToGroup">Add node</string>
+    <string name="title_activity_create_group_select_users">CreateGroupSelectUsersActivity</string>
+    <string name="done">Done</string>
+    <string name="enterGroupName">Enter your group\'s name</string>
+    <string name="next">Next</string>
+    <string name="groupType">Group type : </string>
+    <string name="publicGroup">Public group</string>
+    <string name="privateGroup">Private group</string>
+    <string name="messageGroupNameTooShort">Group name too short</string>
 
 </resources>

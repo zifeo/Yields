@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="yields.client.activities.CreateGroupSelectNameActivity">
+
+
+    <item android:id="@+id/actionDoneSelectName"
+        android:icon="@drawable/ic_arrow_forward_black_24dp"
+        android:title="@string/next"
+        android:layout_gravity="center"
+        app:showAsAction="ifRoom"
+        />
+</menu>

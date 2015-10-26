@@ -48,4 +48,13 @@ public class TextContent implements Content {
         text.setTextSize(20);
         return text;
     }
+
+    /**
+     * Returns a preview of the text content, displayed in the group list with the content's sender
+     * @return a string corresponding to the content
+     */
+    @Override
+    public String getPreview() {
+        return mText;
+    }
 }

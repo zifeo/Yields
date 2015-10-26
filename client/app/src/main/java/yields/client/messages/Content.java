@@ -23,4 +23,10 @@ public interface Content {
      * @throws ContentException If the data of this Content is incorrect.
      */
     View getView() throws ContentException;
+
+    /**
+     * Returns a preview of the content, displayed in the group list with the content's sender
+     * @return a string describing the content
+     */
+    String getPreview();
 }
