@@ -95,7 +95,7 @@ public class MessageActivity extends Activity {
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendMessage(View v) throws MessageActivityException {
+    public void onSendMessage(View v) throws MessageActivityException, IOException {
         String inputMessage =  mInputField.getText().toString();
 
         mInputField.setText("");
@@ -110,7 +110,7 @@ public class MessageActivity extends Activity {
         Message message = new Message("message", new Id(1230), mUser, content);
         // TODO : take right name and right id.
         mMessages.add(message);
-        //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
+        mUser.sendMessage(mGroup, message);
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
         lv.setSelection(lv.getAdapter().getCount() - 1);
