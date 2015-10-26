@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +16,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.TreeMap;
 
 import yields.client.R;
 import yields.client.activities.MessageActivity;
@@ -33,6 +34,7 @@ import static java.lang.Thread.sleep;
 public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity> {
 
     private static final int MOCK_MESSAGE_COUNT = 20;
+    private static final String JSON_MESSAGE = "{\"datetime\": \"2011-12-03T10:15:30+01:00\", \"node\":null, \"text\":\"MESSAGE_TEXT\", \"user\":117, \"id\":2}";
 
     public GroupTest(){
         super(MessageActivity.class);
@@ -44,8 +46,8 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
     @Before
     public void setUp() throws Exception {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
-        getInstrumentation().getContext().getResources();
+        YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
+        YieldsApplication.setResources(getInstrumentation().getContext().getResources());
     }
 
     @Test
@@ -65,6 +67,27 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
             assertEquals("Mock message " + i, ((TextContent) messages.get(i).getContent()).getText());
         }
         YieldsApplication.setUser(lastUser);
+    }
+
+    @Test
+    public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException {
+        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        User u = m.getSender();
+        assertEquals(u.getId(), new Id(117));
+    }
+
+    @Test
+    public void testMessagesFromJSONAreCorrectlyParserForDate() throws JSONException {
+        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        Date date = m.getDate();
+        assertEquals("2011-12-03T10:15:30+01:00", date.toString());
+    }
+
+    @Test
+    public void testMessagesFromJSONAreCorrectlyParserForContent() throws JSONException {
+        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        TextContent content = (TextContent) m.getContent();
+        assertEquals("MESSAGE_TEXT", content.getText());
     }
 
     private class FakeUser extends ClientUser{
