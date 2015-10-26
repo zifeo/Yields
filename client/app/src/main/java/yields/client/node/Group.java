@@ -1,5 +1,7 @@
 package yields.client.node;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +38,7 @@ public class Group extends Node {
     }
 
     public void appendUsers(Collection<User> users) throws NodeException {
-        for (User user: users ) {
+        for (User user: users) {
             connectUser(user);
         }
     }
@@ -58,9 +60,9 @@ public class Group extends Node {
         for(Message m : messages){
             mMessages.put(m.getDate(),m);
         }
-
+        Log.d("TESEEEEEDST", mMessages.toString());
         return Collections.unmodifiableSortedMap(mMessages
-                .headMap(farthestDate));
+                .tailMap(farthestDate));
     }
 
     public Message getLastMessage(){

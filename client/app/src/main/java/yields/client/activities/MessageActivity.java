@@ -170,6 +170,7 @@ public class MessageActivity extends Activity {
      */
     private void retrieveGroupMessages() throws IOException {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
+
         for(Message message : messagesTree.values()){
             mMessages.add(message);
         }

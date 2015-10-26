@@ -59,7 +59,7 @@ public class Message extends Node{
         this.mContent = new TextContent(object.getString("text"));
 
         try {
-            this.mDate = DateSerialization.toDate(object.getString("text"));
+            this.mDate = DateSerialization.toDate(object.getString("datetime"));
         } catch (ParseException e) {
             throw new JSONException(e.getMessage());
         }
