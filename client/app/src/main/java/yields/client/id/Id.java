@@ -10,11 +10,11 @@ public class Id implements IdInterface<String> {
     private String mId;
 
     public Id(long value){
-        mId = String.valueOf(value);
+        mId = Long.toString(value);
     }
 
     public Id(String value){
-        mId = String.valueOf(value);
+        mId = value;
     }
 
     @Override
