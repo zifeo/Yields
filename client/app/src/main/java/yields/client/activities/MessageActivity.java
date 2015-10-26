@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
@@ -38,6 +39,7 @@ import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
+import yields.client.yieldsapplication.YieldsClientUser;
 
 /**
  * Activity used to display messages for a group
@@ -64,6 +66,13 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
+        /** FOR PRESENTATION ONLY **/
+        try {
+            YieldsClientUser.createInstance("Client user", new Id(117), "email", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
+            YieldsApplication.setGroup(new Group("Presentation", new Id(2), new ArrayList<User>()));
+        } catch (InstantiationException | ExecutionException | InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 

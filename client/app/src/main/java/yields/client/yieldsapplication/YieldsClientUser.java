@@ -1,6 +1,8 @@
 package yields.client.yieldsapplication;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
@@ -40,7 +43,6 @@ public class YieldsClientUser extends ClientUser{
     private static ConnectionManager mConnectionManager;
     private static ServerChannel mServerChannel;
 
-
     private YieldsClientUser(String name, Id id, String email, Bitmap img)
             throws NodeException, InstantiationException, IOException {
         super(name, id, email, img);
@@ -61,10 +63,14 @@ public class YieldsClientUser extends ClientUser{
      * @throws IOException If we have trouble creating the server connection
      */
     public static void createInstance(String name, Id id, String email, Bitmap img)
-            throws InstantiationException, IOException {
+            throws InstantiationException, IOException, ExecutionException, InterruptedException {
 
-        mInstance = new YieldsClientUser(name, id, email, img);
+        mInstance  = new CreateInstanceTask().execute(name, id, email, img).get();
         YieldsApplication.setUser(mInstance);
+        if (mInstance == null){
+            Log.d("YCU", "mInstance == null");
+        }
+
     }
 
     /**
@@ -170,5 +176,17 @@ public class YieldsClientUser extends ClientUser{
             default : throw new IllegalArgumentException("type unknown");
         }
         return req;
+    }
+
+    private static class CreateInstanceTask extends AsyncTask<Object, Void, YieldsClientUser>{
+        @Override
+        protected YieldsClientUser doInBackground(Object... params) {
+            try {
+                return  new YieldsClientUser((String) params[0], (Id) params[1], (String)params[2], (Bitmap) params[3]);
+            } catch (InstantiationException | IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
