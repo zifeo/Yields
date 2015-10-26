@@ -13,9 +13,10 @@ import yields.client.exceptions.NodeException;
 import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
-    private List<User> mUsers; // for now, just users
+    private List<User> mUsers;
     private Bitmap mImage;
     private List<Message> mCurrentMessages; // not all the messages the group has ever sent, just
                                             // the ones that are currently in the listView
@@ -27,22 +28,19 @@ public class Group extends Node {
      * @param name The name of the group
      * @param id The id of the group
      * @param users The current users of the group
-     * @param image The current image of the group, can be null
+     * @param image The current image of the group
      * @param isImageCircle Indicates if the image given is already circular
      * @throws NodeException If nodes is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, boolean isImageCircle) throws NodeException {
+    public Group(String name, Id id, List<User> users, Bitmap image, boolean isImageCircle)
+            throws NodeException {
         super(name, id);
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mCurrentMessages = new ArrayList<>();
 
-        if (image != null && !isImageCircle){
+        if (image!=null && !isImageCircle){
             mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
         }
-    }
-
-    public Group(String name, Id id, List<User> users, Bitmap image) throws NodeException {
-        this(name, id, users, image, false);
     }
 
     public Group(String name, Id id, List<User> users) throws NodeException {
@@ -74,10 +72,14 @@ public class Group extends Node {
 
     /**
      * Returns the circular version of the group's image
-     * @return the circular version of the group's image, or null if none has been set
+     * @return the circular version of the group's image, or the default one if none has been set
      */
     public Bitmap getCircularImage(){
-        return mImage;
+        if (mImage != null){
+            return mImage;
+        }
+
+        return YieldsApplication.getDefaultGroupImage();
     }
 
     public List<User> getUsers() {

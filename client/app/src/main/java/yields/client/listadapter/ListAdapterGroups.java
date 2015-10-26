@@ -43,14 +43,7 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         textViewGroupLastMessage.setText(group.getPreviewOfLastMessage());
 
         Bitmap groupImage = group.getCircularImage();
-        if (groupImage == null){
-            imageGroup.setImageBitmap(YieldsApplication.getDefaultGroupImage());
-        }
-        else {
-            imageGroup.setImageBitmap(groupImage);
-        }
-
-
+        imageGroup.setImageBitmap(groupImage);
 
         return singleGroup;
     }
