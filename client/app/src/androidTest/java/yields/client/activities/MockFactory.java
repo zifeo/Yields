@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,20 +27,8 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MockFactory {
 
-    private static final List<Message> MOCK_MESSAGES = generateMockMessages(4);
-
     public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
         return new Group(name, id, connectedUsers);
-    }
-
-    public static List<Message> generateMockMessages(int number){
-        ArrayList<Message> messages = new ArrayList<>();
-        for (int i = 0; i < number; i ++){
-            Content content = generateFakeTextContent(i);
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            messages.add(new Message("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i, new Id(123), "mock email", image1), content));
-        }
-        return messages;
     }
 
     public static TextContent generateFakeTextContent(int i){
@@ -73,28 +62,28 @@ public class MockFactory {
 
         @Override
         public void sendMessage(Group group, Message message) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group,
-                                              Date lastDate) {
-            return MOCK_MESSAGES;
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            return new ArrayList<>();
+
         }
 
         @Override
         public void addNewGroup(Group group) {
-            throw new UnsupportedOperationException();
+
+
         }
 
         @Override
         public void deleteGroup(Group group) {
-            throw new UnsupportedOperationException();
+
         }
 
         @Override
         public Map<User, String> getHistory(Group group, Date from) {
-            return null;
+            return new HashMap<>();
         }
     }
 }

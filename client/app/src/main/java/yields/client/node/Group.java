@@ -60,7 +60,7 @@ public class Group extends Node {
         for(Message m : messages){
             mMessages.put(m.getDate(),m);
         }
-        Log.d("TESEEEEEDST", mMessages.toString());
+
         return Collections.unmodifiableSortedMap(mMessages
                 .tailMap(farthestDate));
     }

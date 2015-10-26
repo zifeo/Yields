@@ -226,14 +226,14 @@ public class RequestBuilder {
         return builder.request();
     }
 
-    public static Request GroupHistoryRequest(Id sender, Date last,
+    public static Request GroupHistoryRequest(Id groupId, Date last,
                                               int messageCount) {
-        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(last);
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPHISTORY, sender);
+                MessageKind.GROUPHISTORY, groupId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
