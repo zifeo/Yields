@@ -124,8 +124,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param message The Message to be deleted.
      */
     public void deleteMessage(Message message) {
-        /*mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODEID + " = ?",
-                new String[]{String.valueOf(message.getId().getId())});*/
+        mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODEID + " = ?",
+                new String[]{String.valueOf(message.getId().getId())});
     }
 
     /**
@@ -139,10 +139,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_MESSAGE_NODEID, message.getId().getId());
             values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
             values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
-            values.put(KEY_MESSAGE_CONTENT, serializeContent((TextContent) message.getContent()));
+            values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
             values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
-            deleteMessage(message);
             mDatabase.insert(TABLE_MESSAGES, null, values);
         } catch (CacheDatabaseException e){
             Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId() + "\n"
@@ -166,13 +165,24 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param user The User to be added.
      */
     public void addUser(User user) {
-        try {
-            ContentValues values = createContentValuesForUser(user);
+        String selectQuery = "SELECT * FROM " + TABLE_USERS
+                + " WHERE " + KEY_USER_NODEID + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectQuery,
+                new String[]{String.valueOf(user.getId().getId())});
+        if(cursor.getCount() == 1){
+            updateUser(user);
+        } else if (cursor.getCount() > 1){ //There should not be several Users with the same Id.
             deleteUser(user);
-            mDatabase.insert(TABLE_USERS, null, values);
-        } catch (CacheDatabaseException e){
-            Log.d(TAG, "Unable to insert User with id: " + user.getId().getId() + "\n"
-                    + "Reason: " + e.toString());
+        }
+
+        if(cursor.getCount() >1 || cursor.getCount() == 0){
+            try {
+                ContentValues values = createContentValuesForUser(user);
+                mDatabase.insert(TABLE_USERS, null, values);
+            } catch (CacheDatabaseException e) {
+                Log.d(TAG, "Unable to insert User with id: " + user.getId().getId() + "\n"
+                        + "Reason: " + e.toString());
+            }
         }
     }
 
@@ -255,15 +265,27 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param group The Group to be added.
      */
     public void addGroup(Group group) {
-        try {
-            ContentValues values = createContentValuesForGroup(group);
-            mDatabase.insert(TABLE_GROUPS, null, values);
-            for (User user : group.getUsers()) {
-                addUser(user);
+        String selectQuery = "SELECT * FROM " + TABLE_GROUPS
+                + " WHERE " + KEY_GROUP_NODEID + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectQuery,
+                new String[]{String.valueOf(group.getId().getId())});
+        if(cursor.getCount() == 1){
+            updateGroup(group);
+        } else if (cursor.getCount() > 1){ //There should not be several Groups with the same Id.
+            deleteGroup(group);
+        }
+
+        if(cursor.getCount() >1 || cursor.getCount() == 0){
+            try {
+                ContentValues values = createContentValuesForGroup(group);
+                mDatabase.insert(TABLE_GROUPS, null, values);
+                for (User user : group.getUsers()) {
+                    addUser(user);
+                }
+            } catch (CacheDatabaseException e) {
+                Log.d(TAG, "Unable to add Group with id: " + group.getId().getId() + "\n"
+                        + "Reason: " + e.toString());
             }
-        } catch (CacheDatabaseException e){
-            Log.d(TAG, "Unable to add Group with id: " + group.getId().getId() + "\n"
-                    + "Reason: " + e.toString());
         }
     }
 
@@ -382,7 +404,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
                 try {
                     byte[] contentAsBytes = cursor.getBlob(cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
-                    Content content = deserializeContent(contentAsBytes);
+                    Content content = deserializeTextContent(contentAsBytes);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                     Date date = dateFormat.parse(dateAsString);
@@ -438,8 +460,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return The serialized version of the TextContent.
      * @throws CacheDatabaseException if the TextContent could not be serialized.
      */
-    private static byte[] serializeContent(TextContent content)
-            throws CacheDatabaseException {
+    private static byte[] serializeTextContent(TextContent content)
+            throws CacheDatabaseException
+    {
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
@@ -454,7 +477,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
 
-    private static Content deserializeContent(byte[] bytes)
+    /**
+     * Deerializes a Byte array into a TextContent.
+     *
+     * @param bytes The bytes to be deserialized.
+     * @return The deserialized version of the bytes.
+     * @throws CacheDatabaseException if the TextContent could not be deserialized.
+     */
+    private static Content deserializeTextContent(byte[] bytes)
             throws CacheDatabaseException
     {
         try {

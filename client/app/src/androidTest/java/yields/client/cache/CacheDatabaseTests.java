@@ -224,31 +224,30 @@ public class CacheDatabaseTests {
      * Test for getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
      */
     @Test
-    public void testDatabaseGetMessageIntervalForGroup(){
-        List<Message> messages = new ArrayList<>();
+    public void testDatabaseGetMessageIntervalForGroup() {
         User user1 = MockFactory.generateFakeUser("User 1", new Id(1), "u@j.ch");
         User user2 = MockFactory.generateFakeUser("User 2", new Id(2), "u@j.fr");
-        List <User> users = new ArrayList<>();
+        List<User> users = new ArrayList<>();
         users.add(user1);
         users.add(user2);
-        Group group = MockFactory.createMockGroup("Group name", new Id(1233), users);
 
-        for(int i = 0; i < 30; i++){
+        Group group = MockFactory.createMockGroup("Group name", new Id(1233), users);
+        mDatabaseHelper.addGroup(group);
+
+        for (int i = 0; i < 30; i++) {
             Message message = new Message("Mock node name User1 " + i, new Id(-i),
-                   user1, MockFactory.generateFakeTextContent(i), new Date(), group);
+                    user1, MockFactory.generateFakeTextContent(i), new Date(), group);
             mDatabaseHelper.addMessage(message);
         }
-        for(int i = 0; i < 30; i++){
-            Message message = new Message("Mock node name User2 " + i, new Id(-i),
+        for (int i = 0; i < 30; i++) {
+            Message message = new Message("Mock node name User2 " + i, new Id(-i - 30),
                     user2, MockFactory.generateFakeTextContent(i), new Date(), group);
             mDatabaseHelper.addMessage(message);
         }
 
-        mDatabaseHelper.addGroup(group);
-
         List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 0, 10);
         assertEquals(10, messagesFromDatabase.size());
-        for(int i = 0; i < 10; i ++){
+        for (int i = 0; i < 10; i++) {
             Message message = messagesFromDatabase.get(i);
             assertEquals(new Long(1), message.getSender().getId().getId());
             assertEquals("Mock message #" + i, ((TextContent) message.getContent()).getText());
@@ -305,16 +304,32 @@ public class CacheDatabaseTests {
         return idIsCorrect && groupNameIsCorrect && groupUserIDsAreCorrect;
     }
 
-    private boolean compareUser(User user1, User user2){
+    /**
+     * Compares two users.
+     *
+     * @param user1 The first User.
+     * @param user2 The second User.
+     * @return True if the two Users have the same name, email and Id. False otherwise.
+     */
+    private boolean compareUser(User user1, User user2) {
         boolean sameName = user1.getName().equals(user2.getName());
         boolean sameEmail = user1.getEmail().equals(user2.getEmail());
         boolean sameId = user1.getId().getId() == user2.getId().getId();
-        return  sameName && sameEmail && sameId;
+        return sameName && sameEmail && sameId;
     }
 
-    private boolean compareUsers(List<User> users1, List<User> users2){
+    /**
+     * Compares two user lists.
+     * The user in the lists must be in the same order.
+     *
+     * @param users1 The first list of Users.
+     * @param users2 The second list of Users.
+     * @return True if for every index of the lists, the Users have the same name, email and Id.
+     * False otherwise.
+     */
+    private boolean compareUsers(List<User> users1, List<User> users2) {
         boolean sameSize = users1.size() == users2.size();
-        if(!sameSize) {
+        if (!sameSize) {
             return sameSize;
         } else {
             boolean same = true;
@@ -323,29 +338,5 @@ public class CacheDatabaseTests {
             }
             return same;
         }
-    }
-
-    private String createUserIDsString(Group group){
-        StringBuilder userIDS = new StringBuilder();
-        List<User> users = group.getUsers();
-        for (User user : users) {
-            userIDS.append(user.getId().getId() + ",");
-        }
-        if (users.size() != 0) {
-            userIDS.deleteCharAt(userIDS.length() - 1);
-        }
-        return userIDS.toString();
-    }
-
-    private List<Id> retrieveUserIDsFromString(String string){
-        ArrayList<Id> ids = new ArrayList<>();
-        if (!string.equals("")) {
-            String[] usersIDs = string.split(",");
-            for (String userID : usersIDs) {
-                Id id = new Id(Long.parseLong(userID));
-                ids.add(id);
-            }
-        }
-        return ids;
     }
 }
