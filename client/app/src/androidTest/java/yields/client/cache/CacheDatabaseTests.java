@@ -15,6 +15,7 @@ import java.util.List;
 import yields.client.activities.MockFactory;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -233,20 +234,25 @@ public class CacheDatabaseTests {
         Group group = MockFactory.createMockGroup("Group name", new Id(1233), users);
 
         for(int i = 0; i < 30; i++){
-            Message message = new Message("Mock node name " + i, new Id(-i),
+            Message message = new Message("Mock node name User1 " + i, new Id(-i),
                    user1, MockFactory.generateFakeTextContent(i), new Date(), group);
             mDatabaseHelper.addMessage(message);
         }
         for(int i = 0; i < 30; i++){
-            Message message = new Message("Mock node name " + i, new Id(-i),
+            Message message = new Message("Mock node name User2 " + i, new Id(-i),
                     user2, MockFactory.generateFakeTextContent(i), new Date(), group);
             mDatabaseHelper.addMessage(message);
         }
 
         mDatabaseHelper.addGroup(group);
 
-        List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 1, 10);
+        List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 0, 10);
         assertEquals(10, messagesFromDatabase.size());
+        for(int i = 0; i < 10; i ++){
+            Message message = messagesFromDatabase.get(i);
+            assertEquals(new Long(1), message.getSender().getId().getId());
+            assertEquals("Mock message #" + i, ((TextContent) message.getContent()).getText());
+        }
         mDatabaseHelper.clearDatabase();
     }
 

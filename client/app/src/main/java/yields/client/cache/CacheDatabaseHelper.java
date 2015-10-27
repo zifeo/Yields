@@ -355,7 +355,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary) {
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUPID + " = " + group.getId().getId() + " ORDER BY "
-                + "datetime(" + KEY_MESSAGE_DATE + ")" + " DESC LIMIT " + (upperBoundary - lowerBoundary)
+                + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT " + (upperBoundary - lowerBoundary)
                 + " OFFSET " + lowerBoundary;
 
         Cursor cursor = mDatabase.rawQuery(selectQuery, null);
@@ -443,7 +443,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
-            outputStream.writeChars(content.getText());
+            outputStream.writeUTF(content.getText());
             outputStream.close();
             byte[] bytes = byteOutputStream.toByteArray();
             byteOutputStream.close();
