@@ -1,5 +1,8 @@
 package yields.server.dbi.models
 
+import yields.server.dbi._
+import yields.server.utils.Helpers
+
 /**
  * Representation of a group
  */
@@ -17,29 +20,72 @@ final class Group {
 
 object Group {
 
-//  def createGroup(name: String): Group = {
-//    val res = queryBySql("insert into group Set date_creation = ?, group_name = ?", databaseDateTime, name)
-//    res match {
-//      case Nil => throw new NoSuchElementException
-//      case head :: tail => res.head
-//    }
-//  }
-//
-//  def getUsersFromGroup(ridGroup: String): List[User] = {
-//    queryBySql("select from E where in = ?", new ORecordId(ridGroup))
-//  }
-//
-//  def addMessage(ridGroup: String, ridSender: String, body: String) = {
-//    queryBySql("""update ? ADD messages = '{"sender":"?", "time":?, "body":"?"}'""", new ORecordId(ridGroup),
-//      new ORecordId(ridSender), databaseDateTime, body)
-//  }
-//
-//  def getGroupInfos(ridGroup: String): Group = {
-//    val res = queryBySql("select from ?", new ORecordId(ridGroup))
-//    res match {
-//      case Nil => throw new NoSuchElementException
-//      case head :: tail => res.head
-//    }
-//  }
+  def createGroup(name: String): GID = {
+
+    val struct = Map(
+      "datetime" -> Helpers.currentDatetime.toString,
+      "name" -> name
+    )
+
+    val gid = r.incr("ids:last:groups") match {
+      case Some(id) => id
+      case None => throw new Exception
+    }
+
+    r.hmset(s"groups:$gid", struct)
+    r.set(s"groups:$gid:nid", "0")
+
+    gid
+  }
+
+  //  def getUsersFromGroup(ridGroup: String): List[User] = {
+  //    queryBySql("select from E where in = ?", new ORecordId(ridGroup))
+  //  }
+  //
+  def addMessage(ridGroup: String, ridSender: String, body: String) = {
+
+    val nid = r.incr(s"groups:$ridGroup:nid") match {
+      case Some(id) => id
+      case None => throw new Exception
+    }
+
+    val struct = Map(
+      "sender" -> ridSender,
+      "datetime" -> Helpers.currentDatetime,
+      "content" -> body
+    )
+
+    r.hmset(s"groups:$ridGroup:content:$nid", struct)
+
+    nid
+
+  }
+
+  def getLast(ridGroup: String, last: Long, count: Long) = {
+
+    val lastNid = r.get(s"groups:$ridGroup:nid") match {
+      case Some(id) => id
+      case None => throw new Exception
+    }
+
+    val from = Math.max(0, lastNid.toInt - count) to lastNid.toInt
+
+    val result = from.map { nid =>
+
+      r.hmget(s"groups:$ridGroup:content:$nid", "datetime", "sender", "content")
+
+    }.flatten
+
+    println(result)
+
+  }
+  //
+  //  def getGroupInfos(ridGroup: String): Group = {
+  //    val res = queryBySql("select from ?", new ORecordId(ridGroup))
+  //    res match {
+  //      case Nil => throw new NoSuchElementException
+  //      case head :: tail => res.head
+  //    }
+  //  }
 
 }
