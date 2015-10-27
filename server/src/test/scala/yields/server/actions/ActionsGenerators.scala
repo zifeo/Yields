@@ -2,7 +2,7 @@ package yields.server.actions
 
 import org.scalacheck.{Arbitrary, Gen}
 
-trait ActionsGenerators extends GroupsGenerators with UsersGenerators with ExceptionsGenerators {
+trait ActionsGenerators extends GroupsGenerators with UsersGenerators {
 
   import Gen.oneOf
 

@@ -3,7 +3,6 @@ package yields.server.io.actions
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
-import yields.server.actions.exceptions.SerializationException
 import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
 import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
 import yields.server.io._
@@ -37,7 +36,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
       case x: UserUpdate => packWithKind(x)
       case x: UserGroupList => packWithKind(x)
 
-      case _ => throw SerializationException(s"unregistered action kind: $kind")
+      case _ => serializationError(s"unregistered action kind: $kind")
     }
   }
 
@@ -54,9 +53,9 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "UserUpdate" => message.convertTo[UserUpdate]
           case "UserGroupList" => message.convertTo[UserGroupList]
 
-          case _ => throw SerializationException(s"unregistered action kind: $kind")
+          case _ => deserializationError(s"unregistered action kind: $kind")
         }
-      case _ => throw SerializationException(s"bad action format: $json")
+      case _ => deserializationError(s"bad action format: $json")
     }
 
 }
