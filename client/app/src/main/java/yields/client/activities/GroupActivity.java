@@ -31,6 +31,10 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Central activity of Yields where the user can discover new nodes, create groups, see its contact
+ * list, change its settings and go to chats of different groups
+ */
 public class GroupActivity extends AppCompatActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
@@ -38,6 +42,10 @@ public class GroupActivity extends AppCompatActivity {
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
 
+    /**
+     * Method automatically called on the creation of the activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +75,10 @@ public class GroupActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -107,16 +119,18 @@ public class GroupActivity extends AppCompatActivity {
         }
 
         if (intent == null){
-            Log.d(TAG, "Error : intent should never be null at this point"); // maybe throw exception
+            throw new IllegalStateException("Itent should never be null at this point");
         }
         else {
             startActivity(intent);
         }
 
-        return intent == null;
+        return intent != null;
     }
 
-
+    /**
+     * Automatically called when the activity is resumed after another activity was displayed
+     */
     @Override
     protected void onStart(){
         super.onStart();

@@ -25,6 +25,10 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Main activity for group creation, displayed after the group's name selection
+ * In this activity, the user is able to go to CreateGroupSelectUsersActivity to add contacts
+ */
 public class CreateGroupActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterUsersCheckBox;
     private List<PairUserBoolean> mUsers;
@@ -36,6 +40,10 @@ public class CreateGroupActivity extends AppCompatActivity {
     private static final String TAG = "CreateGroupActivity";
     private static final int REQUEST_ADD_CONTACT = 1;
 
+    /**
+     * Method automatically called on the creation of the activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +96,10 @@ public class CreateGroupActivity extends AppCompatActivity {
         mAdapterUsersCheckBox.notifyDataSetChanged();
     }
 
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -155,6 +167,12 @@ public class CreateGroupActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Method called when the user returns to it after adding contacts
+     * @param requestCode the code for the request
+     * @param resultCode code indicating if the operation was successful or not
+     * @param data the data sent by the other activity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {

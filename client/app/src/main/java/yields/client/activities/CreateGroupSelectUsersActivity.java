@@ -19,6 +19,10 @@ import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Activity where the list of contacts of the user is displayed and he can choose whether
+ * to include any other user in the future group
+ */
 public class CreateGroupSelectUsersActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterEntourage;
     private List<PairUserBoolean> mEntourageChecked;
@@ -27,6 +31,10 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
     public static final String EMAIL_LIST_KEY = "EMAIL_LIST";
     public static final String EMAIL_LIST_INPUT_KEY = "EMAIL_LIST_INPUT";
 
+    /**
+     * Method automatically called on the creation of the activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +71,10 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
         mAdapterEntourage.notifyDataSetChanged();
     }
 
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
