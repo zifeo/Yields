@@ -4,6 +4,6 @@
 docker-machine start default >> /dev/null
 eval "$(docker-machine env --shell bash default)"
 
-# Run
-docker start redis
+# Cli
+docker exec -i -t redis /usr/local/bin/redis-cli -a "secret"
 
