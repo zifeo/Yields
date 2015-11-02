@@ -68,7 +68,6 @@ public class YieldsClientUser extends ClientUser{
         } else {
             throw new InstantiationException();
         }
-
     }
 
     public static void destroyInstance() throws IOException {

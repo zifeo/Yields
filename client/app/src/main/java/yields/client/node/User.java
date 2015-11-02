@@ -9,16 +9,14 @@ import yields.client.id.Id;
 
 public class User extends Node{
 
-    private String email;
+    private String mEmail;
     private Bitmap mImg;
 
     public User(String name, Id id,
                  String email, Bitmap img) throws NodeException {
         super(name, id);
-        Objects.requireNonNull(email);
-        Objects.requireNonNull(img);
-        this.email = email;
-        this.mImg = img;
+        this.mEmail = Objects.requireNonNull(email);
+        this.mImg = Objects.requireNonNull(img);
     }
 
     public Bitmap getImg(){
@@ -26,6 +24,6 @@ public class User extends Node{
     }
 
     public String getEmail() {
-        return email;
+        return mEmail;
     }
 }

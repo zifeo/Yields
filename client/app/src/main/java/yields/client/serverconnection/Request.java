@@ -8,8 +8,7 @@ public class Request{
     private JSONObject mRequest;
 
     public Request(JSONObject request){
-        Objects.requireNonNull(request);
-        this.mRequest = request;
+        this.mRequest = Objects.requireNonNull(request);
     }
 
     public String message() {
