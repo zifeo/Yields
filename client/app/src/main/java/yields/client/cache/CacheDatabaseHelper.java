@@ -132,13 +132,16 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Adds the given Message to the database.
      *
      * @param message The Message to the database.
+     * @throws CacheDatabaseException If the Message could not be inserted to the database.
      */
-    public void addMessage(Message message) {
+    public void addMessage(Message message)
+            throws CacheDatabaseException
+    {
         try {
             mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message));
-        } catch (CacheDatabaseException e){
-            Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId() + "\n"
-                    + e.toString());
+        } catch (CacheDatabaseException exception){
+            Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId(), exception);
+            throw exception;
         }
     }
 
@@ -156,8 +159,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Adds the User from the database.
      *
      * @param user The User to be added.
+     * @throws CacheDatabaseException If the User could not be inserted into the database.
      */
-    public void addUser(User user) {
+    public void addUser(User user)
+            throws CacheDatabaseException
+    {
         String selectQuery = "SELECT * FROM " + TABLE_USERS
                 + " WHERE " + KEY_USER_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -172,9 +178,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             try {
                 ContentValues values = createContentValuesForUser(user);
                 mDatabase.insert(TABLE_USERS, null, values);
-            } catch (CacheDatabaseException e) {
-                Log.d(TAG, "Unable to insert User with id: " + user.getId().getId() + "\n"
-                        + "Reason: " + e.toString());
+            } catch (CacheDatabaseException exception) {
+                Log.d(TAG, "Unable to insert User with id: " + user.getId().getId(), exception);
+                throw exception;
             }
         }
     }
@@ -183,15 +189,18 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Updates the User in the database.
      *
      * @param user The User to be updated.
+     * @throws CacheDatabaseException If the User could not be updated in the database.
      */
-    public void updateUser(User user) {
+    public void updateUser(User user)
+            throws CacheDatabaseException
+    {
         try {
             ContentValues values = createContentValuesForUser(user);
             mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
                     new String[]{String.valueOf(user.getId().getId())});
-        } catch (CacheDatabaseException e){
-            Log.d(TAG, "Unable to update User with id: " + user.getId().getId() + "\n"
-                    + "Reason: " + e.toString());
+        } catch (CacheDatabaseException exception){
+            Log.d(TAG, "Unable to update User with id: " + user.getId().getId(), exception);
+            throw exception;
         }
     }
 
@@ -256,8 +265,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * are not in the database already.
      *
      * @param group The Group to be added.
+     * @throws CacheDatabaseException If the Group could not be inserted into the database.
      */
-    public void addGroup(Group group) {
+    public void addGroup(Group group)
+            throws CacheDatabaseException
+    {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
                 + " WHERE " + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -275,9 +287,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 for (User user : group.getUsers()) {
                     addUser(user);
                 }
-            } catch (CacheDatabaseException e) {
-                Log.d(TAG, "Unable to add Group with id: " + group.getId().getId() + "\n"
-                        + "Reason: " + e.toString());
+            } catch (CacheDatabaseException exception) {
+                Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
+                throw exception;
             }
         }
     }
@@ -286,15 +298,18 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Updates the Group in the database.
      *
      * @param group The Group to be updated.
+     * @throws CacheDatabaseException If the Group could not be updated in the database.
      */
-    public void updateGroup(Group group) {
+    public void updateGroup(Group group)
+            throws CacheDatabaseException
+    {
         try {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                     new String[]{String.valueOf(group.getId().getId())});
-        } catch (CacheDatabaseException e){
-            Log.d(TAG, "Unable to update Group with id: " + group.getId().getId() + "\n"
-                    + "Reason: " + e.toString());
+        } catch (CacheDatabaseException exception){
+            Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
+            throw exception;
         }
     }
 
@@ -365,12 +380,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param group         The Group from which we want to retrieve the Messages.
      * @param lowerBoundary The lower boundary (must be at least 1).
      * @param upperBoundary The upper boundary.
+     * @throws CacheDatabaseException If the database was unable to fetch some information.
      * @return The list of Messages from the interval for the Group.
       */
-    public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary) {
-        if(lowerBoundary <= 0 || lowerBoundary > upperBoundary){
+    public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
+            throws CacheDatabaseException
+    {
+        if(lowerBoundary < 0 || lowerBoundary > upperBoundary){
             throw new IllegalArgumentException("Illegal boundaries ! The upper boundary must be "
-                    + "greater than the lower boundary which can not be smaller or equal than 0");
+                    + "greater than the lower boundary which can not be negative");
         }
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
@@ -409,11 +427,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date, group));
                     }
-                }catch (CacheDatabaseException e){
-                    Log.d(TAG, "Unable to retrieve Messages from Group with id: " + group.getId().getId() + "\n"
-                            + "Reason: " + e.toString());
-                } catch (ParseException e) {
-                    Log.d(TAG, "Unable to parse given String as a Date.");
+                }catch (CacheDatabaseException exception){
+                    Log.d(TAG, "Unable to retrieve Messages from Group with id: "
+                            + group.getId().getId(), exception);
+                    throw exception;
+                } catch (ParseException exception) {
+                    Log.d(TAG, "Unable to parse String as a Date.", exception);
+                    throw new CacheDatabaseException("Unable to retrieve Messages from Group "
+                            + group.getId().getId());
                 }
             } while (cursor.moveToNext());
             return messages;
@@ -470,7 +491,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             byteOutputStream.close();
             return bytes;
         } catch (IOException e) {
-            throw new CacheDatabaseException("Could not serialize Object !");
+            throw new CacheDatabaseException("Could not serialize TextContent !");
         }
         //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
