@@ -1,20 +1,36 @@
 package yields.server
 
+import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
+
 import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
+import yields.server.utils.{Helpers, Config}
 
 import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
 package object dbi {
-  val uri = "remote:192.168.99.100:2424/orientdb"
 
-  lazy implicit val database: OObjectDatabaseTx = new OObjectDatabaseTx(uri).open("root", "AEB2F0FCA414B253A76E235E96856BA436A00E2654B07825867B11060016011D")
-  database.getEntityManager.registerEntityClasses("yields.server.models")
+  private[dbi] lazy implicit val database: OObjectDatabaseTx = {
+    val db = new OObjectDatabaseTx(Config.getString("database.uri"))
+    db.open(Config.getString("database.user"), Config.getString("database.pass"))
+    db.getEntityManager.registerEntityClasses("yields.server.dbi.models")
+    db
+  }
+
+  private val databaseDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
   def queryBySql[T](sql: String, params: AnyRef*)(implicit db: OObjectDatabaseTx): List[T] = {
     val params4java = params.toArray
     val results: java.util.List[T] = db.query(new OSQLSynchQuery[T](sql), params4java: _*)
     results.asScala.toList
   }
+
+  /** Returns current database formatted date and time. */
+  def databaseDateTime: String = databaseDateTime(Helpers.currentDatetime)
+
+  /** Returns given database formatted date and time. */
+  def databaseDateTime(datetime: OffsetDateTime): String =  databaseDateTimeFormat.format(datetime)
+
 }
