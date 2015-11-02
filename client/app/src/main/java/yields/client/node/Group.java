@@ -22,32 +22,24 @@ public class Group extends Node {
                                             // the ones that are currently in the listView
 
 
-
      /** Constructor for groups
      *
      * @param name The name of the group
      * @param id The id of the group
      * @param users The current users of the group
      * @param image The current image of the group
-     * @param isImageCircle Indicates if the image given is already circular
-     * @throws NodeException If nodes is null
+     * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, boolean isImageCircle)
+    public Group(String name, Id id, List<User> users, Bitmap image)
             throws NodeException {
         super(name, id);
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mCurrentMessages = new ArrayList<>();
-
-        if (image == null){
-            mImage = YieldsApplication.getDefaultGroupImage();
-        }
-        else if (image!=null && !isImageCircle){
-            mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
-        }
+        mImage = Objects.requireNonNull(image);
     }
 
     public Group(String name, Id id, List<User> users) throws NodeException {
-        this(name, id, users, null, false);
+        this(name, id, users, YieldsApplication.getDefaultGroupImage());
     }
 
     public void addUser(User newUser) {
@@ -74,10 +66,10 @@ public class Group extends Node {
     }
 
     /**
-     * Returns the circular version of the group's image
-     * @return the circular version of the group's image, or the default one if none has been set
+     * Returns the group's image
+     * @return the group's image, uncropped
      */
-    public Bitmap getCircularImage(){
+    public Bitmap getImage(){
         return mImage;
     }
 

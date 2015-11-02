@@ -14,7 +14,6 @@ import java.util.List;
 import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
-import yields.client.yieldsapplication.YieldsApplication;
 
 public class ListAdapterGroups extends ArrayAdapter<Group> {
     private Context mContext;
@@ -31,7 +30,7 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View singleGroup = inflater.inflate(R.layout.group_layout, parent, false);
+        View singleGroup = inflater.inflate(mGroupLayout, parent, false);
 
         TextView textViewGroupName = (TextView) singleGroup.findViewById(R.id.textViewGroupName);
         TextView textViewGroupLastMessage = (TextView) singleGroup.findViewById(R.id.textViewGroupLastMessage);
@@ -42,8 +41,9 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         textViewGroupName.setText(group.getName());
         textViewGroupLastMessage.setText(group.getPreviewOfLastMessage());
 
-        Bitmap groupImage = group.getCircularImage();
-        imageGroup.setImageBitmap(groupImage);
+        Bitmap groupImage = group.getImage();
+        imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(groupImage,
+                mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
         return singleGroup;
     }
