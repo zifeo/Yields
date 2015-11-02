@@ -98,4 +98,13 @@ public class ImageContent implements Content{
         layout.addView(img);
         return layout;
     }
+
+    /**
+     * Returns a preview of the content, displayed in the group list with the content's sender
+     * @return a string describing the content
+     */
+    @Override
+    public String getPreview() {
+        return "image";
+    }
 }

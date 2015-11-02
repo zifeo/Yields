@@ -3,7 +3,6 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -16,15 +15,11 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
@@ -32,7 +27,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -51,7 +45,7 @@ public class MessageActivity extends Activity {
     /**
      * Starts the activity by displaying the group info and showing the most recent
      * messages.
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,19 +54,10 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
 
-        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
-        try {
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email", image1);
-            mGroup = createFakeGroup();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-
-        mMessages = new ArrayList<>();
+        mMessages = new ArrayList<>(mGroup.getCurrentMessages());
         mImage = null;
         mSendImage = false;
 
@@ -92,7 +77,11 @@ public class MessageActivity extends Activity {
             toast.show();
         }else {
             setHeaderBar();
-            retrieveGroupMessages();
+            try {
+                retrieveGroupMessages();
+            } catch (IOException e) {
+                throw new MessageActivityException("Could not retrieve messages");
+            }
         }
     }
 
@@ -100,7 +89,9 @@ public class MessageActivity extends Activity {
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v) throws MessageActivityException {
-        String inputMessage =  mInputField.getText().toString();
+        String inputMessage =  mInputField.getText().toString(); // CAN CRASH IF USER CHOOSES TO SEND
+                                                                // A PICTURE BUT CANCELS AND SENDS
+                                                                // TEXT INSTEAD
 
         mInputField.setText("");
         Content content;
@@ -114,6 +105,7 @@ public class MessageActivity extends Activity {
         Message message = new Message("message", new Id(1230), mUser, content);
         // TODO : take right name and right id.
         mMessages.add(message);
+        mGroup.addMessage(message); // temporary
         //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
@@ -141,7 +133,7 @@ public class MessageActivity extends Activity {
     /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
-    private void retrieveGroupMessages(){
+    private void retrieveGroupMessages() throws IOException {
         for(Message m : mUser.getGroupMessages(mGroup)){
             mMessages.add(m);
         }
@@ -189,49 +181,5 @@ public class MessageActivity extends Activity {
                 Log.d("Message Activity", "Couldn't add image to the message");
             }
         }
-    }
-
-    /**
-     * Mock Client user, only for presentation during the second sprint.
-     */
-    private class  MockClientUser extends ClientUser{
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
-        }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group) {
-            ArrayList<Message> messageList =  new ArrayList<>();
-            return messageList;
-        }
-
-        @Override
-        public void addNewGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * Create fake group for sake of the presentation.
-     * @return fake group.
-     */
-    private Group createFakeGroup() throws NodeException {
-        return new Group("Mock group", new Id(123), new ArrayList<User>());
     }
 }

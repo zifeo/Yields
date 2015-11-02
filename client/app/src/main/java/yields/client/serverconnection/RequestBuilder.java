@@ -25,10 +25,10 @@ public class RequestBuilder {
         MessageKind(String name) { this.name = name; }
         public String getValue() { return name; }
     }
-    private enum Fields {
+    public enum Fields {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
-        FROM("from"), TO("to");
+        FROM("from"), TO("to"), COUNT("count");
 
         private final String name;
         Fields(String name) { this.name = name; }
@@ -184,6 +184,15 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    public static Request GroupHistoryRequest(Id sender, int messageCount) {
+        RequestBuilder builder = new RequestBuilder(
+                MessageKind.USERUPDATE, sender);
+
+        builder.addField(Fields.COUNT, messageCount);
+
+        return builder.request();
+    }
+
     public static Request GroupHistoryRequest(Id sender, Date from, Date to) {
         RequestBuilder builder = new RequestBuilder(
                 MessageKind.USERUPDATE, sender);
@@ -223,6 +232,10 @@ public class RequestBuilder {
 
     private void addField(Fields fieldType, Date field) {
         this.mConstructingMap.put(fieldType.getValue(), field.toString());
+    }
+
+    private void addField(Fields fieldType, int field) {
+        this.mConstructingMap.put(fieldType.getValue(), field);
     }
 
     private Request request() {

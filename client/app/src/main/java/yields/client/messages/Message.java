@@ -57,4 +57,12 @@ public class Message extends Node{
     public java.util.Date getDate(){
         return new java.util.Date(mDate.getTime());
     }
+
+    /**
+     * Returns a preview of the message, displayed in the group list
+     * @return a string describing the message
+     */
+    public String getPreview(){
+        return mSender.getName() + " : " + mContent.getPreview();
+    }
 }
