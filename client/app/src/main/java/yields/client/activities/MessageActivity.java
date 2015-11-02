@@ -71,7 +71,7 @@ public class MessageActivity extends Activity {
             YieldsClientUser.createInstance("Client user", new Id(117), "email", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
             YieldsApplication.setGroup(new Group("Presentation", new Id(2), new ArrayList<User>()));
         } catch (InstantiationException | ExecutionException | InterruptedException | IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't initiate presentation demo.");
         }
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
