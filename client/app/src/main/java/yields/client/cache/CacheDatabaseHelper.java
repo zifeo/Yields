@@ -135,14 +135,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      */
     public void addMessage(Message message) {
         try {
-            ContentValues values = new ContentValues();
-            values.put(KEY_MESSAGE_NODEID, message.getId().getId());
-            values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
-            values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
-            values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-            values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
-            mDatabase.insert(TABLE_MESSAGES, null, values);
+            mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message));
         } catch (CacheDatabaseException e){
             Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId() + "\n"
                     + e.toString());
@@ -370,11 +363,16 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * boundaries.
      *
      * @param group         The Group from which we want to retrieve the Messages.
-     * @param lowerBoundary The lower boundary.
+     * @param lowerBoundary The lower boundary (must be at least 1).
      * @param upperBoundary The upper boundary.
      * @return The list of Messages from the interval for the Group.
       */
     public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary) {
+        if(lowerBoundary <= 0 || lowerBoundary > upperBoundary){
+            throw new IllegalArgumentException("Illegal boundaries ! The upper boundary must be "
+                    + "greater than the lower boundary which can not be smaller or equal than 0");
+        }
+
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUPID + " = " + group.getId().getId() + " ORDER BY "
                 + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT " + (upperBoundary - lowerBoundary)
@@ -499,6 +497,26 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             throw new CacheDatabaseException("Could not deserialize Content !");
         }
         //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
+    }
+
+    /**
+     * Creates the appropriate row entry (ContentValues) for a Message.
+     *
+     * @param message The Message for which a ContentValues is built.
+     * @return A ContentValues object which corresponds to the Message.
+     * @throws CacheDatabaseException If some of the Message information could not be serialized.
+     */
+    private static ContentValues createContentValuesForMessage(Message message)
+            throws CacheDatabaseException
+    {
+        ContentValues values = new ContentValues();
+        values.put(KEY_MESSAGE_NODEID, message.getId().getId());
+        values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
+        values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
+        values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
+        return values;
     }
 
     /**
