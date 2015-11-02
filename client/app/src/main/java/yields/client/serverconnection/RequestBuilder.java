@@ -18,8 +18,14 @@ import java.util.TimeZone;
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
 
+/**
+ * A builder for requests that will be send to the server
+ */
 public class RequestBuilder {
 
+    /**
+     * The Kind of messages possible
+     */
     private enum MessageKind {
         PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdate"),
         USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
@@ -32,6 +38,10 @@ public class RequestBuilder {
         MessageKind(String name) { this.name = name; }
         public String getValue() { return name; }
     }
+
+    /**
+     * The Fields possible for the request
+     */
     public enum Fields {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
@@ -116,6 +126,14 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Creates a Group create request
+     *
+     * @param sender The id of the sender
+     * @param name The new name of the group
+     * @param nodes The nodes attached to the group
+     * @return The request itself
+     */
     public static Request GroupCreateRequest(Id sender, String name,
                                              List<Id> nodes) {
         Objects.requireNonNull(sender);
@@ -191,8 +209,17 @@ public class RequestBuilder {
         return builder.request();
     }
 
-    public static Request GroupMessageRequest(Id sender, Id groupId,
-                                              String kind, String content) {
+    /**
+     * Creates a Group message request
+     *
+     * @param sender The id of the sender
+     * @param groupId The group id to send the message to
+     * @param kind The kind of the message should be text
+     * @param content The content of the message
+     * @return The request itself
+     */
+    public static Request GroupTextMessageRequest(Id sender, Id groupId,
+                                                  String kind, String content) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(kind);
@@ -208,6 +235,14 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Creates a Group image message request
+     * @param sender The id of the sender
+     * @param groupId The group id of the recipient
+     * @param kind The kind of the message should be image
+     * @param content The image to send
+     * @return The request itself
+     */
     public static Request GroupImageMessageRequest(Id sender, Id groupId,
                                                    String kind,
                                                    ImageContent content) {
@@ -226,6 +261,14 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Creates a group history request
+     *
+     * @param groupId The id of the group you want the history from
+     * @param last The last time we got a message from this group
+     * @param messageCount The max number of message we want
+     * @return The request itself
+     */
     public static Request GroupHistoryRequest(Id groupId, Date last,
                                               int messageCount) {
         Objects.requireNonNull(groupId);
@@ -241,6 +284,12 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Creates a simple ping request
+     *
+     * @param content A string of content
+     * @return The request itself
+     */
     public static Request pingRequest(String content) {
         Objects.requireNonNull(content);
 

@@ -27,7 +27,6 @@ import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
-import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 
 /**
@@ -173,7 +172,7 @@ public class YieldsClientUser extends ClientUser{
                 break;
             case "text":
                 req = RequestBuilder
-                        .GroupMessageRequest(message.getSender().getId(), group.getId(),
+                        .GroupTextMessageRequest(message.getSender().getId(), group.getId(),
                                 "text", ((TextContent) message
                                         .getContent()).getText());
                 break;

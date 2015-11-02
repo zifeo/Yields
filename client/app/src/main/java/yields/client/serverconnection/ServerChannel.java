@@ -15,6 +15,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The server channel connects to the server and sends message to the server
+ */
 public class ServerChannel implements CommunicationChannel {
     private BufferedWriter mSender;
     private BufferedReader mReceiver;
@@ -28,6 +31,13 @@ public class ServerChannel implements CommunicationChannel {
         this.mConnectionStatus = connectionStatus;
     }
 
+    /**
+     * Sends a request by this communication channels
+     *
+     * @param request Request to send
+     * @return The Response of the request
+     * @throws IOException If we have trouble sending the request
+     */
     @Override
     public Response sendRequest(Request request)
             throws IOException {
