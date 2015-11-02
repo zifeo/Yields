@@ -30,7 +30,7 @@ public class ServerChannelTest {
     private static String sSimpleRequest = "{" +
             "\"metadata\":{" +
             "\"sender\":\"0\"," +
-            "\"date-time\":\"TIME\"}," +
+            "\"datetime\":\"TIME\"}," +
             "\"kind\":\"PING\"," +
             "\"message\":" +
             "{\"content\":\"test\"}" +

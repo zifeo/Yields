@@ -123,7 +123,7 @@ public class RequestBuilder {
         Objects.requireNonNull(nodes);
 
         if(nodes.size() < 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No nodes to add...");
         }
 
         RequestBuilder builder = new RequestBuilder(
@@ -297,7 +297,7 @@ public class RequestBuilder {
         Map<String, Object> metadata = new ArrayMap<>();
         metadata.put("sender", mSender.getId());
 
-        metadata.put("date-time", formatDate(
+        metadata.put("datetime", formatDate(
                 new Date()));
 
         request.put("metadata", new JSONObject(metadata));
