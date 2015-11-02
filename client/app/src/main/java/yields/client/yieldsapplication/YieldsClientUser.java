@@ -67,10 +67,6 @@ public class YieldsClientUser extends ClientUser{
 
         mInstance  = new CreateInstanceTask().execute(name, id, email, img).get();
         YieldsApplication.setUser(mInstance);
-        if (mInstance == null){
-            Log.d("YCU", "mInstance == null");
-        }
-
     }
 
     /**
