@@ -26,7 +26,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
     }
 
-    @Test
     public void testGroupCreation(){
         getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
@@ -51,7 +50,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         assertTrue("Group not found in list", found);
     }
 
-    @Test
     public void testGroupCreationWithContactAdded(){
         getActivity();
         onView(withId(R.id.actionCreate)).perform(click());

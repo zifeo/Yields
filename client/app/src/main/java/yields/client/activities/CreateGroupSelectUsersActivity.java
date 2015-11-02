@@ -9,12 +9,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
-import yields.client.gui.PairUserBoolean;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -25,7 +26,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class CreateGroupSelectUsersActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterEntourage;
-    private List<PairUserBoolean> mEntourageChecked;
+    private List<Map.Entry<User, Boolean> > mEntourageChecked;
     private ListView mListView;
 
     public static final String EMAIL_LIST_KEY = "EMAIL_LIST";
@@ -33,7 +34,7 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,7 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
         List<User> entourage = YieldsApplication.getUser().getEntourage();
 
         for (int i = 0; i < entourage.size(); i++){
-            mEntourageChecked.add(new PairUserBoolean(entourage.get(i),
+            mEntourageChecked.add(new AbstractMap.SimpleEntry<User, Boolean>(entourage.get(i),
                     inputEmailList.contains(entourage.get(i).getEmail())));
         }
 
@@ -73,7 +74,7 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
-     * @param menu
+     * @param menu The tool bar menu
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,8 +93,8 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
         ArrayList<String> emailList = new ArrayList<>();
 
         for (int i = 0; i < mEntourageChecked.size(); i++){
-            if (mEntourageChecked.get(i).getBoolean()){
-                emailList.add(mEntourageChecked.get(i).getUser().getEmail());
+            if (mEntourageChecked.get(i).getValue()){
+                emailList.add(mEntourageChecked.get(i).getKey().getEmail());
             }
         }
 

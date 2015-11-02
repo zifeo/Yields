@@ -32,7 +32,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
-     * @param menu
+     * @param menu The tool bar menu
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,7 +64,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
     /** Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
-     * @return
+     * @return true iff the click is not propagated
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

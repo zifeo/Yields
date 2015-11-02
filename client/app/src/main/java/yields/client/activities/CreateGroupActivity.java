@@ -13,12 +13,13 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
-import yields.client.gui.PairUserBoolean;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.Group;
@@ -31,7 +32,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class CreateGroupActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterUsersCheckBox;
-    private List<PairUserBoolean> mUsers;
+    private List<Map.Entry<User, Boolean> > mUsers;
     private ListView mListView;
 
     private String mGroupName;
@@ -42,7 +43,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 CreateGroupSelectNameActivity.PUBLIC_GROUP);
 
         mUsers = new ArrayList<>();
-        mUsers.add(new PairUserBoolean(YieldsApplication.getUser(), true));
+        mUsers.add(new AbstractMap.SimpleEntry<User, Boolean>(YieldsApplication.getUser(), true));
 
         mAdapterUsersCheckBox = new ListAdapterUsersCheckBox(getApplicationContext(),
                 R.layout.add_user_layout, mUsers, true);
@@ -84,10 +85,10 @@ public class CreateGroupActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkboxUser);
 
-                boolean b = mUsers.get(position).getBoolean();
+                boolean b = mUsers.get(position).getValue();
 
                 checkBox.setChecked(!b);
-                mUsers.get(position).setBoolean(!b);
+                mUsers.get(position).setValue(!b);
             }
         });
 
@@ -98,7 +99,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
-     * @param menu
+     * @param menu The tool bar menu
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -111,7 +112,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     /** Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
-     * @return
+     * @return true iff the click is not propagated
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -124,7 +125,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 ArrayList<String> emailList = new ArrayList<>();
 
                 for (int i = 0; i < mUsers.size(); i++){
-                    emailList.add(mUsers.get(i).getUser().getEmail());
+                    emailList.add(mUsers.get(i).getKey().getEmail());
                 }
 
                 Intent intentSelectUsers = new Intent(this, CreateGroupSelectUsersActivity.class);
@@ -142,7 +143,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 List<User> userList = new ArrayList<>();
 
                 for (int i = 0; i < mUsers.size(); i++){
-                    userList.add(mUsers.get(i).getUser());
+                    userList.add(mUsers.get(i).getKey());
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
@@ -185,7 +186,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                 boolean found = false;
                 for (int j = 0; j < mUsers.size(); j++){ // check if user is already present
-                    if (mUsers.get(j).getUser().getEmail().equals(emailList.get(i))){
+                    if (mUsers.get(j).getKey().getEmail().equals(emailList.get(i))){
                         found = true;
                     }
                 }
@@ -193,7 +194,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 if (!found){
                     for (int j = 0; j < entourage.size(); j++){ // find the user from its email
                         if (entourage.get(j).getEmail().equals(emailList.get(i))){
-                            mUsers.add(new PairUserBoolean(entourage.get(j), true));
+                            mUsers.add(new AbstractMap.SimpleEntry<User, Boolean>(entourage.get(j), true));
                         }
                     }
                 }

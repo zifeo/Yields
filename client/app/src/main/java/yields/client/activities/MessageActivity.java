@@ -45,7 +45,7 @@ public class MessageActivity extends Activity {
     /**
      * Starts the activity by displaying the group info and showing the most recent
      * messages.
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
