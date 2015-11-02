@@ -10,10 +10,8 @@ public abstract class Node {
     private final Id mId;
 
     public Node(String name, Id id) throws NodeException {
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(id);
-        this.mName = name;
-        this.mId = id;
+        this.mName = Objects.requireNonNull(name);
+        this.mId = Objects.requireNonNull(id);
     }
 
     public String getName() {

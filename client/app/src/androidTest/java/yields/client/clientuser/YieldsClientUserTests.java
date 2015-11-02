@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
@@ -49,9 +50,7 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
         try {
             YieldsClientUser.createInstance("Mock Client User", new Id(117), "Mock email", BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture));
             fail("An exception should have been raised");
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (InstantiationException | IOException | ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
     }
