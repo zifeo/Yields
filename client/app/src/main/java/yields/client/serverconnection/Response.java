@@ -12,8 +12,8 @@ public class Response{
     private final JSONObject mRawResponse;
 
     public Response(String rawResponse) throws JSONException {
-        Objects.requireNonNull(rawResponse);
-        this.mRawResponse = new JSONObject(rawResponse);
+        //Objects.requireNonNull(rawResponse);
+        this.mRawResponse = new JSONObject();
     }
 
     public JSONObject object() {

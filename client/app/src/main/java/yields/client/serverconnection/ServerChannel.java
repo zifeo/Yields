@@ -1,18 +1,26 @@
 package yields.client.serverconnection;
 
+import android.util.Log;
+
 import org.json.JSONException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class ServerChannel implements CommunicationChannel {
-    private PrintWriter mSender;
+    private BufferedWriter mSender;
     private BufferedReader mReceiver;
     private ConnectionStatus mConnectionStatus;
 
-    protected ServerChannel(PrintWriter sender, BufferedReader receiver,
+    protected ServerChannel(BufferedWriter sender, BufferedReader receiver,
                          ConnectionStatus connectionStatus){
 
         this.mSender = sender;
@@ -30,12 +38,13 @@ public class ServerChannel implements CommunicationChannel {
             throw new IOException("Not connected to server");
         }
 
-        mSender.print(request.message());
+        mSender.write(request.message());
+        mSender.newLine();
         mSender.flush();
 
         Response response = null;
 
-        String rawResponse = mReceiver.readLine();
+        String rawResponse = ""; //mReceiver.readLine();
 
         try {
             response = new Response(rawResponse);

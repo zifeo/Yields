@@ -19,15 +19,17 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
 
     @Override
     public boolean working(){
-        return mSocket.isConnected();
+
+
+        return mSocket.isConnected() && mSocket.isBound()
+                && !mSocket.isOutputShutdown() && !mSocket.isInputShutdown();
     }
 
     @Override
     public CommunicationChannel getCommunicationChannel() throws IOException{
-        PrintWriter sender = new PrintWriter(
-                new BufferedWriter(
+        BufferedWriter sender = new BufferedWriter(
                         new OutputStreamWriter(
-                                mSocket.getOutputStream())), true);
+                                mSocket.getOutputStream()));
 
         BufferedReader receiver = new BufferedReader(
                 new InputStreamReader(mSocket.getInputStream()));
