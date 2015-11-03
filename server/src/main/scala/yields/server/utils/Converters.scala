@@ -13,5 +13,4 @@ object Converters {
   def offsetDateTime2Date(datetime: OffsetDateTime): Date =
     Date.from(datetime.toInstant)
 
-
 }
