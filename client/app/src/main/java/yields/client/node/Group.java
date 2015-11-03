@@ -94,8 +94,7 @@ public class Group extends Node {
      * @param image A squared image which this method will make circular
      */
     public void setImage(Bitmap image){
-        Objects.requireNonNull(image);
-        mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
+        mImage = Objects.requireNonNull(image);
     }
 
     /**
