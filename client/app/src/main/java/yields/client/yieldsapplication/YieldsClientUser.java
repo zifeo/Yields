@@ -1,7 +1,6 @@
 package yields.client.yieldsapplication;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,7 +10,6 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,13 +22,11 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
-import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 
 /**
@@ -41,15 +37,12 @@ public class YieldsClientUser extends ClientUser{
     private static YieldsClientUser mInstance;
     private static YieldEmulatorSocketProvider mSocketProvider;
     private static ConnectionManager mConnectionManager;
-    private static ServerChannel mServerChannel;
 
     private YieldsClientUser(String name, Id id, String email, Bitmap img)
             throws NodeException, InstantiationException, IOException {
         super(name, id, email, img);
         mSocketProvider = new YieldEmulatorSocketProvider();
         mConnectionManager = new ConnectionManager(mSocketProvider);
-        mServerChannel = (ServerChannel) mConnectionManager
-                .getCommunicationChannel();
     }
 
     /**
@@ -63,10 +56,22 @@ public class YieldsClientUser extends ClientUser{
      * @throws IOException If we have trouble creating the server connection
      */
     public static void createInstance(String name, Id id, String email, Bitmap img)
-            throws InstantiationException, IOException, ExecutionException, InterruptedException {
+            throws InstantiationException, ExecutionException, InterruptedException {
 
-        mInstance  = new CreateInstanceTask().execute(name, id, email, img).get();
-        YieldsApplication.setUser(mInstance);
+        if (mInstance == null) {
+            mInstance = new CreateInstanceTask().execute(name, id, email, img).get();
+            if (mInstance == null) {
+                throw new InstantiationException("Error initializing the instance");
+            }
+            YieldsApplication.setUser(mInstance);
+        } else {
+            throw new InstantiationException();
+        }
+    }
+
+    public static void destroyInstance() throws IOException {
+        mInstance = null;
+        mConnectionManager.close();
     }
 
     /**
@@ -79,7 +84,7 @@ public class YieldsClientUser extends ClientUser{
     public void sendMessage(Group group, Message message) throws IOException {
         Request groupMessageReq = createRequestForMessageToSend(group, message);
         Log.d("REQUEST", "sendMessage = " + groupMessageReq.message());
-        Response response = mServerChannel.sendRequest(groupMessageReq);
+        new SendRequestTask().execute(groupMessageReq);
         // TODO : Check response.
     }
 
@@ -98,7 +103,8 @@ public class YieldsClientUser extends ClientUser{
 
         Request groupHistoryRequest = RequestBuilder
                 .GroupHistoryRequest(group.getId(), lastDate, MESSAGE_COUNT);
-        Response response = mServerChannel.sendRequest(groupHistoryRequest);
+        Response response = mConnectionManager
+                .getCommunicationChannel().sendRequest(groupHistoryRequest);
         Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
         List<Message> messageList = new ArrayList<>();
 
@@ -112,7 +118,7 @@ public class YieldsClientUser extends ClientUser{
             }
 
         } catch (JSONException e) {
-            throw new IOException();
+            throw new IOException(e.getMessage());
         }
 
         return messageList;
@@ -133,7 +139,8 @@ public class YieldsClientUser extends ClientUser{
         Request groupAddRequest = RequestBuilder
                 .GroupCreateRequest(this.getId(), group.getName(), memberIDs);
         Log.d("REQUEST", "Add new group");
-        Response response = mServerChannel.sendRequest(groupAddRequest);
+        Response response = mConnectionManager
+                .getCommunicationChannel().sendRequest(groupAddRequest);
         // TODO : Check response
     }
 
@@ -165,7 +172,7 @@ public class YieldsClientUser extends ClientUser{
                 break;
             case "text":
                 req = RequestBuilder
-                        .GroupMessageRequest(message.getSender().getId(), group.getId(),
+                        .GroupTextMessageRequest(message.getSender().getId(), group.getId(),
                                 "text", ((TextContent) message
                                         .getContent()).getText());
                 break;
@@ -178,9 +185,23 @@ public class YieldsClientUser extends ClientUser{
         @Override
         protected YieldsClientUser doInBackground(Object... params) {
             try {
-                return  new YieldsClientUser((String) params[0], (Id) params[1], (String)params[2], (Bitmap) params[3]);
+                return  new YieldsClientUser((String) params[0],
+                        (Id) params[1], (String)params[2], (Bitmap) params[3]);
             } catch (InstantiationException | IOException e) {
-                e.printStackTrace();
+
+            }
+            return null;
+        }
+    }
+
+    private static class SendRequestTask extends AsyncTask<Request, Void, Void>{
+        @Override
+        protected Void doInBackground(Request... params) {
+            try {
+                mConnectionManager.getCommunicationChannel()
+                        .sendRequest(params[0]);
+            } catch (IOException e) {
+
             }
             return null;
         }

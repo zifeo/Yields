@@ -4,9 +4,6 @@ import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -26,7 +23,7 @@ import yields.client.yieldsapplication.YieldsClientUser;
 
 public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<GroupActivity> {
 
-    public YieldsClientUserTests(){
+    public YieldsClientUserTests() throws InterruptedException, ExecutionException, InstantiationException {
         super(GroupActivity.class);
     }
 
@@ -37,25 +34,28 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
     /**
      * Set up for the tests.
      */
-    @Before
-    public void setUp() throws Exception {
+    public void setUp() throws InterruptedException, ExecutionException, InstantiationException {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(getInstrumentation().getContext().getResources());
-        YieldsClientUser.createInstance("Mock Client User", new Id(117), "Mock email", BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture));
+        YieldsClientUser.createInstance("Mock Client User", new Id(117), "Mock email",
+                BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture));
     }
 
-    @Test
+    public void tearDown() throws IOException {
+        System.out.print("clean");
+        YieldsClientUser.destroyInstance();
+    }
+
     public void testYieldsClientUserIsASingleton(){
         try {
             YieldsClientUser.createInstance("Mock Client User", new Id(117), "Mock email", BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture));
             fail("An exception should have been raised");
-        } catch (InstantiationException | IOException | ExecutionException | InterruptedException e) {
+        } catch (InterruptedException | InstantiationException | ExecutionException e) {
             e.printStackTrace();
         }
     }
 
-    @Test
     public void testTextMessageRequestIsCorrectlyParsed(){
         Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(117), new ArrayList<User>());
         TextContent mockContent = MockFactory.generateFakeTextContent("Hi, how are you ?");
@@ -65,7 +65,6 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
         // TODO : verify the parsed json ...
     }
 
-    @Test
     public void testImageMessageRequestIsCorrectlyParsed(){
         Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(117), new ArrayList<User>());
         ImageContent mockContent = MockFactory.generateFakeImageContent(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture), "Caption");

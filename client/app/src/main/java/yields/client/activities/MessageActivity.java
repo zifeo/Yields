@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.util.SortedList;
@@ -71,8 +72,8 @@ public class MessageActivity extends Activity {
         try {
             YieldsClientUser.createInstance("Client user", new Id(117), "email", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
             YieldsApplication.setGroup(new Group("Presentation", new Id(2), new ArrayList<User>()));
-        } catch (InstantiationException | ExecutionException | InterruptedException | IOException e) {
-            throw new RuntimeException("Couldn't initiate presentation demo.");
+        } catch (InstantiationException | ExecutionException | InterruptedException e) {
+            e.printStackTrace();
         }
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
@@ -96,9 +97,9 @@ public class MessageActivity extends Activity {
         }else {
             setHeaderBar();
             try {
-                retrieveGroupMessages();
-            } catch (IOException e) {
-                showErrorToast("Couldn't retrieve messages.");
+                new RetrieveMEssageTask().execute().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -209,5 +210,18 @@ public class MessageActivity extends Activity {
     private void setHeaderBar(){
         TextView groupNameField = (TextView) findViewById(R.id.groupName);
         groupNameField.setText(mGroup.getName());
+    }
+
+    private class RetrieveMEssageTask extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                retrieveGroupMessages();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 }
