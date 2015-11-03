@@ -47,7 +47,11 @@ public class Message extends Node{
         this.mDate = new java.util.Date();
     }
 
-    //TODO: create exception
+    /**
+     * Create a message from a JSON object.
+     * @param object The JSON representing the message.
+     * @throws JSONException if the json is invalid.
+     */
     public Message(JSONObject object ) throws JSONException{
         super(object.getString("datetime") + object.getString("user"),
                 new Id(object.getString("id")));

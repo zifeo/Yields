@@ -69,6 +69,10 @@ public class YieldsClientUser extends ClientUser{
         }
     }
 
+    /**
+     * Destroy the instance of the ClientUser.
+     * @throws IOException when cannot close the connection manager.
+     */
     public static void destroyInstance() throws IOException {
         mInstance = null;
         mConnectionManager.close();
