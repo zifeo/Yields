@@ -18,18 +18,13 @@ import yields.client.messages.Message;
  *
  */
 public abstract class ClientUser extends User {
-    private List<Group> groups;
-    private boolean isInstantiated;
+    List<Group> groups;
+    List<User> mEntourage;
 
-    protected ClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
-
+    public ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
         super(name, id, email,img);
         this.groups = new ArrayList<>();
-        if(isInstantiated) {
-            throw new InstantiationException();
-        }else {
-            isInstantiated = true;
-        }
+        mEntourage = new ArrayList<>();
     }
 
     public abstract void sendMessage(Group group, Message message) throws IOException;
@@ -44,5 +39,14 @@ public abstract class ClientUser extends User {
 
     public List<Group> getGroups() {
         return Collections.unmodifiableList(groups);
+    }
+
+    // maybe change it later
+    public void addUserToEntourage(User user){
+        mEntourage.add(user);
+    }
+
+    public List<User> getEntourage() {
+        return Collections.unmodifiableList(mEntourage);
     }
 }

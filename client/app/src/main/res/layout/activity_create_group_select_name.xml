@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="yields.client.activities.CreateGroupSelectNameActivity"
+    android:orientation="vertical"
+    android:weightSum="1"
+    >
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.30" />
+
+    <EditText
+        android:layout_width="313dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextSelectGroupName"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/enterGroupName" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.30" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/groupType"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="10sp" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/publicGroup"
+            android:id="@+id/radioButtonPublicGroup"
+            android:checked="true" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/privateGroup"
+            android:id="@+id/radioButtonPrivateGroup" />
+    </RadioGroup>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.40" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="#FFCC99"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="0sp"
+        android:paddingRight="10sp"
+        >
+    </android.support.v7.widget.Toolbar>
+
+</LinearLayout>

@@ -2,7 +2,6 @@ package yields.client.activities;
 
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Toast;
 
 import yields.client.R;
 

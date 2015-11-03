@@ -18,6 +18,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 
 import yields.client.R;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class GoogleLoginActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -64,6 +65,8 @@ public class GoogleLoginActivity extends AppCompatActivity implements
                 .addScope(new Scope(Scopes.EMAIL))
                 .build();
 
+        YieldsApplication.setGoogleApiClient(mGoogleApiClient);
+
         mGoogleSingInButton = (SignInButton) findViewById(R.id.googleSignInButton);
         mButtonCancelGoogleConnection = (Button) findViewById(R.id.buttonCancelGoogleConnection);
         mProgressBarGoogleConnection = (ProgressBar) findViewById(R.id.progressBarGoogleConnection);
@@ -101,7 +104,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
-        Intent intent = new Intent(this, SelectUsernameActivity.class);
+        Intent intent = new Intent(this, LoggingInActivity.class);
         startActivity(intent);
     }
 

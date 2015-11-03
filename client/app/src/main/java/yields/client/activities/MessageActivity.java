@@ -3,7 +3,6 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,7 +29,6 @@ import yields.client.exceptions.MessageActivityException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
@@ -38,7 +36,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 import yields.client.yieldsapplication.YieldsClientUser;
 
@@ -59,7 +56,7 @@ public class MessageActivity extends Activity {
     /**
      * Starts the activity by displaying the group info and showing the most recent
      * messages.
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +65,6 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /** FOR PRESENTATION ONLY **/
-        try {
-            YieldsClientUser.createInstance("Client user", new Id(117), "email", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
-            YieldsApplication.setGroup(new Group("Presentation", new Id(2), new ArrayList<User>()));
-        } catch (InstantiationException | ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
@@ -88,11 +78,10 @@ public class MessageActivity extends Activity {
 
         mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
                 mMessages);
-        ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
-        listView.setAdapter(mAdapter);
+        mMessageScrollLayout = (ListView) findViewById(R.id.messageScrollLayout);
+        mMessageScrollLayout.setAdapter(mAdapter);
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
-        mMessageScrollLayout = (ListView) findViewById(R.id.messageScrollLayout);
 
         if(mUser == null || mGroup == null) {
             showErrorToast("Couldn't get group informations.");
@@ -128,6 +117,7 @@ public class MessageActivity extends Activity {
         // TODO : take right name and right id.
         mMessages.add(message);
         mUser.sendMessage(mGroup, message);
+
         mAdapter.notifyDataSetChanged();
         mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
     }

@@ -1,0 +1,32 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="yields.client.activities.CreateGroupActivity">
+
+    <item android:id="@+id/actionCancelCreateGroup"
+        android:icon="@drawable/ic_arrow_back_black_24dp"
+        android:title="@string/cancelText"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+        />
+
+    <item android:id="@+id/actionAddContactToGroup"
+
+        android:title="@string/addContactToGroup"
+        android:layout_gravity="center"
+        app:showAsAction="withText|always"
+    />
+
+    <item android:id="@+id/actionAddNodeToGroup"
+        android:title="@string/addNodeToGroup"
+        android:layout_gravity="center"
+        app:showAsAction="withText|always"
+    />
+
+    <item android:id="@+id/actionDoneCreateGroup"
+        android:icon="@drawable/ic_arrow_forward_black_24dp"
+        android:title="@string/done"
+        android:layout_gravity="center"
+        app:showAsAction="always"
+    />
+</menu>
