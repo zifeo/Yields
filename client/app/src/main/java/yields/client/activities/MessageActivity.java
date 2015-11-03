@@ -78,6 +78,10 @@ public class MessageActivity extends Activity {
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
+        if (mUser == null){
+            throw new MessageActivityException("Error, mUser is null.");
+        }
+
         mMessages = new ArrayList<>();
         mImage = null;
         mSendImage = false;
