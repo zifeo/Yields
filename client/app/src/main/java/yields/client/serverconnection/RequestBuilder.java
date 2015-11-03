@@ -160,7 +160,8 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
 
         if (newName == null && newImage == null) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "You make no change with this group update");
         }
 
         RequestBuilder builder = new RequestBuilder(
