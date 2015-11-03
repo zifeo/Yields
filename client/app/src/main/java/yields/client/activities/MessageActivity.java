@@ -53,6 +53,7 @@ public class MessageActivity extends Activity {
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
+    private static ListView mMessageScrollLayout;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -86,6 +87,7 @@ public class MessageActivity extends Activity {
         listView.setAdapter(mAdapter);
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
+        mMessageScrollLayout = (ListView) findViewById(R.id.messageScrollLayout);
 
         if(mUser == null || mGroup == null) {
             showErrorToast("Couldn't get group informations.");
@@ -109,9 +111,10 @@ public class MessageActivity extends Activity {
 
         mInputField.setText("");
         Content content;
-        if (mSendImage){
+        if (mSendImage && mImage != null){
             content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
+            mImage = null;
         }
         else {
             content = new TextContent(inputMessage);
@@ -121,8 +124,7 @@ public class MessageActivity extends Activity {
         mMessages.add(message);
         mUser.sendMessage(mGroup, message);
         mAdapter.notifyDataSetChanged();
-        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
-        lv.setSelection(lv.getAdapter().getCount() - 1);
+        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
     }
 
     /**
@@ -157,8 +159,10 @@ public class MessageActivity extends Activity {
 
             try {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
-                toast.show();
+                if (mImage != null) {
+                    Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
             }
