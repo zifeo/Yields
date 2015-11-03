@@ -149,7 +149,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 Group group = new Group(mGroupName, new Id(1), userList);
 
                 try {
-                    YieldsApplication.getUser().addNewGroup(group);
+                    YieldsApplication.getUser().createNewGroup(group);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

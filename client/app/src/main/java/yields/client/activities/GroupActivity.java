@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -186,13 +187,13 @@ public class GroupActivity extends AppCompatActivity {
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group) {
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
             ArrayList<Message> messageList =  new ArrayList<>();
             return messageList;
         }
 
         @Override
-        public void addNewGroup(Group group) {
+        public void createNewGroup(Group group) throws IOException {
             mGroups.add(group);
             mAdapterGroups.notifyDataSetChanged();
         }

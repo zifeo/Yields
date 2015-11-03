@@ -51,6 +51,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
 

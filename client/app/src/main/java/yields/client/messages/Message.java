@@ -1,12 +1,25 @@
 package yields.client.messages;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.util.Date;
 import java.util.Objects;
 
+import yields.client.R;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
+import yields.client.node.Group;
 import yields.client.node.Node;
 import yields.client.node.User;
+import yields.client.serverconnection.DateSerialization;
+import yields.client.yieldsapplication.YieldsApplication;
 
 
 /**
@@ -32,6 +45,33 @@ public class Message extends Node{
         this.mSender = Objects.requireNonNull(sender);
         this.mContent = Objects.requireNonNull(content);
         this.mDate = new java.util.Date();
+    }
+
+    /**
+     * Create a message from a JSON object.
+     * @param object The JSON representing the message.
+     * @throws JSONException if the json is invalid.
+     */
+    public Message(JSONObject object ) throws JSONException{
+        super(object.getString("datetime") + object.getString("user"),
+                new Id(object.getString("id")));
+
+        Id idUser = new Id(object.getString("user"));
+        /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
+        // TODO : The same apply for the profil pic and the email.
+        User sender = new User(idUser.getId() , idUser, "",
+                BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
+                        R.drawable.userpicture));
+
+        this.mSender = sender;
+        // TODO : Implement images !!!
+        this.mContent = new TextContent(object.getString("text"));
+
+        try {
+            this.mDate = DateSerialization.toDate(object.getString("datetime"));
+        } catch (ParseException e) {
+            throw new JSONException(e.getMessage());
+        }
     }
 
     /**

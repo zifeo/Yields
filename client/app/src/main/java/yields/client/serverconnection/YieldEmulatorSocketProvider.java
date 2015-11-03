@@ -18,10 +18,21 @@ public class YieldEmulatorSocketProvider implements SocketProvider {
     private final static String LOCAL_ADDRESS = "10.0.2.2";
     private final InetAddress mDstAddress;
 
+    /**
+     * Constructs a Socket Provider for the yield application on an Emulator
+     *
+     * @throws UnknownHostException In case of trouble connecting
+     */
     public YieldEmulatorSocketProvider() throws UnknownHostException{
         this.mDstAddress = InetAddress.getByName(LOCAL_ADDRESS);
     }
 
+    /**
+     * Gives the socket connected to the server
+     *
+     * @return The sus mentioned socket
+     * @throws IOException In case of trouble getting connected
+     */
     public Socket getConnection() throws IOException {
 
         Socket socket = new Socket(mDstAddress, DST_PORT);

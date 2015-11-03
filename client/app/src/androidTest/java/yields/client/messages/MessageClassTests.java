@@ -9,13 +9,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.text.ParseException;
+import java.util.Date;
 
 import yields.client.activities.MockFactory;
 import yields.client.R;
 import yields.client.activities.MessageActivity;
 import yields.client.exceptions.ContentException;
+import yields.client.id.Id;
+import yields.client.node.User;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -23,7 +31,8 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final TextContent MOCK_TEXT_CONTENT_1 = MockFactory.generateFakeTextContent("Mock text.");
+    private static TextContent MOCK_TEXT_CONTENT_1;
+    private static final String JSON_MESSAGE = "{\"datetime\": \"2011-12-03T10:15:30+01:00\", \"node\":\"null\", \"text\":\"MESSAGE_TEXT\", \"user\":\"117\", \"id\":\"2\"}";
 
     public MessageClassTests() {
         super(MessageActivity.class);
@@ -35,8 +44,9 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Before
     public void setUp() throws Exception {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
-        getInstrumentation().getContext().getResources();
+        YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
+        YieldsApplication.setResources(getInstrumentation().getContext().getResources());
+        MOCK_TEXT_CONTENT_1  = MockFactory.generateFakeTextContent("Mock text.");
     }
 
     /**
@@ -114,6 +124,27 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         //Image from ImageView
         ImageView image = (ImageView) view.getChildAt(1);
         //TODO : find a way to check that layout image is correct
+    }
+
+    @Test
+    public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException {
+        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        User u = m.getSender();
+        assertEquals((new Id("117")).getId(), u.getId().getId());
+    }
+
+    @Test
+    public void testMessagesFromJSONAreCorrectlyParserForDate() throws JSONException, ParseException {
+        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        Date date = m.getDate();
+        assertEquals(DateSerialization.toDate("2011-12-03T10:15:30+01:00").toString(), date.toString());
+    }
+
+    @Test
+    public void testMessagesFromJSONAreCorrectlyParserForContent() throws JSONException {
+        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        TextContent content = (TextContent) m.getContent();
+        assertEquals("MESSAGE_TEXT", content.getText());
     }
 
     /**

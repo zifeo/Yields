@@ -37,11 +37,11 @@ public class YieldsApplication {
     }
 
     public static Bitmap getDefaultGroupImage(){
-        return mDefaultGroupImage;
+        return  Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
     }
 
     public static Bitmap getDefaultUserImage(){
-        return mDefaultUserImage;
+        return Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
     }
 
     public static GoogleApiClient getGoogleApiClient(){
