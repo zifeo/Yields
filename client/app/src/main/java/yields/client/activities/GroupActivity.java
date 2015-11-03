@@ -188,12 +188,14 @@ public class GroupActivity extends AppCompatActivity {
 
         @Override
         public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            return null;
+            ArrayList<Message> messageList =  new ArrayList<>();
+            return messageList;
         }
 
         @Override
         public void createNewGroup(Group group) throws IOException {
-
+            mGroups.add(group);
+            mAdapterGroups.notifyDataSetChanged();
         }
 
         @Override
