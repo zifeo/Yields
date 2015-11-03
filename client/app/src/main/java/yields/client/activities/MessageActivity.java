@@ -3,11 +3,11 @@ package yields.client.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.util.SortedList;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.MessageViewException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
@@ -36,8 +34,8 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
-import yields.client.yieldsapplication.YieldsClientUser;
 
 /**
  * Activity used to display messages for a group
@@ -65,12 +63,17 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
+        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
+        try {
+            Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+            YieldsApplication.setUser(new MockClientUser("Mock User", new Id(117), "Mock Email", image1));
+            YieldsApplication.setGroup(createFakeGroup());
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
-
-        if (mUser == null){
-            throw new MessageActivityException("Error, mUser is null.");
-        }
 
         mMessages = new ArrayList<>();
         mImage = null;
@@ -90,7 +93,7 @@ public class MessageActivity extends Activity {
         }else {
             setHeaderBar();
             try {
-                new RetrieveMEssageTask().execute().get();
+                new RetrieveMessageTask().execute().get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -206,7 +209,10 @@ public class MessageActivity extends Activity {
         groupNameField.setText(mGroup.getName());
     }
 
-    private class RetrieveMEssageTask extends AsyncTask<Void, Void, Void>{
+    /**
+     * Retreive the group messages.
+     */
+    private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -217,5 +223,49 @@ public class MessageActivity extends Activity {
             }
             return null;
         }
+    }
+
+    /**
+     * Mock Client user, only for presentation during the second sprint.
+     */
+    private class  MockClientUser extends ClientUser{
+
+        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+            super(name, id, email, img);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message) {
+            /* Nothing */
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public void createNewGroup(Group group) throws IOException {
+
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+            /* Nothing */
+        }
+
+        @Override
+        public Map<User, String> getHistory(Group group, Date from) {
+            return null;
+        }
+    }
+
+    /**
+     * Create fake group for sake of the presentation.
+     * @return fake group.
+     */
+    private Group createFakeGroup() throws NodeException {
+        Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+        return new Group("Mock group", new Id(123), new ArrayList<User>(), image1);
     }
 }

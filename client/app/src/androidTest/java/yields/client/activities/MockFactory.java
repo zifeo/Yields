@@ -35,7 +35,7 @@ public class MockFactory {
     private static class FakeGroup extends Group{
 
         public FakeGroup(String name, Id id, List<User> users) throws NodeException {
-            super(name, id, users);
+            super(name, id, users, Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
         }
 
         public void addMessage(Message newMessage){

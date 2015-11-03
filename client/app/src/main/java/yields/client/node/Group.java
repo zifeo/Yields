@@ -45,7 +45,6 @@ public class Group extends Node {
         mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
-
     }
 
     /**
