@@ -21,7 +21,7 @@ public abstract class ClientUser extends User {
     List<Group> groups;
     List<User> mEntourage;
 
-    public  ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+    public ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
         super(name, id, email,img);
         this.groups = new ArrayList<>();
         mEntourage = new ArrayList<>();
@@ -29,9 +29,9 @@ public abstract class ClientUser extends User {
 
     public abstract void sendMessage(Group group, Message message) throws IOException;
 
-    public abstract List<Message> getGroupMessages(Group group) throws IOException;
+    public abstract List<Message> getGroupMessages(Group group, Date lastDate) throws IOException;
 
-    public abstract void addNewGroup(Group group) throws IOException;
+    public abstract void createNewGroup(Group group) throws IOException;
 
     public abstract void deleteGroup(Group group);
 

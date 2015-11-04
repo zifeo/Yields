@@ -5,21 +5,25 @@ import java.util.Objects;
 /**
  * Id used in the App.
  */
-public class Id implements IdInterface<Long> {
+public class Id implements IdInterface<String> {
 
-    private Long mId;
+    private String mId;
 
     public Id(long value){
+        mId = Long.toString(value);
+    }
+
+    public Id(String value){
         mId = value;
     }
 
     @Override
-    public Long getId() {
+    public String getId() {
         return mId;
     }
 
     @Override
-    public boolean equals(IdInterface<Long> other) {
+    public boolean equals(IdInterface<String> other) {
         return Objects.equals(mId, other);
     }
 }

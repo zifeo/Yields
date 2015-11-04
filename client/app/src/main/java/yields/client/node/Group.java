@@ -2,24 +2,29 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import yields.client.R;
 import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
-    private List<User> mUsers; // for now, just users
-    private Bitmap mImage;
-    private List<Message> mCurrentMessages; // not all the messages the group has ever sent, just
-                                            // the ones that are currently in the listView
 
+    private List<User> mConnectedUsers;
+    private TreeMap<Date, Message> mMessages;
+    private boolean mConsumed;
+    private List<User> mUsers;
+    private Bitmap mImage;
 
 
      /** Constructor for groups
@@ -27,59 +32,116 @@ public class Group extends Node {
      * @param name The name of the group
      * @param id The id of the group
      * @param users The current users of the group
-     * @param image The current image of the group, can be null
-     * @param isImageCircle Indicates if the image given is already circular
-     * @throws NodeException If nodes is null
+     * @param image The current image of the group
+     * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, boolean isImageCircle) throws NodeException {
+    public Group(String name, Id id, List<User> users, Bitmap image) {
         super(name, id);
+        Objects.requireNonNull(users);
+        this.mConnectedUsers = new ArrayList<>(users);
+        this.mMessages = new TreeMap<>();
+        mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
-        mCurrentMessages = new ArrayList<>();
+        mImage = Objects.requireNonNull(image);
+    }
 
-        if (image != null && !isImageCircle){
-            mImage = GraphicTransforms.getCroppedCircleBitmap(image, 80);
+    /**
+     * Overloaded constructor for default image.
+     * @param name The name of the group
+     * @param id The id of the group
+     * @param users The current users of the group
+     * @throws NodeException if one of the node is null.
+     */
+    public Group(String name, Id id, List<User> users) {
+        this(name, id, users, YieldsApplication.getDefaultGroupImage());
+    }
+
+    /**
+     * Add a user to a group.
+     * @param user the user to add.
+     * @throws NodeException if the user in not valid.
+     */
+    private void connectUser(User user) throws NodeException {
+        User newUser = new User(user.getName(), user.getId(),
+                user.getEmail(), user.getImg());
+        mConnectedUsers.add(newUser);
+    }
+
+    /**
+     * Add a list of users to the group.
+     * @param users The list of users to add.
+     * @throws NodeException if the list is invalid.
+     */
+    public void appendUsers(Collection<User> users) throws NodeException {
+        for (User user : users) {
+            connectUser(user);
         }
     }
 
-    public Group(String name, Id id, List<User> users, Bitmap image) throws NodeException {
-        this(name, id, users, image, false);
-    }
-
-    public Group(String name, Id id, List<User> users) throws NodeException {
-        this(name, id, users, null, false);
-    }
-
-    public void addUser(User newUser) {
-        // TODO : Check if node is not a message
-
-        mUsers.add(newUser);
-    }
-
+    /**
+     * Add e new message to the group messages.
+     * @param newMessage if the message is not valid.
+     */
     public void addMessage(Message newMessage) {
-        mCurrentMessages.add(newMessage);
+        mMessages.put(newMessage.getDate(), newMessage);
     }
 
-    public List<Message> getCurrentMessages(){
-        return Collections.unmodifiableList(mCurrentMessages);
-    }
 
     /**
      * Set the image to the group
      * @param image A squared image which this method will make circular
      */
     public void setImage(Bitmap image){
-        Objects.requireNonNull(image);
-        mImage = GraphicTransforms.getCroppedCircleBitmap(image, R.integer.groupImageDiameter);
+        mImage = Objects.requireNonNull(image);
     }
 
     /**
-     * Returns the circular version of the group's image
-     * @return the circular version of the group's image, or null if none has been set
+     * Returns the group's image
+     * @return the group's image, uncropped
      */
-    public Bitmap getCircularImage(){
+    public Bitmap getImage(){
         return mImage;
     }
 
+    /**
+     *  Returns the lasts messages of the group (up to a certain date util the user scrolls up).
+     * @return A sorted map containing the messages sorted by date.
+     * @throws IOException In case the user cannot retreive the messages.
+     */
+    public SortedMap<Date, Message> getLastMessages() throws IOException{
+        Map.Entry<Date, Message> message = mMessages.firstEntry();
+
+        Date farthestDate;
+
+        if (message == null) {
+            farthestDate = new Date();
+        } else {
+            farthestDate = message.getKey();
+        }
+
+        List<Message> messages = YieldsApplication.getUser()
+                .getGroupMessages(this, farthestDate);
+
+        for(Message m : messages){
+            mMessages.put(m.getDate(),m);
+        }
+
+        return Collections.unmodifiableSortedMap(mMessages
+                .tailMap(farthestDate));
+    }
+
+    /**
+     * Return the very last message.
+     * @return The last message.
+     */
+    public Message getLastMessage(){
+        return mMessages.firstEntry().getValue();
+    }
+
+    /**
+     * Returns the users of the group.
+     * @return the users.
+     */
     public List<User> getUsers() {
         return Collections.unmodifiableList(mUsers);
     }
@@ -89,10 +151,10 @@ public class Group extends Node {
      * @return the preview of the last message or "" if there are no messages
      */
     public String getPreviewOfLastMessage(){
-        if (mCurrentMessages.size() > 0){
-            return mCurrentMessages.get(mCurrentMessages.size() - 1).getPreview();
+        if (mMessages.size() > 0){
+            return getLastMessage().getPreview();
         }
-        else {
+        else{
             return "";
         }
     }

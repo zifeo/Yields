@@ -8,11 +8,9 @@ import android.util.Log;
 import com.google.android.gms.plus.Plus;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 import yields.client.R;
 import yields.client.id.Id;
-import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;

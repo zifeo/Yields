@@ -292,7 +292,7 @@ public class CacheDatabaseTests {
             assertEquals(10, messagesFromDatabase.size());
             for (int i = 0; i < 10; i++) {
                 Message message = messagesFromDatabase.get(i);
-                assertEquals(new Long(1), message.getSender().getId().getId());
+                assertEquals("1", message.getSender().getId().getId());
                 assertEquals("Mock message #" + i, ((TextContent) message.getContent()).getText());
             }
         } catch (CacheDatabaseException exception){

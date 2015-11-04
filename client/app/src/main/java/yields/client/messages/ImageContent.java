@@ -37,7 +37,7 @@ public class ImageContent implements Content{
     public ImageContent(Bitmap img, String caption) throws ContentException {
         Objects.requireNonNull(img);
         mImage = Bitmap.createBitmap(img);
-        mCaption = new String(caption);
+        mCaption = Objects.requireNonNull(caption);
     }
 
     /**
@@ -45,7 +45,7 @@ public class ImageContent implements Content{
      * @return The caption of this Content.
      */
     public String getCaption(){
-        return new String(mCaption);
+        return mCaption;
     }
 
     /**

@@ -64,18 +64,18 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODEID + " INTEGER,"
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODEID + " TEXT,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
             + " BLOB" + ")";
 
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " INTEGER,"
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " TEXT,"
             + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
             + " BLOB" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " INTEGER,"
-            + KEY_MESSAGE_GROUPID + " INTEGER," + KEY_MESSAGE_SENDERID + " ," + KEY_MESSAGE_CONTENT
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
+            + KEY_MESSAGE_GROUPID + " TEXT," + KEY_MESSAGE_SENDERID + " TEXT," + KEY_MESSAGE_CONTENT
             + " BLOB," + KEY_MESSAGE_DATE + " DATETIME" + ")";
 
     private final SQLiteDatabase mDatabase;
@@ -167,7 +167,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_USERS
                 + " WHERE " + KEY_USER_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{String.valueOf(user.getId().getId())});
+                new String[]{user.getId().getId()});
         if(cursor.getCount() == 1){
             updateUser(user);
         } else if (cursor.getCount() > 1){ //There should not be several Users with the same Id.
@@ -197,7 +197,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = createContentValuesForUser(user);
             mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
-                    new String[]{String.valueOf(user.getId().getId())});
+                    new String[]{user.getId().getId()});
         } catch (CacheDatabaseException exception){
             Log.d(TAG, "Unable to update User with id: " + user.getId().getId(), exception);
             throw exception;
@@ -216,7 +216,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
                 + KEY_USER_NODEID + " = ?";
         Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
-                new String[]{userID.getId().toString()});
+                new String[]{userID.getId()});
         if (!userCursor.moveToFirst()) {
             return null;
         } else {
@@ -255,9 +255,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteGroup(Group group) {
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_GROUPID + " = ?",
-                new String[]{String.valueOf(group.getId().getId())});
+                new String[]{group.getId().getId()});
         mDatabase.delete(TABLE_GROUPS, KEY_GROUP_NODEID + " = ?",
-                new String[]{String.valueOf(group.getId().getId())});
+                new String[]{group.getId().getId()});
     }
 
     /**
@@ -273,7 +273,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
                 + " WHERE " + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{String.valueOf(group.getId().getId())});
+                new String[]{group.getId().getId()});
         if(cursor.getCount() == 1){
             updateGroup(group);
         } else if (cursor.getCount() > 1){ //There should not be several Groups with the same Id.
@@ -306,7 +306,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                    new String[]{String.valueOf(group.getId().getId())});
+                    new String[]{group.getId().getId()});
         } catch (CacheDatabaseException exception){
             Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
             throw exception;
@@ -325,7 +325,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{groupID.getId().toString()});
+                new String[]{groupID.getId()});
         if (!cursor.moveToFirst()) {
             return null;
         } else {
@@ -412,8 +412,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 boolean foundUser = false;
                 while (iterator.hasNext() && !foundUser) {
                     User tmpUser = (User) iterator.next();
-                    Long userID = tmpUser.getId().getId();
-                    if (userID == cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_SENDERID))) {
+                    String userID = tmpUser.getId().getId();
+                    if (userID.equals(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDERID)))) {
                         messageSender = tmpUser;
                         foundUser = true;
                     }
@@ -570,7 +570,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NODEID, group.getId().getId());
-        values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getCircularImage()));
+        values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getImage()));
         values.put(KEY_GROUP_NAME, group.getName());
         StringBuilder userIDS = new StringBuilder();
         List<User> users = group.getUsers();

@@ -3,8 +3,10 @@ package yields.client.activities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,21 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MockFactory {
 
+
+    public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
+        return new FakeGroup(name, id, connectedUsers);
+    }
+
+    private static class FakeGroup extends Group{
+
+        public FakeGroup(String name, Id id, List<User> users) throws NodeException {
+            super(name, id, users, Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
+        }
+
+        public void addMessage(Message newMessage){
+        }
+    }
+
     public static List<Message> generateMockMessages(int number){
         ArrayList<Message> messages = new ArrayList<>();
         for (int i = 0; i < number; i ++){
@@ -33,7 +50,7 @@ public class MockFactory {
             messages.add(generateMockMessage("Mock node name " + i, new Id(-i), generateFakeUser("Mock user " + i,
                             new Id(123), "mock email"), content,
                     createMockGroup("Mock group " + number, new Id(123), new ArrayList<User>())));
-        }
+      }
         return messages;
     }
 
@@ -53,13 +70,6 @@ public class MockFactory {
         return groups;
     }
 
-
-    public static Group createMockGroup(String name, Id id, List<User> connectedUsers){
-        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                R.drawable.userpicture);
-        return new Group(name, id, connectedUsers, image1);
-    }
-
     public static Message generateMockMessage(String nodeName, Id nodeID, User sender,
                                               Content content, Group group){
         return new Message(nodeName, nodeID, sender, content, new Date(), group);
@@ -76,7 +86,12 @@ public class MockFactory {
     }
 
     public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img){
+        try {
             return new FakeClientUser(name, id, email, img);
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
     }
 
     public static ImageContent generateFakeImageContent(Bitmap img, String caption){
@@ -88,33 +103,34 @@ public class MockFactory {
     }
 
     private static class FakeClientUser extends ClientUser {
-        public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+
+        public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
             super(name, id, email, img);
         }
 
         @Override
         public void sendMessage(Group group, Message message) {
-            throw new UnsupportedOperationException();
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group) {
-            return  generateMockMessages(4);
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            return new ArrayList<>();
         }
 
         @Override
-        public void addNewGroup(Group group) {
-            throw new UnsupportedOperationException();
+        public void createNewGroup(Group group) {
+
+
         }
 
         @Override
         public void deleteGroup(Group group) {
-            throw new UnsupportedOperationException();
+
         }
 
         @Override
         public Map<User, String> getHistory(Group group, Date from) {
-            return null;
+            return new HashMap<>();
         }
     }
 }
