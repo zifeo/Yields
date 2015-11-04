@@ -59,7 +59,8 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
     public void testTextMessageRequestIsCorrectlyParsed(){
         Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(117), new ArrayList<User>());
         TextContent mockContent = MockFactory.generateFakeTextContent("Hi, how are you ?");
-        Message message = MockFactory.generateMockMessage("node name", new Id(2), YieldsApplication.getUser(), mockContent);
+        Message message = MockFactory.generateMockMessage("node name", new Id(2),
+                YieldsApplication.getUser(), mockContent, mockGroup);
 
         Request req = YieldsClientUser.createRequestForMessageToSend(mockGroup, message);
         // TODO : verify the parsed json ...
@@ -68,7 +69,8 @@ public class YieldsClientUserTests extends ActivityInstrumentationTestCase2<Grou
     public void testImageMessageRequestIsCorrectlyParsed(){
         Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(117), new ArrayList<User>());
         ImageContent mockContent = MockFactory.generateFakeImageContent(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.userpicture), "Caption");
-        Message message = MockFactory.generateMockMessage("node name", new Id(2), YieldsApplication.getUser(), mockContent);
+        Message message = MockFactory.generateMockMessage("node name", new Id(2),
+                YieldsApplication.getUser(), mockContent, mockGroup);
 
         Request req = YieldsClientUser.createRequestForMessageToSend(mockGroup, message);
         // TODO : verify the parsed json ...

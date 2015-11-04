@@ -84,7 +84,10 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
             List<Message> messages = new ArrayList<>();
             for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
                 TextContent mockContent = MockFactory.generateFakeTextContent("Mock message " + i);
-                Message m = MockFactory.generateMockMessage("node name", new Id(i), this, mockContent);
+                List<User> usersInGroup = new ArrayList<User>();
+                usersInGroup.add(this);
+                Message m = MockFactory.generateMockMessage("node name", new Id(i), this, mockContent,
+                        MockFactory.createMockGroup("Group", new Id(123), usersInGroup));
                 messages.add(m);
                 try {
                     sleep(5);

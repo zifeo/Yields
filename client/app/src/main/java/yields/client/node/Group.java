@@ -1,7 +1,8 @@
 package yields.client.node;
 
-import java.io.IOException;
 import android.graphics.Bitmap;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,18 +13,16 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import yields.client.R;
 import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
+
     private List<User> mConnectedUsers;
     private TreeMap<Date, Message> mMessages;
     private boolean mConsumed;
-
     private List<User> mUsers;
     private Bitmap mImage;
 
@@ -36,8 +35,7 @@ public class Group extends Node {
      * @param image The current image of the group
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image)
-            throws NodeException {
+    public Group(String name, Id id, List<User> users, Bitmap image) {
         super(name, id);
         Objects.requireNonNull(users);
         this.mConnectedUsers = new ArrayList<>(users);
@@ -54,7 +52,7 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users) throws NodeException {
+    public Group(String name, Id id, List<User> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage());
     }
 

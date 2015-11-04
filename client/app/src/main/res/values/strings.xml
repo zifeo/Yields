@@ -18,6 +18,7 @@
     <string name="textViewLoggingIn">Logging in ...</string>
     <string name="messageUsernameTooShort">Username too short</string>
     <string name="messageUsernameContainsSpaces">Username can\'t contain spaces</string>
+
     <string name="entourage">Entourage</string>
     <string name="createGroup">Create group</string>
     <string name="settings">Settings</string>
@@ -35,4 +36,5 @@
     <string name="publicGroup">Public group</string>
     <string name="privateGroup">Private group</string>
     <string name="messageGroupNameTooShort">Group name too short</string>
+
 </resources>

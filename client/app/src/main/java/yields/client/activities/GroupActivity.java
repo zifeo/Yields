@@ -142,38 +142,6 @@ public class GroupActivity extends AppCompatActivity {
     /**
      * To be removed as soon as the logging is working
      */
-    private void createFakeUserAndGroups() {
-        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
-        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
-
-        try {
-            YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico1", new Id(2), "m@m.es", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Teo", new Id(3), "m@m.fr", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Justinien", new Id(4), "m@m.cn", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico2", new Id(5), "m@m.jpp", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Jeremy", new Id(6), "m@m.ch", imageUser));
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-
-        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(), R.drawable.default_group_image);
-
-        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
-        YieldsApplication.setDefaultGroupImage(GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
-
-        mGroups = new ArrayList<>();
-
-        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
-        group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !")));
-        group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !")));
-        mGroups.add(group1);
-
-        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
-        group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?")));
-        group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !")));
-        mGroups.add(group2);
-    }
 
     private class MockClientUser extends ClientUser {
 
@@ -207,5 +175,41 @@ public class GroupActivity extends AppCompatActivity {
         public Map<User, String> getHistory(Group group, Date from) {
             return null;
         }
+    }
+
+    /**
+     * To be removed as soon as the logging is working
+     */
+    private void createFakeUserAndGroups() {
+        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
+        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
+
+        try {
+            YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico1", new Id(2), "m@m.es", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Teo", new Id(3), "m@m.fr", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Justinien", new Id(4), "m@m.cn", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico2", new Id(5), "m@m.jpp", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Jeremy", new Id(6), "m@m.ch", imageUser));
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+
+        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(), R.drawable.default_group_image);
+
+        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
+        YieldsApplication.setDefaultGroupImage(GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
+
+        mGroups = new ArrayList<>();
+
+        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
+        group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !"), new java.util.Date(), group1));
+        group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !"), new java.util.Date(), group1));
+        mGroups.add(group1);
+
+        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
+        group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date(), group2));
+        group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date(), group2));
+        mGroups.add(group2);
     }
 }

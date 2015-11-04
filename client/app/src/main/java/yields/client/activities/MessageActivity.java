@@ -116,7 +116,7 @@ public class MessageActivity extends Activity {
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(1230), mUser, content);
+        Message message = new Message("message", new Id(1230), mUser, content, new Date(), mGroup);
         // TODO : take right name and right id.
         mMessages.add(message);
         mUser.sendMessage(mGroup, message);
