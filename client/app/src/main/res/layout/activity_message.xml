@@ -1,8 +1,28 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="yields.client.activities.MessageActivity"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="#FFA000"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="-18sp"
+        android:paddingRight="0sp"
+        >
+    </android.support.v7.widget.Toolbar>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/messageScrollLayout"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1.00" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -58,52 +78,7 @@
 
     </LinearLayout>
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/messageScrollLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_above="@+id/bottomLayout"
-        android:layout_below="@+id/topRow" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/topRow"
-        android:layout_alignParentStart="false"
-        android:divider="@drawable/messageseparator"
-        android:showDividers="end"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:weightSum="1"
-            android:id="@+id/clickableGroupName"
-            android:clickable="true">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:id="@+id/returnArrow"
-                android:src="@drawable/return_icon"
-                android:layout_marginLeft="6dp"
-                android:layout_marginRight="6dp"
-                android:layout_marginBottom="6dp"
-                android:layout_marginTop="6dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/groupName"
-                android:textSize="25dp"
-                android:layout_margin="6dp" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

@@ -8,7 +8,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -40,7 +45,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends Activity {
+public class MessageActivity extends AppCompatActivity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -50,6 +55,8 @@ public class MessageActivity extends Activity {
     private boolean mSendImage;
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
+
+    private ActionBar mActionBar;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -63,14 +70,11 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
-        try {
-            Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
-            YieldsApplication.setUser(new MockClientUser("Mock User", new Id(117), "Mock Email", image1));
-            YieldsApplication.setGroup(createFakeGroup());
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
 
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
@@ -87,10 +91,9 @@ public class MessageActivity extends Activity {
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            showErrorToast("Couldn't get group informations.");
-            TextView groupName = (TextView) findViewById(R.id.groupName);
-            groupName.setText("Unknown group");
-        }else {
+            showErrorToast("Couldn't get group information.");
+            mActionBar.setTitle("Unknown group");
+        } else {
             setHeaderBar();
             try {
                 new RetrieveMessageTask().execute().get();
@@ -98,6 +101,18 @@ public class MessageActivity extends Activity {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu The tool bar menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.menu_message, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -205,12 +220,11 @@ public class MessageActivity extends Activity {
      * Sets the correct information on the header.
      */
     private void setHeaderBar(){
-        TextView groupNameField = (TextView) findViewById(R.id.groupName);
-        groupNameField.setText(mGroup.getName());
+        mActionBar.setTitle(mGroup.getName());
     }
 
     /**
-     * Retreive the group messages.
+     * Retrieve the group messages.
      */
     private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
 

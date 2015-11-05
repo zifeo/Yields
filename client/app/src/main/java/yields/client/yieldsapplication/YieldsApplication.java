@@ -19,8 +19,8 @@ public class YieldsApplication {
     private static Context mApplicationContext;
     private static Resources mResources;
 
-    private static Bitmap mDefaultGroupImage;
-    private static Bitmap mDefaultUserImage;
+    private static Bitmap mDefaultGroupImage = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+    private static Bitmap mDefaultUserImage = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
 
     private static GoogleApiClient mGoogleApiClient;
 
@@ -37,11 +37,11 @@ public class YieldsApplication {
     }
 
     public static Bitmap getDefaultGroupImage(){
-        return  Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+        return mDefaultGroupImage;
     }
 
     public static Bitmap getDefaultUserImage(){
-        return Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+        return mDefaultUserImage;
     }
 
     public static GoogleApiClient getGoogleApiClient(){

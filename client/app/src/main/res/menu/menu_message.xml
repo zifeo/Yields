@@ -2,6 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="yields.client.activities.MessageActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/actionSettingsGroup"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/groupSettings"
+        android:layout_gravity="center"
+        app:showAsAction="ifRoom"
+        />
+
+
 </menu>

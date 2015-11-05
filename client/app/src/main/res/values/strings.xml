@@ -36,5 +36,8 @@
     <string name="publicGroup">Public group</string>
     <string name="privateGroup">Private group</string>
     <string name="messageGroupNameTooShort">Group name too short</string>
+    <string name="backToGroupActivity">Back to group list</string>
+    <string name="unknownGroup">Unknown group</string>
+    <string name="groupSettings">Edit group</string>
 
 </resources>
