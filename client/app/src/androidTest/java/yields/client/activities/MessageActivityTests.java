@@ -1,5 +1,6 @@
 package yields.client.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -70,8 +71,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         Activity messageActivity = getActivity();
 
         //Group info
-        TextView groupName = (TextView) messageActivity.findViewById(R.id.groupName);
-        assertEquals(MOCK_GROUP.getName(), groupName.getText());
+        ActionBar actionBar = (ActionBar) messageActivity.getActionBar();
+        assertEquals(MOCK_GROUP.getName(), actionBar.getTitle());
 
         //Input field
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);

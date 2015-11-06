@@ -19,8 +19,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".activities.MessageActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName="yields.client.activities.GroupActivity">
+            android:parentActivityName=".activities.GroupActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
             android:name=".activities.GoogleLoginActivity"
@@ -55,8 +55,14 @@
             android:name=".activities.CreateGroupSelectUsersActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
-        <activity android:name=".activities.CreateGroupSelectNameActivity"
+        <activity
+            android:name=".activities.CreateGroupSelectNameActivity"
             android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".activities.GroupSettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.MessageActivity" >
         </activity>
     </application>
 
