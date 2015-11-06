@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import yields.client.R;
+import yields.client.activities.GroupSettingsActivity;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
 
@@ -34,14 +35,11 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
 
         ImageView imageSetting = (ImageView) setting.findViewById(R.id.imageSetting);
 
-        switch (position){
-            case 3:
-                imageSetting.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_group_black_24dp));
-            break;
-
-            default:
-                imageSetting.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_share_black_24dp));
-            break;
+        if (position == GroupSettingsActivity.Settings.USERS.ordinal()){
+            imageSetting.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_group_black_24dp));
+        }
+        else {
+            imageSetting.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_share_black_24dp));
         }
 
         TextView textViewSetting = (TextView) setting.findViewById(R.id.textViewSetting);

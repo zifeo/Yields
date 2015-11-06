@@ -24,6 +24,10 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 
 public class GroupSettingsActivity extends AppCompatActivity {
+    public enum Settings {NAME, TYPE, IMAGE, USERS}
+
+    private static final int REQUEST_IMAGE= 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,12 +41,12 @@ public class GroupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Group Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        List<String> itemList = new ArrayList<>();
+        List<String> itemList = new ArrayList<>(4);
 
-        itemList.add("Change group name");
-        itemList.add("Change group type");
-        itemList.add("Change group image");
-        itemList.add("Add users");
+        itemList.add(Settings.NAME.ordinal(), "Change group name");
+        itemList.add(Settings.TYPE.ordinal(), "Change group type");
+        itemList.add(Settings.IMAGE.ordinal(), "Change group image");
+        itemList.add(Settings.USERS.ordinal(), "Add users");
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
@@ -58,21 +62,19 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            switch (position){
-                case 0: // change name
-                    changeNameListener();
-                    break;
 
-                case 1: // change type
-                    changeTypeListener();
-                    break;
-
-                default:
-
-
-                    break;
+            if (position == Settings.NAME.ordinal()){
+                changeNameListener();
             }
+            else if (position == Settings.TYPE.ordinal()){
+                changeTypeListener();
+            }
+            else if (position == Settings.IMAGE.ordinal()){
+                changeImageListener();
+            }
+            else {
 
+            }
         }
 
         private void changeNameListener(){
@@ -126,6 +128,13 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 });
             groupTypeDialog = builder.create();
             groupTypeDialog.show();
+        }
+
+        void changeImageListener(){
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE);
         }
     }
 
