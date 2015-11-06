@@ -11,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
 
     // List of users with a boolean indicating if the user is currently selected
     private List<Map.Entry<User, Boolean>> mUsers;
+    private List<User> mOriginalUsers; // list of users who cannot be unchecked
     private boolean mRemoveWhenUnchecked;
 
     public ListAdapterUsersCheckBox(Context context, int addUserLayout, List<Map.Entry<User, Boolean>> users, boolean removeWhenUnchecked) {
@@ -30,6 +32,13 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
         mContext = context;
         mUsers = users;
         mRemoveWhenUnchecked = removeWhenUnchecked;
+        mOriginalUsers = new ArrayList<>();
+
+        for (int i = 0; i < users.size(); i++){
+            if (users.get(i).getValue()){
+                mOriginalUsers.add(users.get(i).getKey());
+            }
+        }
     }
 
     @Override
@@ -60,17 +69,22 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mUsers.get(pos).setValue(isChecked);
-
-                // Cannot remove the first user
-                if (mRemoveWhenUnchecked && !isChecked && pos!=0){
-                    mUsers.remove(pos);
-                    ListAdapterUsersCheckBox.this.notifyDataSetChanged();
+                if (mOriginalUsers.contains(mUsers.get(pos).getKey())){
+                    buttonView.setChecked(true);
                 }
+                else {
+                    mUsers.get(pos).setValue(isChecked);
 
-                // Cannot remove the first user, need to recheck the box
-                if (mRemoveWhenUnchecked  && pos==0){
-                    buttonView.setChecked(!isChecked);
+                    // Cannot remove the first user
+                    if (mRemoveWhenUnchecked && !isChecked && pos!=0){
+                        mUsers.remove(pos);
+                        ListAdapterUsersCheckBox.this.notifyDataSetChanged();
+                    }
+
+                    // Cannot remove the first user, need to recheck the box
+                    if (mRemoveWhenUnchecked  && pos==0){
+                        buttonView.setChecked(!isChecked);
+                    }
                 }
             }
         });

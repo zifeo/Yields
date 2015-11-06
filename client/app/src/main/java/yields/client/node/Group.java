@@ -20,7 +20,6 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
 
-    private List<User> mConnectedUsers;
     private TreeMap<Date, Message> mMessages;
     private boolean mConsumed;
     private List<User> mUsers;
@@ -38,7 +37,6 @@ public class Group extends Node {
     public Group(String name, Id id, List<User> users, Bitmap image) {
         super(name, id);
         Objects.requireNonNull(users);
-        this.mConnectedUsers = new ArrayList<>(users);
         this.mMessages = new TreeMap<>();
         mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
@@ -57,29 +55,25 @@ public class Group extends Node {
     }
 
     /**
-     * Add a user to a group.
-     * @param user the user to add.
-     * @throws NodeException if the user in not valid.
+     * Add a user to the group
+     * @param user The user we want to add
      */
-    private void connectUser(User user) throws NodeException {
-        User newUser = new User(user.getName(), user.getId(),
-                user.getEmail(), user.getImg());
-        mConnectedUsers.add(newUser);
+    public void addUser(User user){
+        Objects.requireNonNull(user);
+        mUsers.add(user);
     }
 
     /**
-     * Add a list of users to the group.
-     * @param users The list of users to add.
-     * @throws NodeException if the list is invalid.
+     * Indicates if a user belongs to the group
+     * @param user The user we want to test
      */
-    public void appendUsers(Collection<User> users) throws NodeException {
-        for (User user : users) {
-            connectUser(user);
-        }
+    public boolean containsUser(User user){
+        Objects.requireNonNull(user);
+        return mUsers.contains(user);
     }
 
     /**
-     * Add e new message to the group messages.
+     * Add a new message to the group messages.
      * @param newMessage if the message is not valid.
      */
     public void addMessage(Message newMessage) {

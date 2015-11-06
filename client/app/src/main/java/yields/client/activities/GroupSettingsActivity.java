@@ -4,6 +4,7 @@ package yields.client.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,23 +23,46 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.exceptions.NodeException;
+import yields.client.gui.GraphicTransforms;
+import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSettings;
+import yields.client.messages.Message;
+import yields.client.messages.TextContent;
+import yields.client.node.ClientUser;
+import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
-
+/**
+ * Activity where the user can change some parameters for the group, leave it and
+ * the admin can change its name, image, users...
+ */
 public class GroupSettingsActivity extends AppCompatActivity {
     public enum Settings {NAME, TYPE, IMAGE, USERS}
 
-    private static final int REQUEST_IMAGE= 1;
+    private Group mGroup;
+    private ClientUser mUser;
 
+    private static final int REQUEST_IMAGE = 1;
+    private static final int REQUEST_ADD_USERS = 2;
+
+    /**
+     * Method automatically called on the creation of the activity
+     * @param savedInstanceState the previous instance of the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_settings);
+
+        createFakeUsersAndGroup();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -63,6 +87,14 @@ public class GroupSettingsActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new CustomListener());
         listView.setItemsCanFocus(false);
 
+        mGroup = YieldsApplication.getGroup();
+        mUser = YieldsApplication.getUser();
+
+        Objects.requireNonNull(mGroup,
+                "The group in YieldsApplication cannot be null when this activity is created");
+
+        Objects.requireNonNull(mUser,
+                "The user in YieldsApplication cannot be null when this activity is created");
     }
 
     /**
@@ -91,6 +123,87 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 toast.show();
             }
         }
+        else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK){
+            ArrayList<String> emailList = data.getStringArrayListExtra(
+                    CreateGroupSelectUsersActivity.EMAIL_LIST_KEY);
+
+            int count = 0;
+
+            List<User> entourage = mUser.getEntourage();
+            for (int i = 0; i < emailList.size(); i++){
+                for (int j = 0; j < entourage.size(); j++){
+                    if (entourage.get(j).getEmail().equals(emailList.get(i))
+                            && !mGroup.containsUser(entourage.get(j))){
+
+                        // TODO Add user to group and send notification to server
+
+                        count++;
+                    }
+                }
+            }
+
+            Toast toast = Toast.makeText(getApplicationContext(), count + " user(s) added to group", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    /**
+     * To be removed as soon as the logging is working
+     */
+
+    private class MockClientUser extends ClientUser {
+
+        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
+            super(name, id, email, img);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message) {
+            /* Nothing */
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            ArrayList<Message> messageList =  new ArrayList<>();
+            return messageList;
+        }
+
+        @Override
+        public void createNewGroup(Group group) throws IOException {
+
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+            /* Nothing */
+        }
+
+        @Override
+        public Map<User, String> getHistory(Group group, Date from) {
+            return null;
+        }
+    }
+
+    /**
+     * To be removed as soon as the logging is working
+     */
+    private void createFakeUsersAndGroup() {
+        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
+        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
+
+        YieldsApplication.setGroup(new Group("SWENG", new Id(666), new ArrayList<User>()));
+
+        try {
+            YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico1", new Id(2), "m@m.es", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Teo", new Id(3), "m@m.fr", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Justinien", new Id(4), "m@m.cn", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico2", new Id(5), "m@m.jpp", imageUser));
+            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Jeremy", new Id(6), "m@m.ch", imageUser));
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private class CustomListener implements AdapterView.OnItemClickListener {
@@ -115,7 +228,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         private void changeNameListener(){
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
             editTextName.setText("Current Group");
-            editTextName.setLeft(10);
+            editTextName.setPadding(20, 0, 0, 0);
 
             new AlertDialog.Builder(GroupSettingsActivity.this)
                     .setTitle("Change group name")
@@ -172,7 +285,18 @@ public class GroupSettingsActivity extends AppCompatActivity {
         }
 
         void addUsersListener(){
+            ArrayList<String> emailList = new ArrayList<>();
+            List<User> currentUsers = mGroup.getUsers();
 
+            for (int i = 0; i < currentUsers.size(); i++){
+                emailList.add(currentUsers.get(i).getEmail());
+            }
+
+            Intent intentSelectUsers = new Intent(GroupSettingsActivity.this, CreateGroupSelectUsersActivity.class);
+            intentSelectUsers.putStringArrayListExtra(CreateGroupSelectUsersActivity.
+                    EMAIL_LIST_INPUT_KEY, emailList);
+
+            startActivityForResult(intentSelectUsers, REQUEST_ADD_USERS);
         }
     }
 
