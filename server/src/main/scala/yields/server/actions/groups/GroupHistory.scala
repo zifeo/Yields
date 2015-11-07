@@ -5,11 +5,10 @@ import yields.server.dbi.models.{GID, NID, Node, UID}
 
 /**
  * Fetch each group node between two dates with time.
- * @param gid group id
- * @param lastNid last node id
+ * @param nid last node id
  * @param count number of node wanted
  */
-case class GroupHistory(gid: GID, lastNid: NID, count: Int) extends Action {
+case class GroupHistory(nid: NID, count: Int) extends Action {
 
   /**
    * Run the action given the sender.
@@ -17,6 +16,9 @@ case class GroupHistory(gid: GID, lastNid: NID, count: Int) extends Action {
    * @return action result
    */
   override def run(sender: UID): Result = {
+    val n = new Node(nid)
+    val history = n.getMessagesInRange(0, 50)
+
     GroupHistoryRes(Seq.empty)
   }
 
