@@ -1,11 +1,11 @@
 package yields.client.activities;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.app.ActionBar;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.widget.EditText;
@@ -68,10 +68,10 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      */
     @Test
     public void testStartingDisplay(){
-        Activity messageActivity = getActivity();
+        MessageActivity messageActivity = getActivity();
 
         //Group info
-        ActionBar actionBar = (ActionBar) messageActivity.getActionBar();
+        ActionBar actionBar = (ActionBar) messageActivity.getSupportActionBar();
         assertEquals(MOCK_GROUP.getName(), actionBar.getTitle());
 
         //Input field
