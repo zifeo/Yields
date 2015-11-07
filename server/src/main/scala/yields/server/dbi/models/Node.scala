@@ -108,9 +108,6 @@ abstract class Node {
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.zadd(Key.nodes, Helpers.currentDatetime.toEpochSecond, nid))
 
-  private def valueOrDefault[T](value: Option[T], default: T): T =
-    value.getOrElse(default)
-
   private def update[T](field: String, value: T): Option[T] = {
     val status = redis.hmset(Key.infos, List((field, value), (Key.updated_at, Helpers.currentDatetime)))
     if (!status) throw new RedisNotAvailableException
@@ -124,4 +121,7 @@ abstract class Node {
   // Gets the value if set or else throws an exception (cannot be unset).
   private def valueOrException[T](value: Option[T]): T =
     value.getOrElse(throw new ModelValueNotSetException)
+
+  private def valueOrDefault[T](value: Option[T], default: T): T =
+    value.getOrElse(default)
 }
