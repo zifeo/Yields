@@ -38,8 +38,8 @@ final class User private (val uid: UID) {
     val picture = "picture"
     val created_at = "created_at"
     val updated_at = "updated_at"
-    val groups = s"users:$uid:groups"
-    val entourage = s"users:$uid:entourage"
+    val groups = s"$user:groups"
+    val entourage = s"$user:entourage"
   }
 
   private var _name: Option[String] = None

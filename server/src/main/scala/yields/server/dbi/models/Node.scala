@@ -3,6 +3,8 @@ package yields.server.dbi.models
 import yields.server.dbi._
 import yields.server.dbi.exceptions.RedisNotAvailableException
 import yields.server.utils.Helpers
+import com.redis.serialization._
+import Parse.Implicits._
 
 /**
  *
