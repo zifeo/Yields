@@ -12,14 +12,13 @@ import yields.server.utils.Helpers
  * nodes:[nid]:users Zset[UID]
  * nodes:[nid]:nodes Zset[NID]
  * nodes:[nid]:feed Zset[tid -> (uid, text, nid, datetime)]
- * nodes:[nid]:content Binary
  * nodes:nid -> last used nid
  */
 
 /**
  * Representation of a node
  */
-abstract class Node(val nid: NID) {
+abstract class Node {
 
   object Key {
     val infos = s"nodes:$nid"
@@ -35,6 +34,8 @@ abstract class Node(val nid: NID) {
   }
 
   type feedEntry = Map[TID, feedContent]
+
+  val nid: NID
 
   var _date_creation: Option[OffsetDateTime] = None
   var _last_activity: Option[OffsetDateTime] = None
@@ -66,10 +67,10 @@ abstract class Node(val nid: NID) {
 
   /** name setter */
   def name_(n: String): Unit =
-  _name = update(Key.name, n)
+    _name = update(Key.name, n)
 
   /** kind getter */
-  def kind: String = _kind.getOrElse{
+  def kind: String = _kind.getOrElse {
     _kind = redis.hget(Key.infos, Key.kind)
     valueOrException(_kind)
   }
@@ -94,15 +95,25 @@ abstract class Node(val nid: NID) {
   def addMessage(content: feedContent): Boolean = {
     val tid: TID = redis.incr(Key.tid).getOrElse(0)
     val entry: feedEntry = Map(tid -> content)
-    hasChangeOneEntry(redis.zadd(Key.feed, Helpers.currentDatetime.toEpochSecond, entry))
+    hasChangeOneEntry(redis.zadd(Key.feed, tid, entry))
   }
+
+  /** node getter */
+  def node: List[NID] = _nodes.getOrElse {
+    _nodes = redis.zrange[NID](Key.nodes, 0, -1)
+    valueOrDefault(_nodes, List())
+  }
+
+  /** add node */
+  def addNode(nid: NID): Boolean =
+    hasChangeOneEntry(redis.zadd(Key.nodes, Helpers.currentDatetime.toEpochSecond, nid))
 
   private def valueOrDefault[T](value: Option[T], default: T): T =
     value.getOrElse(default)
 
   private def update[T](field: String, value: T): Option[T] = {
     val status = redis.hmset(Key.infos, List((field, value), (Key.updated_at, Helpers.currentDatetime)))
-    if (! status) throw new RedisNotAvailableException
+    if (!status) throw new RedisNotAvailableException
     Some(value)
   }
 
