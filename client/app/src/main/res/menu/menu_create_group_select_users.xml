@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="yields.client.activities.CreateGroupSelectUsersActivity">
+
+    <item android:id="@+id/actionDoneSelectUser"
+        android:title="@string/done"
+        android:layout_gravity="center"
+        app:showAsAction="withText|ifRoom"
+        />
+</menu>

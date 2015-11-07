@@ -25,7 +25,6 @@ public class YieldEmulatorSocketProviderTest {
             socket.close();
         } catch (IOException e) {
             Assert.fail(e.getMessage());
-            return;
         }
     }
 

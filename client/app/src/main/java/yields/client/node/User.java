@@ -2,19 +2,21 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 
+import java.util.Objects;
+
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
 public class User extends Node{
 
-    private String email;
+    private String mEmail;
     private Bitmap mImg;
 
     public User(String name, Id id,
                  String email, Bitmap img) throws NodeException {
         super(name, id);
-        this.email = email;
-        this.mImg = img;
+        this.mEmail = Objects.requireNonNull(email);
+        this.mImg = Objects.requireNonNull(img);
     }
 
     public Bitmap getImg(){
@@ -22,6 +24,6 @@ public class User extends Node{
     }
 
     public String getEmail() {
-        return email;
+        return mEmail;
     }
 }

@@ -2,7 +2,6 @@ package yields.server.io.mpi
 
 import spray.json._
 import yields.server.actions.Action
-import yields.server.actions.exceptions.SerializationException
 import yields.server.io._
 import yields.server.mpi.{Metadata, Request}
 
@@ -21,7 +20,7 @@ object RequestJsonFormat extends RootJsonFormat[Request] {
     val action = json.convertTo[Action]
     val metadata = json.asJsObject.getFields(metadataFld) match {
       case Seq(md) => md.convertTo[Metadata]
-      case _ => throw SerializationException(s"unknown metadata")
+      case _ => deserializationError(s"unknown metadata")
     }
     Request(action, metadata)
   }

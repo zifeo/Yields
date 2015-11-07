@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.UnknownHostException;
+import java.util.Date;
 
 public class ServerChannelTest {
     private final static String FAKE_RESPONSE = "{" +
@@ -27,20 +27,18 @@ public class ServerChannelTest {
             "}" +
             "}";
 
-    private final static String SIMPLE_REQUEST = "{" +
+    private static String sSimpleRequest = "{" +
             "\"metadata\":{" +
-            "\"sender\":0," +
-            "\"time\":0" +
-            "}," +
+            "\"sender\":\"0\"," +
+            "\"datetime\":\"TIME\"}," +
             "\"kind\":\"PING\"," +
-            "\"message\":{" +
-            "\"content\":\"test\"" +
-            "}" +
-            "}";
+            "\"message\":" +
+            "{\"content\":\"test\"}" +
+            "}\n";
 
     @Test
     public void testWorkingSendRequestAndReadResponse() throws JSONException{
-        Request simpleRequest = RequestBuilder.simpleRequest("test");
+        Request simpleRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -53,9 +51,9 @@ public class ServerChannelTest {
 
         try {
             Response response = channel.sendRequest(simpleRequest);
-            Assert.assertEquals(SIMPLE_REQUEST, output.toString());
-            Assert.assertEquals("Response is wrong",
-                    response.object().toString(), FAKE_RESPONSE);
+            Assert.assertEquals(sSimpleRequest
+                    .replace("TIME", DateSerialization.toString(new Date())),
+                    output.toString());
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
@@ -63,7 +61,7 @@ public class ServerChannelTest {
 
     @Test
     public void testNonWorkingConnection() throws IOException{
-        Request simpleRequest = RequestBuilder.simpleRequest("test");
+        Request simpleRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -90,9 +88,9 @@ public class ServerChannelTest {
         };
     }
 
-    private PrintWriter toWriter(OutputStream output) {
-        return new PrintWriter( new BufferedWriter(
-                new OutputStreamWriter(output)), true);
+    private BufferedWriter toWriter(OutputStream output) {
+        return new BufferedWriter(
+                new OutputStreamWriter(output));
     }
 
     private BufferedReader toReade(InputStream input) {

@@ -12,9 +12,9 @@ object MessagesJsonFormatSpecifications extends Properties("MessagesJsonFormat")
     toAndFromJson(x) == x
   }
 
-  property("Response") = forAll { (x: Response) =>
+  /*property("Response") = forAll { (x: Response) =>
     toAndFromJson(x) == x
-  }
+  }*/
 
   property("Metadata") = forAll { (x: Metadata) =>
     toAndFromJson(x) == x

@@ -3,8 +3,7 @@ package yields.server.io.actions
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
-import yields.server.actions.exceptions.SerializationException
-import yields.server.actions.groups.{NodeCreate, GroupHistory, GroupMessage, GroupUpdate}
+import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
 import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
 import yields.server.io._
 
@@ -28,7 +27,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   override def write(obj: Action): JsValue = {
     val kind = obj.getClass.getSimpleName
     obj match {
-      case x: NodeCreate => packWithKind(x)
+      case x: GroupCreate => packWithKind(x)
       case x: GroupUpdate => packWithKind(x)
       case x: GroupMessage => packWithKind(x)
       case x: GroupHistory => packWithKind(x)
@@ -37,7 +36,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
       case x: UserUpdate => packWithKind(x)
       case x: UserGroupList => packWithKind(x)
 
-      case _ => throw SerializationException(s"unregistered action kind: $kind")
+      case _ => serializationError(s"unregistered action kind: $kind")
     }
   }
 
@@ -45,7 +44,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     json.asJsObject.getFields(kindFld, messageFld) match {
       case Seq(JsString(kind), message) =>
         kind match {
-          case "GroupCreate" => message.convertTo[NodeCreate]
+          case "GroupCreate" => message.convertTo[GroupCreate]
           case "GroupUpdate" => message.convertTo[GroupUpdate]
           case "GroupMessage" => message.convertTo[GroupMessage]
           case "GroupHistory" => message.convertTo[GroupHistory]
@@ -54,9 +53,9 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "UserUpdate" => message.convertTo[UserUpdate]
           case "UserGroupList" => message.convertTo[UserGroupList]
 
-          case _ => throw SerializationException(s"unregistered action kind: $kind")
+          case _ => deserializationError(s"unregistered action kind: $kind")
         }
-      case _ => throw SerializationException(s"bad action format: $json")
+      case _ => deserializationError(s"bad action format: $json")
     }
 
 }

@@ -23,6 +23,7 @@ import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -50,11 +51,15 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
+        YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
+
         YieldsApplication.setGroup(MOCK_GROUP);
-        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-        ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user", new Id(117), "Mock email client user", image1);
+
+        ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user", new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
         YieldsApplication.setUser(MOCK_CLIENT_USER);
+        assertTrue(YieldsApplication.getUser().getImg() != null);
     }
 
     /**
@@ -106,6 +111,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testWrittenTextMessageIsCorrect(){
         Activity messageActivity = getActivity();
+        YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
         ListView listView = (ListView) messageActivity.findViewById(R.id.messageScrollLayout);
@@ -115,6 +121,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
                 ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         assertTrue(inputMessageField.getText().length() == 0);
+
+        messageActivity.finish();
     }
 
     /**
@@ -133,5 +141,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         assertTrue(0 < inputMessageField.getScrollY());
         inputMessageField.clearComposingText();
+
+        messageActivity.finish();
     }
 }

@@ -2,6 +2,9 @@ package yields.client.yieldsapplication;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ConcurrentModificationException;
 
@@ -16,6 +19,11 @@ public class YieldsApplication {
     private static Context mApplicationContext;
     private static Resources mResources;
 
+    private static Bitmap mDefaultGroupImage;
+    private static Bitmap mDefaultUserImage;
+
+    private static GoogleApiClient mGoogleApiClient;
+
     public static ClientUser getUser(){
         return mUser;
     }
@@ -26,6 +34,22 @@ public class YieldsApplication {
 
     public static Context getApplicationContext(){
         return mApplicationContext;
+    }
+
+    public static Bitmap getDefaultGroupImage(){
+        return  Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+    }
+
+    public static Bitmap getDefaultUserImage(){
+        return Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+    }
+
+    public static GoogleApiClient getGoogleApiClient(){
+        return mGoogleApiClient;
+    }
+
+    public static void setGoogleApiClient(GoogleApiClient gac){
+        mGoogleApiClient = gac;
     }
 
     public static void setResources(Resources r){
@@ -42,6 +66,14 @@ public class YieldsApplication {
 
     public static void setApplicationContext(Context c){
         mApplicationContext = c;
+    }
+
+    public static void setDefaultGroupImage(Bitmap b){
+        mDefaultGroupImage = b;
+    }
+
+    public static void setDefaultUserImage(Bitmap b){
+        mDefaultUserImage = b;
     }
 
     public static Resources getResources(){

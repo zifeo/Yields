@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -19,12 +20,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
@@ -47,11 +49,12 @@ public class MessageActivity extends Activity {
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
+    private static ListView mMessageScrollLayout;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
      * messages.
-     * @param savedInstanceState
+     * @param savedInstanceState the previous instance of the activity
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,64 +63,66 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
-
         /** FOR SAKE OF SPRINT PRESENTATION !!! **/
         try {
-            Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(), R.drawable.userpicture);
-            mUser = new MockClientUser("Mock User", new Id(117), "Mock Email", image1);
-            mGroup = createFakeGroup();
+            Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+            YieldsApplication.setUser(new MockClientUser("Mock User", new Id(117), "Mock Email", image1));
+            YieldsApplication.setGroup(createFakeGroup());
         } catch (NodeException e) {
             e.printStackTrace();
         }
+
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
 
         mMessages = new ArrayList<>();
         mImage = null;
         mSendImage = false;
 
-
         mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
                 mMessages);
-        ListView listView = (ListView) findViewById(R.id.messageScrollLayout);
-        listView.setAdapter(mAdapter);
+        mMessageScrollLayout = (ListView) findViewById(R.id.messageScrollLayout);
+        mMessageScrollLayout.setAdapter(mAdapter);
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            int duration = Toast.LENGTH_SHORT;
+            showErrorToast("Couldn't get group informations.");
             TextView groupName = (TextView) findViewById(R.id.groupName);
             groupName.setText("Unknown group");
-            Toast toast = Toast.makeText(this, "Impossible to load group info", duration);
-            toast.show();
         }else {
             setHeaderBar();
-            retrieveGroupMessages();
+            try {
+                new RetrieveMessageTask().execute().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendMessage(View v) throws MessageActivityException {
+    public void onSendMessage(View v) throws MessageActivityException, IOException {
         String inputMessage =  mInputField.getText().toString();
 
         mInputField.setText("");
         Content content;
-        if (mSendImage){
+        if (mSendImage && mImage != null){
             content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
+            mImage = null;
         }
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(1230), mUser, content);
+        Message message = new Message("message", new Id(1230), mUser, content, new Date(), mGroup);
         // TODO : take right name and right id.
         mMessages.add(message);
-        //mUser.sendMessage(mGroup, message); TODO : implement sendMessage for ClientUser.
+        mUser.sendMessage(mGroup, message);
+
         mAdapter.notifyDataSetChanged();
-        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
-        lv.setSelection(lv.getAdapter().getCount() - 1);
+        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
     }
 
     /**
@@ -139,11 +144,46 @@ public class MessageActivity extends Activity {
     }
 
     /**
+     * Is called once the image picking is finished. It displays a toast informing the
+     * user that he added a message to his message.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+
+            try {
+                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                if (mImage != null) {
+                    Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+            } catch (IOException e) {
+                Log.d("Message Activity", "Couldn't add image to the message");
+            }
+        }
+    }
+
+    /**
+     * Show an error message in a toast.
+     * @param errorMsg The error message to be displayed.
+     */
+    private void showErrorToast(String errorMsg){
+        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
-    private void retrieveGroupMessages(){
-        for(Message m : mUser.getGroupMessages(mGroup)){
-            mMessages.add(m);
+    private void retrieveGroupMessages() throws IOException {
+        SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
+
+        for(Message message : messagesTree.values()){
+            mMessages.add(message);
         }
         mAdapter.notifyDataSetChanged();
         ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
@@ -170,24 +210,18 @@ public class MessageActivity extends Activity {
     }
 
     /**
-     * Is called once the image picking is finished. It displays a toast informing the
-     * user that he added a message to his message.
+     * Retreive the group messages.
      */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-
-            Uri uri = data.getData();
-
+        @Override
+        protected Void doInBackground(Void... params) {
             try {
-                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
-                toast.show();
+                retrieveGroupMessages();
             } catch (IOException e) {
-                Log.d("Message Activity", "Couldn't add image to the message");
+                e.printStackTrace();
             }
+            return null;
         }
     }
 
@@ -206,14 +240,13 @@ public class MessageActivity extends Activity {
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group) {
-            ArrayList<Message> messageList =  new ArrayList<>();
-            return messageList;
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            return new ArrayList<>();
         }
 
         @Override
-        public void addNewGroup(Group group) {
-            /* Nothing */
+        public void createNewGroup(Group group) throws IOException {
+
         }
 
         @Override
@@ -232,6 +265,7 @@ public class MessageActivity extends Activity {
      * @return fake group.
      */
     private Group createFakeGroup() throws NodeException {
-        return new Group("Mock group", new Id(123), new ArrayList<User>());
+        Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+        return new Group("Mock group", new Id(123), new ArrayList<User>(), image1);
     }
 }
