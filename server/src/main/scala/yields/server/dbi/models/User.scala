@@ -2,12 +2,10 @@ package yields.server.dbi.models
 
 import java.time.OffsetDateTime
 
+import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{ModelValueNotSetException, RedisNotAvailableException}
 import yields.server.utils.Helpers
-
-
-
 
 /**
  * User model with linked database interface.
@@ -54,7 +52,7 @@ final class User private (val uid: UID) {
 
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.hget(Key.user, Key.name)
+    _name = redis.hget[String](Key.user, Key.name)
     valueOrDefault(_name, "")
   }
 
@@ -64,7 +62,7 @@ final class User private (val uid: UID) {
 
   /** Email getter. */
   def email: Email = _email.getOrElse {
-    _email = redis.hget(Key.user, Key.email)
+    _email = redis.hget[Email](Key.user, Key.email)
     valueOrException(_email)
   }
 
@@ -74,7 +72,7 @@ final class User private (val uid: UID) {
 
   /** Picture getter. TODO: format to be determined. */
   def picture: Blob = _picture.getOrElse {
-    _picture = redis.hget(Key.user, Key.picture)
+    _picture = redis.hget[Blob](Key.user, Key.picture)
     valueOrDefault(_picture, "")
   }
 
@@ -84,13 +82,13 @@ final class User private (val uid: UID) {
 
   /** Created_at datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.hget(Key.user, Key.created_at).map(OffsetDateTime.parse)
+    _created_at = redis.hget[String](Key.user, Key.created_at).map(OffsetDateTime.parse)
     valueOrException(_created_at)
   }
 
   /** Updated_at getter. */
   def updated_at: OffsetDateTime = _updated_at.getOrElse {
-    _updated_at = redis.hget(Key.user, Key.updated_at).map(OffsetDateTime.parse)
+    _updated_at = redis.hget[String](Key.user, Key.updated_at).map(OffsetDateTime.parse)
     valueOrException(_updated_at)
   }
 
@@ -129,7 +127,7 @@ final class User private (val uid: UID) {
    * on the concerned getter call and issue either the default value or a corresponding exception.
    */
   def hydrate(): Unit = {
-    val values = redis.hgetall(Key.user).getOrElse(throw new RedisNotAvailableException)
+    val values = redis.hgetall[String, String](Key.user).getOrElse(throw new RedisNotAvailableException)
     _name = values.get(Key.name)
     _email = values.get(Key.email)
     _picture = values.get(Key.picture)
@@ -180,7 +178,7 @@ object User {
 
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): User =
-    redis.hget("users:indexes:email", email) match {
+    redis.hget[String]("users:indexes:email", email) match {
       case Some(uid) => new User(uid.toLong)
       case None => throw new Exception
     }

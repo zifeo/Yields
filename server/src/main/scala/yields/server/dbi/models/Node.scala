@@ -2,10 +2,10 @@ package yields.server.dbi.models
 
 import java.time.OffsetDateTime
 
+import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{ModelValueNotSetException, RedisNotAvailableException}
 import yields.server.utils.Helpers
-import com.redis.serialization.Parse
 
 /**
  *
@@ -36,8 +36,6 @@ abstract class Node(val nid: NID) {
     val tid = s"$node:tid"
   }
 
-  import Parse.Implicits.parseLong
-
   private var _date_creation: Option[OffsetDateTime] = None
   private var _last_activity: Option[OffsetDateTime] = None
   private var _name: Option[String] = None
@@ -48,19 +46,19 @@ abstract class Node(val nid: NID) {
 
   /** dateCreation getter */
   def date_creation: OffsetDateTime = _date_creation.getOrElse {
-    _date_creation = redis.hget(Key.name, Key.date_creation).map(OffsetDateTime.parse)
+    _date_creation = redis.hget[OffsetDateTime](Key.name, Key.date_creation)
     valueOrException(_date_creation)
   }
 
   /** lastActivity getter */
   def last_activity: OffsetDateTime = _last_activity.getOrElse {
-    _last_activity = redis.hget(Key.name, Key.last_activity).map(OffsetDateTime.parse)
+    _last_activity = redis.hget[OffsetDateTime](Key.name, Key.last_activity)
     valueOrException(_last_activity)
   }
 
   /** name getter */
   def name: String = _name.getOrElse {
-    _name = redis.hget(Key.name, Key.name)
+    _name = redis.hget[String](Key.name, Key.name)
     valueOrException(_name)
   }
 
@@ -70,7 +68,7 @@ abstract class Node(val nid: NID) {
 
   /** kind getter */
   def kind: String = _kind.getOrElse{
-    _kind = redis.hget(Key.name, Key.kind)
+    _kind = redis.hget[String](Key.name, Key.kind)
     valueOrException(_kind)
   }
 

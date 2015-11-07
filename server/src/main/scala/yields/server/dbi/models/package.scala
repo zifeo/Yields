@@ -2,6 +2,8 @@ package yields.server.dbi
 
 import java.time.OffsetDateTime
 
+import com.redis.serialization.Parse
+
 /**
  * Provisory models types.
  */
@@ -31,6 +33,19 @@ package object models {
   // type Node = Int
 
   /** */
-  type FeedContent = (UID, String, NID, OffsetDateTime)
+  type FeedContent = (OffsetDateTime, UID, NID, String)
+
+  import Parse.Implicits._
+
+  /** [[OffsetDateTime]] Redis format. */
+  implicit val parseOffsetDateTime = Parse[OffsetDateTime](byteArray => OffsetDateTime.parse(byteArray))
+
+  /** [[FeedContent]] Redis format. */
+  implicit val parseTuple = Parse[FeedContent] { byteArray =>
+    val (datetime, uidNidText) = byteArray.span(_ == ',')
+    val (uid, nidText) = uidNidText.span(_ == ',')
+    val (nid, text) = nidText.span(_ == ',')
+    (datetime, uid, nid, text)
+  }
 
 }

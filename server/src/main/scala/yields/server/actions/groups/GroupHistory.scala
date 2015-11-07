@@ -16,8 +16,7 @@ case class GroupHistory(nid: NID, count: Int) extends Action {
    * @return action result
    */
   override def run(sender: UID): Result = {
-    val n = new Node(nid)
-    val history = n.getMessagesInRange(0, 50)
+
 
     GroupHistoryRes(Seq.empty)
   }

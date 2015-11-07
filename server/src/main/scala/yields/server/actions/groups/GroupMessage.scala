@@ -17,17 +17,17 @@ case class GroupMessage(nid: NID, content: FeedContent) extends Action {
    * @return action result
    */
   override def run(sender: UID): Result = {
-    if (checkContent) {
+    /*if (checkContent) {
       val n = new Node(nid)
       n.addMessage(content)
-      GroupMessageRes()
     } else {
       throw new BadFeedContentException("Invalid UID and/or NID")
-    }
+    }*/
+    GroupMessageRes()
   }
 
-  def checkContent: Boolean =
-    content._1 < 0 && (content._2 != "" || content._3 > 0)
+  /*def checkContent: Boolean =
+    content._1 < 0 && (content._2 != "" || content._3 > 0)*/
 
 }
 
