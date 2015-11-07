@@ -3,11 +3,11 @@ package yields.server.dbi.models
 import java.time.OffsetDateTime
 
 import yields.server.dbi._
+import yields.server.dbi.exceptions.{ModelValueNotSetException, RedisNotAvailableException}
 import yields.server.utils.Helpers
 
-// TODO : custom exception, which is fatal, which is not?
-class ModelValueNotSetException extends Exception
-class RedisNotAvailableException extends Exception
+
+
 
 /**
  * User model with linked database interface.
