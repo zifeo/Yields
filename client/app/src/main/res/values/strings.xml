@@ -39,5 +39,8 @@
     <string name="backToGroupActivity">Back to group list</string>
     <string name="unknownGroup">Unknown group</string>
     <string name="groupSettings">Edit group</string>
-    <string name="title_activity_group_settings">Group settings</string>
+    <string name="changeGroupName">Change group name</string>
+    <string name="changeGroupType">Change group type</string>
+    <string name="changeGroupImage">Change group image</string>
+    <string name="addUsers">Add users</string>
 </resources>

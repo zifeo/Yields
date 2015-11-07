@@ -4,7 +4,6 @@ package yields.client.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,17 +18,11 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import yields.client.R;
-import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
-import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSettings;
-import yields.client.messages.Message;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -57,9 +50,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_settings);
 
-        // TO BE REMOVED
-        createFakeUsersAndGroup();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,10 +59,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         List<String> itemList = new ArrayList<>(4);
 
-        itemList.add(Settings.NAME.ordinal(), "Change group name");
-        itemList.add(Settings.TYPE.ordinal(), "Change group type");
-        itemList.add(Settings.IMAGE.ordinal(), "Change group image");
-        itemList.add(Settings.USERS.ordinal(), "Add users");
+        itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeGroupName));
+        itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
+        itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
+        itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
@@ -96,7 +86,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
      * Method automatically called when the user has selected the new group image
      * @param requestCode The code of the request
      * @param resultCode The code of the result
-     * @param data The data where the uri is
+     * @param data The data where the uri, or the list of email is
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -110,8 +100,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
             try {
                 Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (image != null) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "Group image changed !", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(getApplicationContext(), "Group image changed", Toast.LENGTH_SHORT);
                     toast.show();
+
+                    //TODO Change group image and send notification to server
                 }
             } catch (IOException e) {
                 Toast toast = Toast.makeText(getApplicationContext(), "Could not retrieve image", Toast.LENGTH_SHORT);
@@ -143,65 +135,17 @@ public class GroupSettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * To be removed as soon as the logging is working
+     * Class used to take care of clicks in the listview
      */
-    private class MockClientUser extends ClientUser {
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
-        }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            ArrayList<Message> messageList =  new ArrayList<>();
-            return messageList;
-        }
-
-        @Override
-        public void createNewGroup(Group group) throws IOException {
-
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * To be removed as soon as the logging is working
-     */
-    private void createFakeUsersAndGroup() {
-        Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
-        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
-
-        YieldsApplication.setGroup(new Group("SWENG", new Id(666), new ArrayList<User>()));
-
-        try {
-            YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico1", new Id(2), "m@m.es", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Teo", new Id(3), "m@m.fr", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Justinien", new Id(4), "m@m.cn", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Nico2", new Id(5), "m@m.jpp", imageUser));
-            YieldsApplication.getUser().addUserToEntourage(new MockClientUser("Jeremy", new Id(6), "m@m.ch", imageUser));
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private class CustomListener implements AdapterView.OnItemClickListener {
 
+        /**
+         *  Method called when an item in the listview is clicked
+         * @param parent The AdapterView
+         * @param view The view clicked
+         * @param position The position in the list
+         * @param id The id of the view
+         */
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
@@ -219,8 +163,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
             }
         }
 
+        // When the item "Change group name" is clicked
         private void changeNameListener(){
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
+            editTextName.setId(R.id.editText);
             editTextName.setText(mGroup.getName());
 
             new AlertDialog.Builder(GroupSettingsActivity.this)
@@ -229,11 +175,12 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String name = editTextName.getText().toString();
+                            String name = "Group name changed to \"" + editTextName.getText().toString() + "\"";
 
-                            //TEMPORARY
                             Toast toast = Toast.makeText(getApplicationContext(), name, Toast.LENGTH_SHORT);
                             toast.show();
+
+                            // TODO Add change in group's name, not just display
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -243,8 +190,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .show();
         }
 
+        // When the item "Change group type" is clicked
         private void changeTypeListener(){
-            final CharSequence[] types = {" Public "," Private "};
+            final CharSequence[] types = {" Public"," Private"};
             final int[] itemSelected = {0}; // used as a pointer
             AlertDialog groupTypeDialog;
 
@@ -258,18 +206,28 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 })
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Type = " + itemSelected[0], Toast.LENGTH_SHORT);
+                        String type = "public";
+                        if (itemSelected[0] == 1) {
+                            type = "private";
+                        }
+
+                        String text = "Group type changed to : " + type;
+
+                        Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
                         toast.show();
+
+                        // TODO Add change in group's type
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
                     }
                 });
             groupTypeDialog = builder.create();
             groupTypeDialog.show();
         }
 
+        // When the item "Change group image" is clicked
         void changeImageListener(){
             Intent intent = new Intent();
             intent.setType("image/*");
@@ -277,6 +235,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE);
         }
 
+        // When the item "Add users" is clicked
         void addUsersListener(){
             ArrayList<String> emailList = new ArrayList<>();
             List<User> currentUsers = mGroup.getUsers();
