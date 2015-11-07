@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -182,6 +183,26 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.actionSettingsGroup:
+                Intent intent = new Intent(this, GroupSettingsActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
     /**
      * Show an error message in a toast.
      * @param errorMsg The error message to be displayed.
@@ -237,49 +258,5 @@ public class MessageActivity extends AppCompatActivity {
             }
             return null;
         }
-    }
-
-    /**
-     * Mock Client user, only for presentation during the second sprint.
-     */
-    private class  MockClientUser extends ClientUser{
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
-        }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public void createNewGroup(Group group) throws IOException {
-
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * Create fake group for sake of the presentation.
-     * @return fake group.
-     */
-    private Group createFakeGroup() throws NodeException {
-        Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
-        return new Group("Mock group", new Id(123), new ArrayList<User>(), image1);
     }
 }

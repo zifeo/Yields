@@ -11,12 +11,8 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -34,7 +30,6 @@ import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSettings;
 import yields.client.messages.Message;
-import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -62,11 +57,11 @@ public class GroupSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_settings);
 
+        // TO BE REMOVED
         createFakeUsersAndGroup();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("Group Settings2");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Group Settings");
@@ -85,7 +80,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new CustomListener());
-        listView.setItemsCanFocus(false);
+        listView.setItemsCanFocus(true);
 
         mGroup = YieldsApplication.getGroup();
         mUser = YieldsApplication.getUser();
@@ -125,7 +120,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         }
         else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK){
             ArrayList<String> emailList = data.getStringArrayListExtra(
-                    CreateGroupSelectUsersActivity.EMAIL_LIST_KEY);
+                    AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
             int count = 0;
 
@@ -150,7 +145,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
     /**
      * To be removed as soon as the logging is working
      */
-
     private class MockClientUser extends ClientUser {
 
         public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
@@ -227,8 +221,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         private void changeNameListener(){
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
-            editTextName.setText("Current Group");
-            editTextName.setPadding(20, 0, 0, 0);
+            editTextName.setText(mGroup.getName());
 
             new AlertDialog.Builder(GroupSettingsActivity.this)
                     .setTitle("Change group name")
@@ -292,8 +285,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 emailList.add(currentUsers.get(i).getEmail());
             }
 
-            Intent intentSelectUsers = new Intent(GroupSettingsActivity.this, CreateGroupSelectUsersActivity.class);
-            intentSelectUsers.putStringArrayListExtra(CreateGroupSelectUsersActivity.
+            Intent intentSelectUsers = new Intent(GroupSettingsActivity.this, AddUsersFromEntourageActivity.class);
+            intentSelectUsers.putStringArrayListExtra(AddUsersFromEntourageActivity.
                     EMAIL_LIST_INPUT_KEY, emailList);
 
             startActivityForResult(intentSelectUsers, REQUEST_ADD_USERS);

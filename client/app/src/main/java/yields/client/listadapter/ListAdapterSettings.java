@@ -2,6 +2,7 @@ package yields.client.listadapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,11 +36,18 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
 
         ImageView imageSetting = (ImageView) setting.findViewById(R.id.imageSetting);
 
-        if (position == GroupSettingsActivity.Settings.USERS.ordinal()){
-            imageSetting.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_group_black_24dp));
+        int idDrawable = R.drawable.ic_mode_edit_black_24dp;
+        if (position == GroupSettingsActivity.Settings.IMAGE.ordinal()){
+            idDrawable = R.drawable.ic_photo_camera_black_24dp;
         }
-        else {
-            imageSetting.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_share_black_24dp));
+        else if (position == GroupSettingsActivity.Settings.USERS.ordinal()){
+            idDrawable = R.drawable.ic_group_black_24dp;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            imageSetting.setImageDrawable(mContext.getResources().getDrawable(idDrawable, mContext.getTheme()));
+        } else {
+            imageSetting.setImageDrawable(mContext.getResources().getDrawable(idDrawable));
         }
 
         TextView textViewSetting = (TextView) setting.findViewById(R.id.textViewSetting);

@@ -52,11 +52,11 @@
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
-            android:name=".activities.CreateGroupSelectUsersActivity"
+            android:name=".activities.CreateGroupSelectNameActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
-            android:name=".activities.CreateGroupSelectNameActivity"
+            android:name=".activities.AddUsersFromEntourageActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity

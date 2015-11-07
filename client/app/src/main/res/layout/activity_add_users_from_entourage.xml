@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="yields.client.activities.CreateGroupSelectUsersActivity"
+    tools:context="yields.client.activities.AddUsersFromEntourageActivity"
     android:orientation="vertical"
     android:weightSum="1"
     >

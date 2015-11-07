@@ -28,7 +28,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Main activity for group creation, displayed after the group's name selection
- * In this activity, the user is able to go to CreateGroupSelectUsersActivity to add contacts
+ * In this activity, the user is able to go to AddUsersFromEntourageActivity to add contacts
  */
 public class CreateGroupActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterUsersCheckBox;
@@ -128,8 +128,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                     emailList.add(mUsers.get(i).getKey().getEmail());
                 }
 
-                Intent intentSelectUsers = new Intent(this, CreateGroupSelectUsersActivity.class);
-                intentSelectUsers.putStringArrayListExtra(CreateGroupSelectUsersActivity.
+                Intent intentSelectUsers = new Intent(this, AddUsersFromEntourageActivity.class);
+                intentSelectUsers.putStringArrayListExtra(AddUsersFromEntourageActivity.
                         EMAIL_LIST_INPUT_KEY, emailList);
 
                 startActivityForResult(intentSelectUsers, REQUEST_ADD_CONTACT);
@@ -179,7 +179,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {
 
             ArrayList<String> emailList = data.getStringArrayListExtra(
-                    CreateGroupSelectUsersActivity.EMAIL_LIST_KEY);
+                    AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
             List<User> entourage = YieldsApplication.getUser().getEntourage();
             for (int i = 0; i < emailList.size(); i++){
