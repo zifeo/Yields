@@ -17,7 +17,6 @@ case class GroupHistory(nid: NID, count: Int) extends Action {
    */
   override def run(sender: UID): Result = {
 
-
     GroupHistoryRes(Seq.empty)
   }
 

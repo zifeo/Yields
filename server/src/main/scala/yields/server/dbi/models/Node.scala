@@ -14,14 +14,13 @@ import yields.server.utils.Helpers
  * nodes:[nid]:users Zset[UID]
  * nodes:[nid]:nodes Zset[NID]
  * nodes:[nid]:feed Zset[tid -> (uid, text, nid, datetime)]
- * nodes:[nid]:content Binary
  * nodes:nid -> last used nid
  */
 
 /**
  * Representation of a node
  */
-abstract class Node(val nid: NID) {
+abstract class Node {
 
   object Key {
     val node = s"nodes:$nid"
@@ -35,6 +34,8 @@ abstract class Node(val nid: NID) {
     val feed = s"$node:feed"
     val tid = s"$node:tid"
   }
+
+  val nid: NID
 
   private var _date_creation: Option[OffsetDateTime] = None
   private var _last_activity: Option[OffsetDateTime] = None
@@ -64,7 +65,7 @@ abstract class Node(val nid: NID) {
 
   /** name setter */
   def name_(n: String): Unit =
-  _name = update(Key.name, n)
+    _name = update(Key.name, n)
 
   /** kind getter */
   def kind: String = _kind.getOrElse{
@@ -94,8 +95,15 @@ abstract class Node(val nid: NID) {
     hasChangeOneEntry(redis.zadd(Key.feed, tid, content))
   }
 
-  private def valueOrDefault[T](value: Option[T], default: T): T =
-    value.getOrElse(default)
+  /** node getter */
+  def node: List[NID] = _nodes.getOrElse {
+    _nodes = redis.zrange[NID](Key.nodes, 0, -1)
+    valueOrDefault(_nodes, List())
+  }
+
+  /** add node */
+  def addNode(nid: NID): Boolean =
+    hasChangeOneEntry(redis.zadd(Key.nodes, Helpers.currentDatetime.toEpochSecond, nid))
 
   private def update[T](field: String, value: T): Option[T] = {
     val status = redis.hmset(Key.node, List((field, value), (Key.updated_at, Helpers.currentDatetime)))
@@ -110,4 +118,8 @@ abstract class Node(val nid: NID) {
   // Gets the value if set or else throws an exception (cannot be unset).
   private def valueOrException[T](value: Option[T]): T =
     value.getOrElse(throw new ModelValueNotSetException)
+
+  private def valueOrDefault[T](value: Option[T], default: T): T =
+    value.getOrElse(default)
+
 }
