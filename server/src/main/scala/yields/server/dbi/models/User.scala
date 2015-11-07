@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{ModelValueNotSetException, RedisNotAvailableException}
+import yields.server.dbi.exceptions.{UnincrementalIdentifier, ModelValueNotSetException, RedisNotAvailableException}
 import yields.server.utils.Helpers
 
 /**
@@ -80,13 +80,13 @@ final class User private (val uid: UID) {
   def picture_=(newPic: String): Unit =
     _picture = update(Key.picture, newPic)
 
-  /** Created_at datetime getter. */
+  /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
     _created_at = redis.hget[String](Key.user, Key.created_at).map(OffsetDateTime.parse)
     valueOrException(_created_at)
   }
 
-  /** Updated_at getter. */
+  /** Update datetime getter. */
   def updated_at: OffsetDateTime = _updated_at.getOrElse {
     _updated_at = redis.hget[String](Key.user, Key.updated_at).map(OffsetDateTime.parse)
     valueOrException(_updated_at)
@@ -167,8 +167,8 @@ object User {
    * @return user
    */
   def create(email: String): User = {
-    val uid = redis.incr("users:uid").getOrElse(throw new Exception)
-    if (! redis.hset("users:indexes:email", email, uid)) throw new Exception
+    val uid = redis.incr("users:uid").getOrElse(throw new UnincrementalIdentifier)
+    if (! redis.hset("users:indexes:email", email, uid)) throw new RedisNotAvailableException
     new User(uid)
   }
 

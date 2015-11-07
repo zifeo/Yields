@@ -1,7 +1,8 @@
 package yields.server.dbi.models
 
+import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{RedisNotAvailableException, ModelValueNotSetException}
+import yields.server.dbi.exceptions.{UnincrementalIdentifier, RedisNotAvailableException, ModelValueNotSetException}
 
 /**
  * Represent a image ressource
@@ -12,31 +13,32 @@ import yields.server.dbi.exceptions.{RedisNotAvailableException, ModelValueNotSe
  */
 class Image private(override val nid: NID) extends Node {
 
+  object Key {
+    val content = s"$node:content"
+  }
+
   private var _content: Option[String] = None
 
   def content: String = _content.getOrElse {
-    _content = redis.hget(s"nodes:$nid:content", "path")
+    _content = redis.get[String](Key.content)
     _content.getOrElse(throw new ModelValueNotSetException)
   }
 
-  def content_(newPath: String) = {
-    redis.hset(s"nodes:$nid:content", "path", newPath)
+  def content_=(newPath: String) = {
+    redis.set(Key.content, newPath)
   }
 
 }
 
 object Image {
-  def createImage(content: String): NID = {
-    val lastNid: Long = redis.incr("nodes:nid").getOrElse(-1)
-    if (lastNid > 0) {
-      new Image(lastNid)
-      lastNid
-    } else {
-      throw new RedisNotAvailableException
-    }
+
+  def createImage(content: String): Image = {
+    val nid = redis.incr("nodes:nid").getOrElse(throw new UnincrementalIdentifier)
+    new Image(nid)
   }
 
   def apply(n: NID): Image = {
     new Image(n)
   }
+
 }

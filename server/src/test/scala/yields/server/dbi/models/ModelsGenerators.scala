@@ -18,7 +18,7 @@ trait ModelsGenerators {
     } yield {
       g.id = gid
       g.group_name = name
-      g.last_activity = lastActivity
+      g.refreshed_at = lastActivity
       g
     }
   }

@@ -24,8 +24,8 @@ abstract class Node {
 
   object Key {
     val node = s"nodes:$nid"
-    val date_creation = "creation"
-    val last_activity = "activity"
+    val refreshed_at = "refreshed_at"
+    val created_at = "created_at"
     val updated_at = "updated_at"
     val name = "name"
     val kind = "kind"
@@ -37,71 +37,71 @@ abstract class Node {
 
   val nid: NID
 
-  private var _date_creation: Option[OffsetDateTime] = None
-  private var _last_activity: Option[OffsetDateTime] = None
+  private var _created_at: Option[OffsetDateTime] = None
+  private var _refreshed_at: Option[OffsetDateTime] = None
   private var _name: Option[String] = None
   private var _kind: Option[String] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
 
-  /** dateCreation getter */
-  def date_creation: OffsetDateTime = _date_creation.getOrElse {
-    _date_creation = redis.hget[OffsetDateTime](Key.name, Key.date_creation)
-    valueOrException(_date_creation)
+  /** Creation datetime getter. */
+  def created_at: OffsetDateTime = _created_at.getOrElse {
+    _created_at = redis.hget[OffsetDateTime](Key.name, Key.created_at)
+    valueOrException(_created_at)
   }
 
-  /** lastActivity getter */
-  def last_activity: OffsetDateTime = _last_activity.getOrElse {
-    _last_activity = redis.hget[OffsetDateTime](Key.name, Key.last_activity)
-    valueOrException(_last_activity)
+  /** Refresh datetime getter. */
+  def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
+    _refreshed_at = redis.hget[OffsetDateTime](Key.name, Key.refreshed_at)
+    valueOrException(_refreshed_at)
   }
 
-  /** name getter */
+  /** Name getter. */
   def name: String = _name.getOrElse {
     _name = redis.hget[String](Key.name, Key.name)
     valueOrException(_name)
   }
 
-  /** name setter */
+  /** Name setter. */
   def name_(n: String): Unit =
     _name = update(Key.name, n)
 
-  /** kind getter */
+  /** Kind getter. */
   def kind: String = _kind.getOrElse{
     _kind = redis.hget[String](Key.name, Key.kind)
     valueOrException(_kind)
   }
 
-  /** users getter */
+  /** Users getter. */
   def users: List[UID] = _users.getOrElse {
     _users = redis.zrange[UID](Key.users, 0, -1)
     valueOrDefault(_users, List())
   }
 
-  /** add user */
+  /** Add user. */
   def addUser(id: UID): Boolean =
     hasChangeOneEntry(redis.zadd(Key.users, Helpers.currentDatetime.toEpochSecond, id))
 
-  /** get n messages from an index */
+  /** Get n messages from an index. */
   def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
     _feed = redis.zrange[FeedContent](Key.feed, start, n)
     valueOrDefault(_feed, List())
   }
 
-  /** add message */
+  /** Add message. */
   def addMessage(content: FeedContent): Boolean = {
     val tid: TID = redis.incr(Key.tid).getOrElse(0)
     hasChangeOneEntry(redis.zadd(Key.feed, tid, content))
   }
 
-  /** node getter */
+  /** Node getter. */
   def node: List[NID] = _nodes.getOrElse {
     _nodes = redis.zrange[NID](Key.nodes, 0, -1)
     valueOrDefault(_nodes, List())
   }
 
-  /** add node */
+  /** Add node. */
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.zadd(Key.nodes, Helpers.currentDatetime.toEpochSecond, nid))
 
