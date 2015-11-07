@@ -31,6 +31,6 @@ package object models {
   // type Node = Int
 
   /** */
-  type feedContent = (UID, String, NID, OffsetDateTime)
+  type FeedContent = (UID, String, NID, OffsetDateTime)
 
 }

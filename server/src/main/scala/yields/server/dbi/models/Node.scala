@@ -3,8 +3,7 @@ package yields.server.dbi.models
 import yields.server.dbi._
 import yields.server.dbi.exceptions.RedisNotAvailableException
 import yields.server.utils.Helpers
-import com.redis.serialization._
-import Parse.Implicits._
+import com.redis.serialization.Parse
 
 /**
  *
@@ -23,30 +22,32 @@ import Parse.Implicits._
 class Node(val nid: NID) {
 
   object Key {
-    val infos = s"nodes:$nid"
+    val node = s"nodes:$nid"
     val users = s"nodes:$nid:users"
     val nodes = s"nodes:$nid:nodes"
     val feed = s"nodes:$nid:feed"
     val tid = s"nodes:$nid:tid"
   }
 
-  type feedEntry = Map[TID, feedContent]
+  import Parse.Implicits.parseLong
 
-  var _infos: Option[Map[String, String]] = None
+  type FeedEntry = Map[TID, FeedContent]
+
+  var _node: Option[Map[String, String]] = None
   var _users: Option[List[UID]] = None
   var _nodes: Option[List[NID]] = None
-  var _feed: Option[List[feedEntry]] = None
+  var _feed: Option[List[FeedEntry]] = None
 
 
   /** infos getter */
-  def infos: Map[String, String] = _infos.getOrElse {
-    _infos = redis.hmget(Key.infos)
-    valueOrDefault(_infos, Map())
+  def infos: Map[String, String] = _node.getOrElse {
+    _node = redis.hmget(Key.node)
+    valueOrDefault(_node, Map.empty)
   }
 
   /** infos setter */
   def infos_(newInfos: Map[String, String]): Unit =
-    _infos = update(Key.infos, newInfos)
+    _node = update(Key.node, newInfos)
 
   /** users getter */
   def users: List[UID] = _users.getOrElse {
@@ -59,15 +60,15 @@ class Node(val nid: NID) {
     hasChangeOneEntry(redis.zadd(Key.users, Helpers.currentDatetime.toEpochSecond, id))
 
   /** get n messages from an index */
-  def getMessagesInRange(start: Int, n: Int): List[feedEntry] = {
-    _feed = redis.zrange[feedEntry](Key.feed, start, n)
+  def getMessagesInRange(start: Int, n: Int): List[FeedEntry] = {
+    _feed = redis.zrange[FeedEntry](Key.feed, start, n)
     valueOrDefault(_feed, List())
   }
 
   /** add message */
-  def addMessage(content: feedContent): Boolean = {
+  def addMessage(content: FeedContent): Boolean = {
     val tid: TID = redis.incr(Key.tid).getOrElse(0)
-    val entry: feedEntry = Map(tid -> content)
+    val entry: FeedEntry = Map(tid -> content)
     hasChangeOneEntry(redis.zadd(Key.feed, Helpers.currentDatetime.toEpochSecond, entry))
   }
 
