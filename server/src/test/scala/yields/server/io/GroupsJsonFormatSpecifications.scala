@@ -9,7 +9,7 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
 
   import Prop.forAll
 
-  property("GroupCreate") = forAll { (x: GroupCreate) =>
+  property("GroupCreate") = forAll { (x: NodeCreate) =>
     toAndFromJson(x) == x
   }
 

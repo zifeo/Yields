@@ -1,5 +1,7 @@
 package yields.server.dbi
 
+import java.time.OffsetDateTime
+
 /**
  * Provisory models types.
  */
@@ -16,6 +18,9 @@ package object models {
   /** Represents a node id. */
   type NID = ID
 
+  /** Represent an item of group content */
+  type TID = ID
+
   /** Represents an email address. */
   type Email = String
 
@@ -23,6 +28,9 @@ package object models {
   type Blob = String
 
   /** Represents a node. */
-  type Node = Int
+  // type Node = Int
+
+  /** */
+  type feedContent = (UID, String, NID, OffsetDateTime)
 
 }

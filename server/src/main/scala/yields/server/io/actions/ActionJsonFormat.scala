@@ -4,7 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.exceptions.SerializationException
-import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
+import yields.server.actions.groups.{NodeCreate, GroupHistory, GroupMessage, GroupUpdate}
 import yields.server.actions.users.{UserConnect, UserGroupList, UserUpdate}
 import yields.server.io._
 
@@ -28,7 +28,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   override def write(obj: Action): JsValue = {
     val kind = obj.getClass.getSimpleName
     obj match {
-      case x: GroupCreate => packWithKind(x)
+      case x: NodeCreate => packWithKind(x)
       case x: GroupUpdate => packWithKind(x)
       case x: GroupMessage => packWithKind(x)
       case x: GroupHistory => packWithKind(x)
@@ -45,7 +45,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     json.asJsObject.getFields(kindFld, messageFld) match {
       case Seq(JsString(kind), message) =>
         kind match {
-          case "GroupCreate" => message.convertTo[GroupCreate]
+          case "GroupCreate" => message.convertTo[NodeCreate]
           case "GroupUpdate" => message.convertTo[GroupUpdate]
           case "GroupMessage" => message.convertTo[GroupMessage]
           case "GroupHistory" => message.convertTo[GroupHistory]

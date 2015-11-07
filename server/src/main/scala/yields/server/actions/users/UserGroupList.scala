@@ -1,6 +1,6 @@
 package yields.server.actions.users
 
-import yields.server.dbi.models.{Group, UID}
+import yields.server.dbi.models.{Node, UID}
 import yields.server.actions.{Result, Action}
 
 /**
@@ -21,4 +21,4 @@ case class UserGroupList(uid: UID) extends Action {
 }
 
 /** [[UserGroupList]] result. */
-case class UserGroupListRes(groups: Seq[Group]) extends Result
+case class UserGroupListRes(groups: Seq[Node]) extends Result

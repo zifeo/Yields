@@ -23,7 +23,7 @@ class RedisNotAvailableException extends Exception
  * users:[uid]:entourage Zset[UID] with score datetime
  * users:indexes:email Map[Email, UID] - email
  *
- * TODO : improve setters by only settings is the value is different.
+ * TODO : improve setters by only settings if the value is different.
  * TODO : what about a `save()` method? are there any use cases?
  * TODO : check for groups/users existance before adding/removing to groups/entourage
  *
