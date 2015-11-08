@@ -1,6 +1,6 @@
 package yields.server.actions.users
 
-import yields.server.actions.exceptions.BadArgumentValue
+import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models.{User, Blob, Email, UID}
 import yields.server.mpi.Metadata
@@ -37,7 +37,7 @@ case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], imag
       }
       UserUpdateRes()
     } else {
-      throw new BadArgumentValue("Invalid uid")
+      throw new ActionArgumentException("Invalid uid")
     }
 
   }

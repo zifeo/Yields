@@ -1,6 +1,6 @@
 package yields.server.actions.groups
 
-import yields.server.actions.exceptions.BadArgumentValue
+import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models.{Group, Blob, NID}
 import yields.server.mpi.Metadata
@@ -30,7 +30,7 @@ case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extend
 
       GroupUpdateRes()
     } else {
-      throw new BadArgumentValue("Bad nid")
+      throw new ActionArgumentException("Bad nid")
     }
   }
 

@@ -1,6 +1,6 @@
 package yields.server.actions.groups
 
-import yields.server.actions.exceptions.BadArgumentValue
+import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
@@ -23,7 +23,7 @@ case class GroupCreate(name: String, nodes: Seq[NID]) extends Action {
       nodes.foreach(group.addNode)
       GroupCreateRes(group.nid)
     } else {
-      throw new BadArgumentValue("Empty name")
+      throw new ActionArgumentException("Empty name")
     }
   }
 

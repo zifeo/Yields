@@ -1,8 +1,8 @@
 package yields.server.actions.groups
 
-import yields.server.actions.exceptions.{BadArgumentValue, BadFeedContentException}
+import yields.server.actions.exceptions.ActionArgumentException
+import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
-import yields.server.actions.{Result, Action}
 import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
 
@@ -26,10 +26,10 @@ case class GroupMessage(nid: NID, content: String) extends Action {
         group.addMessage(c)
         GroupMessageRes()
       } else {
-        throw new BadArgumentValue("Empty content")
+        throw new ActionArgumentException("Empty content")
       }
     } else {
-      throw new BadArgumentValue("Bad nid value")
+      throw new ActionArgumentException("Bad nid value")
     }
   }
 

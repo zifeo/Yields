@@ -1,6 +1,6 @@
 package yields.server.actions.users
 
-import yields.server.actions.exceptions.BadLoginException
+import yields.server.actions.exceptions.UnauthorizeActionException
 import yields.server.dbi.models.{User, UID, Email}
 import yields.server.actions.{Result, Action}
 import yields.server.mpi.Metadata
@@ -22,7 +22,7 @@ case class UserConnect(email: Email) extends Action {
     if (user.uid >= 0)
       UserConnectRes(user.uid)
     else
-      throw new BadLoginException("Invalid email")
+      throw new UnauthorizeActionException("Invalid email")
   }
 
 }
