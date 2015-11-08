@@ -57,7 +57,7 @@ final class User private(val uid: UID) {
   }
 
   /** Name setter. */
-  def name_(newName: String): Unit =
+  def name_=(newName: String): Unit =
     _name = update(Key.name, newName)
 
   /** Email getter. */
@@ -67,7 +67,7 @@ final class User private(val uid: UID) {
   }
 
   /** Email setter. */
-  def email_(newEmail: Email): Unit =
+  def email_=(newEmail: Email): Unit =
     _email = update(Key.email, newEmail)
 
   /** Picture getter. TODO: format to be determined. */
@@ -114,7 +114,7 @@ final class User private(val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.current.toEpochSecond, uid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.current.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */

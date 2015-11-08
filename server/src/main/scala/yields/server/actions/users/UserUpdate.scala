@@ -30,10 +30,10 @@ case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], imag
       val _image = image.getOrElse("")
 
       if(!_email.isEmpty) {
-        user.email_(_email)
+        user.email_=(_email)
       }
       if(!_name.isEmpty) {
-        user.name_(_name)
+        user.name_=(_name)
       }
       UserUpdateRes()
     } else {

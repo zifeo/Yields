@@ -38,29 +38,18 @@ abstract class Node {
 
   val nid: NID
 
-  private var _created_at: Option[OffsetDateTime] = None
-  private var _refreshed_at: Option[OffsetDateTime] = None
   private var _name: Option[String] = None
   private var _kind: Option[String] = None
+  private var _created_at: Option[OffsetDateTime] = None
+  private var _updated_at: Option[OffsetDateTime] = None
+  private var _refreshed_at: Option[OffsetDateTime] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
 
-  /** Creation datetime getter. */
-  def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.name, NodeKey.created_at))
-    valueOrException(_created_at)
-  }
-
-  /** Refresh datetime getter. */
-  def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
-    _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.name, NodeKey.refreshed_at))
-    valueOrDefault(_refreshed_at, Temporal.notYet)
-  }
-
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.withClient(_.hget[String](NodeKey.name, NodeKey.name))
+    _name = redis.withClient(_.hget[String](NodeKey.node, NodeKey.name))
     valueOrDefault(_name, "")
   }
 
@@ -74,8 +63,26 @@ abstract class Node {
     valueOrException(_kind)
   }
 
-  def kind_(newKind: String): Unit = {
+  def kind_=(newKind: String): Unit = {
     _kind = update(NodeKey.kind, newKind)
+  }
+
+  /** Creation datetime getter. */
+  def created_at: OffsetDateTime = _created_at.getOrElse {
+    _created_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.created_at))
+    valueOrException(_created_at)
+  }
+
+  /** Update datetime getter. */
+  def updated_at: OffsetDateTime = _updated_at.getOrElse {
+    _updated_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.updated_at))
+    valueOrException(_updated_at)
+  }
+
+  /** Refresh datetime getter. */
+  def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
+    _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.refreshed_at))
+    valueOrDefault(_refreshed_at, Temporal.notYet)
   }
 
   /** Users getter */
@@ -88,9 +95,19 @@ abstract class Node {
   def addUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.current.toEpochSecond, id)))
 
-  /** remove user */
+  /** Remove user */
   def removeUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
+
+  /** Nodes getter */
+  def nodes: List[NID] = _nodes.getOrElse {
+    _nodes = redis.withClient(_.zrange[NID](NodeKey.nodes, 0, -1))
+    valueOrDefault(_nodes, List())
+  }
+
+  /** Add node */
+  def addNode(nid: NID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
   /** Get n messages starting from some point */
   // TODO: Check that TID (expanding Long) is a valid int
@@ -100,21 +117,10 @@ abstract class Node {
   }
 
   /** Add message */
-  def addMessage(content: FeedContent): TID = {
-    val tid: TID = redis.withClient(_.incr(NodeKey.tid).getOrElse(throw new UnincrementalIdentifier))
+  def addMessage(content: FeedContent): Boolean = {
+    val tid = redis.withClient(_.incr(NodeKey.tid).getOrElse(throw new UnincrementalIdentifier))
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
-    tid
   }
-
-  /** Node getter */
-  def node: List[NID] = _nodes.getOrElse {
-    _nodes = redis.withClient(_.zrange[NID](NodeKey.nodes, 0, -1))
-    valueOrDefault(_nodes, List())
-  }
-
-  /** Add node */
-  def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {
@@ -122,6 +128,7 @@ abstract class Node {
     _name = values.get(NodeKey.name)
     _kind = values.get(NodeKey.kind)
     _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
+    _updated_at = values.get(NodeKey.updated_at).map(OffsetDateTime.parse)
     _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
   }
 

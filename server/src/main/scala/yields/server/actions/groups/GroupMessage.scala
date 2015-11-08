@@ -22,7 +22,7 @@ case class GroupMessage(nid: NID, content: String) extends Action {
     if (nid > 0) {
       if (!content.isEmpty) {
         val group = Group(nid)
-        val c: FeedContent = (Temporal.currentDatetime, metadata.sender, None, content)
+        val c: FeedContent = (Temporal.current, metadata.sender, None, content)
         group.addMessage(c)
         GroupMessageRes()
       } else {

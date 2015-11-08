@@ -11,7 +11,11 @@ object Group {
     val group = Group(Node.newNID())
     redis.withClient { r =>
       import group.NodeKey
-      val infos = List((NodeKey.created_at, Temporal.current), (NodeKey.name, name))
+      val infos = List(
+        (NodeKey.created_at, Temporal.current),
+        (NodeKey.name, name),
+        (NodeKey.kind, classOf[Group].getSimpleName)
+      )
       r.hmset(group.NodeKey.node, infos)
     }
     group

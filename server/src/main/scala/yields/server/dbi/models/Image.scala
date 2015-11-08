@@ -14,7 +14,7 @@ import yields.server.dbi.exceptions.{UnincrementalIdentifier, RedisNotAvailableE
 class Image private(override val nid: NID) extends Node {
 
   object Key {
-    val content = s"$node:content"
+    val content = s"$nodes:content"
   }
 
   private var _content: Option[String] = None
