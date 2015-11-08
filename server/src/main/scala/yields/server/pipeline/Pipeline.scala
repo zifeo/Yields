@@ -19,7 +19,7 @@ object Pipeline {
 
   /** Returns current timed server metadata. */
   def currentServerMetadata(): Metadata =
-   Metadata(7777, Temporal.currentDatetime)
+   Metadata(7777, Temporal.current)
 
   /**
    * Creates a pipeline including the following steps:

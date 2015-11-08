@@ -100,7 +100,7 @@ final class User private (val uid: UID) {
 
   /** Adds a group and returns whether this group has been added. */
   def addToGroups(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.current.toEpochSecond, nid)))
 
   /** Remove a group and returns whether this group has been removed. */
   def removeFromGroups(nid: NID): Boolean =
@@ -114,7 +114,7 @@ final class User private (val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, uid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.current.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
@@ -137,7 +137,7 @@ final class User private (val uid: UID) {
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (Key.updated_at, Temporal.currentDatetime))
+    val updates = List((field, value), (Key.updated_at, Temporal.current))
     val status = redis.withClient(_.hmset(Key.user, updates))
     if (! status) throw new RedisNotAvailableException
     Some(value)
@@ -162,8 +162,14 @@ object User {
    */
   def create(email: String): User = {
     val uid = redis.withClient(_.incr(StaticKey.uid)).getOrElse(throw new UnincrementalIdentifier)
-    if (! redis.withClient(_.hset(StaticKey.emailIndex, email, uid))) throw new RedisNotAvailableException
-    User(uid)
+    val user = User(uid)
+    redis.withClient { r =>
+      import user.Key
+      val infos = List((Key.created_at, Temporal.current), (Key.email, email))
+      r.hmset(user.Key.user, infos)
+      r.hset(StaticKey.emailIndex, email, uid)
+    }
+    user
   }
 
   /** Prepares user model for retrieving data given an user id. */

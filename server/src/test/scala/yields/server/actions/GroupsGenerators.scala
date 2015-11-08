@@ -5,13 +5,13 @@ import yields.server._
 import yields.server.actions.groups._
 import yields.server.dbi.models._
 
-trait GroupsGenerators extends DefaultsGenerators {
+trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
 
   import Arbitrary.arbitrary
 
   implicit lazy val groupCreateArb: Arbitrary[GroupCreate] = Arbitrary {
     for {
-      name <- cleanStringGen
+      name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
     } yield GroupCreate(name, nodes)
   }
@@ -25,7 +25,7 @@ trait GroupsGenerators extends DefaultsGenerators {
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      name <- cleanOptionStringGen
+      name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
     } yield GroupUpdate(nid, name, image)
   }
@@ -37,7 +37,7 @@ trait GroupsGenerators extends DefaultsGenerators {
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      content <- cleanStringGen
+      content <- arbitrary[String]
     } yield GroupMessage(nid, content)
   }
 

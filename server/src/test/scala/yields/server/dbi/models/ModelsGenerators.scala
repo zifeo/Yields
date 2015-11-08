@@ -1,8 +1,11 @@
 package yields.server.dbi.models
 
+import java.time.OffsetDateTime
+
+import yields.server._
 import org.scalacheck.Arbitrary
 
-trait ModelsGenerators {
+trait ModelsGenerators extends DefaultsGenerators {
 
   import Arbitrary.arbitrary
 
@@ -16,6 +19,15 @@ trait ModelsGenerators {
     for {
       uid <- arbitrary[UID]
     } yield User(uid)
+  }
+
+  implicit lazy val feedContentArb: Arbitrary[FeedContent] = Arbitrary {
+    for {
+      datetime <- arbitrary[OffsetDateTime]
+      uid <- arbitrary[UID]
+      nid <- arbitrary[Option[NID]]
+      text <- arbitrary[String]
+    } yield (datetime, uid, nid, text)
   }
 
 }

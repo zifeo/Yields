@@ -51,13 +51,13 @@ abstract class Node {
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
     _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.name, NodeKey.refreshed_at))
-    valueOrException(_refreshed_at)
+    valueOrDefault(_refreshed_at, Temporal.notYet)
   }
 
   /** Name getter. */
   def name: String = _name.getOrElse {
     _name = redis.withClient(_.hget[String](NodeKey.name, NodeKey.name))
-    valueOrException(_name)
+    valueOrDefault(_name, "")
   }
 
   /** Name setter. */
@@ -78,7 +78,7 @@ abstract class Node {
 
   /** Add user. */
   def addUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.currentDatetime.toEpochSecond, id)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.current.toEpochSecond, id)))
 
   /** Get n messages from an index. */
   def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
@@ -100,14 +100,14 @@ abstract class Node {
 
   /** Add node. */
   def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.currentDatetime.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
   // TODO : hydrate
   // TODO : check default, why? valid?
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (NodeKey.updated_at, Temporal.currentDatetime))
+    val updates = List((field, value), (NodeKey.updated_at, Temporal.current))
     val status = redis.withClient(_.hmset(NodeKey.node, updates))
     if (! status) throw new RedisNotAvailableException
     Some(value)

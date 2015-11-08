@@ -1,7 +1,9 @@
 package yields.server.actions.users
 
+import java.time.OffsetDateTime
+
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Group, UID}
+import yields.server.dbi.models.{NID, Group, UID}
 import yields.server.mpi.Metadata
 
 /**
@@ -22,4 +24,4 @@ case class UserGroupList(uid: UID) extends Action {
 }
 
 /** [[UserGroupList]] result. */
-case class UserGroupListRes(groups: Seq[Group]) extends Result
+case class UserGroupListRes(groups: Seq[(NID, String, OffsetDateTime)]) extends Result
