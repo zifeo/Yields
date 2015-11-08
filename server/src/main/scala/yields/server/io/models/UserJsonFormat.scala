@@ -10,6 +10,11 @@ object UserJsonFormat extends RootJsonFormat[User] {
   private val uidFld = "uid"
   private val nameFld = "name"
 
+  override def write(obj: User): JsValue = JsObject(
+    uidFld-> obj.id.toJson,
+    nameFld -> obj.name.toJson
+  )
+
   override def read(json: JsValue): User = json.asJsObject.getFields(uidFld, nameFld) match {
     case Seq(JsString(uid), JsString(name)) =>
       val u = new User
@@ -17,10 +22,5 @@ object UserJsonFormat extends RootJsonFormat[User] {
       u.name = name
       u
   }
-
-  override def write(obj: User): JsValue = JsObject(
-    uidFld-> obj.id.toJson,
-    nameFld -> obj.name.toJson
-  )
 
 }

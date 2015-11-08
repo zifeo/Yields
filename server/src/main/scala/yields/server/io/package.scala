@@ -1,10 +1,11 @@
 package yields.server
 
 import spray.json.DefaultJsonProtocol._
+import spray.json._
 import yields.server.actions.groups._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
-import yields.server.io.models.{GroupJsonWriter, UserJsonFormat}
+import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
 import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -17,7 +18,8 @@ package object io {
 
   /***** Models *****/
 
-  implicit lazy val groupJF = GroupJsonWriter
+  implicit lazy val nodeJF = NodeJsonFormat
+  implicit lazy val groupJF = GroupJsonFormat
   implicit lazy val userJF = UserJsonFormat
 
   /***** Actions  *****/
@@ -56,5 +58,15 @@ package object io {
   implicit lazy val responseJF = ResponseJsonFormat
   implicit lazy val metadataJF = jsonFormat2(Metadata)
 
+  /**
+    * Format given object with its type.
+    * @param obj object to pack
+    * @tparam T object type
+    * @return packed json object
+    */
+  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
+    "kind" -> obj.getClass.getSimpleName.toJson,
+    "raw" -> obj.toJson
+  )
 
 }

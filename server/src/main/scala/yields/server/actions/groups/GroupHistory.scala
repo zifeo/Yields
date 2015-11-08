@@ -1,7 +1,7 @@
 package yields.server.actions.groups
 
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{GID, NID, Node, UID}
+import yields.server.dbi.models._
 
 /**
  * Fetch each group node between two dates with time.
@@ -23,5 +23,5 @@ case class GroupHistory(nid: NID,  lastNid: NID, count: Int) extends Action {
 }
 
 /** [[GroupHistory]] result. */
-case class GroupHistoryRes(nodes: Seq[Node]) extends Result
+case class GroupHistoryRes(nodes: Seq[FeedContent]) extends Result
 

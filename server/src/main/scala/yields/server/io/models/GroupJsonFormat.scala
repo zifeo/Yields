@@ -6,7 +6,7 @@ import yields.server.dbi.models.Group
 import yields.server.io._
 
 /** Json writer for [[Group]]. */
-object GroupJsonWriter extends RootJsonWriter[Group] {
+object GroupJsonFormat extends RootJsonFormat[Group] {
 
   private val nidFld = "nid"
   private val nameFld = "name"
@@ -19,5 +19,12 @@ object GroupJsonWriter extends RootJsonWriter[Group] {
       refreshedAtFld -> obj.refreshed_at.toJson
     )
   }
+
+  override def read(json: JsValue): Group =
+    json.asJsObject.getFields(nidFld) match {
+      case Seq(JsString(nid)) => Group(nid.toLong)
+      case _ => deserializationError(s"bad action format: $json")
+    }
+
 
 }
