@@ -4,31 +4,28 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{UnincrementalIdentifier, ModelValueNotSetException, RedisNotAvailableException}
+import yields.server.dbi.exceptions.{RedisNotAvailableException, UnincrementalIdentifier}
 import yields.server.utils.Helpers
 
 /**
+ * Representation of a node.
  *
- * nodes:nid Long
- * nodes:[nid] Map[attributes -> value]   containing date_creation, last_activity, name, kind
- * nodes:[nid]:users Zset[UID]
- * nodes:[nid]:nodes Zset[NID]
- * nodes:[nid]:feed Zset[tid -> (uid, text, nid, datetime)]
- * nodes:nid -> last used nid
- */
-
-/**
- * Representation of a node
+ * nodes:nid Long - last node id created
+ * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
+ * nodes:[nid]:users Zset[UID] with score datetime
+ * nodes:[nid]:nodes Zset[NID] with score datetime
+ * nodes:[nid]:tid Long - last time id created
+ * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
  */
 abstract class Node {
 
   object NodeKey {
     val node = s"nodes:$nid"
+    val name = "name"
+    val kind = "kind"
     val refreshed_at = "refreshed_at"
     val created_at = "created_at"
     val updated_at = "updated_at"
-    val name = "name"
-    val kind = "kind"
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
@@ -64,7 +61,7 @@ abstract class Node {
   }
 
   /** Name setter. */
-  def name_(n: String): Unit =
+  def name_=(n: String): Unit =
     _name = update(NodeKey.name, n)
 
   /** Kind getter. */
@@ -105,22 +102,15 @@ abstract class Node {
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.zadd(NodeKey.nodes, Helpers.currentDatetime.toEpochSecond, nid))
 
+  // TODO : hydrate
+  // TODO : check default, why? valid?
+
+  // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
     val status = redis.hmset(NodeKey.node, List((field, value), (NodeKey.updated_at, Helpers.currentDatetime)))
     if (! status) throw new RedisNotAvailableException
     Some(value)
   }
-
-  // Returns whether the count is one or throws an exception on error.
-  private def hasChangeOneEntry(count: Option[Long]): Boolean =
-    1 == count.getOrElse(throw new RedisNotAvailableException)
-
-  // Gets the value if set or else throws an exception (cannot be unset).
-  private def valueOrException[T](value: Option[T]): T =
-    value.getOrElse(throw new ModelValueNotSetException)
-
-  private def valueOrDefault[T](value: Option[T], default: T): T =
-    value.getOrElse(default)
 
 }
 
@@ -131,11 +121,8 @@ object Node {
     val nid = "nodes:nid"
   }
 
-  redis.setnx(StaticKey.nid, 0)
-
   /** Creates a new node by reserving a node identifier. */
   def newNID(): NID =
     redis.incr(StaticKey.nid).getOrElse(throw new UnincrementalIdentifier)
-
 
 }

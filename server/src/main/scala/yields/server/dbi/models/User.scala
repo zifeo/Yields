@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{UnincrementalIdentifier, ModelValueNotSetException, RedisNotAvailableException}
+import yields.server.dbi.exceptions.{RedisNotAvailableException, UnincrementalIdentifier}
 import yields.server.utils.Helpers
 
 /**
@@ -17,7 +17,7 @@ import yields.server.utils.Helpers
  * Database structure:
  * users:uid Long - last user id created
  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at
- * users:[uid]:groups Zset[NID] with scoredatetime
+ * users:[uid]:groups Zset[NID] with score datetime
  * users:[uid]:entourage Zset[UID] with score datetime
  * users:indexes:email Map[Email, UID] - email
  *
@@ -43,7 +43,7 @@ final class User private (val uid: UID) {
   private var _name: Option[String] = None
   private var _email: Option[Email] = None
   private var _picture: Option[Blob] = None
-  
+
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
 
@@ -82,13 +82,13 @@ final class User private (val uid: UID) {
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.hget[String](Key.user, Key.created_at).map(OffsetDateTime.parse)
+    _created_at = redis.hget[OffsetDateTime](Key.user, Key.created_at)
     valueOrException(_created_at)
   }
 
   /** Update datetime getter. */
   def updated_at: OffsetDateTime = _updated_at.getOrElse {
-    _updated_at = redis.hget[String](Key.user, Key.updated_at).map(OffsetDateTime.parse)
+    _updated_at = redis.hget[OffsetDateTime](Key.user, Key.updated_at)
     valueOrException(_updated_at)
   }
 
@@ -142,18 +142,6 @@ final class User private (val uid: UID) {
     Some(value)
   }
 
-  // Gets the value if set or else throws an exception (cannot be unset).
-  private def valueOrException[T](value: Option[T]): T =
-    value.getOrElse(throw new ModelValueNotSetException)
-
-  // Gets the value if set or else gets default value.
-  private def valueOrDefault[T](value: Option[T], default: T): T =
-    value.getOrElse(default)
-
-  // Returns whether the count is one or throws an exception on error.
-  private def hasChangeOneEntry(count: Option[Long]): Boolean =
-    1 == count.getOrElse(throw new RedisNotAvailableException)
-
 }
 
 /** [[User]] companion. */
@@ -163,8 +151,6 @@ object User {
     val uid = "users:uid"
     val emailIndex = "users:indexes:email"
   }
-
-  redis.setnx(StaticKey.uid, 0)
 
   /**
    * Creates an user with an email and returns its new corresponding user.
