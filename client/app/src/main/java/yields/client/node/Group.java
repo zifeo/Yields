@@ -124,7 +124,7 @@ public class Group extends Node {
      * Add a new message to the group messages.
      * @param newMessage Message to be added
      */
-    public void addMessage(Message newMessage) {
+    synchronized public void addMessage(Message newMessage) {
         mMessages.put(newMessage.getDate(), newMessage);
     }
 
@@ -132,7 +132,7 @@ public class Group extends Node {
      * Add a new message to the group messages.
      * @param newMessageList Messages to be added.
      */
-    public void addMessages(List<Message> newMessageList) {
+    synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
             mMessages.put(newMessage.getDate(), newMessage);
         }
@@ -176,7 +176,7 @@ public class Group extends Node {
      * @return A sorted map containing the messages sorted by date.
      * @throws IOException In case the user cannot retreive the messages.
      */
-    public SortedMap<Date, Message> getLastMessages() throws IOException{
+    synchronized public SortedMap<Date, Message> getLastMessages() throws IOException{
         Map.Entry<Date, Message> message = mMessages.firstEntry();
 
         Date farthestDate;
@@ -199,14 +199,6 @@ public class Group extends Node {
     }
 
     /**
-     * Return the very last message.
-     * @return The last message.
-     */
-    public Message getLastMessage(){
-        return mMessages.firstEntry().getValue();
-    }
-
-    /**
      * Returns the users of the group.
      * @return the users.
      */
@@ -218,12 +210,20 @@ public class Group extends Node {
      * Returns the preview of the last message posted on this group
      * @return the preview of the last message or "" if there are no messages
      */
-    public String getPreviewOfLastMessage(){
+    synchronized public String getPreviewOfLastMessage(){
         if (mMessages.size() > 0){
             return getLastMessage().getPreview();
         }
         else{
             return "";
         }
+    }
+
+    /**
+     * Return the very last message.
+     * @return The last message.
+     */
+    private Message getLastMessage(){
+        return mMessages.firstEntry().getValue();
     }
 }
