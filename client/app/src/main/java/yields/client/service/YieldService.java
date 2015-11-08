@@ -12,13 +12,23 @@ import yields.client.node.User;
 import yields.client.serverconnection.Request;
 
 public class YieldService extends Service {
-    final static private int mStartMode = START_STICKY;
 
+    /**
+     * Connects the service to the server when it is created
+     */
     @Override
     public void onCreate() {
         //TODO connect to server
     }
 
+    /**
+     * Starts the service and creates a User if necessary
+     *
+     * @param intent The Intent which states if we have to create a new User
+     * @return
+     *      The starting Mode which makes the service never stop or
+     *      at least restarts when it is closed by the system
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.getBooleanExtra("newUser", false)) {
@@ -26,9 +36,16 @@ public class YieldService extends Service {
             //TODO Call to create new User to the server and connect to server
         }
 
-        return mStartMode;
+        return START_STICKY;
     }
 
+    /**
+     * Returns the correct binder depending on the activity binding
+     * @param intent
+     *      The intent of the binding which contains a boolean that states
+     *      which binder to send
+     * @return The Binder concerned
+     */
     @Override
     public IBinder onBind(Intent intent) {
         IBinder binder = null;
@@ -43,6 +60,10 @@ public class YieldService extends Service {
         return binder;
     }
 
+    /**
+     * Sends request to server
+     * @param request The request to send
+     */
     public void sendRequest(Request request){
         new SendRequestTask().execute(request);
     }
@@ -55,6 +76,9 @@ public class YieldService extends Service {
         }
     }
 
+    /**
+     * Disconnects to server when the service is stopped
+     */
     @Override
     public void onDestroy() {
         //TODO : disconnect from server
