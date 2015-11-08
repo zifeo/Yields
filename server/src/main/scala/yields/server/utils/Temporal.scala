@@ -14,6 +14,9 @@ object Temporal {
     Date.from(datetime.toInstant)
 
   /** Returns current date and time. */
-  def currentDatetime: OffsetDateTime = Temporal.date2OffsetDateTime(new Date())
+  def current: OffsetDateTime = date2OffsetDateTime(new Date())
+
+  /** Returns a date not yet set. */
+  def notYet: OffsetDateTime = OffsetDateTime.MIN
 
 }

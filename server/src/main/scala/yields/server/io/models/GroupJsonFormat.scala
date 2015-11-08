@@ -22,9 +22,8 @@ object GroupJsonFormat extends RootJsonFormat[Group] {
 
   override def read(json: JsValue): Group =
     json.asJsObject.getFields(nidFld) match {
-      case Seq(JsString(nid)) => Group(nid.toLong)
-      case _ => deserializationError(s"bad group format: $json")
+      case Seq(JsNumber(nid)) => Group(nid.toLong)
+      case x => deserializationError(s"bad group format: $x")
     }
-
 
 }

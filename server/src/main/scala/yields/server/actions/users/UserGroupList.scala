@@ -1,9 +1,12 @@
 package yields.server.actions.users
 
+import java.time.OffsetDateTime
+
 import yields.server.actions.exceptions.BadArgumentValue
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{User, Group, UID}
+import yields.server.dbi.models.{Group, NID, UID, User}
 import yields.server.mpi.Metadata
+import yields.server.utils.Temporal
 
 /**
  * Lists the groups of the user.
@@ -20,7 +23,7 @@ case class UserGroupList(uid: UID) extends Action {
     if (uid > 0) {
       val user = User(uid)
       val groups = user.groups.toSeq
-      val list: Seq[Group] = groups.map(Group(_))
+      val list = groups.map(x => (x, "", Temporal.notYet))
       UserGroupListRes(list)
     } else {
       throw new BadArgumentValue("Bad uid")
@@ -31,4 +34,4 @@ case class UserGroupList(uid: UID) extends Action {
 }
 
 /** [[UserGroupList]] result. */
-case class UserGroupListRes(groups: Seq[Group]) extends Result
+case class UserGroupListRes(groups: Seq[(NID, String, OffsetDateTime)]) extends Result

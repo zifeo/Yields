@@ -16,4 +16,11 @@ trait DefaultsGenerators {
     } yield Temporal.date2OffsetDateTime(date)
   }
 
+  // avoids finding end-of-input char
+  implicit lazy val stringArb: Arbitrary[String] = Arbitrary {
+    for {
+      str <- arbitrary(Arbitrary.arbString)
+    } yield str.replace('\uFFFF', ' ')
+  }
+
 }
