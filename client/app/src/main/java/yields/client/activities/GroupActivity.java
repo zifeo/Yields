@@ -1,9 +1,13 @@
 package yields.client.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -29,6 +33,9 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.service.GroupBinder;
+import yields.client.service.MessageBinder;
+import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -38,6 +45,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
+    private GroupBinder mGroupBinder;
 
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
@@ -74,6 +82,10 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
 
         YieldsApplication.setResources(getResources());
         YieldsApplication.setApplicationContext(getApplicationContext());
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindGroupActivity", true);
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -221,4 +233,17 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date(), group2));
         mGroups.add(group2);
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mGroupBinder = (GroupBinder) service;
+            //TODO activate send button
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            //TODO send Toast
+        }
+    };
 }
