@@ -1,7 +1,6 @@
 package yields.client.listadapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +13,6 @@ import java.util.List;
 
 import yields.client.R;
 import yields.client.activities.GroupSettingsActivity;
-import yields.client.gui.GraphicTransforms;
-import yields.client.node.Group;
 
 public class ListAdapterSettings extends ArrayAdapter<String> {
     private Context mContext;

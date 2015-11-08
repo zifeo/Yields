@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +20,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class Group extends Node {
 
     private TreeMap<Date, Message> mMessages;
+    private boolean mValidated;
     private boolean mConsumed;
     private List<User> mUsers;
     private Bitmap mImage;
@@ -34,24 +34,37 @@ public class Group extends Node {
      * @param image The current image of the group
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image) {
+    public Group(String name, Id id, List<User> users, Bitmap image, boolean validated) {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
         mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
+        mValidated = validated;
     }
 
     /**
-     * Overloaded constructor for default image.
+     * Overloaded constructor.
+     * @param name The name of the group
+     * @param id The id of the group
+     * @param users The current users of the group
+     * @param image The current image of the group
+     * @throws NodeException if one of the node is null.
+     */
+    public Group(String name, Id id, List<User> users, Bitmap image) {
+        this(name, id, users, image, false);
+    }
+
+    /**
+     * Overloaded constructor.
      * @param name The name of the group
      * @param id The id of the group
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<User> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage());
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), false);
     }
 
     /**
@@ -95,6 +108,22 @@ public class Group extends Node {
      */
     public Bitmap getImage(){
         return mImage;
+    }
+
+    /**
+     * Indicate that the server has validated
+     * the created group
+     */
+    public void setValidated(){
+        mValidated = true;
+    }
+
+    /**
+     *  Indicate if the group has been validated by the server
+     * @return true iff the group has been validated by the server
+     */
+    public boolean isValidated(){
+        return mValidated;
     }
 
     /**

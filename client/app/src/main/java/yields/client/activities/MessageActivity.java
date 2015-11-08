@@ -40,7 +40,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity implements NotifiableActivity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -236,6 +236,15 @@ public class MessageActivity extends AppCompatActivity {
      */
     private void setHeaderBar(){
         mActionBar.setTitle(mGroup.getName());
+    }
+
+    /**
+     * Notify the activity that the
+     * data set has changed
+     */
+    @Override
+    public void notifyChange() {
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
