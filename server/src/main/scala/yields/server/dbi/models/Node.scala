@@ -89,6 +89,10 @@ abstract class Node {
   def removeUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
 
+  /** remove user */
+  def removeUser(id: UID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
+
   /** Get n messages from an index. */
   def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
     _feed = redis.withClient(_.zrange[FeedContent](NodeKey.feed, start, n))
@@ -111,6 +115,14 @@ abstract class Node {
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.currentDatetime.toEpochSecond, nid)))
 
+  def hydrate(): Unit = {
+    val values = redis.withClient(_.hgetall[String, String](NodeKey.node)).getOrElse(throw new RedisNotAvailableException)
+    _name = values.get(NodeKey.name)
+    _kind = values.get(NodeKey.kind)
+    _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
+    _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
+  }
+  
   def hydrate(): Unit = {
     val values = redis.withClient(_.hgetall[String, String](NodeKey.node)).getOrElse(throw new RedisNotAvailableException)
     _name = values.get(NodeKey.name)

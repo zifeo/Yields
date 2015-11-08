@@ -27,8 +27,10 @@ package object models {
   /** Represents a byte array. */
   type Blob = String
 
-  /** Represents a feed entry. */
+  /** */
   type FeedContent = (OffsetDateTime, UID, Option[NID], String)
+
+  import Parse.Implicits._
 
   /** [[OffsetDateTime]] Redis parser. */
   implicit val parseOffsetDateTime = Parse[OffsetDateTime](byteArray => OffsetDateTime.parse(byteArray))
