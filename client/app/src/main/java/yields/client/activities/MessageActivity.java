@@ -56,7 +56,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private boolean mSendImage;
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
-    private static MessageBinder mMessageBinder;
+    private MessageBinder mMessageBinder;
 
     private ActionBar mActionBar;
 
