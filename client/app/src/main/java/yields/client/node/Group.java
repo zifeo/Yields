@@ -176,7 +176,7 @@ public class Group extends Node {
      * @return A sorted map containing the messages sorted by date.
      * @throws IOException In case the user cannot retreive the messages.
      */
-    synchronized public SortedMap<Date, Message> getLastMessages() throws IOException{
+    synchronized public SortedMap<Date, Message> getLastMessages() {
         return Collections.unmodifiableSortedMap(mMessages);
     }
 
