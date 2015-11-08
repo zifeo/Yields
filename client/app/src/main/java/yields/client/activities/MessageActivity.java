@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -57,8 +58,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
     private static MessageBinder mMessageBinder;
-
-    private ActionBar mActionBar;
+    private static ActionBar mActionBar;
+    private static ImageButton mSendButton;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -69,7 +70,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //TODO set disabled send button
+        //TODO : Create mMessage !!! NICO !
+        mMessageBinder.attachActivity(this);
 
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
@@ -110,6 +112,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         Intent serviceIntent = new Intent(this, YieldService.class)
                 .putExtra("bindMessageActivity", true);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+
+        mSendButton = (ImageButton) findViewById(R.id.sendButton);
+        mSendButton.setEnabled(false);
     }
 
     /**
@@ -147,13 +152,14 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(1230), mUser, content, new Date(), mGroup);
-        // TODO : take right name and right id.
+        Message message = new Message("message", new Id(0), mUser, content,
+                new Date(), mGroup);
         mMessages.add(message);
-        mUser.sendMessage(mGroup, message);
+        mMessageBinder.sendMessage(mGroup, message);
 
         mAdapter.notifyDataSetChanged();
-        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
+        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter()
+                .getCount() - 1);
     }
 
     /**
@@ -261,16 +267,22 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     /**
      * Notify the activity that the
-     * data set has changed
+     * data set has changed.
      */
     @Override
     public void notifyChange() {
-        mAdapter.notifyDataSetChanged();
+        try {
+            retrieveGroupMessages();
+        } catch (IOException e) {
+            // TODO : Use message binder to get the last messages and get rid
+            // of this exception.
+        }
     }
 
     /**
      * Retrieve the group messages.
      */
+    // TODO : Use binder instead.
     private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
 
         @Override
@@ -288,12 +300,12 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mMessageBinder = (MessageBinder) service;
-            //TODO activate send button
+            mSendButton.setEnabled(true);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            //TODO send Toast
+            showErrorToast("Disconnected from network");
         }
     };
 }
