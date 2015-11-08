@@ -3,13 +3,8 @@ package yields.client.service;
 import android.os.Binder;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import yields.client.activities.MessageActivity;
@@ -19,11 +14,9 @@ import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 
 public class MessageBinder extends Binder {
     private final YieldService mService;
-    private boolean linked;
 
     /**
      * Creates the binder and links it to the service
@@ -37,9 +30,17 @@ public class MessageBinder extends Binder {
      * Binds the activity to the service which permits it to receive incoming messages directly
      * @param activity the current messagingActivity
      */
-    public void bind(MessageActivity activity) {
+    public void attachActivity(MessageActivity activity) {
         Objects.requireNonNull(activity);
         mService.setMessageActivity(activity);
+    }
+
+    /**
+     * Can be used to know if the erver is connected to the server
+     */
+    public boolean isServerConnected(){
+        //TODO implement a mean of knowing if the server is connected
+        return true;
     }
 
     /**
@@ -54,13 +55,17 @@ public class MessageBinder extends Binder {
         mService.sendRequest(groupMessageReq);
     }
 
+    /**
+     * Add older message to the Message Activity
+     *
+     * @param group The group we want to retrieve from
+     * @param lastDate The last date we have in the history
+     * @param messageCount The max number of message we want
+     */
     public void addMoreGroupMessages(Group group,
-                                 Date lastDate)
-            throws IOException {
-        final int MESSAGE_COUNT = 20;
-
+                                 Date lastDate, int messageCount) {
         Request groupHistoryRequest = RequestBuilder
-                .GroupHistoryRequest(group.getId(), lastDate, MESSAGE_COUNT);
+                .GroupHistoryRequest(group.getId(), lastDate, messageCount);
         mService.sendRequest(groupHistoryRequest);
         Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
     }
