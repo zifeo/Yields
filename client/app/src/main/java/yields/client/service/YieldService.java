@@ -39,7 +39,7 @@ public class YieldService extends Service {
     @Override
     public void onCreate() {
         mMessageBinder = new MessageBinder(this);
-        mMessageBinder = new GroupBinder(this);
+        mGroupBinder = new GroupBinder(this);
         mIdLastNotification = 0;
         //TODO connect to server
     }
