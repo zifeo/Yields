@@ -279,13 +279,13 @@ public class CacheDatabaseTests {
 
             for (int i = 0; i < 30; i++) {
                 Message message = new Message("Mock node name User1 " + i, new Id(-i),
-                        user1, MockFactory.generateFakeTextContent(i), new Date(), group);
-                mDatabaseHelper.addMessage(message);
+                        user1, MockFactory.generateFakeTextContent(i), new Date());
+                mDatabaseHelper.addMessage(message, group);
             }
             for (int i = 0; i < 30; i++) {
                 Message message = new Message("Mock node name User2 " + i, new Id(-i - 30),
-                        user2, MockFactory.generateFakeTextContent(i), new Date(), group);
-                mDatabaseHelper.addMessage(message);
+                        user2, MockFactory.generateFakeTextContent(i), new Date());
+                mDatabaseHelper.addMessage(message, group);
             }
 
             List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 0, 10);

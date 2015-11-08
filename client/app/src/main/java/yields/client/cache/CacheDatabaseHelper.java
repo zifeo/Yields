@@ -131,13 +131,21 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Adds the given Message to the database.
      *
-     * @param message The Message to the database.
-     * @throws CacheDatabaseException If the Message could not be inserted to the database.
+     * @param message The Message to be added to the database.
+     * @param group The Group to which this Message was sent.
+     * @throws CacheDatabaseException If the message could not be added to the database.
      */
-    public void addMessage(Message message)
+    public void addMessage(Message message, Group group)
             throws CacheDatabaseException
     {
         try {
+            String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
+                    + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
+            Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{message.getId().getId()});
+            if(cursor.getCount() != 0) {
+                deleteMessage(message);
+            }
+            this.addGroup(group);
             mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message));
         } catch (CacheDatabaseException exception){
             Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId(), exception);
@@ -287,9 +295,16 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 for (User user : group.getUsers()) {
                     addUser(user);
                 }
+                for(Message message : group.getLastMessages().values()) {
+                    addMessage(message, group);
+                }
             } catch (CacheDatabaseException exception) {
                 Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
                 throw exception;
+            }
+            catch (IOException exception){
+                Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
+                throw new CacheDatabaseException(exception);
             }
         }
     }
@@ -307,9 +322,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                     new String[]{group.getId().getId()});
+            for(Message message : group.getLastMessages().values()){
+                addMessage(message, group);
+            }
         } catch (CacheDatabaseException exception){
             Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
             throw exception;
+        } catch (IOException exception){
+            Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
+            throw new CacheDatabaseException(exception);
         }
     }
 
@@ -326,6 +347,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{groupID.getId()});
+
         if (!cursor.moveToFirst()) {
             return null;
         } else {
@@ -425,7 +447,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                     Date date = dateFormat.parse(dateAsString);
                     if (messageSender != null && content != null) {
-                        messages.add(new Message(nodeName, id, messageSender, content, date, group));
+                        messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
                 }catch (CacheDatabaseException exception){
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
@@ -532,7 +554,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     {
         ContentValues values = new ContentValues();
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
-        values.put(KEY_MESSAGE_GROUPID, message.getReceivingGroup().getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
         values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");

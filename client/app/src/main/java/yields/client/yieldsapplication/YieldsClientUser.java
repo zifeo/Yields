@@ -39,7 +39,8 @@ public class YieldsClientUser extends ClientUser{
     private static ConnectionManager mConnectionManager;
 
     private YieldsClientUser(String name, Id id, String email, Bitmap img)
-            throws NodeException, InstantiationException, IOException {
+            throws NodeException, InstantiationException, IOException
+    {
         super(name, id, email, img);
         mSocketProvider = new YieldEmulatorSocketProvider();
         mConnectionManager = new ConnectionManager(mSocketProvider);
@@ -56,8 +57,8 @@ public class YieldsClientUser extends ClientUser{
      * @throws IOException If we have trouble creating the server connection
      */
     public static void createInstance(String name, Id id, String email, Bitmap img)
-            throws InstantiationException, ExecutionException, InterruptedException {
-
+            throws InstantiationException, ExecutionException, InterruptedException
+    {
         if (mInstance == null) {
             mInstance = new CreateInstanceTask().execute(name, id, email, img).get();
             if (mInstance == null) {
@@ -102,7 +103,8 @@ public class YieldsClientUser extends ClientUser{
     @Override
     public List<Message> getGroupMessages(Group group,
                                           Date lastDate)
-            throws IOException {
+            throws IOException
+    {
         final int MESSAGE_COUNT = 20;
 
         Request groupHistoryRequest = RequestBuilder
@@ -134,7 +136,9 @@ public class YieldsClientUser extends ClientUser{
      * @throws IOException in case of connexion error
      */
     @Override
-    public void createNewGroup(Group group) throws IOException {
+    public void createNewGroup(Group group)
+            throws IOException
+    {
         List<Id> memberIDs = new ArrayList<>();
         List<User> members = group.getUsers();
         for (User u : members){
