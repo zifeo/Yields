@@ -151,7 +151,6 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
     /**
      * To be removed as soon as the logging is working
      */
-
     private class MockClientUser extends ClientUser {
 
         public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {

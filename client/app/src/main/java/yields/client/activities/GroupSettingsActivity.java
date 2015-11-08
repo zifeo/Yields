@@ -32,7 +32,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the user can change some parameters for the group, leave it and
- * the admin can change its name, image, users...
+ * where the admin can change its name, image, users...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
     public enum Settings {NAME, TYPE, IMAGE, USERS}
@@ -59,7 +59,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Group Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        List<String> itemList = new ArrayList<>(4);
+        List<String> itemList = new ArrayList<>(Settings.values().length);
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeGroupName));
         itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
@@ -68,7 +68,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
-        ListAdapterSettings arrayAdapter = new ListAdapterSettings(getApplicationContext(), R.layout.group_settings_layout, itemList);
+        ListAdapterSettings arrayAdapter = new ListAdapterSettings(getApplicationContext(),
+                R.layout.group_settings_layout, itemList);
 
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new CustomListener());
@@ -102,14 +103,16 @@ public class GroupSettingsActivity extends AppCompatActivity {
             try {
                 Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (image != null) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "Group image changed", Toast.LENGTH_SHORT);
-                    toast.show();
+
+                    displayMessage("Group image changed");
 
                     //TODO Change group image and send notification to server
                 }
+                else {
+                    displayMessage("Could not retrieve image");
+                }
             } catch (IOException e) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Could not retrieve image", Toast.LENGTH_SHORT);
-                toast.show();
+                displayMessage("Could not retrieve image");
             }
         }
         else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK){
@@ -131,9 +134,18 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 }
             }
 
-            Toast toast = Toast.makeText(getApplicationContext(), count + " user(s) added to group", Toast.LENGTH_SHORT);
-            toast.show();
+            String text = count + " user(s) added to group";
+            displayMessage(text);
         }
+    }
+
+    /**
+     * Method that displays a message in a tost
+     * @param message The message to be displayed
+     */
+    private void displayMessage(String message){
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     /**
@@ -179,8 +191,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             String name = "Group name changed to \"" + editTextName.getText().toString() + "\"";
 
-                            Toast toast = Toast.makeText(getApplicationContext(), name, Toast.LENGTH_SHORT);
-                            toast.show();
+                            displayMessage(name);
 
                             // TODO Add change in group's name, not just display
                         }
@@ -213,10 +224,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                             type = "private";
                         }
 
-                        String typeText = "Group type changed to : " + type;
+                        String text = "Group type changed to : " + type;
 
-                        Toast toast = Toast.makeText(getApplicationContext(), typeText, Toast.LENGTH_SHORT);
-                        toast.show();
+                        displayMessage(text);
 
                         if (type.equals("public")) {
                             mGroup.setVisibility(Group.GroupVisibility.PUBLIC);
