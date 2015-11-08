@@ -1,10 +1,14 @@
 package yields.client.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +39,8 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.service.MessageBinder;
+import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -50,6 +56,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private boolean mSendImage;
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
+    private static MessageBinder mMessageBinder;
 
     private ActionBar mActionBar;
 
@@ -61,6 +68,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //TODO set disabled send button
+
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
@@ -96,6 +106,10 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
                 e.printStackTrace();
             }
         }
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindMessageActivity", true);
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -269,4 +283,17 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             return null;
         }
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessageBinder = (MessageBinder) service;
+            //TODO activate send button
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            //TODO send Toast
+        }
+    };
 }
