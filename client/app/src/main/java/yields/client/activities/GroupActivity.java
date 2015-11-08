@@ -35,7 +35,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Central activity of Yields where the user can discover new nodes, create groups, see its contact
  * list, change its settings and go to chats of different groups
  */
-public class GroupActivity extends AppCompatActivity {
+public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
 
@@ -130,6 +130,15 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     /**
+     * Notify the activity that the
+     * data set has changed
+     */
+    @Override
+    public void notifyChange(){
+        mAdapterGroups.notifyDataSetChanged();
+    }
+
+    /**
      * Automatically called when the activity is resumed after another activity was displayed
      */
     @Override
@@ -202,12 +211,12 @@ public class GroupActivity extends AppCompatActivity {
 
         mGroups = new ArrayList<>();
 
-        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
+        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>(), YieldsApplication.getDefaultGroupImage());
         group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !"), new java.util.Date(), group1));
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !"), new java.util.Date(), group1));
         mGroups.add(group1);
 
-        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
+        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>(), YieldsApplication.getDefaultGroupImage());
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date(), group2));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date(), group2));
         mGroups.add(group2);

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.v7.app.ActionBar;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -64,11 +65,11 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      */
     @Test
     public void testStartingDisplay(){
-        Activity messageActivity = getActivity();
+        MessageActivity messageActivity = getActivity();
 
         //Group info
-        TextView groupName = (TextView) messageActivity.findViewById(R.id.groupName);
-        assertEquals(MOCK_GROUP.getName(), groupName.getText());
+        ActionBar actionBar = (ActionBar) messageActivity.getSupportActionBar();
+        assertEquals(MOCK_GROUP.getName(), actionBar.getTitle());
 
         //Input field
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);

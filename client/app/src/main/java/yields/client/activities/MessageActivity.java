@@ -1,30 +1,32 @@
 package yields.client.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -33,13 +35,12 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends Activity {
+public class MessageActivity extends AppCompatActivity implements NotifiableActivity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -49,6 +50,8 @@ public class MessageActivity extends Activity {
     private boolean mSendImage;
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
+
+    private ActionBar mActionBar;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -62,14 +65,11 @@ public class MessageActivity extends Activity {
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
-        try {
-            Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
-            YieldsApplication.setUser(new MockClientUser("Mock User", new Id(117), "Mock Email", image1));
-            YieldsApplication.setGroup(createFakeGroup());
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
 
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
@@ -86,10 +86,9 @@ public class MessageActivity extends Activity {
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            showErrorToast("Couldn't get group informations.");
-            TextView groupName = (TextView) findViewById(R.id.groupName);
-            groupName.setText("Unknown group");
-        }else {
+            showErrorToast("Couldn't get group information.");
+            mActionBar.setTitle("Unknown group");
+        } else {
             setHeaderBar();
             try {
                 new RetrieveMessageTask().execute().get();
@@ -102,8 +101,20 @@ public class MessageActivity extends Activity {
     /**
      * @return The id of the current group
      */
-    public Id getGroupId(){
+    public Id getGroupId() {
         return mGroup.getId();
+    }
+
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu The tool bar menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.menu_message, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
@@ -173,6 +184,26 @@ public class MessageActivity extends Activity {
         }
     }
 
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.actionSettingsGroup:
+                Intent intent = new Intent(this, GroupSettingsActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
+
     /**
      * Show an error message in a toast.
      * @param errorMsg The error message to be displayed.
@@ -211,12 +242,20 @@ public class MessageActivity extends Activity {
      * Sets the correct information on the header.
      */
     private void setHeaderBar(){
-        TextView groupNameField = (TextView) findViewById(R.id.groupName);
-        groupNameField.setText(mGroup.getName());
+        mActionBar.setTitle(mGroup.getName());
     }
 
     /**
-     * Retreive the group messages.
+     * Notify the activity that the
+     * data set has changed
+     */
+    @Override
+    public void notifyChange() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Retrieve the group messages.
      */
     private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
 
@@ -229,49 +268,5 @@ public class MessageActivity extends Activity {
             }
             return null;
         }
-    }
-
-    /**
-     * Mock Client user, only for presentation during the second sprint.
-     */
-    private class  MockClientUser extends ClientUser{
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
-        }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public void createNewGroup(Group group) throws IOException {
-
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * Create fake group for sake of the presentation.
-     * @return fake group.
-     */
-    private Group createFakeGroup() throws NodeException {
-        Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
-        return new Group("Mock group", new Id(123), new ArrayList<User>(), image1);
     }
 }

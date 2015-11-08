@@ -6,7 +6,7 @@ import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
 public abstract class Node {
-    private final String mName;
+    private String mName;
     private final Id mId;
 
     public Node(String name, Id id) throws NodeException {
@@ -16,6 +16,10 @@ public abstract class Node {
 
     public String getName() {
         return mName;
+    }
+
+    public void setName(String name){
+        mName = Objects.requireNonNull(name);
     }
 
     public Id getId() {
