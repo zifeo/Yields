@@ -7,25 +7,26 @@ import yields.server.utils.Config
 import scala.language.implicitConversions
 
 /**
-  *
-  * users:uid Long
-  * users:[uid] Map[attributes -> value]
-  * users:indexes:mail Map[mail -> uid]
-  *
-  * nodes:nid Long
-  * nodes:[nid] Map[attributes -> value]
-  * nodes:[nid]:users List[UID]
-  * nodes:[nid]:nodes List[NID]
-  * nodes:[nid]:feed Zset[tid -> (uid, text, nid, datetime)]
-  * nodes:indexes:live Zset[time -> uid]
-  *
-  */
+ *
+ * users:uid Long
+ * users:[uid] Map[attributes -> value]
+ * users:indexes:mail Map[mail -> uid]
+ *
+ * nodes:nid Long
+ * nodes:[nid] Map[attributes -> value]
+ * nodes:[nid]:users List[UID]
+ * nodes:[nid]:nodes List[NID]
+ * nodes:[nid]:feed Zset[tid -> (uid, text, nid, datetime)]
+ * nodes:indexes:live Zset[time -> uid]
+ *
+ */
 package object dbi {
 
   private[dbi] val redis = new RedisClientPool(
     host = Config.getString("database.addr"),
     port = Config.getInt("database.port"),
-    secret = Some(Config.getString("database.pass"))
+    secret = Some(Config.getString("database.pass")),
+    database = Config.getInt("database.id")
   )
 
   /** Terminates database connection. */

@@ -2,12 +2,18 @@ package yields.server.dbi.models
 
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import yields.server.dbi._
-import yields.server.utils.Temporal
+import yields.server.utils.{Config, Temporal}
 
 class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
 
   before {
+    redis.withClient(_.select(Config.getInt("test.database.id")))
     redis.withClient(_.flushdb)
+  }
+
+  after {
+    redis.withClient(_.flushdb)
+    redis.withClient(_.select(Config.getInt("database.id")))
   }
 
   val testName = "Group Test"
@@ -16,9 +22,9 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
     val g1 = Group.createGroup(testName)
     val g2 = Group(g1.nid)
 
-    g2.nid should be (g1.nid)
-    g2.name should be (g1.name)
-    g2.kind should be (classOf[Group].getSimpleName)
+    g2.nid should be(g1.nid)
+    g2.name should be(g1.name)
+    g2.kind should be(classOf[Group].getSimpleName)
   }
 
   "Adding user to a group" should "modify the model" in {
@@ -66,7 +72,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
     g1.addNode(g2.nid)
     val g3 = Group(g1.nid)
 
-    g3.nodes should contain (g2.nid)
+    g3.nodes should contain(g2.nid)
   }
 
 }
