@@ -110,7 +110,14 @@ abstract class Node {
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Helpers.currentDatetime.toEpochSecond, nid)))
 
-  // TODO : hydrate
+  def hydrate(): Unit = {
+    val values = redis.withClient(_.hgetall[String, String](NodeKey.node)).getOrElse(throw new RedisNotAvailableException)
+    _name = values.get(NodeKey.name)
+    _kind = values.get(NodeKey.kind)
+    _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
+    _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
+  }
+
   // TODO : check default, why? valid?
 
   // Updates the field with given value and actualize timestamp.
