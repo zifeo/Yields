@@ -40,7 +40,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "cache.db";
 
-    private static final String TABLE_CLIENTUSER = "clientUser";
     private static final String TABLE_USERS = "users";
     private static final String TABLE_GROUPS = "groups";
     private static final String TABLE_MESSAGES = "messages";
