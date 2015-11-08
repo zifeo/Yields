@@ -36,7 +36,7 @@ public class MessageBinder extends Binder {
     }
 
     /**
-     * Can be used to know if the erver is connected to the server
+     * Can be used to know if the server is connected to the server
      */
     public boolean isServerConnected(){
         //TODO implement a mean of knowing if the server is connected
