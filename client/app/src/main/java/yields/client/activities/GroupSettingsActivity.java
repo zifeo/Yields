@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.w3c.dom.ProcessingInstruction;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,18 +213,22 @@ public class GroupSettingsActivity extends AppCompatActivity {
                             type = "private";
                         }
 
-                        String text = "Group type changed to : " + type;
+                        String typeText = "Group type changed to : " + type;
 
-                        Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
+                        Toast toast = Toast.makeText(getApplicationContext(), typeText, Toast.LENGTH_SHORT);
                         toast.show();
 
-                        // TODO Add change in group's type
+                        if (type.equals("public")) {
+                            mGroup.setVisibility(Group.GroupVisibility.PUBLIC);
+                        } else {
+                            mGroup.setVisibility(Group.GroupVisibility.PRIVATE);
+                        }
                     }
                 })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                });
+                        }
+                    });
             groupTypeDialog = builder.create();
             groupTypeDialog.show();
         }

@@ -19,11 +19,14 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
 
+    public enum GroupVisibility {PRIVATE, PUBLIC};
+
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
     private boolean mConsumed;
     private List<User> mUsers;
     private Bitmap mImage;
+    private GroupVisibility mVisibility;
 
 
      /** Constructor for groups
@@ -32,9 +35,11 @@ public class Group extends Node {
      * @param id The id of the group
      * @param users The current users of the group
      * @param image The current image of the group
+     * @param visibility The visibility of the group
+	 * @param validated If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, boolean validated) {
+    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
@@ -42,18 +47,32 @@ public class Group extends Node {
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
+        mVisibility = visibility;
     }
 
-    /**
-     * Overloaded constructor.
+    /** Overloaded constructor for groups for default validation.
+    * By default a group is not validated yet.
+    * @param name The name of the group
+    * @param id The id of the group
+    * @param users The current users of the group
+    * @param image The current image of the group
+    * @param visibility The visibility of the group
+    * @throws NodeException If nodes or image is null
+            */
+    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
+        this(name, id, users, image, visibility, false);
+    }
+
+    /** Overloaded constructor for groups for default visibility.
+     * By default a group is set to private.
      * @param name The name of the group
      * @param id The id of the group
      * @param users The current users of the group
      * @param image The current image of the group
-     * @throws NodeException if one of the node is null.
+     * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image) {
-        this(name, id, users, image, false);
+        this(name, id, users, image, GroupVisibility.PRIVATE, false);
     }
 
     /**
@@ -64,7 +83,23 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<User> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), false);
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE, false);
+    }
+
+    /**
+     * Set the visibility of a group.
+     * @param visibility The new visibility.
+     */
+    public void setVisibility(GroupVisibility visibility){
+        mVisibility = visibility;
+    }
+
+    /**
+     * Getter for the group visibility.
+     * @return The visibility attribute of the group.
+     */
+    public GroupVisibility getVisibility(){
+        return mVisibility;
     }
 
     /**

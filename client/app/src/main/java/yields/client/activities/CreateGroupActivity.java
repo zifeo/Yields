@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,7 +37,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private ListView mListView;
 
     private String mGroupName;
-    private int mGroupType; // maybe useful later
+    private Group.GroupVisibility mGroupType;
 
     private static final String TAG = "CreateGroupActivity";
     private static final int REQUEST_ADD_CONTACT = 1;
@@ -67,8 +68,10 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
 
         mGroupName = intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY);
-        mGroupType = intent.getIntExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY,
-                CreateGroupSelectNameActivity.PUBLIC_GROUP);
+        mGroupType = Group.GroupVisibility.valueOf(
+                intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
+        Log.d("CreateGroupActivity", "Group type = " +
+                intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
 
         mUsers = new ArrayList<>();
         mUsers.add(new AbstractMap.SimpleEntry<User, Boolean>(YieldsApplication.getUser(), true));
@@ -147,6 +150,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
+                group.setVisibility(mGroupType);
 
                 try {
                     YieldsApplication.getUser().createNewGroup(group);
@@ -155,7 +159,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
 
                 Intent createGroupIntent = new Intent(this, GroupActivity.class);
-                createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                 startActivity(createGroupIntent);
             break;
