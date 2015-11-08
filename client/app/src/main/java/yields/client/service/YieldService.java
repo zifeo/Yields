@@ -16,6 +16,7 @@ import java.util.List;
 import yields.client.R;
 import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
+import yields.client.activities.NotifiableActivity;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.Group;
