@@ -25,7 +25,7 @@ object YieldsServer extends Build {
 
     cancelable in Global := true,
     fork := true,
-    evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+    evictionWarningOptions in update := EvictionWarningOptions.empty
 
   )
 

@@ -2,7 +2,7 @@ package yields.server.dbi
 
 import java.time.OffsetDateTime
 
-import com.redis.serialization.Parse
+import com.redis.serialization.{Format, Parse}
 import com.redis.serialization.Parse.Implicits._
 
 /**
@@ -28,17 +28,24 @@ package object models {
   type Blob = String
 
   /** Represents a feed entry. */
-  type FeedContent = (OffsetDateTime, UID, NID, String)
+  type FeedContent = (OffsetDateTime, UID, Option[NID], String)
 
-  /** [[OffsetDateTime]] Redis format. */
+  /** [[OffsetDateTime]] Redis parser. */
   implicit val parseOffsetDateTime = Parse[OffsetDateTime](byteArray => OffsetDateTime.parse(byteArray))
 
-  /** [[FeedContent]] Redis format. */
-  implicit val parseTuple = Parse[FeedContent] { byteArray =>
+  /** [[FeedContent]] Redis parser. */
+  implicit val parseFeedContent = Parse[FeedContent] { byteArray =>
     val (datetime, uidNidText) = byteArray.span(_ == ',')
     val (uid, nidText) = uidNidText.span(_ == ',')
-    val (nid, text) = nidText.span(_ == ',')
+    val (nidOption, text) = nidText.span(_ == ',')
+    val nid: Option[NID] = if (nidOption.nonEmpty) Some(nidOption) else None
     (datetime, uid, nid, text)
+  }
+
+  /** [[FeedContent]] Redis format. */
+  implicit val formatFeedContent = Format {
+    case (datetime, uid, Some(nid), text) => s"$datetime,$uid,$nid,$text"
+    case (datetime, uid, None, text) => s"$datetime,$uid,,$text"
   }
 
 }
