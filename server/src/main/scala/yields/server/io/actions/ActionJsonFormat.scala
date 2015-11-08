@@ -13,6 +13,17 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   private val kindFld = "kind"
   private val messageFld = "message"
 
+  /**
+    * Format given object with its type.
+    * @param obj object to pack
+    * @tparam T object type
+    * @return packed json object
+    */
+  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
+    kindFld -> obj.getClass.getSimpleName.toJson,
+    messageFld -> obj.toJson
+  )
+
   override def write(obj: Action): JsValue = obj match {
     case x: GroupCreate => packWithKind(x)
     case x: GroupUpdate => packWithKind(x)

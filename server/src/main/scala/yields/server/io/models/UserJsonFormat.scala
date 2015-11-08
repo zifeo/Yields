@@ -18,7 +18,7 @@ object UserJsonFormat extends RootJsonFormat[User] {
   override def read(json: JsValue): User =
     json.asJsObject.getFields(uidFld) match {
       case Seq(JsString(uid)) => User(uid.toLong)
-      case _ => deserializationError(s"bad action format: $json")
+      case _ => deserializationError(s"bad user format: $json")
     }
 
 }

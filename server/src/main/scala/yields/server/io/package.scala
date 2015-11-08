@@ -1,7 +1,6 @@
 package yields.server
 
 import spray.json.DefaultJsonProtocol._
-import spray.json._
 import yields.server.actions.groups._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
@@ -57,16 +56,5 @@ package object io {
   implicit lazy val requestJF = RequestJsonFormat
   implicit lazy val responseJF = ResponseJsonFormat
   implicit lazy val metadataJF = jsonFormat2(Metadata)
-
-  /**
-    * Format given object with its type.
-    * @param obj object to pack
-    * @tparam T object type
-    * @return packed json object
-    */
-  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
-    "kind" -> obj.getClass.getSimpleName.toJson,
-    "raw" -> obj.toJson
-  )
 
 }
