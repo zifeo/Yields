@@ -56,18 +56,22 @@ abstract class Node {
 
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.withClient(_.hget[String](NodeKey.name, NodeKey.name))
+    _name = redis.withClient(_.hget[String](NodeKey.node, NodeKey.name))
     valueOrException(_name)
   }
 
   /** Name setter. */
-  def name_=(n: String): Unit =
+  def name_(n: String): Unit =
     _name = update(NodeKey.name, n)
 
   /** Kind getter. */
-  def kind: String = _kind.getOrElse{
-    _kind = redis.withClient(_.hget[String](NodeKey.name, NodeKey.kind))
+  def kind: String = _kind.getOrElse {
+    _kind = redis.withClient(_.hget[String](NodeKey.node, NodeKey.kind))
     valueOrException(_kind)
+  }
+
+  def kind_(newKind: String): Unit = {
+    _kind = update(NodeKey.kind, newKind)
   }
 
   /** Users getter. */
@@ -79,6 +83,10 @@ abstract class Node {
   /** Add user. */
   def addUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Helpers.currentDatetime.toEpochSecond, id)))
+
+  /** remove user */
+  def removeUser(id: UID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
 
   /** Get n messages from an index. */
   def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
@@ -109,7 +117,7 @@ abstract class Node {
   private def update[T](field: String, value: T): Option[T] = {
     val updates = List((field, value), (NodeKey.updated_at, Helpers.currentDatetime))
     val status = redis.withClient(_.hmset(NodeKey.node, updates))
-    if (! status) throw new RedisNotAvailableException
+    if (!status) throw new RedisNotAvailableException
     Some(value)
   }
 

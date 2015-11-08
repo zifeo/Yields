@@ -33,7 +33,7 @@ package object models {
   // type Node = Int
 
   /** */
-  type FeedContent = (OffsetDateTime, UID, NID, String)
+  type FeedContent = (OffsetDateTime, UID, Option[NID], Option[String])
 
   import Parse.Implicits._
 
