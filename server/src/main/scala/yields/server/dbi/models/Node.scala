@@ -88,7 +88,7 @@ abstract class Node {
   /** Users getter */
   def users: List[UID] = _users.getOrElse {
     _users = redis.withClient(_.zrange[UID](NodeKey.users, 0, -1))
-    valueOrDefault(_users, List())
+    valueOrDefault(_users, List.empty)
   }
 
   /** Add user */
@@ -102,7 +102,7 @@ abstract class Node {
   /** Nodes getter */
   def nodes: List[NID] = _nodes.getOrElse {
     _nodes = redis.withClient(_.zrange[NID](NodeKey.nodes, 0, -1))
-    valueOrDefault(_nodes, List())
+    valueOrDefault(_nodes, List.empty)
   }
 
   /** Add node */
@@ -131,8 +131,6 @@ abstract class Node {
     _updated_at = values.get(NodeKey.updated_at).map(OffsetDateTime.parse)
     _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
   }
-
-  // TODO : check default, why? valid?
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {

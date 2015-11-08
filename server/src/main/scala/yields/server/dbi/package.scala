@@ -7,19 +7,8 @@ import yields.server.utils.Config
 import scala.language.implicitConversions
 
 /**
- *
- * users:uid Long
- * users:[uid] Map[attributes -> value]
- * users:indexes:mail Map[mail -> uid]
- *
- * nodes:nid Long
- * nodes:[nid] Map[attributes -> value]
- * nodes:[nid]:users List[UID]
- * nodes:[nid]:nodes List[NID]
- * nodes:[nid]:feed Zset[tid -> (uid, text, nid, datetime)]
- * nodes:indexes:live Zset[time -> uid]
- *
- */
+  * All Redis database interface related values and functions.
+  */
 package object dbi {
 
   private[dbi] val redis = new RedisClientPool(
@@ -32,7 +21,7 @@ package object dbi {
   /** Terminates database connection. */
   def close(): Unit = {
     redis.withClient(_.disconnect)
-    redis.close
+    redis.closegi
   }
 
   // Gets the value if set or else throws an exception (cannot be unset).

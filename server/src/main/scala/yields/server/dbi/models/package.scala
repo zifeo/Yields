@@ -10,8 +10,6 @@ import com.redis.serialization.Parse.Implicits._
  */
 package object models {
 
-  private type ID = Long
-
   /** Represents an user identifier. */
   type UID = Long
 
@@ -19,7 +17,7 @@ package object models {
   type NID = Long
 
   /** Represent a time identifier (used for indexing an item in a group content). */
-  type TID = ID
+  type TID = Long
 
   /** Represents an email address. */
   type Email = String
