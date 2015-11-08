@@ -125,6 +125,8 @@ public class YieldService extends Service {
         }
     }
 
+    // TODO : receive a response from server (a list of old messages)
+
     private void sendMessageNotification(Message message){
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
