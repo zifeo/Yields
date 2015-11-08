@@ -21,7 +21,7 @@ package object dbi {
   /** Terminates database connection. */
   def close(): Unit = {
     redis.withClient(_.disconnect)
-    redis.closegi
+    redis.close
   }
 
   // Gets the value if set or else throws an exception (cannot be unset).
