@@ -20,10 +20,13 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
 
+    public enum GroupVisibility {PRIVATE, PUBLIC};
+
     private TreeMap<Date, Message> mMessages;
     private boolean mConsumed;
     private List<User> mUsers;
     private Bitmap mImage;
+    private GroupVisibility mVisibility;
 
 
      /** Constructor for groups
@@ -32,15 +35,29 @@ public class Group extends Node {
      * @param id The id of the group
      * @param users The current users of the group
      * @param image The current image of the group
+     * @param visibility The visibility of the group
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image) {
+    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
         mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
+        mVisibility = visibility;
+    }
+
+    /** Overloaded constructor for groups for default visibility.
+     * By default a group is set to private.
+     * @param name The name of the group
+     * @param id The id of the group
+     * @param users The current users of the group
+     * @param image The current image of the group
+     * @throws NodeException If nodes or image is null
+     */
+    public Group(String name, Id id, List<User> users, Bitmap image) {
+        this(name, id, users, image, GroupVisibility.PRIVATE);
     }
 
     /**
@@ -52,6 +69,14 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<User> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage());
+    }
+
+    /**
+     * Set the visibility of a group.
+     * @param visibility The new visibility.
+     */
+    public void setVisibility(GroupVisibility visibility){
+        mVisibility = visibility;
     }
 
     /**
