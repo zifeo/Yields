@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{RedisNotAvailableException, UnincrementalIdentifier}
+import yields.server.dbi.exceptions.{IndexNotFoundException, RedisNotAvailableException, UnincrementalIdentifier}
 import yields.server.utils.Helpers
 
 /**
@@ -163,7 +163,7 @@ object User {
   def create(email: String): User = {
     val uid = redis.withClient(_.incr(StaticKey.uid)).getOrElse(throw new UnincrementalIdentifier)
     if (! redis.withClient(_.hset(StaticKey.emailIndex, email, uid))) throw new RedisNotAvailableException
-    new User(uid)
+    User(uid)
   }
 
   /** Prepares user model for retrieving data given an user id. */
@@ -171,10 +171,9 @@ object User {
     new User(uid)
 
   /** Retrieves user model given an user email. */
-  def fromEmail(email: String): User =
-    redis.withClient(_.hget[String](StaticKey.emailIndex, email)) match {
-      case Some(uid) => new User(uid.toLong)
-      case None => throw new Exception
-    }
+  def fromEmail(email: String): User = {
+    val uid = redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).getOrElse(throw new IndexNotFoundException)
+    User(uid)
+  }
 
 }

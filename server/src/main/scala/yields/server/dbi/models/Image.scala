@@ -33,7 +33,7 @@ class Image private(override val nid: NID) extends Node {
 object Image {
 
   def createImage(content: String): Image = {
-    new Image(Node.newNID())
+    Image(Node.newNID())
   }
 
   def apply(n: NID): Image = {
