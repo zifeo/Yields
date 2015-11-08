@@ -122,10 +122,20 @@ public class Group extends Node {
 
     /**
      * Add a new message to the group messages.
-     * @param newMessage if the message is not valid.
+     * @param newMessage Message to be added
      */
     public void addMessage(Message newMessage) {
         mMessages.put(newMessage.getDate(), newMessage);
+    }
+
+    /**
+     * Add a new message to the group messages.
+     * @param newMessageList Messages to be added.
+     */
+    public void addMessages(List<Message> newMessageList) {
+        for (Message newMessage : newMessageList) {
+            mMessages.put(newMessage.getDate(), newMessage);
+        }
     }
 
 
