@@ -27,7 +27,7 @@ import yields.server.utils.Temporal
  *
  * @param uid user id
  */
-final class User private (val uid: UID) {
+final class User private(val uid: UID) {
 
   object Key {
     val user = s"users:$uid"
@@ -106,7 +106,7 @@ final class User private (val uid: UID) {
   def removeFromGroups(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, nid)))
 
-  /** Groups getter. */
+  /** entourage getter. */
   def entourage: List[UID] = _entourage.getOrElse {
     _entourage = redis.withClient(_.zrange[UID](Key.entourage, 0, -1))
     valueOrException(_entourage)
@@ -139,7 +139,7 @@ final class User private (val uid: UID) {
   private def update[T](field: String, value: T): Option[T] = {
     val updates = List((field, value), (Key.updated_at, Temporal.currentDatetime))
     val status = redis.withClient(_.hmset(Key.user, updates))
-    if (! status) throw new RedisNotAvailableException
+    if (!status) throw new RedisNotAvailableException
     Some(value)
   }
 
@@ -162,8 +162,10 @@ object User {
    */
   def create(email: String): User = {
     val uid = redis.withClient(_.incr(StaticKey.uid)).getOrElse(throw new UnincrementalIdentifier)
-    if (! redis.withClient(_.hset(StaticKey.emailIndex, email, uid))) throw new RedisNotAvailableException
-    User(uid)
+    if (!redis.withClient(_.hset(StaticKey.emailIndex, email, uid))) throw new RedisNotAvailableException
+    val u = User(uid)
+    u.email_=(email)
+    u
   }
 
   /** Prepares user model for retrieving data given an user id. */
@@ -174,6 +176,11 @@ object User {
   def fromEmail(email: String): User = {
     val uid = redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).getOrElse(throw new IndexNotFoundException)
     User(uid)
+  }
+
+  /** flush database */
+  def flushDB(): Unit = {
+    redis.withClient(_.flushdb)
   }
 
 }
