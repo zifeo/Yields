@@ -100,6 +100,9 @@ public class MessageActivity extends Activity {
         }
     }
 
+    /**
+     * @return The id of the current group
+     */
     public Id getGroupId(){
         return mGroup.getId();
     }

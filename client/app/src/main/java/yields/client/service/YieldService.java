@@ -11,8 +11,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import yields.client.R;
@@ -104,10 +102,17 @@ public class YieldService extends Service {
         mCurrentMessageActivity = messageActivity;
     }
 
+    /**
+     * Unset the current messageActivity
+     */
     synchronized public void unsetMessageActivity(){
         mCurrentMessageActivity = null;
     }
 
+    /**
+     * Called when a message is received from the server
+     * @param message The message in question
+     */
     synchronized public void receivedMessage(Message message){
         if (mCurrentMessageActivity == null ||
                 mCurrentMessageActivity.getGroupId() != message
