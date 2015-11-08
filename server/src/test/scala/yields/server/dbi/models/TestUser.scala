@@ -6,11 +6,13 @@ import yields.server.utils.Config
 
 class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
 
+  /** Switch on test database */
   before {
     redis.withClient(_.select(Config.getInt("test.database.id")))
     redis.withClient(_.flushdb)
   }
 
+  /** Switch back on main database */
   after {
     redis.withClient(_.flushdb)
     redis.withClient(_.select(Config.getInt("database.id")))
