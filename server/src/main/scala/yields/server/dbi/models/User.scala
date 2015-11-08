@@ -178,9 +178,4 @@ object User {
     User(uid)
   }
 
-  /** flush database */
-  def flushDB(): Unit = {
-    redis.withClient(_.flushdb)
-  }
-
 }

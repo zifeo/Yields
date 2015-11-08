@@ -1,11 +1,12 @@
 package yields.server.dbi.models
 
 import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
+import yields.server.dbi._
 
 class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
 
   before {
-    User.flushDB
+    redis.withClient(_.flushdb)
   }
 
   val email = "test@test.com"

@@ -3,12 +3,13 @@ package yields.server.dbi.models
 import java.time.OffsetDateTime
 
 import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
+import yields.server.dbi._
 import yields.server.utils.Temporal
 
 class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
 
   before {
-    User.flushDB()
+    redis.withClient(_.flushdb)
   }
 
   val testName = "Group Test"
@@ -54,8 +55,6 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
     val lastTid = g1.addMessage(m3)
     val g2 = Group(g1.nid)
     val feed = g2.getMessagesInRange(0, 3)
-
-    // println(feed)
 
     feed.length should be(3)
     feed should contain(m1)
