@@ -110,6 +110,18 @@ public class MockFactory {
 
         @Override
         public void sendMessage(Group group, Message message) {
+            Group found = null;
+            for(int i = 0; i < m_groups.size(); i++){
+                if(group.getId().getId().equals(m_groups.get(i).getId().getId())){
+                    found = m_groups.get(i);
+                }
+            }
+            if(found == null){
+                this.createNewGroup(group);
+            }
+            else{
+                found.addMessage(message);
+            }
         }
 
         @Override
