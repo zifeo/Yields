@@ -80,6 +80,14 @@ public class Group extends Node {
     }
 
     /**
+     * Getter for the group visibility.
+     * @return The visibility attribute of the group.
+     */
+    public GroupVisibility getVisibility(){
+        return mVisibility;
+    }
+
+    /**
      * Add a user to the group
      * @param user The user we want to add
      */

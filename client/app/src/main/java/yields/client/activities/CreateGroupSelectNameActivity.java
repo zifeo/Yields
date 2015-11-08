@@ -80,7 +80,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
             Intent intentSelectName = new Intent(this, CreateGroupActivity.class);
             intentSelectName.putExtra(GROUP_NAME_KEY, groupName);
-            intentSelectName.putExtra(GROUP_TYPE_KEY, groupType);
+            intentSelectName.putExtra(GROUP_TYPE_KEY, groupType.toString());
 
             startActivity(intentSelectName);
         }
