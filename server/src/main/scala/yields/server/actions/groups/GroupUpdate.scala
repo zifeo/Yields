@@ -2,6 +2,7 @@ package yields.server.actions.groups
 
 import yields.server.dbi.models.{UID, Blob, GID}
 import yields.server.actions.{Result, Action}
+import yields.server.mpi.Metadata
 
 /**
  * Update a group given given specific fields.
@@ -13,10 +14,10 @@ case class GroupUpdate(gid: GID, name: Option[String], pic: Option[Blob]) extend
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
+  override def run(metadata: Metadata): Result = {
     GroupUpdateRes()
   }
 

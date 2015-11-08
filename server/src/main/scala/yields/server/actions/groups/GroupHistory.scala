@@ -2,6 +2,7 @@ package yields.server.actions.groups
 
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
+import yields.server.mpi.Metadata
 
 /**
  * Fetch each group node between two dates with time.
@@ -12,10 +13,10 @@ case class GroupHistory(nid: NID,  lastNid: NID, count: Int) extends Action {
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
+  override def run(metadata: Metadata): Result = {
 
     GroupHistoryRes(Seq.empty)
   }

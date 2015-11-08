@@ -2,6 +2,7 @@ package yields.server.actions.users
 
 import yields.server.dbi.models.{UID, Email}
 import yields.server.actions.{Result, Action}
+import yields.server.mpi.Metadata
 
 /**
  * Connects an user to the server.
@@ -11,11 +12,11 @@ case class UserConnect(email: Email) extends Action {
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
-    UserConnectRes(sender)
+  override def run(metadata: Metadata): Result = {
+    UserConnectRes(metadata.sender)
   }
 
 }

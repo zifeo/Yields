@@ -2,6 +2,7 @@ package yields.server.actions.users
 
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models.{Blob, Email, UID}
+import yields.server.mpi.Metadata
 
 /**
  * Update an user given optional fields.
@@ -14,10 +15,10 @@ case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], imag
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
+  override def run(metadata: Metadata): Result = {
     UserUpdateRes()
   }
 

@@ -3,6 +3,7 @@ package yields.server.actions.groups
 import yields.server.actions.exceptions.BadFeedContentException
 import yields.server.dbi.models._
 import yields.server.actions.{Result, Action}
+import yields.server.mpi.Metadata
 
 /**
  * Message related to a particular group.
@@ -13,10 +14,10 @@ case class GroupMessage(nid: NID, content: String) extends Action {
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
+  override def run(metadata: Metadata): Result = {
     /*if (checkContent) {
       val n = new Node(nid)
       n.addMessage(content)

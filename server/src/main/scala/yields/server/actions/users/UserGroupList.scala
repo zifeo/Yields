@@ -2,6 +2,7 @@ package yields.server.actions.users
 
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models.{Group, UID}
+import yields.server.mpi.Metadata
 
 /**
  * Lists the groups of the user.
@@ -11,10 +12,10 @@ case class UserGroupList(uid: UID) extends Action {
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
+  override def run(metadata: Metadata): Result = {
     UserGroupListRes(Seq.empty)
   }
 
