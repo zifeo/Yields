@@ -57,7 +57,7 @@ final class User private(val uid: UID) {
   }
 
   /** Name setter. */
-  def name_=(newName: String): Unit =
+  def name_(newName: String): Unit =
     _name = update(Key.name, newName)
 
   /** Email getter. */
@@ -67,7 +67,7 @@ final class User private(val uid: UID) {
   }
 
   /** Email setter. */
-  def email_=(newEmail: Email): Unit =
+  def email_(newEmail: Email): Unit =
     _email = update(Key.email, newEmail)
 
   /** Picture getter. TODO: format to be determined. */
@@ -164,7 +164,7 @@ object User {
     val uid = redis.withClient(_.incr(StaticKey.uid)).getOrElse(throw new UnincrementalIdentifier)
     if (!redis.withClient(_.hset(StaticKey.emailIndex, email, uid))) throw new RedisNotAvailableException
     val u = User(uid)
-    u.email_=(email)
+    u.email_(email)
     u
   }
 

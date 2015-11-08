@@ -1,7 +1,8 @@
 package yields.server.actions.groups
 
+import yields.server.actions.exceptions.BadArgumentValue
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.NID
+import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
@@ -17,8 +18,13 @@ case class GroupCreate(name: String, nodes: Seq[NID]) extends Action {
    * @return action result
    */
   override def run(metadata: Metadata): Result = {
-
-    GroupCreateRes(1)
+    if (!name.isEmpty) {
+      val group = Group.createGroup(name)
+      nodes.foreach(group.addNode)
+      GroupCreateRes(group.nid)
+    } else {
+      throw new BadArgumentValue("Empty name")
+    }
   }
 
 }

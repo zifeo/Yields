@@ -20,7 +20,7 @@ class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
   "Getting an existing user from an email" should "return the correct user" in {
     val name = "Test User"
     val u1 = User.create(email)
-    u1.name_=(name)
+    u1.name_(name)
 
     val u2 = User.fromEmail(email)
     u2.email should be(email)
@@ -37,7 +37,7 @@ class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
   "A user with a name" should "have the correct name set" in {
     val name = "Test User"
     val u1 = User.create(email)
-    u1.name_=(name)
+    u1.name_(name)
 
     val u2 = User(u1.uid)
 
@@ -47,7 +47,7 @@ class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
   "A user with a email set" should "have the correct email set" in {
     val newEmail = "test1@test.com"
     val u1 = User.create(email)
-    u1.email_=(newEmail)
+    u1.email_(newEmail)
     val u2 = User(u1.uid)
 
     u2.email should be(newEmail)

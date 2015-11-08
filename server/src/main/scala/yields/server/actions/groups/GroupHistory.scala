@@ -1,5 +1,6 @@
 package yields.server.actions.groups
 
+import yields.server.actions.exceptions.BadArgumentValue
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
@@ -18,8 +19,13 @@ case class GroupHistory(nid: NID, lastTid: TID, count: Int) extends Action {
    * @return action result
    */
   override def run(metadata: Metadata): Result = {
-
-    GroupHistoryRes(Seq.empty)
+    if (nid > 0 && lastTid > 0 && count > 0) {
+      val group = Group(nid)
+      val content = group.getMessagesInRange(lastTid, count).toSeq
+      GroupHistoryRes(content)
+    } else {
+      throw new BadArgumentValue("Bad arguments value")
+    }
   }
 
 }

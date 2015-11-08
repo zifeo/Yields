@@ -9,8 +9,11 @@ import yields.server.utils.Temporal
 import yields.server.dbi.models._
 
 /**
- * Representation of a node.
+ * Model of a node with link to the database
  *
+ * Node is abstract superclass of every possible kind of nodes like Group, Image etc
+ *
+ * Database structure :
  * nodes:nid Long - last node id created
  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
  * nodes:[nid]:users Zset[UID] with score datetime
@@ -75,13 +78,13 @@ abstract class Node {
     _kind = update(NodeKey.kind, newKind)
   }
 
-  /** Users getter. */
+  /** Users getter */
   def users: List[UID] = _users.getOrElse {
     _users = redis.withClient(_.zrange[UID](NodeKey.users, 0, -1))
     valueOrDefault(_users, List())
   }
 
-  /** Add user. */
+  /** Add user */
   def addUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.currentDatetime.toEpochSecond, id)))
 
@@ -89,40 +92,31 @@ abstract class Node {
   def removeUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
 
-  /** remove user */
-  def removeUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
-
-  /** Get n messages from an index. */
-  def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
-    _feed = redis.withClient(_.zrange[FeedContent](NodeKey.feed, start, n))
-    valueOrDefault(_feed, List())
+  /** Get n messages starting from some point */
+  // TODO: Check that TID (expanding Long) is a valid int
+  def getMessagesInRange(start: TID, n: Int): List[FeedContent] = {
+    _feed = redis.withClient(_.zrange[FeedContent](NodeKey.feed, start.toInt, n))
+    valueOrException(_feed)
   }
 
-  /** Add message. */
-  def addMessage(content: FeedContent): Boolean = {
+  /** Add message */
+  def addMessage(content: FeedContent): TID = {
     val tid: TID = redis.withClient(_.incr(NodeKey.tid).getOrElse(throw new UnincrementalIdentifier))
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
+    tid
   }
 
-  /** Node getter. */
+  /** Node getter */
   def node: List[NID] = _nodes.getOrElse {
     _nodes = redis.withClient(_.zrange[NID](NodeKey.nodes, 0, -1))
     valueOrDefault(_nodes, List())
   }
 
-  /** Add node. */
+  /** Add node */
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.currentDatetime.toEpochSecond, nid)))
 
-  def hydrate(): Unit = {
-    val values = redis.withClient(_.hgetall[String, String](NodeKey.node)).getOrElse(throw new RedisNotAvailableException)
-    _name = values.get(NodeKey.name)
-    _kind = values.get(NodeKey.kind)
-    _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
-    _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
-  }
-  
+  /** Fill the model with the database content */
   def hydrate(): Unit = {
     val values = redis.withClient(_.hgetall[String, String](NodeKey.node)).getOrElse(throw new RedisNotAvailableException)
     _name = values.get(NodeKey.name)

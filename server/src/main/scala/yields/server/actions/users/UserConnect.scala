@@ -1,6 +1,7 @@
 package yields.server.actions.users
 
-import yields.server.dbi.models.{UID, Email}
+import yields.server.actions.exceptions.BadLoginException
+import yields.server.dbi.models.{User, UID, Email}
 import yields.server.actions.{Result, Action}
 import yields.server.mpi.Metadata
 
@@ -16,7 +17,12 @@ case class UserConnect(email: Email) extends Action {
    * @return action result
    */
   override def run(metadata: Metadata): Result = {
-    UserConnectRes(metadata.sender)
+    val user = User.fromEmail(email)
+
+    if (user.uid >= 0)
+      UserConnectRes(user.uid)
+    else
+      throw new BadLoginException("Invalid email")
   }
 
 }

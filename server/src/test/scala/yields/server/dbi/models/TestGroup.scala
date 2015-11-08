@@ -51,7 +51,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
     val m3: FeedContent = (Temporal.currentDatetime, u1.uid, None, "other other body")
     g1.addMessage(m1)
     g1.addMessage(m2)
-    g1.addMessage(m3)
+    val lastTid = g1.addMessage(m3)
     val g2 = Group(g1.nid)
     val feed = g2.getMessagesInRange(0, 3)
 
