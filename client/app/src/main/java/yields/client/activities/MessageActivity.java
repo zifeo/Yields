@@ -138,7 +138,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendMessage(View v) throws MessageActivityException, IOException {
+    public void onSendMessage(View v){
         String inputMessage =  mInputField.getText().toString();
 
         mInputField.setText("");
@@ -235,7 +235,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
-    private void retrieveGroupMessages() throws IOException {
+    private void retrieveGroupMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
@@ -270,11 +270,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      */
     @Override
     public void notifyChange() {
-        try {
-            retrieveGroupMessages();
-        } catch (IOException e) {
-            // TODO : remove the IOException in the group class.
-        }
+        retrieveGroupMessages();
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -295,10 +291,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      */
     private void getMessagesOnCreation(){
         mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
-        try {
-            retrieveGroupMessages();
-        } catch (IOException e) {
-            // TODO : remove the IOException in the group class.
-        }
+        retrieveGroupMessages();
     }
 }
