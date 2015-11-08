@@ -114,12 +114,12 @@ final class User private(val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, uid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Helpers.currentDatetime.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
   def removeFromEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, uid)))
+    hasChangeOneEntry(redis.withClient(_.zrem(Key.entourage, uid)))
 
   /**
    * Loads the entire model for intensive usage (except entourage and groups).
