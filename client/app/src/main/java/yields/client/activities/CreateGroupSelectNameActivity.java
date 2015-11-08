@@ -13,6 +13,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import yields.client.R;
+import yields.client.node.Group;
 
 /**
  * The activity where the user can choose the name of the future group and it type (public / private)
@@ -20,9 +21,6 @@ import yields.client.R;
 public class CreateGroupSelectNameActivity extends AppCompatActivity {
     public final static String GROUP_NAME_KEY = "name";
     public final static String GROUP_TYPE_KEY = "type";
-
-    public final static int PUBLIC_GROUP = 1; // maybe create an enum in Group.java
-    public final static int PRIVATE_GROUP = 2;
 
     private static Toast mToast = null;
 
@@ -74,10 +72,10 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
             displayError(getString(R.string.messageGroupNameTooShort));
         }
         else {
-            int groupType = PUBLIC_GROUP;
+            Group.GroupVisibility groupType = Group.GroupVisibility.PUBLIC;
 
             if (mRadioPrivate.isChecked()){
-                groupType = PRIVATE_GROUP;
+                groupType = Group.GroupVisibility.PRIVATE;
             }
 
             Intent intentSelectName = new Intent(this, CreateGroupActivity.class);
