@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IndexNotFoundException, RedisNotAvailableException, UnincrementalIdentifier}
-import yields.server.utils.Helpers
+import yields.server.utils.Temporal
 
 /**
  * User model with linked database interface.
@@ -100,7 +100,7 @@ final class User private (val uid: UID) {
 
   /** Adds a group and returns whether this group has been added. */
   def addToGroups(gid: GID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, gid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, gid)))
 
   /** Remove a group and returns whether this group has been removed. */
   def removeFromGroups(gid: GID): Boolean =
@@ -114,7 +114,7 @@ final class User private (val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, uid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
@@ -137,7 +137,7 @@ final class User private (val uid: UID) {
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (Key.updated_at, Helpers.currentDatetime))
+    val updates = List((field, value), (Key.updated_at, Temporal.currentDatetime))
     val status = redis.withClient(_.hmset(Key.user, updates))
     if (! status) throw new RedisNotAvailableException
     Some(value)

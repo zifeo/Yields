@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{RedisNotAvailableException, UnincrementalIdentifier}
-import yields.server.utils.Helpers
+import yields.server.utils.Temporal
 
 /**
  * Representation of a node.
@@ -78,7 +78,7 @@ abstract class Node {
 
   /** Add user. */
   def addUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Helpers.currentDatetime.toEpochSecond, id)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.currentDatetime.toEpochSecond, id)))
 
   /** Get n messages from an index. */
   def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
@@ -100,14 +100,14 @@ abstract class Node {
 
   /** Add node. */
   def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Helpers.currentDatetime.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.currentDatetime.toEpochSecond, nid)))
 
   // TODO : hydrate
   // TODO : check default, why? valid?
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (NodeKey.updated_at, Helpers.currentDatetime))
+    val updates = List((field, value), (NodeKey.updated_at, Temporal.currentDatetime))
     val status = redis.withClient(_.hmset(NodeKey.node, updates))
     if (! status) throw new RedisNotAvailableException
     Some(value)

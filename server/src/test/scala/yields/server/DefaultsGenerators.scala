@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 import java.util.Date
 
 import org.scalacheck.Arbitrary
-import yields.server.utils.Converters
+import yields.server.utils.Temporal
 
 trait DefaultsGenerators {
 
@@ -13,7 +13,7 @@ trait DefaultsGenerators {
   implicit lazy val offsetDateTimeArb: Arbitrary[OffsetDateTime] = Arbitrary {
     for {
       date <- arbitrary[Date]
-    } yield Converters.date2OffsetDateTime(date)
+    } yield Temporal.date2OffsetDateTime(date)
   }
 
 }
