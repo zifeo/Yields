@@ -9,11 +9,11 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   import Arbitrary.arbitrary
 
-  implicit lazy val groupCreateArb: Arbitrary[NodeCreate] = Arbitrary {
+  implicit lazy val groupCreateArb: Arbitrary[GroupCreate] = Arbitrary {
     for {
       name <- cleanStringGen
       nodes <- arbitrary[List[NID]]
-    } yield NodeCreate(name, nodes)
+    } yield GroupCreate(name, nodes)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
@@ -55,7 +55,7 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
     for {
-      nodes <- arbitrary[List[Node]]
+      nodes <- arbitrary[List[FeedContent]]
     } yield GroupHistoryRes(nodes)
   }
 

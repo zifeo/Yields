@@ -33,8 +33,7 @@ class Image private(override val nid: NID) extends Node {
 object Image {
 
   def createImage(content: String): Image = {
-    val nid = redis.incr("nodes:nid").getOrElse(throw new UnincrementalIdentifier)
-    new Image(nid)
+    new Image(Node.newNID())
   }
 
   def apply(n: NID): Image = {

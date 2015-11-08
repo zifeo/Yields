@@ -159,6 +159,13 @@ final class User private (val uid: UID) {
 /** [[User]] companion. */
 object User {
 
+  object StaticKey {
+    val uid = "users:uid"
+    val emailIndex = "users:indexes:email"
+  }
+
+  redis.setnx(StaticKey.uid, 0)
+
   /**
    * Creates an user with an email and returns its new corresponding user.
    * User id incrementation is done at each creation.
@@ -167,8 +174,8 @@ object User {
    * @return user
    */
   def create(email: String): User = {
-    val uid = redis.incr("users:uid").getOrElse(throw new UnincrementalIdentifier)
-    if (! redis.hset("users:indexes:email", email, uid)) throw new RedisNotAvailableException
+    val uid = redis.incr(StaticKey.uid).getOrElse(throw new UnincrementalIdentifier)
+    if (! redis.hset(StaticKey.emailIndex, email, uid)) throw new RedisNotAvailableException
     new User(uid)
   }
 
@@ -178,7 +185,7 @@ object User {
 
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): User =
-    redis.hget[String]("users:indexes:email", email) match {
+    redis.hget[String](StaticKey.emailIndex, email) match {
       case Some(uid) => new User(uid.toLong)
       case None => throw new Exception
     }

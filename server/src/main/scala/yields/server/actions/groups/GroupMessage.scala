@@ -9,7 +9,7 @@ import yields.server.actions.{Result, Action}
  * @param nid group id
  * @param content message content
  */
-case class GroupMessage(nid: NID, content: FeedContent) extends Action {
+case class GroupMessage(nid: NID, content: String) extends Action {
 
   /**
    * Run the action given the sender.
