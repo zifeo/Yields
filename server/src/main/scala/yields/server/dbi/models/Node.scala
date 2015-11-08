@@ -6,6 +6,7 @@ import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{RedisNotAvailableException, UnincrementalIdentifier}
 import yields.server.utils.Temporal
+import yields.server.dbi.models._
 
 /**
  * Representation of a node.

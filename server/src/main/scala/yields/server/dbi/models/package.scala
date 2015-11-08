@@ -35,11 +35,11 @@ package object models {
 
   /** [[FeedContent]] Redis parser. */
   implicit val parseFeedContent = Parse[FeedContent] { byteArray =>
-    val (datetime, uidNidText) = byteArray.span(_ == ',')
-    val (uid, nidText) = uidNidText.span(_ == ',')
-    val (nidOption, text) = nidText.span(_ == ',')
+    val (datetime, uidNidText) = byteArray.span(_ != ',')
+    val (uid, nidText) = uidNidText.drop(1).span(_ != ',')
+    val (nidOption, text) = nidText.drop(1).span(_ != ',')
     val nid: Option[NID] = if (nidOption.nonEmpty) Some(nidOption) else None
-    (datetime, uid, nid, text)
+    (datetime,uid,nid,text.drop(1))
   }
 
   /** [[FeedContent]] Redis format. */
