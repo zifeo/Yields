@@ -10,8 +10,10 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 import java.util.List;
+import java.util.logging.StreamHandler;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
@@ -120,7 +122,7 @@ public class YieldService extends Service {
      *
      * @param message The message in question
      */
-    synchronized public void receivedMessage(Message message) {
+    synchronized public void receiveMessage(Message message) {
         if (mCurrentNotifiableActivity == null ||
                 mCurrentGroup.getId() != message
                         .getReceivingGroup().getId()) {
@@ -131,7 +133,22 @@ public class YieldService extends Service {
         }
     }
 
-    // TODO : receive a response from server (a list of old messages)
+    synchronized public void receiveMessages(List<Message> messages) {
+        if (mCurrentNotifiableActivity != null &&
+                mCurrentGroup.getId() ==
+                        messages.get(0).getReceivingGroup().getId()) {
+
+            mCurrentGroup.addMessages(messages);
+            mCurrentNotifiableActivity.notifyChange();
+        }
+    }
+
+    public void receiveError(String errorMsg) {
+        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
+        toast.show();
+    }
+
+    // TODO : receive a response from server (an error message)
 
     private void sendMessageNotification(Message message) {
         NotificationCompat.Builder notificationBuilder =
