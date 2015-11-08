@@ -177,25 +177,7 @@ public class Group extends Node {
      * @throws IOException In case the user cannot retreive the messages.
      */
     synchronized public SortedMap<Date, Message> getLastMessages() throws IOException{
-        Map.Entry<Date, Message> message = mMessages.firstEntry();
-
-        Date farthestDate;
-
-        if (message == null) {
-            farthestDate = new Date();
-        } else {
-            farthestDate = message.getKey();
-        }
-
-        List<Message> messages = YieldsApplication.getUser()
-                .getGroupMessages(this, farthestDate);
-
-        for(Message m : messages){
-            mMessages.put(m.getDate(),m);
-        }
-
-        return Collections.unmodifiableSortedMap(mMessages
-                .tailMap(farthestDate));
+        return Collections.unmodifiableSortedMap(mMessages);
     }
 
     /**
