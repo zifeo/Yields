@@ -100,6 +100,10 @@ public class MessageActivity extends Activity {
         }
     }
 
+    public Id getGroupId(){
+        return mGroup.getId();
+    }
+
     /**
      * Listener called when the user sends a message to the group.
      */
