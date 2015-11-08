@@ -72,6 +72,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
         //TODO : Create mMessage !!! NICO !
         mMessageBinder.attachActivity(this);
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindMessageActivity", true);
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
 
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
@@ -102,19 +105,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             mActionBar.setTitle("Unknown group");
         } else {
             setHeaderBar();
-            try {
-                new RetrieveMessageTask().execute().get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+            // We can 'fill' the group with the message using the
+            // MessageBinder.
+            getMessagesOnCreation();
         }
 
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindMessageActivity", true);
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
 
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
+
     }
 
     /**
@@ -274,25 +273,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         try {
             retrieveGroupMessages();
         } catch (IOException e) {
-            // TODO : Use message binder to get the last messages and get rid
-            // of this exception.
-        }
-    }
-
-    /**
-     * Retrieve the group messages.
-     */
-    // TODO : Use binder instead.
-    private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                retrieveGroupMessages();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            // TODO : remove the IOException in the group class.
         }
     }
 
@@ -308,4 +289,16 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             showErrorToast("Disconnected from network");
         }
     };
+
+    /**
+     * Get the last messages from the group when the activity is created.
+     */
+    private void getMessagesOnCreation(){
+        mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
+        try {
+            retrieveGroupMessages();
+        } catch (IOException e) {
+            // TODO : remove the IOException in the group class.
+        }
+    }
 }
