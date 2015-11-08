@@ -2,8 +2,9 @@ import sbt._
 
 object Dependencies {
 
-  val typeSafe = Seq(
-    "com.typesafe" % "config" % "1.3.0"
+  val meta = Seq(
+    "com.typesafe" % "config" % "1.3.0",
+    "ch.qos.logback" % "logback-classic" % "1.1.3"
   )
 
   val akka = {
@@ -15,7 +16,7 @@ object Dependencies {
     )
   }
 
-  val akkaStream = {
+  val akkaExp = {
     val version = "1.0"
     Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % version,

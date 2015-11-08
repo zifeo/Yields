@@ -29,7 +29,10 @@ package object dbi {
   )
 
   /** Terminates database connection. */
-  def close(): Unit = redis.close
+  def close(): Unit = {
+    redis.withClient(_.disconnect)
+    redis.close
+  }
 
   // Gets the value if set or else throws an exception (cannot be unset).
   private[dbi] def valueOrException[T](value: Option[T]): T =
