@@ -24,8 +24,8 @@ package object dbi {
 
   private[dbi] val redis = new RedisClientPool(
     host = Config.getString("database.addr"),
-    port = Config.getInt("database.port"),
-    secret = Some(Config.getString("database.pass"))
+    port = Config.getInt("database.port")
+    // ,secret = Some(Config.getString("database.pass"))
   )
 
   /** Terminates database connection. */
