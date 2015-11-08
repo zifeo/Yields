@@ -20,12 +20,12 @@ class Image private(override val nid: NID) extends Node {
   private var _content: Option[String] = None
 
   def content: String = _content.getOrElse {
-    _content = redis.get[String](Key.content)
+    _content = redis.withClient(_.get[String](Key.content))
     _content.getOrElse(throw new ModelValueNotSetException)
   }
 
   def content_=(newPath: String) = {
-    redis.set(Key.content, newPath)
+    redis.withClient(_.set(Key.content, newPath))
   }
 
 }

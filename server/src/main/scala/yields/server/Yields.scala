@@ -40,6 +40,6 @@ object Yields extends App {
   // Kindly terminate
   StdIn.readLine()
   system.terminate()
-  dbi.closeDatabase()
+  dbi.close()
 
 }

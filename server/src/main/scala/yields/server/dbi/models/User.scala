@@ -52,7 +52,7 @@ final class User private (val uid: UID) {
 
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.hget[String](Key.user, Key.name)
+    _name = redis.withClient(_.hget[String](Key.user, Key.name))
     valueOrDefault(_name, "")
   }
 
@@ -62,7 +62,7 @@ final class User private (val uid: UID) {
 
   /** Email getter. */
   def email: Email = _email.getOrElse {
-    _email = redis.hget[Email](Key.user, Key.email)
+    _email = redis.withClient(_.hget[Email](Key.user, Key.email))
     valueOrException(_email)
   }
 
@@ -72,7 +72,7 @@ final class User private (val uid: UID) {
 
   /** Picture getter. TODO: format to be determined. */
   def picture: Blob = _picture.getOrElse {
-    _picture = redis.hget[Blob](Key.user, Key.picture)
+    _picture = redis.withClient(_.hget[Blob](Key.user, Key.picture))
     valueOrDefault(_picture, "")
   }
 
@@ -82,44 +82,44 @@ final class User private (val uid: UID) {
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.hget[OffsetDateTime](Key.user, Key.created_at)
+    _created_at = redis.withClient(_.hget[OffsetDateTime](Key.user, Key.created_at))
     valueOrException(_created_at)
   }
 
   /** Update datetime getter. */
   def updated_at: OffsetDateTime = _updated_at.getOrElse {
-    _updated_at = redis.hget[OffsetDateTime](Key.user, Key.updated_at)
+    _updated_at = redis.withClient(_.hget[OffsetDateTime](Key.user, Key.updated_at))
     valueOrException(_updated_at)
   }
 
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {
-    _groups = redis.zrange[NID](Key.groups, 0, -1)
+    _groups = redis.withClient(_.zrange[NID](Key.groups, 0, -1))
     valueOrException(_groups)
   }
 
   /** Adds a group and returns whether this group has been added. */
   def addToGroups(gid: GID): Boolean =
-    hasChangeOneEntry(redis.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, gid))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, gid)))
 
   /** Remove a group and returns whether this group has been removed. */
   def removeFromGroups(gid: GID): Boolean =
-    hasChangeOneEntry(redis.zrem(Key.groups, gid))
+    hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, gid)))
 
   /** Groups getter. */
   def entourage: List[UID] = _entourage.getOrElse {
-    _entourage = redis.zrange[UID](Key.entourage, 0, -1)
+    _entourage = redis.withClient(_.zrange[UID](Key.entourage, 0, -1))
     valueOrException(_entourage)
   }
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, uid))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Helpers.currentDatetime.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
   def removeFromEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.zrem(Key.groups, uid))
+    hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, uid)))
 
   /**
    * Loads the entire model for intensive usage (except entourage and groups).
@@ -127,7 +127,7 @@ final class User private (val uid: UID) {
    * on the concerned getter call and issue either the default value or a corresponding exception.
    */
   def hydrate(): Unit = {
-    val values = redis.hgetall[String, String](Key.user).getOrElse(throw new RedisNotAvailableException)
+    val values = redis.withClient(_.hgetall[String, String](Key.user)).getOrElse(throw new RedisNotAvailableException)
     _name = values.get(Key.name)
     _email = values.get(Key.email)
     _picture = values.get(Key.picture)
@@ -137,7 +137,8 @@ final class User private (val uid: UID) {
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val status = redis.hmset(Key.user, List((field, value), (Key.updated_at, Helpers.currentDatetime)))
+    val updates = List((field, value), (Key.updated_at, Helpers.currentDatetime))
+    val status = redis.withClient(_.hmset(Key.user, updates))
     if (! status) throw new RedisNotAvailableException
     Some(value)
   }
@@ -160,8 +161,8 @@ object User {
    * @return user
    */
   def create(email: String): User = {
-    val uid = redis.incr(StaticKey.uid).getOrElse(throw new UnincrementalIdentifier)
-    if (! redis.hset(StaticKey.emailIndex, email, uid)) throw new RedisNotAvailableException
+    val uid = redis.withClient(_.incr(StaticKey.uid)).getOrElse(throw new UnincrementalIdentifier)
+    if (! redis.withClient(_.hset(StaticKey.emailIndex, email, uid))) throw new RedisNotAvailableException
     new User(uid)
   }
 
@@ -171,7 +172,7 @@ object User {
 
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): User =
-    redis.hget[String](StaticKey.emailIndex, email) match {
+    redis.withClient(_.hget[String](StaticKey.emailIndex, email)) match {
       case Some(uid) => new User(uid.toLong)
       case None => throw new Exception
     }

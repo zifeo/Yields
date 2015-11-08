@@ -44,19 +44,19 @@ abstract class Node {
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.hget[OffsetDateTime](NodeKey.name, NodeKey.created_at)
+    _created_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.name, NodeKey.created_at))
     valueOrException(_created_at)
   }
 
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
-    _refreshed_at = redis.hget[OffsetDateTime](NodeKey.name, NodeKey.refreshed_at)
+    _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.name, NodeKey.refreshed_at))
     valueOrException(_refreshed_at)
   }
 
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.hget[String](NodeKey.name, NodeKey.name)
+    _name = redis.withClient(_.hget[String](NodeKey.name, NodeKey.name))
     valueOrException(_name)
   }
 
@@ -66,48 +66,49 @@ abstract class Node {
 
   /** Kind getter. */
   def kind: String = _kind.getOrElse{
-    _kind = redis.hget[String](NodeKey.name, NodeKey.kind)
+    _kind = redis.withClient(_.hget[String](NodeKey.name, NodeKey.kind))
     valueOrException(_kind)
   }
 
   /** Users getter. */
   def users: List[UID] = _users.getOrElse {
-    _users = redis.zrange[UID](NodeKey.users, 0, -1)
+    _users = redis.withClient(_.zrange[UID](NodeKey.users, 0, -1))
     valueOrDefault(_users, List())
   }
 
   /** Add user. */
   def addUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.zadd(NodeKey.users, Helpers.currentDatetime.toEpochSecond, id))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Helpers.currentDatetime.toEpochSecond, id)))
 
   /** Get n messages from an index. */
   def getMessagesInRange(start: Int, n: Int): List[FeedContent] = {
-    _feed = redis.zrange[FeedContent](NodeKey.feed, start, n)
+    _feed = redis.withClient(_.zrange[FeedContent](NodeKey.feed, start, n))
     valueOrDefault(_feed, List())
   }
 
   /** Add message. */
   def addMessage(content: FeedContent): Boolean = {
-    val tid: TID = redis.incr(NodeKey.tid).getOrElse(0)
-    hasChangeOneEntry(redis.zadd(NodeKey.feed, tid, content))
+    val tid: TID = redis.withClient(_.incr(NodeKey.tid).getOrElse(0))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
   }
 
   /** Node getter. */
   def node: List[NID] = _nodes.getOrElse {
-    _nodes = redis.zrange[NID](NodeKey.nodes, 0, -1)
+    _nodes = redis.withClient(_.zrange[NID](NodeKey.nodes, 0, -1))
     valueOrDefault(_nodes, List())
   }
 
   /** Add node. */
   def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.zadd(NodeKey.nodes, Helpers.currentDatetime.toEpochSecond, nid))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Helpers.currentDatetime.toEpochSecond, nid)))
 
   // TODO : hydrate
   // TODO : check default, why? valid?
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val status = redis.hmset(NodeKey.node, List((field, value), (NodeKey.updated_at, Helpers.currentDatetime)))
+    val updates = List((field, value), (NodeKey.updated_at, Helpers.currentDatetime))
+    val status = redis.withClient(_.hmset(NodeKey.node, updates))
     if (! status) throw new RedisNotAvailableException
     Some(value)
   }
@@ -123,6 +124,6 @@ object Node {
 
   /** Creates a new node by reserving a node identifier. */
   def newNID(): NID =
-    redis.incr(StaticKey.nid).getOrElse(throw new UnincrementalIdentifier)
+    redis.withClient(_.incr(StaticKey.nid).getOrElse(throw new UnincrementalIdentifier))
 
 }
