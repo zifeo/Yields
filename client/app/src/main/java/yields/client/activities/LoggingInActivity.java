@@ -16,6 +16,7 @@ import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
+import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class LoggingInActivity extends AppCompatActivity {
@@ -27,7 +28,7 @@ public class LoggingInActivity extends AppCompatActivity {
 
         // Client user call
 
-        // sEmailValid(googleApiClient.getEmail(), this);
+        /*// sEmailValid(googleApiClient.getEmail(), this);
         YieldEmulatorSocketProvider socket = null;
         try {
             socket = new YieldEmulatorSocketProvider();
@@ -38,10 +39,14 @@ public class LoggingInActivity extends AppCompatActivity {
             serverChannel.sendRequest(connectReq);
 
             Log.d("LoggingInActivity", "Email = " + email);
-            // TODO : check request, waiting for Nico...
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("email", Plus.AccountApi
+                        .getAccountName(YieldsApplication.getGoogleApiClient()));
+        startService(serviceIntent);
     }
 
     // Method called by clientUser when the server indicates that the account already exists
