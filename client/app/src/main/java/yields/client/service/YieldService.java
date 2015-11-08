@@ -2,14 +2,17 @@ package yields.client.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.IBinder;
+
+import java.io.IOException;
 
 import yields.client.id.Id;
 import yields.client.node.User;
+import yields.client.serverconnection.Request;
 
 public class YieldService extends Service {
-    int mStartMode;       // indicates how to behave if the service is killed
-    IBinder mBinder;      // interface for clients that bind
+    final static private int mStartMode = START_STICKY;
 
     @Override
     public void onCreate() {
@@ -28,14 +31,28 @@ public class YieldService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        IBinder binder = null;
+
         // A client is binding to the service with bindService()
         if (intent.getBooleanExtra("bindMessageActivity", false)) {
-            //TODO : create a message binder for sending messages
+            binder = new MessageBinder(this);
         } else if (intent.getBooleanExtra("bindMessageActivity", false)) {
             //TODO : create a message binder for modifying/creating groups
         }
 
-        return mBinder;
+        return binder;
+    }
+
+    public void sendRequest(Request request){
+        new SendRequestTask().execute(request);
+    }
+
+    private static class SendRequestTask extends AsyncTask<Request, Void, Void> {
+        @Override
+        protected Void doInBackground(Request... params) {
+            //TODO : send Request to Server
+            return null;
+        }
     }
 
     @Override
