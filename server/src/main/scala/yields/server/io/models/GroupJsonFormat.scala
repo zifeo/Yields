@@ -5,7 +5,7 @@ import spray.json._
 import yields.server.dbi.models.Group
 import yields.server.io._
 
-/** Json writer for [[Group]]. */
+/** Json format for [[Group]]. */
 object GroupJsonFormat extends RootJsonFormat[Group] {
 
   private val nidFld = "nid"

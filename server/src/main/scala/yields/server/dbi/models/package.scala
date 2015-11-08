@@ -3,24 +3,22 @@ package yields.server.dbi
 import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse
+import com.redis.serialization.Parse.Implicits._
 
 /**
- * Provisory models types.
+ * Short models types and some formats.
  */
 package object models {
 
   private type ID = Long
 
-  /** Represents an user id. */
-  type UID = ID
+  /** Represents an user identifier. */
+  type UID = Long
 
-  /** Represents a group id. */
-  type GID = ID
+  /** Represents a node identifier. */
+  type NID = Long
 
-  /** Represents a node id. */
-  type NID = ID
-
-  /** Represent an item of group content */
+  /** Represent a time identifier (used for indexing an item in a group content). */
   type TID = ID
 
   /** Represents an email address. */
@@ -29,13 +27,8 @@ package object models {
   /** Represents a byte array. */
   type Blob = String
 
-  /** Represents a node. */
-  // type Node = Int
-
-  /** */
+  /** Represents a feed entry. */
   type FeedContent = (OffsetDateTime, UID, NID, String)
-
-  import Parse.Implicits._
 
   /** [[OffsetDateTime]] Redis format. */
   implicit val parseOffsetDateTime = Parse[OffsetDateTime](byteArray => OffsetDateTime.parse(byteArray))

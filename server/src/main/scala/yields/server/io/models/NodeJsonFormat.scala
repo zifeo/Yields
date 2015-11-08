@@ -5,7 +5,7 @@ import spray.json._
 import yields.server.dbi.models.{Group, Node}
 import yields.server.io._
 
-/** Json writer for [[Node]]. */
+/** Json format for [[Node]]. */
 object NodeJsonFormat extends RootJsonFormat[Node] {
 
   private val kindFld = "kind"

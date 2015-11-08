@@ -99,12 +99,12 @@ final class User private (val uid: UID) {
   }
 
   /** Adds a group and returns whether this group has been added. */
-  def addToGroups(gid: GID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, gid)))
+  def addToGroups(nid: NID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, nid)))
 
   /** Remove a group and returns whether this group has been removed. */
-  def removeFromGroups(gid: GID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, gid)))
+  def removeFromGroups(nid: NID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, nid)))
 
   /** Groups getter. */
   def entourage: List[UID] = _entourage.getOrElse {

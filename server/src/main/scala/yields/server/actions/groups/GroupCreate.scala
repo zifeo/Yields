@@ -1,7 +1,7 @@
 package yields.server.actions.groups
 
-import yields.server.dbi.models.{GID, UID, NID}
-import yields.server.actions.{Result, Action}
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.NID
 import yields.server.mpi.Metadata
 
 /**
@@ -24,4 +24,4 @@ case class GroupCreate(name: String, nodes: Seq[NID]) extends Action {
 }
 
 /** [[GroupCreate]] result. */
-case class GroupCreateRes(gid: GID) extends Result
+case class GroupCreateRes(nid: NID) extends Result

@@ -6,10 +6,11 @@ import yields.server.mpi.Metadata
 
 /**
  * Fetch each group node between two dates with time.
- * @param nid last node id
+ * @param nid node id
+ * @param lastTid last time identifier related to the given node
  * @param count number of node wanted
  */
-case class GroupHistory(nid: NID,  lastNid: NID, count: Int) extends Action {
+case class GroupHistory(nid: NID, lastTid: TID, count: Int) extends Action {
 
   /**
    * Run the action given the sender.

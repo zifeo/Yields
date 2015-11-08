@@ -88,7 +88,7 @@ abstract class Node {
 
   /** Add message. */
   def addMessage(content: FeedContent): Boolean = {
-    val tid: TID = redis.withClient(_.incr(NodeKey.tid).getOrElse(0))
+    val tid: TID = redis.withClient(_.incr(NodeKey.tid).getOrElse(throw new UnincrementalIdentifier))
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
   }
 

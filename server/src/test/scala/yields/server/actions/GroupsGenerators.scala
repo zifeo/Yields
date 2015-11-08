@@ -18,16 +18,16 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
-    } yield GroupCreateRes(gid)
+      nid <- arbitrary[NID]
+    } yield GroupCreateRes(nid)
   }
 
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
+      nid <- arbitrary[NID]
       name <- cleanOptionStringGen
       image <- arbitrary[Option[Blob]]
-    } yield GroupUpdate(gid, name, image)
+    } yield GroupUpdate(nid, name, image)
   }
 
   implicit lazy val groupUpdateResArb: Arbitrary[GroupUpdateRes] = Arbitrary {
@@ -36,9 +36,9 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
+      nid <- arbitrary[NID]
       content <- cleanStringGen
-    } yield GroupMessage(gid, content)
+    } yield GroupMessage(nid, content)
   }
 
   implicit lazy val groupMessageResArb: Arbitrary[GroupMessageRes] = Arbitrary {
@@ -47,10 +47,10 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
-      lastNid <- arbitrary[NID]
+      nid <- arbitrary[NID]
+      lastTid <- arbitrary[TID]
       count <- arbitrary[Int]
-    } yield GroupHistory(gid, lastNid, count)
+    } yield GroupHistory(nid, lastTid, count)
   }
 
   implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
