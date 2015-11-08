@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
+import yields.client.exceptions.MessageViewException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -91,9 +92,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         } else {
             setHeaderBar();
             try {
-                new RetrieveMessageTask().execute().get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                retrieveGroupMessages();
+            } catch (IOException e) {
+                showErrorToast("Couldn't load messages");
             }
         }
     }
@@ -243,23 +244,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      * data set has changed
      */
     @Override
-    public void notifyChange() {
-        mAdapter.notifyDataSetChanged();
+    public void notifyChange() throws IOException {
+        retrieveGroupMessages();
     }
 
-    /**
-     * Retrieve the group messages.
-     */
-    private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                retrieveGroupMessages();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
 }
