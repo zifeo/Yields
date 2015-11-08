@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.logging.FileHandler;
 
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
+import yields.client.node.Group;
 
 /**
  * A builder for requests that will be send to the server
@@ -30,7 +32,9 @@ public class RequestBuilder {
         PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdate"),
         USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
         USERENTOURAGEREMOVE("UserEntourageRemove"), USERSTATUS("UserStatus"),
-        GROUPCREATE("GroupCreate"), GROUPUPDATE("GroupUpdate"),
+        GROUPCREATE("GroupCreate"), GROUPUPDATENAME("GroupUpdateName"),
+        GROUPUPDATEVISIBILITY("GroupUpdateVisibility"), GROUPUPDATEIMAGE
+                ("GroupUpdateImage"),
         GROUPADD("GroupAdd"), GROUPREMOVE("GroupRemove"),
         GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");
 
@@ -46,7 +50,7 @@ public class RequestBuilder {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
         LAST("dateLast"), TO("to"), COUNT("count"),
-        IMAGE("image"), NID("nid");
+        IMAGE("image"), NID("nid"), VISIBILITY("visibility");
 
         private final String name;
         Fields(String name) { this.name = name; }
@@ -153,29 +157,37 @@ public class RequestBuilder {
         return builder.request();
     }
 
-    public static Request GroupUpdateRequest(Id sender, Id groupId,
-                                             String newName,
-                                             ImageContent newImage) {
+    public static Request GroupUpdateNameRequest(Id sender, Id groupId, String newName){
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newName);
 
-        if (newName == null && newImage == null) {
-            throw new IllegalArgumentException(
-                    "You make no change with this group update");
-        }
+        RequestBuilder builder = new RequestBuilder(MessageKind.GROUPUPDATENAME, sender);
+        builder.addField(Fields.NAME, newName);
+        return builder.request();
+    }
 
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPUPDATE, sender);
+    public static Request GroupUpdateVisibilityRequest(Id sender, Id groupId,
+                                           Group.GroupVisibility newVisibility){
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newVisibility);
 
-        builder.addField(Fields.GID, groupId);
+        RequestBuilder builder = new RequestBuilder(MessageKind
+                .GROUPUPDATEVISIBILITY, sender);
+        builder.addField(Fields.VISIBILITY, newVisibility);
+        return builder.request();
+    }
 
-        if (newName != null) {
-            builder.addField(Fields.NAME, newName);
-        }
-        if (newImage != null) {
-            builder.addField(Fields.IMAGE, newImage.getImage());
-        }
+    public static Request GroupUpdateImageRequest(Id sender, Id groupId,
+                                                  ImageContent newImage){
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newImage);
 
+        RequestBuilder builder = new RequestBuilder(MessageKind
+                .GROUPUPDATEIMAGE, sender);
+        builder.addField(Fields.IMAGE, newImage.getImage());
         return builder.request();
     }
 
@@ -338,6 +350,10 @@ public class RequestBuilder {
         byte[] byteImage = b.array();
         this.mConstructingMap.put(fieldType.getValue(), Base64
                 .encodeToString(byteImage, Base64.DEFAULT));
+    }
+
+    private void addField(Fields fieldType, Group.GroupVisibility field){
+        this.mConstructingMap.put(fieldType.getValue(), field.toString());
     }
 
     private Request request() {
