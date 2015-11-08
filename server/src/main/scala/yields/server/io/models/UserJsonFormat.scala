@@ -11,16 +11,14 @@ object UserJsonFormat extends RootJsonFormat[User] {
   private val nameFld = "name"
 
   override def write(obj: User): JsValue = JsObject(
-    uidFld-> obj.id.toJson,
+    uidFld-> obj.uid.toJson,
     nameFld -> obj.name.toJson
   )
 
-  override def read(json: JsValue): User = json.asJsObject.getFields(uidFld, nameFld) match {
-    case Seq(JsString(uid), JsString(name)) =>
-      val u = new User
-      u.id = uid
-      u.name = name
-      u
-  }
+  override def read(json: JsValue): User =
+    json.asJsObject.getFields(uidFld) match {
+      case Seq(JsString(uid)) => User(uid.toLong)
+      case _ => deserializationError(s"bad action format: $json")
+    }
 
 }
