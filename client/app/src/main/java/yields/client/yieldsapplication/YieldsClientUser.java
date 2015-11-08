@@ -120,7 +120,7 @@ public class YieldsClientUser extends ClientUser{
 
             for (int i = 0; i < responseArray.length(); i++) {
                 messageList.add(new Message(responseArray.getJSONObject(i)));
-                Log.d("REQUEST", "    Message " + i + " : " + ((TextContent) messageList.get(i).getContent()).getText());
+                Log.d("REQUEST", "Message " + i + " : " + ((TextContent) messageList.get(i).getContent()).getText());
             }
 
         } catch (JSONException e) {

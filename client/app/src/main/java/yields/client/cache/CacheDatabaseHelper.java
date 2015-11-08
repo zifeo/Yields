@@ -40,6 +40,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "cache.db";
 
+    private static final String TABLE_CLIENTUSER = "clientUser";
     private static final String TABLE_USERS = "users";
     private static final String TABLE_GROUPS = "groups";
     private static final String TABLE_MESSAGES = "messages";
@@ -145,8 +146,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             if(cursor.getCount() != 0) {
                 deleteMessage(message);
             }
-            this.addGroup(group);
-            mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message));
+            mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, group));
         } catch (CacheDatabaseException exception){
             Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId(), exception);
             throw exception;
@@ -414,11 +414,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
-                + KEY_MESSAGE_GROUPID + " = " + group.getId().getId() + " ORDER BY "
+                + KEY_MESSAGE_GROUPID + " =  ? " + " ORDER BY "
                 + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT " + (upperBoundary - lowerBoundary)
                 + " OFFSET " + lowerBoundary;
 
-        Cursor cursor = mDatabase.rawQuery(selectQuery, null);
+        Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{group.getId().getId()});
 
         List<Message> messages = new ArrayList<>();
         if (!cursor.moveToFirst()) {
@@ -546,15 +546,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Creates the appropriate row entry (ContentValues) for a Message.
      *
      * @param message The Message for which a ContentValues is built.
+     * @param group The Group to which the Message is added.
      * @return A ContentValues object which corresponds to the Message.
      * @throws CacheDatabaseException If some of the Message information could not be serialized.
      */
-    private static ContentValues createContentValuesForMessage(Message message)
+    private static ContentValues createContentValuesForMessage(Message message, Group group)
             throws CacheDatabaseException
     {
         ContentValues values = new ContentValues();
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
+        values.put(KEY_MESSAGE_GROUPID, group.getId().getId());
         values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));

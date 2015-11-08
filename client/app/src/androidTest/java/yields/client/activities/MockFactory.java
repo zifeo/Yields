@@ -82,9 +82,9 @@ public class MockFactory {
         return new User(name, id, email, image1);
     }
 
-    public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img, ArrayList<Group> groups) {
+    public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img) {
         try {
-            return new FakeClientUser(name, id, email, img, groups);
+            return new FakeClientUser(name, id, email, img);
         } catch (InstantiationException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
@@ -101,43 +101,23 @@ public class MockFactory {
 
     private static class FakeClientUser extends ClientUser {
 
-        List<Group> m_groups;
-
-        public FakeClientUser(String name, Id id, String email, Bitmap img, ArrayList<Group> groups) throws NodeException, InstantiationException {
+        public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
             super(name, id, email, img);
-            m_groups = new ArrayList<>(groups);
         }
 
         @Override
         public void sendMessage(Group group, Message message) {
-            Group found = null;
-            for(int i = 0; i < m_groups.size(); i++){
-                if(group.getId().getId().equals(m_groups.get(i).getId().getId())){
-                    found = m_groups.get(i);
-                }
-            }
-            if(found == null){
-                this.createNewGroup(group);
-            }
-            else{
-                found.addMessage(message);
-            }
+
         }
 
         @Override
         public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            Group found = null;
-            for(int i = 0; i < m_groups.size(); i++){
-                if(group.getId().getId().equals(m_groups.get(i).getId().getId())){
-                    found = m_groups.get(i);
-                }
-            }
-            return new ArrayList<>(found.getLastMessages().values());
+            return new ArrayList<>();
         }
 
         @Override
-        public void createNewGroup(Group group) {
-            m_groups.add(group);
+        public void createNewGroup(Group group){
+
         }
 
         @Override

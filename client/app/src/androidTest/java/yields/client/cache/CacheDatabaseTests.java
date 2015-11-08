@@ -20,6 +20,7 @@ import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
+import yields.client.yieldsapplication.YieldsClientUser;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -37,6 +38,8 @@ public class CacheDatabaseTests {
     public void setUp() {
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
+        YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bobby", new Id(123),
+                "lol@gmail.com", YieldsApplication.getDefaultGroupImage()));
         mDatabaseHelper = new CacheDatabaseHelper();
         mDatabase = mDatabaseHelper.getWritableDatabase();
         mDatabaseHelper.clearDatabase();
@@ -288,6 +291,12 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addMessage(message, group);
             }
 
+            String selectQuery = "SELECT * FROM " + "messages" + " WHERE "
+                    + "messageGroup" + " = " + group.getId().getId(); /* + " ORDER BY "
+                + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT " + (upperBoundary - lowerBoundary)
+                + " OFFSET " + lowerBoundary;*/
+
+            Cursor cursor = mDatabase.rawQuery(selectQuery, null);
             List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 0, 10);
             assertEquals(10, messagesFromDatabase.size());
             for (int i = 0; i < 10; i++) {
