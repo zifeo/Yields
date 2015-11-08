@@ -117,9 +117,10 @@ final class User private(val uid: UID) {
     hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.currentDatetime.toEpochSecond, uid)))
 
 
+
   /** Remove a user and returns whether this user has been removed. */
   def removeFromEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, uid)))
+    hasChangeOneEntry(redis.withClient(_.zrem(Key.entourage, uid)))
 
   /**
    * Loads the entire model for intensive usage (except entourage and groups).
