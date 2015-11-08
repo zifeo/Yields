@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class YieldEmulatorSocketProviderTest {
 

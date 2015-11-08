@@ -3,7 +3,6 @@ package yields.client.service;
 import android.os.Binder;
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.junit.Test;
-
 import yields.client.R;
 
 import static android.support.test.espresso.Espresso.onView;

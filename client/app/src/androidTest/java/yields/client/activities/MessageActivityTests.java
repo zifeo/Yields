@@ -2,11 +2,9 @@ package yields.client.activities;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,7 +21,6 @@ import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 

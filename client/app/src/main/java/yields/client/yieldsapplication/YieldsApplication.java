@@ -6,11 +6,8 @@ import android.graphics.Bitmap;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import java.util.ConcurrentModificationException;
-
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 
 public class YieldsApplication {
     private static ClientUser mUser;

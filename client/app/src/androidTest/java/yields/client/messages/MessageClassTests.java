@@ -17,9 +17,9 @@ import org.junit.Test;
 import java.text.ParseException;
 import java.util.Date;
 
-import yields.client.activities.MockFactory;
 import yields.client.R;
 import yields.client.activities.MessageActivity;
+import yields.client.activities.MockFactory;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
 import yields.client.node.User;

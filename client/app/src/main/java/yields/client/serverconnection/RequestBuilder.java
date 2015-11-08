@@ -8,12 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
