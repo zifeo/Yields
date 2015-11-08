@@ -2,7 +2,7 @@ package yields.server.dbi.models
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{UnincrementalIdentifier, RedisNotAvailableException, ModelValueNotSetException}
+import yields.server.dbi.exceptions.{UnincrementableIdentifierException, IllegalValueException}
 
 /**
  * Represent a image ressource
@@ -23,7 +23,7 @@ class Image private(override val nid: NID) extends Node {
   /** Image content getter */
   def content: String = _content.getOrElse {
     _content = redis.withClient(_.get[String](Key.content))
-    _content.getOrElse(throw new ModelValueNotSetException)
+    _content.getOrElse(throw new IllegalValueException(s"image content should be have a value"))
   }
 
   /** Image content setter */

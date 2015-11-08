@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{IndexNotFoundException, RedisNotAvailableException, UnincrementalIdentifier}
+import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
 
 /**
@@ -127,7 +127,8 @@ final class User private(val uid: UID) {
    * on the concerned getter call and issue either the default value or a corresponding exception.
    */
   def hydrate(): Unit = {
-    val values = redis.withClient(_.hgetall[String, String](Key.user)).getOrElse(throw new RedisNotAvailableException)
+    val values = redis.withClient(_.hgetall[String, String](Key.user))
+      .getOrElse(throw new IllegalValueException("node should have some data"))
     _name = values.get(Key.name)
     _email = values.get(Key.email)
     _picture = values.get(Key.picture)
@@ -138,8 +139,7 @@ final class User private(val uid: UID) {
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
     val updates = List((field, value), (Key.updated_at, Temporal.current))
-    val status = redis.withClient(_.hmset(Key.user, updates))
-    if (!status) throw new RedisNotAvailableException
+    redis.withClient(_.hmset(Key.user, updates))
     Some(value)
   }
 
@@ -161,7 +161,8 @@ object User {
    * @return user
    */
   def create(email: String): User = {
-    val uid = redis.withClient(_.incr(StaticKey.uid)).getOrElse(throw new UnincrementalIdentifier)
+    val uid = redis.withClient(_.incr(StaticKey.uid))
+      .getOrElse(throw new UnincrementableIdentifierException("new user identifier (uid) fails"))
     val user = User(uid)
     redis.withClient { r =>
       import user.Key
@@ -177,9 +178,8 @@ object User {
     new User(uid)
 
   /** Retrieves user model given an user email. */
-  def fromEmail(email: String): User = {
-    val uid = redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).getOrElse(throw new IndexNotFoundException)
-    User(uid)
+  def fromEmail(email: String): Option[User] = {
+    redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
   }
 
 }

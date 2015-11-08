@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{RedisNotAvailableException, UnincrementalIdentifier}
+import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
 import yields.server.dbi.models._
 
@@ -118,13 +118,15 @@ abstract class Node {
 
   /** Add message */
   def addMessage(content: FeedContent): Boolean = {
-    val tid = redis.withClient(_.incr(NodeKey.tid).getOrElse(throw new UnincrementalIdentifier))
+    val tid = redis.withClient(_.incr(NodeKey.tid)
+      .getOrElse(throw new UnincrementableIdentifierException(s"time identifier (tid) from node $nid fails")))
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
   }
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {
-    val values = redis.withClient(_.hgetall[String, String](NodeKey.node)).getOrElse(throw new RedisNotAvailableException)
+    val values = redis.withClient(_.hgetall[String, String](NodeKey.node))
+      .getOrElse(throw new IllegalValueException("user should have some data"))
     _name = values.get(NodeKey.name)
     _kind = values.get(NodeKey.kind)
     _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
@@ -135,8 +137,7 @@ abstract class Node {
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
     val updates = List((field, value), (NodeKey.updated_at, Temporal.current))
-    val status = redis.withClient(_.hmset(NodeKey.node, updates))
-    if (!status) throw new RedisNotAvailableException
+    redis.withClient(_.hmset(NodeKey.node, updates))
     Some(value)
   }
 
@@ -151,6 +152,7 @@ object Node {
 
   /** Creates a new node by reserving a node identifier. */
   def newNID(): NID =
-    redis.withClient(_.incr(StaticKey.nid).getOrElse(throw new UnincrementalIdentifier))
+    redis.withClient(_.incr(StaticKey.nid)
+      .getOrElse(throw new UnincrementableIdentifierException("new node identifier (nid) fails")))
 
 }

@@ -32,7 +32,7 @@ class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
     val u1 = User.create(email)
     u1.name = name
 
-    val u2 = User.fromEmail(email)
+    val u2 = User.fromEmail(email).getOrElse(fail("no matching index"))
     u2.email should be (email)
     u2.name should be (name)
   }

@@ -17,12 +17,12 @@ case class UserConnect(email: Email) extends Action {
    * @return action result
    */
   override def run(metadata: Metadata): Result = {
-    val user = User.fromEmail(email)
 
-    if (user.uid >= 0)
-      UserConnectRes(user.uid)
-    else
-      throw new UnauthorizeActionException("Invalid email")
+    User.fromEmail(email) match {
+      case Some(user) => UserConnectRes(user.uid)
+      case _ => throw new UnauthorizeActionException("Invalid email")
+    }
+
   }
 
 }
