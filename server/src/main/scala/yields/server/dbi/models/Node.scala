@@ -54,7 +54,7 @@ abstract class Node {
   }
 
   /** Name setter. */
-  def name_(n: String): Unit =
+  def name_=(n: String): Unit =
     _name = update(NodeKey.name, n)
 
   /** Kind getter. */

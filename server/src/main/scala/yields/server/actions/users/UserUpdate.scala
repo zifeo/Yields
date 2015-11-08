@@ -25,21 +25,18 @@ case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], imag
   override def run(metadata: Metadata): Result = {
     if(uid > 0) {
       val user = User(uid)
-      val _email = email.getOrElse("")
-      val _name = name.getOrElse("")
-      val _image = image.getOrElse("")
 
-      if(!_email.isEmpty) {
-        user.email_=(_email)
+      if(email.isDefined) {
+        user.email = email.get
       }
-      if(!_name.isEmpty) {
-        user.name_=(_name)
+      if(name.isDefined) {
+        user.name = name.get
       }
+
       UserUpdateRes()
     } else {
       throw new ActionArgumentException("Invalid uid")
     }
-
   }
 
 }

@@ -21,7 +21,7 @@ case class GroupHistory(nid: NID, lastTid: TID, count: Int) extends Action {
   override def run(metadata: Metadata): Result = {
     if (nid > 0 && lastTid > 0 && count > 0) {
       val group = Group(nid)
-      val content = group.getMessagesInRange(lastTid, count).toSeq
+      val content = group.getMessagesInRange(lastTid, count)
       GroupHistoryRes(content)
     } else {
       throw new ActionArgumentException("Bad arguments value")

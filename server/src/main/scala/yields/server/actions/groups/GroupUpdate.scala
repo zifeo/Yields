@@ -11,8 +11,7 @@ import yields.server.mpi.Metadata
  * @param name new name
  * @param pic new profile image
  *
- *
- *            TODO: Update picture
+ * TODO: Update picture
  */
 case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extends Action {
 
@@ -24,9 +23,11 @@ case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extend
   override def run(metadata: Metadata): Result = {
     if (nid > 0) {
       val group = Group(nid)
-      val n = name.getOrElse("")
-      if (n != "")
-        group.name_(n)
+
+      name match {
+        case Some(newName) if newName.nonEmpty => group.name = newName
+        case _ =>
+      }
 
       GroupUpdateRes()
     } else {
