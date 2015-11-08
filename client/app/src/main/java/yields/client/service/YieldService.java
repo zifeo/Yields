@@ -11,13 +11,14 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.node.Group;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -25,7 +26,9 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class YieldService extends Service {
     private Binder mMessageBinder;
     private Binder mGroupBinder;
-    private MessageActivity mCurrentMessageActivity;
+    private NotifiableActivity mCurrentNotifiableActivity;
+    private Group mCurrentGroup;
+    private List<Group> mWaitingUpdateGroup;
     private int mIdLastNotification;
 
     /**
@@ -44,9 +47,8 @@ public class YieldService extends Service {
      * Starts the service and creates a User if necessary
      *
      * @param intent The Intent which states if we have to create a new User
-     * @return
-     *      The starting Mode which makes the service never stop or
-     *      at least restarts when it is closed by the system
+     * @return The starting Mode which makes the service never stop or
+     * at least restarts when it is closed by the system
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -61,9 +63,9 @@ public class YieldService extends Service {
 
     /**
      * Returns the correct binder depending on the activity binding
-     * @param intent
-     *      The intent of the binding which contains a boolean that states
-     *      which binder to send
+     *
+     * @param intent The intent of the binding which contains a boolean that states
+     *               which binder to send
      * @return The Binder concerned
      */
     @Override
@@ -80,9 +82,10 @@ public class YieldService extends Service {
 
     /**
      * Sends request to server
+     *
      * @param request The request to send
      */
-    public void sendRequest(Request request){
+    public void sendRequest(Request request) {
         new SendRequestTask().execute(request);
     }
 
@@ -96,38 +99,40 @@ public class YieldService extends Service {
 
     /**
      * Sets the message activity that will retrieve the messages
+     *
      * @param messageActivity The concerned messageActivity
      */
-    synchronized public void setMessageActivity(MessageActivity messageActivity){
-        mCurrentMessageActivity = messageActivity;
+    synchronized public void setMessageActivity(MessageActivity messageActivity) {
+        mCurrentNotifiableActivity = messageActivity;
+        mCurrentGroup = YieldsApplication.getGroup();
     }
 
     /**
      * Unset the current messageActivity
      */
-    synchronized public void unsetMessageActivity(){
-        mCurrentMessageActivity = null;
+    synchronized public void unsetMessageActivity() {
+        mCurrentNotifiableActivity = null;
     }
 
     /**
      * Called when a message is received from the server
+     *
      * @param message The message in question
      */
-    synchronized public void receivedMessage(Message message){
-        if (mCurrentMessageActivity == null ||
-                mCurrentMessageActivity.getGroupId() != message
+    synchronized public void receivedMessage(Message message) {
+        if (mCurrentNotifiableActivity == null ||
+                mCurrentGroup.getId() != message
                         .getReceivingGroup().getId()) {
             sendMessageNotification(message);
         } else {
-            LinkedList<Message> newMessages = new LinkedList<>();
-            newMessages.add(message);
-            mCurrentMessageActivity.receiveNewMessage(newMessages);
+            mCurrentGroup.addMessage(message);
+            mCurrentNotifiableActivity.notifyChange();
         }
     }
 
     // TODO : receive a response from server (a list of old messages)
 
-    private void sendMessageNotification(Message message){
+    private void sendMessageNotification(Message message) {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.send_icon)
