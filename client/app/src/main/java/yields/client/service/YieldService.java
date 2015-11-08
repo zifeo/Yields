@@ -13,7 +13,6 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import java.util.List;
-import java.util.logging.StreamHandler;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
@@ -120,12 +119,12 @@ public class YieldService extends Service {
     /**
      * Called when a message is received from the server
      *
+     * @param groupId The group the message ud from
      * @param message The message in question
      */
-    synchronized public void receiveMessage(Message message) {
+    synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null ||
-                mCurrentGroup.getId() != message
-                        .getReceivingGroup().getId()) {
+                mCurrentGroup.getId() != groupId) {
             sendMessageNotification(message);
         } else {
             mCurrentGroup.addMessage(message);
@@ -133,16 +132,26 @@ public class YieldService extends Service {
         }
     }
 
-    synchronized public void receiveMessages(List<Message> messages) {
+    /**
+     * Called when multiple message is received from the server
+     *
+     * @param groupId The group the messages are from
+     * @param messages The message in question
+     */
+    synchronized public void receiveMessages(Id groupId, List<Message> messages) {
         if (mCurrentNotifiableActivity != null &&
-                mCurrentGroup.getId() ==
-                        messages.get(0).getReceivingGroup().getId()) {
+                mCurrentGroup.getId() == groupId) {
 
             mCurrentGroup.addMessages(messages);
             mCurrentNotifiableActivity.notifyChange();
         }
     }
 
+    /**
+     * Called when an error is received from the server
+     *
+     * @param errorMsg The content of the error
+     */
     public void receiveError(String errorMsg) {
         Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
         toast.show();
