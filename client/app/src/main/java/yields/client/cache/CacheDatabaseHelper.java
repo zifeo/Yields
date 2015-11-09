@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ContentException;
@@ -130,6 +131,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param messageId The Id of the Message to be deleted.
      */
     public void deleteMessage(Id messageId) {
+        Objects.requireNonNull(messageId);
+
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODEID + " = ?",
                 new String[]{String.valueOf(messageId.getId())});
     }
@@ -145,6 +148,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addMessage(Message message, Id groupId)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(groupId);
+
         try {
             String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
                     + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
@@ -170,6 +176,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param userId The Id of the User to be deleted.
      */
     public void deleteUser(Id userId) {
+        Objects.requireNonNull(userId);
+
         mDatabase.delete(TABLE_USERS, KEY_USER_NODEID + " = ?",
                 new String[]{String.valueOf(userId.getId())});
     }
@@ -184,6 +192,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addUser(User user)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(user);
+
         String selectQuery = "SELECT * FROM " + TABLE_USERS
                 + " WHERE " + KEY_USER_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -218,6 +228,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void updateUser(User user)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(user);
+
         try {
             ContentValues values = createContentValuesForUser(user);
             mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
@@ -239,6 +251,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * User in the database.
      */
     public User getUser(Id userID) {
+        Objects.requireNonNull(userID);
+
         String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
                 + KEY_USER_NODEID + " = ?";
         Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
@@ -287,6 +301,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param group The Group to be deleted.
      */
     public void deleteGroup(Group group) {
+        Objects.requireNonNull(group);
+
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_GROUPID + " = ?",
                 new String[]{group.getId().getId()});
         mDatabase.delete(TABLE_GROUPS, KEY_GROUP_NODEID + " = ?",
@@ -304,6 +320,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addGroup(Group group)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(group);
+
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
                 + " WHERE " + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -344,6 +362,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void updateGroup(Group group)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(group);
+
         try {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
@@ -370,6 +390,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param newGroupName The new name of the Group.
      */
     public void updateGroupName(Id groupId, String newGroupName) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newGroupName);
+
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NAME, newGroupName);
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
@@ -383,6 +406,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param newGroupImage The new image for the Group.
      */
     public void updateGroupImage(Id groupId, Bitmap newGroupImage) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newGroupImage);
+
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_IMAGE, serializeBitmap(newGroupImage));
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
@@ -396,6 +422,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param userId  The Id of the User that will bre removed from the Group.
      */
     public void removeUserFromGroup(Id groupId, Id userId) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(userId);
+
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
@@ -416,6 +445,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param userId  The Id of the User that will be added to the Group.
      */
     public void addUserToGroup(Id groupId, Id userId) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(userId);
+
         List<Id> ids = getUserIdsFromGroup(groupId);
         boolean userIsInCache = false;
         for (Id id : ids) {
@@ -442,6 +474,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * in the database.
      */
     public List<Id> getUserIdsFromGroup(Id groupId) {
+        Objects.requireNonNull(groupId);
+
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -467,6 +501,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * in the database.
      */
     public Group getGroup(Id groupId) {
+        Objects.requireNonNull(groupId);
+
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -542,6 +578,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                                                     int upperBoundary)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(group);
+
         if (lowerBoundary < 0 || lowerBoundary > upperBoundary) {
             throw new IllegalArgumentException("Illegal boundaries ! The upper boundary must be "
                     + "greater than the lower boundary which can not be negative");
@@ -624,6 +662,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return The serialized version of the bitmap.
      */
     private static byte[] serializeBitmap(Bitmap bitmap) {
+        Objects.requireNonNull(bitmap);
+
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
         return stream.toByteArray();
@@ -636,6 +676,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return The deserialized array as a Bitmap object.
      */
     private static Bitmap deserializeBitmap(byte[] bytes) {
+        Objects.requireNonNull(bytes);
+
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
@@ -649,6 +691,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static byte[] serializeContent(Content content)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(content);
+
         try {
             String type = content.getType();
             switch (type) {
@@ -676,6 +720,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static Content deserializeContent(byte[] bytes, String contentType)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(contentType);
+        Objects.requireNonNull(bytes);
+
         try {
             switch (contentType) {
                 case "text":
@@ -701,6 +748,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static byte[] serializeImageContent(ImageContent content)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(content);
+
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
@@ -725,6 +774,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static Content deserializeImageContent(byte[] bytes)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(bytes);
+
         try {
             ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
             ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
@@ -748,6 +799,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static byte[] serializeTextContent(TextContent content)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(content);
+
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
@@ -772,6 +825,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static Content deserializeTextContent(byte[] bytes)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(bytes);
+
         try {
             ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
             ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
@@ -798,6 +853,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static ContentValues createContentValuesForMessage(Message message, Id groupId)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(groupId);
+
         ContentValues values = new ContentValues();
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
@@ -820,6 +878,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static ContentValues createContentValuesForUser(User user)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(user);
+
         ContentValues values = new ContentValues();
         values.put(KEY_USER_NODEID, user.getId().getId());
         values.put(KEY_USER_NAME, user.getName());
@@ -839,6 +899,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static ContentValues createContentValuesForGroup(Group group)
             throws CacheDatabaseException
     {
+        Objects.requireNonNull(group);
+
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NODEID, group.getId().getId());
         values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getImage()));
@@ -860,6 +922,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return The List of Ids corresponding to idsAdString.
      */
     private static List<Id> getIdListFromString(String idsAsString) {
+        Objects.requireNonNull(idsAsString);
+
         String[] idsAsArray = idsAsString.split(",");
         List<Id> ids = new ArrayList<>();
         for (String string : idsAsArray) {
@@ -877,6 +941,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return The String corresponding to the List of Id.
      */
     private static String getStringFromIds(List<Id> ids) {
+        Objects.requireNonNull(ids);
+
         StringBuilder idsAsString = new StringBuilder();
         for (Id id : ids) {
             idsAsString.append(id.getId()).append(",");
