@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.List;
@@ -54,11 +55,13 @@ public class YieldService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getBooleanExtra("newUser", false)) {
+        if (intent != null && intent.getBooleanExtra("newUser", false)) {
             String email = intent.getStringExtra("email");
             Request connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
             sendRequest(connectReq);
         }
+
+        Log.d("DEBUG", "Starting yield service");
 
         return START_STICKY;
     }
@@ -72,10 +75,11 @@ public class YieldService extends Service {
      */
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d("DEBUG", "Service binds to an activity");
         // A client is binding to the service with bindService()
         if (intent.getBooleanExtra("bindMessageActivity", false)) {
             return mMessageBinder;
-        } else if (intent.getBooleanExtra("bindMessageActivity", false)) {
+        } else if (intent.getBooleanExtra("bindGroupActivity", false)) {
             return mGroupBinder;
         } else {
             return null;
@@ -96,6 +100,8 @@ public class YieldService extends Service {
      */
     @Override
     public void onDestroy() {
+        Log.d("DEBUG", "Yield service has been disconnected");
+        receiveError("Yield service has been disconnected");
         //TODO : disconnect from server
     }
 
@@ -152,9 +158,17 @@ public class YieldService extends Service {
      *
      * @param errorMsg The content of the error
      */
-    public void receiveError(String errorMsg) {
-        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
+    public void receiveError(String errorMsg, int time) {
+        if (time != Toast.LENGTH_SHORT && time != Toast.LENGTH_LONG) {
+            throw new IllegalArgumentException("not a valid toast length");
+        }
+
+        Toast toast = Toast.makeText(this, errorMsg, time);
         toast.show();
+    }
+
+    public void receiveError(String errorMsg) {
+        receiveError(errorMsg, Toast.LENGTH_SHORT);
     }
 
     // TODO : receive a response from server (an error message)
