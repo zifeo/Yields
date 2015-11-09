@@ -165,7 +165,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
             }
         }
 
-        // When the item "Change group name" is clicked
+        /**
+         * Listener for the "Change group name" item.
+         */
         private void changeNameListener(){
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
             editTextName.setId(R.id.editText);
@@ -192,7 +194,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .show();
         }
 
-        // When the item "Change group type" is clicked
+        /**
+         * Listener for the "Change group type" item.
+         */
         private void changeTypeListener(){
             final CharSequence[] types = {" Public"," Private"};
             final int[] itemSelected = {0}; // used as a pointer
@@ -233,7 +237,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
             groupTypeDialog.show();
         }
 
-        // When the item "Change group image" is clicked
+        /**
+         * Listener for the "Change group image" item.
+         */
         void changeImageListener(){
             Intent intent = new Intent();
             intent.setType("image/*");
@@ -241,7 +247,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE);
         }
 
-        // When the item "Add users" is clicked
+        /**
+         * Listener for the "Add users" item.
+         */
         void addUsersListener(){
             ArrayList<String> emailList = new ArrayList<>();
             List<User> currentUsers = mGroup.getUsers();
