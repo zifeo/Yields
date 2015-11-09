@@ -1,6 +1,5 @@
 package yields.client.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +9,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.Toast;
 
 import yields.client.R;
 import yields.client.node.Group;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * The activity where the user can choose the name of the future group and it type (public / private)
@@ -21,8 +20,6 @@ import yields.client.node.Group;
 public class CreateGroupSelectNameActivity extends AppCompatActivity {
     public final static String GROUP_NAME_KEY = "name";
     public final static String GROUP_TYPE_KEY = "type";
-
-    private static Toast mToast = null;
 
     private EditText mEditText;
     private RadioButton mRadioPublic; // maybe useful later
@@ -69,7 +66,8 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
         String groupName = mEditText.getText().toString();
 
         if (groupName.length() < 1){
-            displayError(getString(R.string.messageGroupNameTooShort));
+            String message = getString(R.string.messageGroupNameTooShort);
+            YieldsApplication.showToast(getApplicationContext(), message);
         }
         else {
             Group.GroupVisibility groupType = Group.GroupVisibility.PUBLIC;
@@ -86,21 +84,5 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    /**
-     * Displays a Toast containing the given string.
-     * @param error The string to be displyed in the toast.
-     */
-    private void displayError(String error){
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-
-        if (mToast != null){
-            mToast.cancel();
-        }
-
-        mToast = Toast.makeText(context, error, duration);
-        mToast.show();
     }
 }

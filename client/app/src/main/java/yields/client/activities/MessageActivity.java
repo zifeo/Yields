@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
+import yields.client.exceptions.MessageViewException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -95,7 +96,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            showErrorToast("Couldn't get group information.");
+            String message = "Couldn't get group information.";
+            YieldsApplication.showToast(getApplicationContext(), message);
             mActionBar.setTitle("Unknown group");
         } else {
             setHeaderBar();
@@ -208,8 +210,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             try {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (mImage != null) {
-                    Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
-                    toast.show();
+                    String message = "Image added to message";
+                    YieldsApplication.showToast(getApplicationContext(), message);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -235,15 +237,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    /**
-     * Show an error message in a toast.
-     * @param errorMsg The error message to be displayed.
-     */
-    private void showErrorToast(String errorMsg){
-        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
-        toast.show();
     }
 
     /**

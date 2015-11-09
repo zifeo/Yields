@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -32,7 +33,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the user can change some parameters for the group, leave it and
- * the admin can change its name, image, users...
+ * where the admin can change its name, image, users...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
     public enum Settings {NAME, TYPE, IMAGE, USERS}
@@ -42,6 +43,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE = 1;
     private static final int REQUEST_ADD_USERS = 2;
+
+    private static final String TAG = "GroupSettingsActivity";
 
     /**
      * Method automatically called on the creation of the activity
@@ -59,7 +62,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Group Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        List<String> itemList = new ArrayList<>(4);
+        List<String> itemList = new ArrayList<>(Settings.values().length);
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeGroupName));
         itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
@@ -68,7 +71,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
-        ListAdapterSettings arrayAdapter = new ListAdapterSettings(getApplicationContext(), R.layout.group_settings_layout, itemList);
+        ListAdapterSettings arrayAdapter = new ListAdapterSettings(getApplicationContext(),
+                R.layout.group_settings_layout, itemList);
 
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new CustomListener());
@@ -102,14 +106,20 @@ public class GroupSettingsActivity extends AppCompatActivity {
             try {
                 Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (image != null) {
-                    Toast toast = Toast.makeText(getApplicationContext(), "Group image changed", Toast.LENGTH_SHORT);
-                    toast.show();
+
+                    String message = "Group image changed";
+                    YieldsApplication.showToast(getApplicationContext(), message);
 
                     //TODO Change group image and send notification to server
                 }
+                else {
+                    String message = "Could not retrieve image";
+                    YieldsApplication.showToast(getApplicationContext(), message);
+                }
             } catch (IOException e) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Could not retrieve image", Toast.LENGTH_SHORT);
-                toast.show();
+                String message = "Could not retrieve image";
+                YieldsApplication.showToast(getApplicationContext(), message);
+                Log.d(TAG, message);
             }
         }
         else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK){
@@ -131,8 +141,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 }
             }
 
-            Toast toast = Toast.makeText(getApplicationContext(), count + " user(s) added to group", Toast.LENGTH_SHORT);
-            toast.show();
+            String message = count + " user(s) added to group";
+            YieldsApplication.showToast(getApplicationContext(), message);
         }
     }
 
@@ -150,18 +160,23 @@ public class GroupSettingsActivity extends AppCompatActivity {
          */
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Settings[] settings = Settings.values();
+            switch(settings[position]){
+                case NAME:
+                    changeNameListener();
+                    break;
 
-            if (position == Settings.NAME.ordinal()){
-                changeNameListener();
-            }
-            else if (position == Settings.TYPE.ordinal()){
-                changeTypeListener();
-            }
-            else if (position == Settings.IMAGE.ordinal()){
-                changeImageListener();
-            }
-            else {
-                addUsersListener();
+                case TYPE:
+                    changeTypeListener();
+                    break;
+
+                case IMAGE:
+                    changeImageListener();
+                    break;
+
+                default:
+                    addUsersListener();
+                    break;
             }
         }
 
@@ -179,10 +194,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String name = "Group name changed to \"" + editTextName.getText().toString() + "\"";
-
-                            Toast toast = Toast.makeText(getApplicationContext(), name, Toast.LENGTH_SHORT);
-                            toast.show();
+                            String message = "Group name changed to \"" + editTextName.getText().toString() + "\"";
+                            YieldsApplication.showToast(getApplicationContext(), message);
 
                             // TODO Add change in group's name, not just display
                         }
@@ -217,10 +230,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                             type = "private";
                         }
 
-                        String typeText = "Group type changed to : " + type;
-
-                        Toast toast = Toast.makeText(getApplicationContext(), typeText, Toast.LENGTH_SHORT);
-                        toast.show();
+                        String message = "Group type changed to : " + type;
+                        YieldsApplication.showToast(getApplicationContext(), message);
 
                         if (type.equals("public")) {
                             mGroup.setVisibility(Group.GroupVisibility.PUBLIC);

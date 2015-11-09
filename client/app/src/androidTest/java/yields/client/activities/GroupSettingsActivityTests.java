@@ -34,6 +34,9 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         super(GroupSettingsActivity.class);
     }
 
+    /**
+     * Set up for the tests.
+     */
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -46,6 +49,10 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         YieldsApplication.setGroup(new Group("Group", new Id(124), new ArrayList<User>()));
     }
 
+    /**
+     * Test that tries to change the name of the group
+     * @throws InterruptedException
+     */
     public void testChangeName() throws InterruptedException {
         getActivity();
         onView(withText(R.string.changeGroupName)).perform(click());
@@ -53,13 +60,15 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
         onView(withText("Ok")).perform(click());
 
-
+        
         onView(withText("Group name changed to \"Group SWENG\"")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
-        // Wait until the toast disappear.
-        Thread.sleep(2000);
     }
 
+    /**
+     * Test that tries to change the type of the group to private
+     * @throws InterruptedException
+     */
     public void testChangeTypePrivate() throws InterruptedException {
         getActivity();
         onView(withText(R.string.changeGroupType)).perform(click());
@@ -71,9 +80,12 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
 
         assertEquals(Group.GroupVisibility.PRIVATE, YieldsApplication.getGroup().getVisibility());
-        Thread.sleep(2000);
     }
 
+    /**
+     * Test that tries to change the type of the group to public
+     * @throws InterruptedException
+     */
     public void testChangeTypePublic() throws InterruptedException {
         getActivity();
         onView(withText(R.string.changeGroupType)).perform(click());
@@ -85,9 +97,12 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
 
         assertEquals(Group.GroupVisibility.PUBLIC, YieldsApplication.getGroup().getVisibility());
-        Thread.sleep(2000);
     }
 
+    /**
+     * Test that clicks on the 'add users' item
+     * @throws InterruptedException
+     */
     public void testAddUsers() throws InterruptedException {
         getActivity();
         onView(withText(R.string.addUsers)).perform(click());
@@ -95,6 +110,5 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
         onView(withText("0 user(s) added to group")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
-        Thread.sleep(2000);
     }
 }

@@ -22,7 +22,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the list of contacts of the user is displayed and he can choose whether
- * to include any other user in the future group
+ * to include any other user in the future (or modified) group.
  */
 public class AddUsersFromEntourageActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterEntourage;

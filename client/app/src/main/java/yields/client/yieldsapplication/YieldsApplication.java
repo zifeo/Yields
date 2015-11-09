@@ -3,6 +3,7 @@ package yields.client.yieldsapplication;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -20,6 +21,7 @@ public class YieldsApplication {
     private static Bitmap mDefaultUserImage = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
 
     private static GoogleApiClient mGoogleApiClient;
+    private static Toast mToast = null;
 
     /**
      * Getter for the user of the application.
@@ -131,5 +133,19 @@ public class YieldsApplication {
      */
     public static Resources getResources(){
         return mResources;
+    }
+
+    /**
+     * Static method used for centralized toast display
+     * @param context The app context
+     * @param text The message to write on the toast
+     */
+    public static void showToast(Context context, String text){
+        if (mToast != null){
+            mToast.cancel();
+        }
+
+        mToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 }
