@@ -15,6 +15,9 @@ import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
 
+/**
+ * Class used to represent a list of groups, in a listview
+ */
 public class ListAdapterGroups extends ArrayAdapter<Group> {
     private Context mContext;
     private int mGroupLayout;

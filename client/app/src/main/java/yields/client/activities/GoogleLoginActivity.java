@@ -108,7 +108,6 @@ public class GoogleLoginActivity extends AppCompatActivity implements
      * attempt to resolve any errors that occur.
      */
     private void onSignInClicked() {
-        mShouldResolve = true;
         connect();
     }
 
@@ -195,7 +194,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
 
 
     /**
-     * Connect to the google api client.
+     * Connect to the google servers
      */
     private void connect(){
         mGoogleSingInButton.setVisibility(View.INVISIBLE);
@@ -203,11 +202,12 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         mButtonCancelGoogleConnection.setVisibility(View.VISIBLE);
         mProgressBarGoogleConnection.setVisibility(View.VISIBLE);
 
+        mShouldResolve = true;
         mGoogleApiClient.connect();
     }
 
     /**
-     * Disconnect from the google api client.
+     * Disconnect from the google servers
      */
     private void disconnect(){
         mGoogleSingInButton.setVisibility(View.VISIBLE);

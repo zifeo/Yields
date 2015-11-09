@@ -14,6 +14,9 @@ import java.util.List;
 import yields.client.R;
 import yields.client.activities.GroupSettingsActivity;
 
+/**
+ * Class used to represent the list of settings of a group, in a listview
+ */
 public class ListAdapterSettings extends ArrayAdapter<String> {
     private Context mContext;
     private int mSettingLayout;
@@ -36,7 +39,7 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
      * Returns the View of the adapter.
      * @param position Position of the element.
      * @param convertView The View to convert.
-     * @param parent The parent of the view to be conveted.
+     * @param parent The parent of the view to be converted.
      * @return The new View respecting the layout.
      */
     @Override
@@ -55,7 +58,8 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            imageSetting.setImageDrawable(mContext.getResources().getDrawable(idDrawable, mContext.getTheme()));
+            imageSetting.setImageDrawable(mContext.getResources().getDrawable(idDrawable,
+                    mContext.getTheme()));
         } else {
             imageSetting.setImageDrawable(mContext.getResources().getDrawable(idDrawable));
         }

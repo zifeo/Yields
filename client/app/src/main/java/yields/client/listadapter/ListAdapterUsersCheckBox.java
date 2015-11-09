@@ -19,6 +19,9 @@ import yields.client.R;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Class used to represent a list of user, each with a checkbox
+ */
 public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boolean>> {
     private Context mContext;
 
@@ -35,7 +38,10 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
      * @param removeWhenUnchecked If the user should be removed when the checkbox becomes unchecked
      * (used only to prevent the removing of the first user)
      */
-    public ListAdapterUsersCheckBox(Context context, int addUserLayout, List<Map.Entry<User, Boolean>> users, boolean removeWhenUnchecked) {
+    public ListAdapterUsersCheckBox(Context context,
+                                    int addUserLayout,
+                                    List<Map.Entry<User, Boolean>> users,
+                                    boolean removeWhenUnchecked) {
         super(context, addUserLayout, users);
         mContext = context;
         mUsers = users;
