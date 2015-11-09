@@ -32,7 +32,7 @@ public class MessageBinder extends Binder {
      */
     public void attachActivity(MessageActivity activity) {
         Objects.requireNonNull(activity);
-        mService.setMessageActivity(activity);
+        mService.setNotifiableActivity(activity);
     }
 
     /**
