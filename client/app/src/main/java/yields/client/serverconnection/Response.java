@@ -3,11 +3,6 @@ package yields.client.serverconnection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-import java.util.Objects;
-
-import yields.client.messages.Message;
-
 /**
  * The response object which represents a response to be send to the server.
  */
@@ -34,6 +29,10 @@ public class Response{
         return mRawResponse;
     }
 
+    /**
+     * Getter for the response in raw format.
+     * @return The response in raw format.
+     */
     protected String rawResponse(){
         return mRawResponse.toString();
     }

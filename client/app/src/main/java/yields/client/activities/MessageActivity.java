@@ -1,31 +1,38 @@
 package yields.client.activities;
 
-import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.NodeException;
+import yields.client.exceptions.MessageViewException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -34,13 +41,14 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
+import yields.client.service.MessageBinder;
+import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends Activity {
+public class MessageActivity extends AppCompatActivity implements NotifiableActivity {
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -50,6 +58,9 @@ public class MessageActivity extends Activity {
     private boolean mSendImage;
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
+    private static MessageBinder mMessageBinder;
+    private static ActionBar mActionBar;
+    private static ImageButton mSendButton;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -59,18 +70,16 @@ public class MessageActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
 
-        /** FOR SAKE OF SPRINT PRESENTATION !!! **/
-        try {
-            Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
-            YieldsApplication.setUser(new MockClientUser("Mock User", new Id(117), "Mock Email", image1));
-            YieldsApplication.setGroup(createFakeGroup());
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
 
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
@@ -87,23 +96,63 @@ public class MessageActivity extends Activity {
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            showErrorToast("Couldn't get group informations.");
-            TextView groupName = (TextView) findViewById(R.id.groupName);
-            groupName.setText("Unknown group");
-        }else {
+            String message = "Couldn't get group information.";
+            YieldsApplication.showToast(getApplicationContext(), message);
+            mActionBar.setTitle("Unknown group");
+        } else {
             setHeaderBar();
-            try {
-                new RetrieveMessageTask().execute().get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
         }
+
+        mSendButton = (ImageButton) findViewById(R.id.sendButton);
+        mSendButton.setEnabled(false);
+    }
+
+    /**
+     * Automatically called when the activity is resumed after another activity was displayed
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindMessageActivity", true);
+
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     * Called to pause the activity
+     */
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        unbindService(mConnection);
+    }
+
+    /**
+     * @return The id of the current group
+     */
+    public Id getGroupId() {
+        return mGroup.getId();
+    }
+
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu The tool bar menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.menu_message, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendMessage(View v) throws MessageActivityException, IOException {
+    public void onSendMessage(View v){
         String inputMessage =  mInputField.getText().toString();
 
         mInputField.setText("");
@@ -119,10 +168,11 @@ public class MessageActivity extends Activity {
         Message message = new Message("message", new Id(1230), mUser, content, new Date());
         // TODO : take right name and right id.
         mMessages.add(message);
-        mUser.sendMessage(mGroup, message);
+        mMessageBinder.sendMessage(mGroup, message);
 
         mAdapter.notifyDataSetChanged();
-        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
+        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter()
+                .getCount() - 1);
     }
 
     /**
@@ -158,8 +208,8 @@ public class MessageActivity extends Activity {
             try {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (mImage != null) {
-                    Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
-                    toast.show();
+                    String message = "Image added to message";
+                    YieldsApplication.showToast(getApplicationContext(), message);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -167,19 +217,29 @@ public class MessageActivity extends Activity {
         }
     }
 
-    /**
-     * Show an error message in a toast.
-     * @param errorMsg The error message to be displayed.
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
      */
-    private void showErrorToast(String errorMsg){
-        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
-        toast.show();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.actionSettingsGroup:
+                Intent intent = new Intent(this, GroupSettingsActivity.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
-    private void retrieveGroupMessages() throws IOException {
+    private void retrieveGroupMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
@@ -205,67 +265,31 @@ public class MessageActivity extends Activity {
      * Sets the correct information on the header.
      */
     private void setHeaderBar(){
-        TextView groupNameField = (TextView) findViewById(R.id.groupName);
-        groupNameField.setText(mGroup.getName());
+        mActionBar.setTitle(mGroup.getName());
     }
 
     /**
-     * Retreive the group messages.
+     * Notify the activity that the
+     * data set has changed.
      */
-    private class RetrieveMessageTask extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            try {
-                retrieveGroupMessages();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
+    @Override
+    public void notifyChange() {
+        retrieveGroupMessages();
     }
 
-    /**
-     * Mock Client user, only for presentation during the second sprint.
-     */
-    private class  MockClientUser extends ClientUser{
-
-        public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-            super(name, id, email, img);
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMessageBinder = (MessageBinder) service;
+            mMessageBinder.attachActivity(MessageActivity.this);
+            mSendButton.setEnabled(true);
+            mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
         }
 
         @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
+        public void onServiceDisconnected(ComponentName name) {
+            mMessageBinder = null;
+            mSendButton.setEnabled(false);
         }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public void createNewGroup(Group group) throws IOException {
-
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
-    }
-
-    /**
-     * Create fake group for sake of the presentation.
-     * @return fake group.
-     */
-    private Group createFakeGroup() throws NodeException {
-        Bitmap image1 = Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
-        return new Group("Mock group", new Id(123), new ArrayList<User>(), image1);
-    }
+    };
 }

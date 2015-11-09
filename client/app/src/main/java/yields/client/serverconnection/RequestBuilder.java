@@ -8,15 +8,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
+import yields.client.node.Group;
 
 /**
  * A builder for requests that will be send to the server
@@ -30,7 +29,9 @@ public class RequestBuilder {
         PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdate"),
         USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
         USERENTOURAGEREMOVE("UserEntourageRemove"), USERSTATUS("UserStatus"),
-        GROUPCREATE("GroupCreate"), GROUPUPDATE("GroupUpdate"),
+        GROUPCREATE("GroupCreate"), GROUPUPDATENAME("GroupUpdateName"),
+        GROUPUPDATEVISIBILITY("GroupUpdateVisibility"), GROUPUPDATEIMAGE
+                ("GroupUpdateImage"),
         GROUPADD("GroupAdd"), GROUPREMOVE("GroupRemove"),
         GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");
 
@@ -46,7 +47,7 @@ public class RequestBuilder {
         EMAIL("email"), CONTENT("content"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
         LAST("dateLast"), TO("to"), COUNT("count"),
-        IMAGE("image"), NID("nid");
+        IMAGE("image"), NID("nid"), VISIBILITY("visibility");
 
         private final String name;
         Fields(String name) { this.name = name; }
@@ -57,6 +58,13 @@ public class RequestBuilder {
     private final Id mSender;
     private final Map<String, Object> mConstructingMap;
 
+    /**
+     * Request for updating user properties.
+     * @param sender The sender of the request.
+     * @param args The properties to be changed organized in a form
+     *             property -> new value
+     * @return The request.
+     */
     public static Request UserUpdateRequest(Id sender,
                                             Map<Fields, String> args) {
         Objects.requireNonNull(sender);
@@ -77,6 +85,11 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Request to receive the group list.
+     * @param sender The sender of the request.
+     * @return The request.
+     */
     public static Request userGroupListRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
@@ -85,6 +98,12 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Request for adding a 'contact' to the user entourage list.
+     * @param sender The sender of the request.
+     * @param email Email of the new contact to add.
+     * @return The request.
+     */
     public static Request userEntourageAddRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
@@ -96,6 +115,12 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Request for removing a 'contact' from the user entourage list.
+     * @param sender The sender of the request.
+     * @param email Email of the contact to remove.
+     * @return The request.
+     */
     public static Request userEntourageRemoveRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
@@ -107,6 +132,12 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Request for connecting a user to the app.
+     * @param sender The sender of the request.
+     * @param email Email of the user.
+     * @return The request.
+     */
     public static Request userConnectRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
@@ -118,6 +149,11 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * TODO : Nicolas.C explain please.
+     * @param sender The sender of the request.
+     * @return The request.
+     */
     public static Request userUpdateRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
@@ -153,33 +189,72 @@ public class RequestBuilder {
         return builder.request();
     }
 
-    public static Request GroupUpdateRequest(Id sender, Id groupId,
-                                             String newName,
-                                             ImageContent newImage) {
+    /**
+     * Request for updating the group name.
+     * @param sender Sender of the request.
+     * @param groupId Id of the group having its name changed.
+     * @param newName New name for the group.
+     * @return The request.
+     */
+    public static Request GroupUpdateNameRequest(Id sender, Id groupId, String newName){
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newName);
 
-        if (newName == null && newImage == null) {
-            throw new IllegalArgumentException(
-                    "You make no change with this group update");
-        }
-
-        RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPUPDATE, sender);
-
+        RequestBuilder builder = new RequestBuilder(MessageKind.GROUPUPDATENAME, sender);
         builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NAME, newName);
+        return builder.request();
+    }
 
-        if (newName != null) {
-            builder.addField(Fields.NAME, newName);
-        }
-        if (newImage != null) {
-            builder.addField(Fields.IMAGE, newImage.getImage());
-        }
+    /**
+     * Request for updating the group visibility.
+     * @param sender Sender of the request.
+     * @param groupId Id of the group having its name changed.
+     * @param newVisibility The new visibility of the group.
+     * @return The request.
+     */
+    public static Request GroupUpdateVisibilityRequest(Id sender, Id groupId,
+                                           Group.GroupVisibility newVisibility){
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newVisibility);
 
+        RequestBuilder builder = new RequestBuilder(MessageKind
+                .GROUPUPDATEVISIBILITY, sender);
+        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.VISIBILITY, newVisibility);
+        return builder.request();
+    }
+
+    /**
+     * Request for updating the group image.
+     * @param sender Sender of the reauest.
+     * @param groupId Id of the group having its image changed.
+     * @param newImage The new Image
+     * @return The request.
+     */
+    public static Request GroupUpdateImageRequest(Id sender, Id groupId,
+                                                  ImageContent newImage){
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newImage);
+
+        RequestBuilder builder = new RequestBuilder(MessageKind
+                .GROUPUPDATEIMAGE, sender);
+        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.IMAGE, newImage.getImage());
         return builder.request();
     }
 
 
+    /**
+     * Request for adding a new user to a group.
+     * @param sender The sender of the request.
+     * @param groupId Id of the group.
+     * @param newUser The user to add in this group.
+     * @return The request.
+     */
     public static Request GroupAddRequest(Id sender, Id groupId,
                                           Id newUser) {
         Objects.requireNonNull(sender);
@@ -195,6 +270,13 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Request for removing a user from a group.
+     * @param sender The sender of the request.
+     * @param groupId Id of the group.
+     * @param newUser The user to remove from  this group.
+     * @return The request.
+     */
     public static Request GroupRemoveRequest(Id sender, Id groupId,
                                              Id newUser ) {
         Objects.requireNonNull(sender);
@@ -302,12 +384,22 @@ public class RequestBuilder {
         return builder.request();
     }
 
+    /**
+     * Constructor of a RequestBuilder
+     * @param kind The kind of request to be built.
+     * @param sender The sender of the request.
+     */
     private RequestBuilder(MessageKind kind, Id sender){
         this.mKind = kind;
         this.mSender = sender;
         this.mConstructingMap = new ArrayMap<>();
     }
 
+    /**
+     * Here are the methods allowing us to add fields to the request builder.
+     * @param fieldType The type of the field to be added.
+     * @param field The value of this field.
+     */
     private void addField(Fields fieldType, String field) {
         this.mConstructingMap.put(fieldType.getValue(), field);
     }
@@ -340,6 +432,14 @@ public class RequestBuilder {
                 .encodeToString(byteImage, Base64.DEFAULT));
     }
 
+    private void addField(Fields fieldType, Group.GroupVisibility field){
+        this.mConstructingMap.put(fieldType.getValue(), field.toString());
+    }
+
+    /**
+     * Instantiate the request from the reauest builder.
+     * @return The instance of the request.
+     */
     private Request request() {
         Map<String, Object> request = new ArrayMap<>();
         request.put("kind", mKind.name);
@@ -357,8 +457,13 @@ public class RequestBuilder {
         return new Request(new JSONObject(request));
     }
 
+    /**
+     * Format a date.
+     * @param date The date to be formatted..
+     * @return The corresponding formatted format for this date.
+     */
     private String formatDate(Date date) {
-
+        Objects.requireNonNull(date);
         return DateSerialization.toString(date);
     }
 }

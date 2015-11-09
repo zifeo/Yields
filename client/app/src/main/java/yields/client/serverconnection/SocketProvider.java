@@ -2,7 +2,6 @@ package yields.client.serverconnection;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 

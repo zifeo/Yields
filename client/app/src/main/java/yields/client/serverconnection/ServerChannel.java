@@ -1,18 +1,10 @@
 package yields.client.serverconnection;
 
-import android.util.Log;
-
 import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +15,12 @@ public class ServerChannel implements CommunicationChannel {
     private BufferedReader mReceiver;
     private ConnectionStatus mConnectionStatus;
 
+    /**
+     * Constructor for the server channel.
+     * @param sender The sender.
+     * @param receiver The receiver.
+     * @param connectionStatus Status of the connection.
+     */
     protected ServerChannel(BufferedWriter sender, BufferedReader receiver,
                          ConnectionStatus connectionStatus){
 
@@ -65,6 +63,11 @@ public class ServerChannel implements CommunicationChannel {
         return response;
     }
 
+    /**
+     * Test the validity of the response.
+     * @param response The response to test.
+     * @return True if valid, false otherwise.
+     */
     private boolean isValid(String response){
         //TODO: verify response validity with regex maybe
         return true;

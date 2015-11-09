@@ -22,9 +22,9 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the list of contacts of the user is displayed and he can choose whether
- * to include any other user in the future group
+ * to include any other user in the future (or modified) group.
  */
-public class CreateGroupSelectUsersActivity extends AppCompatActivity {
+public class AddUsersFromEntourageActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterEntourage;
     private List<Map.Entry<User, Boolean> > mEntourageChecked;
     private ListView mListView;
@@ -39,7 +39,7 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_group_select_users);
+        setContentView(R.layout.activity_add_users_from_entourage);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -49,7 +49,7 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
 
         if (!intent.hasExtra(EMAIL_LIST_INPUT_KEY)){
             throw new MissingIntentExtraException(
-                    "Email list extra is missing from intent in CreateGroupSelectUsersActivity");
+                    "Email list extra is missing from intent in AddUsersFromEntourageActivity");
         }
 
         ArrayList<String> inputEmailList = intent.getStringArrayListExtra(EMAIL_LIST_INPUT_KEY);
@@ -80,7 +80,7 @@ public class CreateGroupSelectUsersActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
 
-        inflater.inflate(R.menu.menu_create_group_select_users, menu);
+        inflater.inflate(R.menu.menu_add_users_from_entourage, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

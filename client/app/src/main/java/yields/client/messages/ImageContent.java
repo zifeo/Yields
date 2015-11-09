@@ -2,22 +2,18 @@ package yields.client.messages;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Objects;
 
 import yields.client.exceptions.ContentException;
-import yields.client.exceptions.MessageException;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**

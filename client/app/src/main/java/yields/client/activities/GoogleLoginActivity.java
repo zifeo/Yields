@@ -46,11 +46,19 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     private TextView mTextViewGoogleConnecting;
 
 
+    /**
+     * On click Listener.
+     * @param v The View instance.
+     */
     @Override
     public void onClick(View v) {
         onSignInClicked();
     }
 
+    /**
+     * onCreate method for the GoogleLoginActivity.
+     * @param savedInstanceState The bundle.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,30 +85,41 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         mGoogleSingInButton.setOnClickListener(this);
     }
 
+    /**
+     * onStart method for the activity.
+     */
     @Override
     protected void onStart() {
         super.onStart();
         connect();
     }
 
+    /**
+     * onStop method for the activity.
+     */
     @Override
     protected void onStop() {
         super.onStop();
         disconnect();
     }
 
+    /**
+     * User clicked the sign-in button, so begin the sign-in process and automatically
+     * attempt to resolve any errors that occur.
+     */
     private void onSignInClicked() {
-        // User clicked the sign-in button, so begin the sign-in process and automatically
-        // attempt to resolve any errors that occur.
-        mShouldResolve = true;
         connect();
     }
 
+    /**
+     * onConnected indicates that an account was selected on the device, that the selected
+     * account has granted any requested permissions to our app and that we
+     * were able to
+     * establish a service connection to Google Play services.
+     * @param bundle The bundle.
+     */
     @Override
     public void onConnected(Bundle bundle) {
-        // onConnected indicates that an account was selected on the device, that the selected
-        // account has granted any requested permissions to our app and that we were able to
-        // establish a service connection to Google Play services.
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
 
@@ -108,20 +127,26 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    /**
+     * The connection to Google Play services was lost. The GoogleApiClient will automatically
+     * attempt to re-connect. Any UI elements that depend on connection t
+     * Google APIs should
+     * be hidden or disabled until onConnected is called again.
+     * @param unused
+     */
     @Override
     public void onConnectionSuspended(int unused) {
-        // The connection to Google Play services was lost. The GoogleApiClient will automatically
-        // attempt to re-connect. Any UI elements that depend on connection to Google APIs should
-        // be hidden or disabled until onConnected is called again.
-
         connect();
     }
 
+    /**
+     * Could not connect to Google Play Services.  The user needs to select an account,
+     * grant permissions or resolve an error in order to sign in. Refer to the
+     * javadoc for ConnectionResult to see possible error codes.
+     * @param connectionResult result of the connection.
+     */
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        // Could not connect to Google Play Services.  The user needs to select an account,
-        // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
-        // ConnectionResult to see possible error codes.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
 
         if (!mIsResolving && mShouldResolve) {
@@ -145,6 +170,12 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Method called when the connection has ended, successful or not
+     * @param requestCode The code for the request
+     * @param resultCode Code indicating if the operation was successful or not
+     * @param data The data containing the information on the connection
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -162,15 +193,22 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     }
 
 
+    /**
+     * Connect to the google servers
+     */
     private void connect(){
         mGoogleSingInButton.setVisibility(View.INVISIBLE);
         mTextViewGoogleConnecting.setVisibility(View.VISIBLE);
         mButtonCancelGoogleConnection.setVisibility(View.VISIBLE);
         mProgressBarGoogleConnection.setVisibility(View.VISIBLE);
 
+        mShouldResolve = true;
         mGoogleApiClient.connect();
     }
 
+    /**
+     * Disconnect from the google servers
+     */
     private void disconnect(){
         mGoogleSingInButton.setVisibility(View.VISIBLE);
         mTextViewGoogleConnecting.setVisibility(View.INVISIBLE);

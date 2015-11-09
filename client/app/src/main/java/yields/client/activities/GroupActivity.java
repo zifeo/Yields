@@ -1,17 +1,23 @@
 package yields.client.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,15 +35,19 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.service.GroupBinder;
+import yields.client.service.MessageBinder;
+import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Central activity of Yields where the user can discover new nodes, create groups, see its contact
  * list, change its settings and go to chats of different groups
  */
-public class GroupActivity extends AppCompatActivity {
+public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
+    private GroupBinder mGroupBinder = null;
 
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
@@ -130,7 +140,16 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     /**
-     * Automatically called when the activity is resumed after another activity was displayed
+     * Notify the activity that the
+     * data set has changed
+     */
+    @Override
+    public void notifyChange(){
+        mAdapterGroups.notifyDataSetChanged();
+    }
+
+    /**
+     * Automatically called when the activity is started
      */
     @Override
     protected void onStart(){
@@ -140,9 +159,32 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     /**
+     * Automatically called when the activity is resumed after another activity was displayed
+
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindGroupActivity", true);
+
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     * Called to pause the activity
+     */
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        unbindService(mConnection);
+    }
+
+    /**
      * To be removed as soon as the logging is working
      */
-
     private class MockClientUser extends ClientUser {
 
         public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
@@ -210,6 +252,20 @@ public class GroupActivity extends AppCompatActivity {
         Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date()));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date()));
+
         mGroups.add(group2);
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mGroupBinder = (GroupBinder) service;
+            mGroupBinder.attachActivity(GroupActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mGroupBinder = null;
+        }
+    };
 }

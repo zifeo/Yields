@@ -16,41 +16,41 @@ import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
+import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class LoggingInActivity extends AppCompatActivity {
 
+    /**
+     * onCreate method for the LoggingInActivity.
+     * @param savedInstanceState The bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logging_in);
 
-        // Client user call
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("email", Plus.AccountApi
+                        .getAccountName(YieldsApplication.getGoogleApiClient()));
+        startService(serviceIntent);
 
-        // sEmailValid(googleApiClient.getEmail(), this);
-        YieldEmulatorSocketProvider socket = null;
-        try {
-            socket = new YieldEmulatorSocketProvider();
-            ConnectionManager connectionManager = new ConnectionManager(socket);
-            ServerChannel serverChannel = (ServerChannel) connectionManager.getCommunicationChannel();
-            String email = Plus.AccountApi.getAccountName(YieldsApplication.getGoogleApiClient());
-            Request connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
-            serverChannel.sendRequest(connectReq);
-
-            Log.d("LoggingInActivity", "Email = " + email);
-            // TODO : check request, waiting for Nico...
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        goToGroupActivity();
     }
 
-    // Method called by clientUser when the server indicates that the account already exists
+    /**
+     * Method called by clientUser when the server indicates that the account
+     * already exists.
+     */
     public void goToGroupActivity(){
         Intent intent = new Intent(this, GroupActivity.class);
         startActivity(intent);
     }
 
-    // Method called by clientUser when the server indicates that the account doesn't exist
+    /**
+     * Method called by clientUser when the server indicates that the account
+     * doesn't exist.
+     */
     public void goToSelectUsernameActivity(){
         Intent intent = new Intent(this, SelectUsernameActivity.class);
         startActivity(intent);

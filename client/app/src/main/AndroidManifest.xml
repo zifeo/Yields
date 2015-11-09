@@ -17,7 +17,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity android:name=".activities.MessageActivity" >
+        <activity
+            android:name=".activities.MessageActivity"
+            android:parentActivityName=".activities.GroupActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
             android:name=".activities.GoogleLoginActivity"
@@ -49,12 +52,23 @@
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
-            android:name=".activities.CreateGroupSelectUsersActivity"
+            android:name=".activities.CreateGroupSelectNameActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
-        <activity android:name=".activities.CreateGroupSelectNameActivity"
+        <activity
+            android:name=".activities.AddUsersFromEntourageActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".activities.GroupSettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".activities.MessageActivity" >
+        </activity>
+        <service
+            android:name=".service.YieldService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

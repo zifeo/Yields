@@ -344,7 +344,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     addMessage(message, group.getId());
                 }
                 cursor.close();
-            } catch (CacheDatabaseException | IOException exception) {
+            } catch (CacheDatabaseException exception) {
                 Log.d(TAG, "Unable to add Group with id: "
                         + group.getId().getId(), exception);
                 throw new CacheDatabaseException(exception);
@@ -378,10 +378,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Log.d(TAG, "Unable to update Group with id: "
                     + group.getId().getId(), exception);
             throw exception;
-        } catch (IOException exception) {
-            Log.d(TAG, "Unable to update Group with id: "
-                    + group.getId().getId(), exception);
-            throw new CacheDatabaseException(exception);
         }
     }
 

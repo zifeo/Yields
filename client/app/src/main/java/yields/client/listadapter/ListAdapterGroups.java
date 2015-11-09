@@ -15,6 +15,9 @@ import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
 
+/**
+ * Class used to represent a list of groups, in a listview
+ */
 public class ListAdapterGroups extends ArrayAdapter<Group> {
     private Context mContext;
     private int mGroupLayout;
@@ -27,13 +30,21 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         mGroups = groups;
     }
 
+    /**
+     * Get the view at the position
+     * @param position the position of the item
+     * @param convertView The old view
+     * @param parent The parent view
+     * @return The new view
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View singleGroup = inflater.inflate(mGroupLayout, parent, false);
 
         TextView textViewGroupName = (TextView) singleGroup.findViewById(R.id.textViewGroupName);
-        TextView textViewGroupLastMessage = (TextView) singleGroup.findViewById(R.id.textViewGroupLastMessage);
+        TextView textViewGroupLastMessage = (TextView)
+                singleGroup.findViewById(R.id.textViewGroupLastMessage);
         ImageView imageGroup = (ImageView) singleGroup.findViewById(R.id.imageGroup);
 
         Group group = mGroups.get(position);
@@ -46,6 +57,12 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
         return singleGroup;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        Group group = mGroups.get(position);
+        return group.isValidated();
     }
 
 }

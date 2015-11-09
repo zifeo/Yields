@@ -12,18 +12,38 @@ import android.view.ViewGroup;
  */
 public class CenteredToolBar extends Toolbar {
 
+    /**
+     * Constructor for the CenteredToolBar.
+     * @param context The context of the app.
+     */
     public CenteredToolBar(Context context) {
         super(context);
     }
 
+    /**
+     * Constructor for the CenteredToolBar.
+     * @param context The context of the app.
+     * @param attrs The set of attributes.
+     */
     public CenteredToolBar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Constructor for the CenteredToolBar.
+     * @param context The context of the app.
+     * @param attrs The set of attributes.
+     * @param defStyleAttr The default style attribute.
+     */
     public CenteredToolBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
+    /**
+     * Add a View to the toolbar.
+     * @param child The View to be added.
+     * @param params The Layout params for the child.
+     */
     @Override
     public void addView(View child, ViewGroup.LayoutParams params) {
         if (child instanceof ActionMenuView) {
