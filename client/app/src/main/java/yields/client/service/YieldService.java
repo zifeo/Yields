@@ -133,6 +133,10 @@ public class YieldService extends Service {
 
     // TODO : receive a response from server (a list of old messages)
 
+    /**
+     * Create notification for message.
+     * @param message The message.
+     */
     private void sendMessageNotification(Message message) {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
@@ -167,6 +171,9 @@ public class YieldService extends Service {
     }
 
 
+    /**
+     * AsncTask sending th requests.
+     */
     private static class SendRequestTask extends AsyncTask<Request, Void, Void> {
         @Override
         protected Void doInBackground(Request... params) {
