@@ -149,7 +149,7 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
     }
 
     /**
-     * Automatically called when the activity is resumed after another activity was displayed
+     * Automatically called when the activity is started
      */
     @Override
     protected void onStart(){
@@ -158,6 +158,9 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         mAdapterGroups.notifyDataSetChanged();
     }
 
+    /**
+     * Automatically called when the activity is resumed after another activity was displayed
+     */
     @Override
     public void onResume(){
         super.onResume();
@@ -256,6 +259,7 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mGroupBinder = (GroupBinder) service;
+            mGroupBinder.attachActivity(GroupActivity.this);
         }
 
         @Override

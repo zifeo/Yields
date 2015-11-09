@@ -70,8 +70,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //TODO : Create mMessage !!! NICO !
-        mMessageBinder.attachActivity(this);
         Intent serviceIntent = new Intent(this, YieldService.class)
                 .putExtra("bindMessageActivity", true);
         bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
@@ -105,15 +103,35 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             mActionBar.setTitle("Unknown group");
         } else {
             setHeaderBar();
-            // We can 'fill' the group with the message using the
-            // MessageBinder.
-            getMessagesOnCreation();
         }
 
 
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
 
+    }
+
+    /**
+     * Automatically called when the activity is resumed after another activity was displayed
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindMessageActivity", true);
+
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     * Called to pause the activity
+     */
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        unbindService(mConnection);
     }
 
     /**
@@ -277,20 +295,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mMessageBinder = (MessageBinder) service;
+            mMessageBinder.attachActivity(MessageActivity.this);
             mSendButton.setEnabled(true);
+            mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            showErrorToast("Disconnected from network");
+            mMessageBinder = null;
+            mSendButton.setEnabled(false);
         }
     };
-
-    /**
-     * Get the last messages from the group when the activity is created.
-     */
-    private void getMessagesOnCreation(){
-        mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
-        retrieveGroupMessages();
-    }
 }

@@ -108,10 +108,10 @@ public class YieldService extends Service {
     /**
      * Sets the message activity that will retrieve the messages
      *
-     * @param messageActivity The concerned messageActivity
+     * @param notifiableActivity The concerned messageActivity
      */
-    synchronized public void setMessageActivity(MessageActivity messageActivity) {
-        mCurrentNotifiableActivity = messageActivity;
+    synchronized public void setNotifiableActivity(NotifiableActivity notifiableActivity) {
+        mCurrentNotifiableActivity = notifiableActivity;
         mCurrentGroup = YieldsApplication.getGroup();
     }
 
