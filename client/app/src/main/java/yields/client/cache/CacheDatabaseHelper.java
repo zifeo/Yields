@@ -509,7 +509,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
-                + KEY_MESSAGE_GROUPID + " =  ? " + " ORDER BY "
+                + KEY_MESSAGE_GROUPID + " = ? " + " ORDER BY "
                 + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT " + (upperBoundary - lowerBoundary)
                 + " OFFSET " + lowerBoundary;
 
@@ -537,8 +537,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
                 try {
                     byte[] contentAsBytes = cursor.getBlob(cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
-                    String contentType = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
-                    Content content = deserializeContent(contentAsBytes, contentType);
+                    //String contentType = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
+                    Content content = deserializeTextContent(contentAsBytes);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                     Date date = dateFormat.parse(dateAsString);
@@ -616,7 +616,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-
+    /**
+     * Deserializes a byte array into a Content.
+     *
+     * @param bytes The byte array to be deserialized.
+     * @param contentType The type of the Content.
+     * @return  The Content corresponding to the byte array.
+     * @throws CacheDatabaseException If the Content could not be deserialized.
+     */
     private static Content deserializeContent(byte[] bytes, String contentType)
             throws CacheDatabaseException
     {
@@ -751,8 +758,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
-        values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType());
-        values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
+        //values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType());
+        values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
         return values;
