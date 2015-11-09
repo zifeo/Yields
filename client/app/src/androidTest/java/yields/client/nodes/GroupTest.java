@@ -56,6 +56,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         SortedMap<Date, Message> lastMessages = g.getLastMessages();
         List<Message> messages = new ArrayList<>();
         for(Message entry : lastMessages.values()){
+            g.addMessage(entry);
             messages.add(entry);
         }
 
