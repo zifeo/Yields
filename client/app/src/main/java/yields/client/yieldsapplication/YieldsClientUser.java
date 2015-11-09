@@ -185,6 +185,9 @@ public class YieldsClientUser extends ClientUser{
         return req;
     }
 
+    /**
+     * AsyncTask for creating the instance of the YieldsClientUser.
+     */
     private static class CreateInstanceTask extends AsyncTask<Object, Void, YieldsClientUser>{
         @Override
         protected YieldsClientUser doInBackground(Object... params) {
@@ -198,6 +201,9 @@ public class YieldsClientUser extends ClientUser{
         }
     }
 
+    /**
+     * AsyncTask for sending requests.
+     */
     private static class SendRequestTask extends AsyncTask<Request, Void, Void>{
         @Override
         protected Void doInBackground(Request... params) {
