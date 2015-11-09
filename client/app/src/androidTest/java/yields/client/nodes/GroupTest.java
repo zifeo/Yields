@@ -10,10 +10,12 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
@@ -46,10 +48,13 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
     public void setUp() throws Exception {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
-        YieldsApplication.setResources(getInstrumentation().getTargetContext().getResources());ClientUser lastUser = YieldsApplication.getUser();
-        YieldsApplication.setUser(new FakeUserGroupTest("wqef", new Id(2), "d", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565)));
+        YieldsApplication.setResources(getInstrumentation().getTargetContext
+                ().getResources());ClientUser lastUser = YieldsApplication.getUser();
+        YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bob " +
+                "Ross", new Id(1337), "HappyLittleTree@joyOfPainting.ru", Bitmap
+                .createBitmap(80, 80, Bitmap.Config.RGB_565)));
 
-        mG = new Group("Group", new Id(32), new ArrayList<User>());
+        mG = new FakeGroup("Group", new Id(32), new ArrayList<User>());
         YieldsApplication.setGroup(mG);
     }
 
@@ -67,50 +72,29 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         }
     }
 
+    private class FakeGroup extends Group{
 
-    private class FakeUserGroupTest extends ClientUser{
-
-        public FakeUserGroupTest(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
-            super(name, id, email, img);
+        public FakeGroup(String name, Id id, List<User> users) {
+            super(name, id, users);
         }
 
-        @Override
-        public void sendMessage(Group group, Message message) throws IOException {
-
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date last) throws IOException {
-            List<Message> messages = new ArrayList<>();
+        synchronized public SortedMap<Date, Message> getLastMessages() {
+            SortedMap<Date, Message> map = new TreeMap<>();
             for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
                 TextContent mockContent = MockFactory.generateFakeTextContent("Mock message " + i);
                 List<User> usersInGroup = new ArrayList<User>();
-                usersInGroup.add(this);
-                Message m = MockFactory.generateMockMessage("node name", new Id(i), this, mockContent,
+                Message m = MockFactory.generateMockMessage("node name", new
+                                Id(i), MockFactory.generateFakeUser("topkek",
+                                new Id(2), "bobRoss"), mockContent,
                         MockFactory.createMockGroup("Group", new Id(123), usersInGroup));
-                messages.add(m);
+                map.put(new java.util.Date(), m);
                 try {
                     sleep(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            return messages;
-        }
-
-        @Override
-        public void createNewGroup(Group group) throws IOException {
-
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
+            return map;
         }
     }
 }
