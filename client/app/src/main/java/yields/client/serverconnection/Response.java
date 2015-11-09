@@ -29,6 +29,10 @@ public class Response{
         return mRawResponse;
     }
 
+    /**
+     * Getter for the response in raw format.
+     * @return The response in raw format.
+     */
     protected String rawResponse(){
         return mRawResponse.toString();
     }
