@@ -10,12 +10,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
-    private GroupBinder mGroupBinder;
+    private GroupBinder mGroupBinder = null;
 
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
@@ -82,10 +84,6 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
 
         YieldsApplication.setResources(getResources());
         YieldsApplication.setApplicationContext(getApplicationContext());
-
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindGroupActivity", true);
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -158,6 +156,26 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         super.onStart();
 
         mAdapterGroups.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindGroupActivity", true);
+
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    /**
+     * Called to pause the activity
+     */
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        unbindService(mConnection);
     }
 
     /**
@@ -238,12 +256,11 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mGroupBinder = (GroupBinder) service;
-            //TODO activate send button
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            //TODO send Toast
+            mGroupBinder = null;
         }
     };
 }
