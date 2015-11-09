@@ -70,6 +70,12 @@ public class MessageBinder extends Binder {
         Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
     }
 
+    /**
+     * Build a request for sending a message to a group.
+     * @param group The group receiving the message.
+     * @param message The message to be sent to the group.
+     * @return The request.
+     */
     private static Request createRequestForMessageToSend(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
@@ -91,6 +97,10 @@ public class MessageBinder extends Binder {
         return req;
     }
 
+    /**
+     * Finalize the binder.
+     * @throws Throwable
+     */
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
