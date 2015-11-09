@@ -132,21 +132,21 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Adds the given Message to the database.
      *
      * @param message The Message to be added to the database.
-     * @param group The Group to which this Message was sent.
+     * @param groupId The Id of the Group to which this Message was sent.
      * @throws CacheDatabaseException If the message could not be added to the database.
      */
-    public void addMessage(Message message, Group group)
+    public void addMessage(Message message, Id groupId)
             throws CacheDatabaseException
     {
         try {
             String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
                     + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
             Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{message.getId().getId()});
-            if(cursor.getCount() != 0) {
+            if (cursor.getCount() != 0) {
                 deleteMessage(message);
             }
-            mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, group));
-        } catch (CacheDatabaseException exception){
+            mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId));
+        } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId(), exception);
             throw exception;
         }
@@ -175,13 +175,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 + " WHERE " + KEY_USER_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{user.getId().getId()});
-        if(cursor.getCount() == 1){
+        if (cursor.getCount() == 1) {
             updateUser(user);
-        } else if (cursor.getCount() > 1){ //There should not be several Users with the same Id.
+        } else if (cursor.getCount() > 1) { //There should not be several Users with the same Id.
             deleteUser(user);
         }
 
-        if(cursor.getCount() >1 || cursor.getCount() == 0){
+        if (cursor.getCount() > 1 || cursor.getCount() == 0) {
             try {
                 ContentValues values = createContentValuesForUser(user);
                 mDatabase.insert(TABLE_USERS, null, values);
@@ -205,7 +205,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = createContentValuesForUser(user);
             mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
                     new String[]{user.getId().getId()});
-        } catch (CacheDatabaseException exception){
+        } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to update User with id: " + user.getId().getId(), exception);
             throw exception;
         }
@@ -281,27 +281,26 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 + " WHERE " + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{group.getId().getId()});
-        if(cursor.getCount() == 1){
+        if (cursor.getCount() == 1) {
             updateGroup(group);
-        } else if (cursor.getCount() > 1){ //There should not be several Groups with the same Id.
+        } else if (cursor.getCount() > 1) { //There should not be several Groups with the same Id.
             deleteGroup(group);
         }
 
-        if(cursor.getCount() >1 || cursor.getCount() == 0){
+        if (cursor.getCount() > 1 || cursor.getCount() == 0) {
             try {
                 ContentValues values = createContentValuesForGroup(group);
                 mDatabase.insert(TABLE_GROUPS, null, values);
                 for (User user : group.getUsers()) {
                     addUser(user);
                 }
-                for(Message message : group.getLastMessages().values()) {
-                    addMessage(message, group);
+                for (Message message : group.getLastMessages().values()) {
+                    addMessage(message, group.getId());
                 }
             } catch (CacheDatabaseException exception) {
                 Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
                 throw exception;
-            }
-            catch (IOException exception){
+            } catch (IOException exception) {
                 Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
                 throw new CacheDatabaseException(exception);
             }
@@ -321,13 +320,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                     new String[]{group.getId().getId()});
-            for(Message message : group.getLastMessages().values()){
-                addMessage(message, group);
+            for (Message message : group.getLastMessages().values()) {
+                addMessage(message, group.getId());
             }
-        } catch (CacheDatabaseException exception){
+        } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
             throw exception;
-        } catch (IOException exception){
+        } catch (IOException exception) {
             Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
             throw new CacheDatabaseException(exception);
         }
@@ -337,10 +336,10 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Updates the name of a Group in the database.
      *
-     * @param groupId The Id field of the Group that will have it's name changed.
+     * @param groupId      The Id field of the Group that will have it's name changed.
      * @param newGroupName The new name of the Group.
      */
-    public void updateGroupName(Id groupId, String newGroupName){
+    public void updateGroupName(Id groupId, String newGroupName) {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NAME, newGroupName);
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
@@ -350,10 +349,10 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Updates the image of a Group in the database.
      *
-     * @param groupId The Id field of the Group that will have it's image changed.
+     * @param groupId       The Id field of the Group that will have it's image changed.
      * @param newGroupImage The new image for the Group.
      */
-    public void updateGroupImage(Id groupId, Bitmap newGroupImage){
+    public void updateGroupImage(Id groupId, Bitmap newGroupImage) {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_IMAGE, serializeBitmap(newGroupImage));
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
@@ -364,13 +363,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Removes a User from a Group in the database.
      *
      * @param groupId The Id of the Group form which the User shall be removed.
-     * @param userId The Id of the User that will bre removed from the Group.
+     * @param userId  The Id of the User that will bre removed from the Group.
      */
-    public void removeUserFromGroup(Id groupId, Id userId){
+    public void removeUserFromGroup(Id groupId, Id userId) {
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
-        while(idIterator.hasNext()){
-            if(idIterator.next().getId().equals(userId.getId())){
+        while (idIterator.hasNext()) {
+            if (idIterator.next().getId().equals(userId.getId())) {
                 idIterator.remove();
             }
         }
@@ -381,18 +380,44 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Adds a User to a Group in the database.
+     *
+     * @param groupId The Id of the Group to which the User shall be added.
+     * @param userId  The Id of the User that will be added to the Group.
+     */
+    public void addUserToGroup(Id groupId, Id userId) {
+        List<Id> ids = getUserIdsFromGroup(groupId);
+        boolean userIsInCache = false;
+        for(Id id : ids){
+            if(id.getId().equals(userId.getId())){
+                userIsInCache = true;
+            }
+        }
+        if(!userIsInCache) {
+            ids.add(userId);
+            ContentValues values = new ContentValues();
+            values.put(KEY_GROUP_USERS, getStringFromIds(ids));
+            mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+                    new String[]{groupId.getId()});
+
+        }
+    }
+
+    //TODO IMAGEMESSAGE
+
+    /**
      * Retrieves the Ids of all the Users for a Group.
      * Also returns null if the Group is not in the database.
      *
      * @param groupId The Group's Id.
      * @return The Users' id from the Group, or null if there is no such Group in the database.
      */
-    public List<Id> getUserIdsFromGroup(Id groupId){
+    public List<Id> getUserIdsFromGroup(Id groupId) {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{groupId.getId()});
-        if(!cursor.moveToFirst()){
+        if (!cursor.moveToFirst()) {
             return null;
         } else {
             String users = cursor.getString(cursor.getColumnIndex(KEY_GROUP_USERS));
@@ -407,7 +432,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param groupId The Id of the wanted Group.
      * @return The Group which has groupId as its Id or null if there is no such Group
      * in the database.
-    */
+     */
     public Group getGroup(Id groupId) {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
@@ -467,13 +492,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param group         The Group from which we want to retrieve the Messages.
      * @param lowerBoundary The lower boundary (must be at least 1).
      * @param upperBoundary The upper boundary.
-     * @throws CacheDatabaseException If the database was unable to fetch some information.
      * @return The list of Messages from the interval for the Group.
-      */
+     * @throws CacheDatabaseException If the database was unable to fetch some information.
+     */
     public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
             throws CacheDatabaseException
     {
-        if(lowerBoundary < 0 || lowerBoundary > upperBoundary){
+        if (lowerBoundary < 0 || lowerBoundary > upperBoundary) {
             throw new IllegalArgumentException("Illegal boundaries ! The upper boundary must be "
                     + "greater than the lower boundary which can not be negative");
         }
@@ -514,7 +539,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
-                }catch (CacheDatabaseException exception){
+                } catch (CacheDatabaseException exception) {
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
                             + group.getId().getId(), exception);
                     throw exception;
@@ -611,17 +636,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Creates the appropriate row entry (ContentValues) for a Message.
      *
      * @param message The Message for which a ContentValues is built.
-     * @param group The Group to which the Message is added.
+     * @param groupId The Id of the Group to which the Message is added.
      * @return A ContentValues object which corresponds to the Message.
      * @throws CacheDatabaseException If some of the Message information could not be serialized.
      */
-    private static ContentValues createContentValuesForMessage(Message message, Group group)
+    private static ContentValues createContentValuesForMessage(Message message, Id groupId)
             throws CacheDatabaseException
     {
         ContentValues values = new ContentValues();
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
-        values.put(KEY_MESSAGE_GROUPID, group.getId().getId());
+        values.put(KEY_MESSAGE_GROUPID, groupId.getId());
         values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
@@ -663,7 +688,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         StringBuilder userIdsAsString = new StringBuilder();
         List<User> users = group.getUsers();
         List<Id> userIDs = new ArrayList<>();
-        for(User user : users){
+        for (User user : users) {
             userIDs.add(user.getId());
         }
         values.put(KEY_GROUP_USERS, getStringFromIds(userIDs));
@@ -679,7 +704,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static List<Id> getIdListFromString(String idsAsString) {
         String[] idsAsArray = idsAsString.split(",");
         List<Id> ids = new ArrayList<>();
-        for(String string : idsAsArray){
+        for (String string : idsAsArray) {
             ids.add(new Id(string));
         }
         return ids;
