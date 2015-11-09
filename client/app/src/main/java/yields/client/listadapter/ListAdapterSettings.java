@@ -19,6 +19,12 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
     private int mSettingLayout;
     private List<String> mSettings;
 
+    /**
+     * Constructor for the ListAdapterSettings.
+     * @param context The context of the application.
+     * @param settingLayout The layout Settings.
+     * @param settings Text for the icons.
+     */
     public ListAdapterSettings(Context context, int settingLayout, List<String> settings) {
         super(context, settingLayout, settings);
         mContext = context;
@@ -26,6 +32,13 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
         mSettings = settings;
     }
 
+    /**
+     * Returns the View of the adapter.
+     * @param position Position of the element.
+     * @param convertView The View to convert.
+     * @param parent The parent of the view to be conveted.
+     * @return The new View respecting the layout.
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
