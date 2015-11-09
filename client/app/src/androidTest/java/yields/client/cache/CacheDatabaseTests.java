@@ -42,6 +42,7 @@ public class CacheDatabaseTests {
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
         YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bobby", new Id(123),
                 "lol@gmail.com", YieldsApplication.getDefaultGroupImage()));
+        CacheDatabaseHelper.deleteDatbase();
         mDatabaseHelper = new CacheDatabaseHelper();
         mDatabase = mDatabaseHelper.getWritableDatabase();
         mDatabaseHelper.clearDatabase();
@@ -74,6 +75,7 @@ public class CacheDatabaseTests {
             String selectQuery = "SELECT * FROM messages;";
             Cursor cursor = mDatabase.rawQuery(selectQuery, null);
             assertTrue(!cursor.moveToFirst());
+            cursor.close();
         } catch (CacheDatabaseException exception) {
             fail();
         } finally {
@@ -94,7 +96,8 @@ public class CacheDatabaseTests {
             }
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
             assertEquals(3, cursor.getCount());
-            assertEquals(6, cursor.getColumnCount());
+            assertEquals(7, cursor.getColumnCount());
+            cursor.close();
         } catch (CacheDatabaseException e) {
             e.printStackTrace();
         } finally {
@@ -121,6 +124,7 @@ public class CacheDatabaseTests {
             String selectQuery = "SELECT * FROM users;";
             Cursor cursor = mDatabase.rawQuery(selectQuery, null);
             assertTrue(!cursor.moveToFirst());
+            cursor.close();
         } catch (CacheDatabaseException exception) {
             fail();
         } finally {
@@ -146,7 +150,7 @@ public class CacheDatabaseTests {
             cursor.moveToFirst();
 
             for (int i = 0; i < 6; i++) {
-                assertTrue(checkUserInformation(cursor, users.get(i), i));
+                assertTrue(checkUserInformation(cursor, users.get(i)));
                 if (i != 5) {
                     cursor.moveToNext();
                 }
@@ -226,6 +230,7 @@ public class CacheDatabaseTests {
             String selectQuery = "SELECT * FROM groups;";
             Cursor cursor = mDatabase.rawQuery(selectQuery, null);
             assertTrue(!cursor.moveToFirst());
+            cursor.close();
         } catch (CacheDatabaseException exception) {
             fail();
         } finally {
@@ -459,11 +464,9 @@ public class CacheDatabaseTests {
      *
      * @param cursor The row where the User information is to be checked.
      * @param user   The User which should have its data at the row pointed at by cursor.
-     * @param i      The integer used to specify which index the User has when it was created with
-     *               MockFactory.generateMockUsers(int number).
      * @return A boolean which is true if the information is correct, and false otherwise.
      */
-    private boolean checkUserInformation(Cursor cursor, User user, int i) {
+    private boolean checkUserInformation(Cursor cursor, User user) {
         boolean idIsCorrect = user.getId().getId().equals(cursor.getString(cursor.getColumnIndex("nodeID")));
         boolean userNameIsCorrect = user.getName().equals(
                 cursor.getString(cursor.getColumnIndex("userName")));
@@ -492,7 +495,7 @@ public class CacheDatabaseTests {
         StringBuilder userIDS = new StringBuilder();
         List<User> users = group.getUsers();
         for (User user : users) {
-            userIDS.append(user.getId().getId() + ",");
+            userIDS.append(user.getId().getId()).append(",");
         }
         if (users.size() != 0) {
             userIDS.deleteCharAt(userIDS.length() - 1);
@@ -515,7 +518,7 @@ public class CacheDatabaseTests {
     private boolean compareUser(User user1, User user2) {
         boolean sameName = user1.getName().equals(user2.getName());
         boolean sameEmail = user1.getEmail().equals(user2.getEmail());
-        boolean sameId = user1.getId().getId() == user2.getId().getId();
+        boolean sameId = user1.getId().getId().equals(user2.getId().getId());
         return sameName && sameEmail && sameId;
     }
 
@@ -531,7 +534,7 @@ public class CacheDatabaseTests {
     private boolean compareUsers(List<User> users1, List<User> users2) {
         boolean sameSize = users1.size() == users2.size();
         if (!sameSize) {
-            return sameSize;
+            return false;
         } else {
             boolean same = true;
             for (int i = 0; i < users1.size(); i++) {

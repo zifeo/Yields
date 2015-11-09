@@ -151,10 +151,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Cursor cursor = mDatabase.rawQuery(selectQuery,
                     new String[]{message.getId().getId()});
             if (cursor.getCount() != 0) {
+                cursor.close();
                 deleteMessage(message.getId());
             }
             mDatabase.insert(TABLE_MESSAGES, null,
                     createContentValuesForMessage(message, groupId));
+            cursor.close();
         } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to insert Message with id: "
                     + message.getId().getId(), exception);
@@ -187,6 +189,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{user.getId().getId()});
         if (cursor.getCount() == 1) {
+            cursor.close();
             updateUser(user);
         } else if (cursor.getCount() > 1) { //There should not be several Users with the same Id.
             deleteUser(user.getId());
@@ -195,6 +198,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         if (cursor.getCount() > 1 || cursor.getCount() == 0) {
             try {
                 ContentValues values = createContentValuesForUser(user);
+                cursor.close();
                 mDatabase.insert(TABLE_USERS, null, values);
             } catch (CacheDatabaseException exception) {
                 Log.d(TAG, "Unable to insert User with id: "
@@ -240,6 +244,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
                 new String[]{userID.getId()});
         if (!userCursor.moveToFirst()) {
+            userCursor.close();
             return null;
         } else {
             String userName = userCursor.getString(
@@ -248,6 +253,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     userCursor.getColumnIndex(KEY_USER_EMAIL));
             Bitmap userImage = deserializeBitmap(userCursor.getBlob
                     (userCursor.getColumnIndex(KEY_USER_IMAGE)));
+            userCursor.close();
             return new User(userName, userID, userEmail, userImage);
         }
     }
@@ -262,6 +268,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = mDatabase.rawQuery(selectAllUsersQuery, null);
         List<User> users = new ArrayList<>();
         if (!cursor.moveToFirst()) {
+            cursor.close();
             return users;
         } else {
             do {
@@ -269,6 +276,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                         cursor.getColumnIndex(KEY_USER_NODEID)));
                 users.add(getUser(userId));
             } while (cursor.moveToNext());
+            cursor.close();
             return users;
         }
     }
@@ -301,6 +309,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{group.getId().getId()});
         if (cursor.getCount() == 1) {
+            cursor.close();
             updateGroup(group);
         } else if (cursor.getCount() > 1) { //There should not be several Groups with the same Id.
             deleteGroup(group);
@@ -316,11 +325,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 for (Message message : group.getLastMessages().values()) {
                     addMessage(message, group.getId());
                 }
-            } catch (CacheDatabaseException exception) {
-                Log.d(TAG, "Unable to add Group with id: "
-                        + group.getId().getId(), exception);
-                throw exception;
-            } catch (IOException exception) {
+                cursor.close();
+            } catch (CacheDatabaseException | IOException exception) {
                 Log.d(TAG, "Unable to add Group with id: "
                         + group.getId().getId(), exception);
                 throw new CacheDatabaseException(exception);
@@ -427,8 +433,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    //TODO IMAGEMESSAGE
-
     /**
      * Retrieves the Ids of all the Users for a Group.
      * Also returns null if the Group is not in the database.
@@ -443,9 +447,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{groupId.getId()});
         if (!cursor.moveToFirst()) {
+            cursor.close();
             return null;
         } else {
             String users = cursor.getString(cursor.getColumnIndex(KEY_GROUP_USERS));
+            cursor.close();
             return getIdListFromString(users);
         }
     }
@@ -467,6 +473,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 new String[]{groupId.getId()});
 
         if (!cursor.moveToFirst()) {
+            cursor.close();
             return null;
         } else {
             String groupName = cursor.getString(
@@ -486,6 +493,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     }
                 }
             }
+            cursor.close();
             return new Group(groupName, groupId, groupUsers, groupImage);
         }
     }
@@ -501,6 +509,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         List<Group> groups = new ArrayList<>();
         if (!groupCursor.moveToFirst()) {
+            groupCursor.close();
             return groups;
         } else {
             do {
@@ -511,6 +520,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     groups.add(group);
                 }
             } while (groupCursor.moveToNext());
+            groupCursor.close();
             return groups;
         }
     }
@@ -548,6 +558,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         List<Message> messages = new ArrayList<>();
         if (!cursor.moveToFirst()) {
+            cursor.close();
             return messages;
         } else {
             do {
@@ -567,25 +578,25 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     }
                 }
                 try {
-                    byte[] contentAsBytes = cursor.getBlob(cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
-                    //String contentType = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
-                    Content content = deserializeTextContent(contentAsBytes);
+                    byte[] contentAsBytes = cursor.getBlob(
+                            cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
+                    String contentType = cursor.getString(
+                            cursor.getColumnIndex(KEY_MESSAGE_TYPE));
+                    Content content = deserializeContent(contentAsBytes, contentType);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                     Date date = dateFormat.parse(dateAsString);
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
-                } catch (CacheDatabaseException exception) {
+                } catch (CacheDatabaseException | ParseException exception) {
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
                             + group.getId().getId(), exception);
-                    throw exception;
-                } catch (ParseException exception) {
-                    Log.d(TAG, "Unable to parse String as a Date.", exception);
                     throw new CacheDatabaseException("Unable to retrieve Messages from Group "
                             + group.getId().getId());
                 }
             } while (cursor.moveToNext());
+            cursor.close();
             return messages;
         }
     }
@@ -597,6 +608,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         mDatabase.delete("users", null, null);
         mDatabase.delete("groups", null, null);
         mDatabase.delete("messages", null, null);
+    }
+
+    /**
+     * Deletes the Database file in the file system.
+     */
+    public static void deleteDatbase(){
+        YieldsApplication.getApplicationContext().deleteDatabase(DATABASE_NAME);
     }
 
     /**
@@ -686,8 +704,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
-            outputStream.writeUTF(content.getCaption());
-            outputStream.write(serializeBitmap(content.getImage()));
+            outputStream.writeObject(content);
             outputStream.close();
             byte[] bytes = byteOutputStream.toByteArray();
             byteOutputStream.close();
@@ -696,7 +713,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Log.d(TAG, "Could not serialize ImageContent !", exception);
             throw new CacheDatabaseException("Could not serialize ImageContent !");
         }
-        //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
 
     /**
@@ -712,16 +728,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         try {
             ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
             ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
-            String text = objectInputStream.readUTF();
-            TextContent content = new TextContent(text);
+            ImageContent content = (ImageContent) objectInputStream.readObject();
             objectInputStream.close();
             byteInputStream.close();
             return content;
-        } catch (IOException exception) {
+        } catch (IOException | ClassNotFoundException exception) {
             Log.d(TAG, "Could not deserialize TextContent !", exception);
             throw new CacheDatabaseException("Could not deserialize Content !");
         }
-        //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
 
     /**
@@ -746,7 +760,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Log.d(TAG, "Could not serialize TextContent !", exception);
             throw new CacheDatabaseException("Could not serialize TextContent !");
         }
-        //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
 
     /**
@@ -771,7 +784,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Log.d(TAG, "Could not deserialize TextContent !", exception);
             throw new CacheDatabaseException("Could not deserialize Content !");
         }
-        //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
 
     /**
@@ -790,8 +802,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
-        //values.put(KEY_MESSAGE_TYPE, message.getContent().getType());
-        values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
+        values.put(KEY_MESSAGE_TYPE, message.getContent().getType());
+        values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
         return values;
@@ -867,7 +879,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static String getStringFromIds(List<Id> ids) {
         StringBuilder idsAsString = new StringBuilder();
         for (Id id : ids) {
-            idsAsString.append(id.getId() + ",");
+            idsAsString.append(id.getId()).append(",");
         }
         if (ids.size() != 0) {
             idsAsString.deleteCharAt(idsAsString.length() - 1);
