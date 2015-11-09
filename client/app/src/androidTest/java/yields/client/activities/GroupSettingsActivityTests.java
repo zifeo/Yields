@@ -60,7 +60,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
         onView(withText("Ok")).perform(click());
 
-        
         onView(withText("Group name changed to \"Group SWENG\"")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }

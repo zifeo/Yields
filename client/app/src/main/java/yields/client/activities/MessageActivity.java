@@ -103,10 +103,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             setHeaderBar();
         }
 
-
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
-
     }
 
     /**
@@ -235,7 +233,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
