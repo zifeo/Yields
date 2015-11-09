@@ -71,7 +71,7 @@ public class YieldService extends Service {
      *
      * @param intent The intent of the binding which contains a boolean that states
      *               which binder to send
-     * @return The Binder concerned
+     * @return The Binder concerned null if no information on the binding is given
      */
     @Override
     public IBinder onBind(Intent intent) {
