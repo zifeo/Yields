@@ -3,11 +3,14 @@ package yields.client.cache;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +23,6 @@ import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
-import yields.client.yieldsapplication.YieldsClientUser;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -216,18 +218,42 @@ public class CacheDatabaseTests {
 
     /**
      * Tests if a Group can be renamed.
-     * (Test for updateGroupName(String newGroupName, Id groupId))
+     * (Test for updateGroupName(Id groupId, String newGroupName,))
      */
     @Test
     public void testDatabaseCanUpdateGroupName(){
         try {
             Group group = MockFactory.generateMockGroups(1).get(0);
             mDatabaseHelper.addGroup(group);
-            mDatabaseHelper.updateGroupName("New group name", group.getId());
+            mDatabaseHelper.updateGroupName(group.getId(), "New group name");
             Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
             assertEquals(fromDatabase.getName(), "New group name");
             assertEquals(fromDatabase.getId().getId(), group.getId().getId());
             assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+        } catch (CacheDatabaseException e) {
+            fail();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if a Group can have it's image changed.
+     * (Test for testDatabaseCanUpdateGroupImage(Id groupId, Bitmap newGroupImage))
+     */
+    @Test
+    public void testDatabaseCanUpdateGroupImage(){
+        try {
+            Group group = MockFactory.generateMockGroups(1).get(0);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.updateGroupImage(group.getId(),
+                    Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565));
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), group.getName());
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+            assertTrue(compareImages(Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565),
+                    fromDatabase.getImage()));
         } catch (CacheDatabaseException e) {
             fail();
         } finally {
@@ -363,14 +389,15 @@ public class CacheDatabaseTests {
      * @return A boolean which is true if the information is correct, and false otherwise.
      */
     private boolean checkUserInformation(Cursor cursor, User user, int i) {
-        boolean idIsCorrect = -i == cursor.getLong(cursor.getColumnIndex("nodeID"));
-        boolean userNameIsCorrect = ("Mock user name " + i).equals(
+        boolean idIsCorrect = user.getId().getId().equals(cursor.getString(cursor.getColumnIndex("nodeID")));
+        boolean userNameIsCorrect = user.getName().equals(
                 cursor.getString(cursor.getColumnIndex("userName")));
-        boolean userEmailIsCorrect = ("Mock email " + i).equals(cursor.getString(
+        boolean userEmailIsCorrect = user.getEmail().equals(cursor.getString(
                 cursor.getColumnIndex("userEmail")));
-        //TODO: Find out how to check image information
-
-        return idIsCorrect && userNameIsCorrect && userEmailIsCorrect;
+        byte[] imageFromCache = cursor.getBlob(cursor.getColumnIndex("userImage"));
+        boolean userImageIsCorrect = compareImages(user.getImg(),
+                BitmapFactory.decodeByteArray(imageFromCache, 0, imageFromCache.length));
+        return idIsCorrect && userNameIsCorrect && userEmailIsCorrect && userImageIsCorrect;
     }
 
     /**
@@ -397,9 +424,10 @@ public class CacheDatabaseTests {
         }
         boolean groupUserIDsAreCorrect = userIDS.toString().equals(
                 cursor.getString(cursor.getColumnIndex("groupUsers")));
-        //TODO: Find out how to check image information
-
-        return idIsCorrect && groupNameIsCorrect && groupUserIDsAreCorrect;
+        byte[] imageFromCache = cursor.getBlob(cursor.getColumnIndex("groupImage"));
+        boolean groupImageIsCorrect = compareImages(group.getImage(),
+                BitmapFactory.decodeByteArray(imageFromCache, 0, imageFromCache.length));
+        return idIsCorrect && groupNameIsCorrect && groupUserIDsAreCorrect && groupImageIsCorrect;
     }
 
     /**
@@ -436,5 +464,14 @@ public class CacheDatabaseTests {
             }
             return same;
         }
+    }
+
+    private boolean compareImages(Bitmap originalImage, Bitmap imageFromCache){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        originalImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        byte[] bytesOriginalImage = stream.toByteArray();
+        Bitmap reconstructedOriginalImage =  BitmapFactory.decodeByteArray(bytesOriginalImage, 0,
+                bytesOriginalImage.length);
+        return reconstructedOriginalImage.sameAs(imageFromCache);
     }
 }

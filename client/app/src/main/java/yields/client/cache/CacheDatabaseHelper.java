@@ -337,12 +337,25 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Updates the name of a Group in the database.
      *
-     * @param newGroupName The new name of the Group.
      * @param groupId The Id field of the Group that will have it's name changed.
+     * @param newGroupName The new name of the Group.
      */
-    public void updateGroupName(String newGroupName, Id groupId){
+    public void updateGroupName(Id groupId, String newGroupName){
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NAME, newGroupName);
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+                new String[]{groupId.getId()});
+    }
+
+    /**
+     * Updates the image of a Group in the database.
+     *
+     * @param groupId The Id field of the Group that will have it's image changed.
+     * @param newGroupImage The new image for the Group.
+     */
+    public void updateGroupImage(Id groupId, Bitmap newGroupImage){
+        ContentValues values = new ContentValues();
+        values.put(KEY_GROUP_IMAGE, serializeBitmap(newGroupImage));
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                 new String[]{groupId.getId()});
     }

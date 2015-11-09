@@ -77,8 +77,7 @@ public class MockFactory {
     }
 
     public static User generateFakeUser(String name, Id id, String email) {
-        Bitmap image1 = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                R.drawable.userpicture);
+        Bitmap image1 = YieldsApplication.getDefaultUserImage();
         return new User(name, id, email, image1);
     }
 

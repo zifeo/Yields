@@ -37,7 +37,7 @@ public class YieldsApplication {
     }
 
     public static Bitmap getDefaultGroupImage(){
-        return  Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
+        return Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565);
     }
 
     public static Bitmap getDefaultUserImage(){
