@@ -85,8 +85,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
                 List<User> usersInGroup = new ArrayList<User>();
                 Message m = MockFactory.generateMockMessage("node name", new
                                 Id(i), MockFactory.generateFakeUser("topkek",
-                                new Id(2), "bobRoss"), mockContent,
-                        MockFactory.createMockGroup("Group", new Id(123), usersInGroup));
+                                new Id(2), "bobRoss"), mockContent);
                 map.put(new java.util.Date(), m);
                 try {
                     sleep(5);

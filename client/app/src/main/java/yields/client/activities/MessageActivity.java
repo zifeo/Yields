@@ -165,8 +165,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(0), mUser, content,
-                new Date(), mGroup);
+        Message message = new Message("message", new Id(1230), mUser, content, new Date());
+        // TODO : take right name and right id.
         mMessages.add(message);
         mMessageBinder.sendMessage(mGroup, message);
 

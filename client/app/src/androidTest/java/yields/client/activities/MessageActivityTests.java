@@ -55,7 +55,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         YieldsApplication.setGroup(MOCK_GROUP);
 
-        ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user", new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
+        ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user",
+                new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
         YieldsApplication.setUser(MOCK_CLIENT_USER);
         assertTrue(YieldsApplication.getUser().getImg() != null);
     }

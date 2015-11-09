@@ -3,11 +3,14 @@ package yields.client.cache;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +40,9 @@ public class CacheDatabaseTests {
     public void setUp() {
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
+        YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bobby", new Id(123),
+                "lol@gmail.com", YieldsApplication.getDefaultGroupImage()));
+        CacheDatabaseHelper.deleteDatbase();
         mDatabaseHelper = new CacheDatabaseHelper();
         mDatabase = mDatabaseHelper.getWritableDatabase();
         mDatabaseHelper.clearDatabase();
@@ -52,6 +58,55 @@ public class CacheDatabaseTests {
     }
 
     /**
+     * Tests if Messages are correctly deleted from the database.
+     * (Test for CacheDatabaseHelper.deleteMessage(ID id))
+     */
+    @Test
+    public void testDatabaseCanDeleteMessages() {
+        try {
+            List<Message> messages = MockFactory.generateMockMessages(6);
+            for (Message message : messages) {
+                mDatabaseHelper.addMessage(message, new Id(666));
+            }
+            for (Message message : messages) {
+                mDatabaseHelper.deleteMessage(message.getId());
+            }
+
+            String selectQuery = "SELECT * FROM messages;";
+            Cursor cursor = mDatabase.rawQuery(selectQuery, null);
+            assertTrue(!cursor.moveToFirst());
+            cursor.close();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if Messages can be added to the database.
+     * (Test for addMessage(Message message, Id groupId))
+     */
+    @Test
+    public void testDatabaseCanAddMessage(){
+        try {
+            List<Message> messages = MockFactory.generateMockMessages(3);
+            for(Message message : messages) {
+                mDatabaseHelper.addMessage(message, new Id(666));
+            }
+            Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
+            assertEquals(3, cursor.getCount());
+            assertEquals(7, cursor.getColumnCount());
+            cursor.close();
+        } catch (CacheDatabaseException e) {
+            e.printStackTrace();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+
+    /**
      * Tests if users are correctly deleted from the database.
      * (Test for CacheDatabaseHelper.deleteUser(ID id))
      */
@@ -63,14 +118,15 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addUser(user);
             }
             for (User user : users) {
-                mDatabaseHelper.deleteUser(user);
+                mDatabaseHelper.deleteUser(user.getId());
             }
 
             String selectQuery = "SELECT * FROM users;";
             Cursor cursor = mDatabase.rawQuery(selectQuery, null);
             assertTrue(!cursor.moveToFirst());
-        } catch (CacheDatabaseException exception){
-            fail();
+            cursor.close();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -94,13 +150,13 @@ public class CacheDatabaseTests {
             cursor.moveToFirst();
 
             for (int i = 0; i < 6; i++) {
-                assertTrue(checkUserInformation(cursor, users.get(i), i));
+                assertTrue(checkUserInformation(cursor, users.get(i)));
                 if (i != 5) {
                     cursor.moveToNext();
                 }
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -111,7 +167,7 @@ public class CacheDatabaseTests {
      * (Test for CacheDatabaseHelper.getUser(ID userID))
      */
     @Test
-    public void testDatabasCanGetUser() {
+    public void testDatabaseCanGetUser() {
         try {
             List<User> users = MockFactory.generateMockUsers(6);
             for (User user : users) {
@@ -123,8 +179,8 @@ public class CacheDatabaseTests {
                 assertEquals(users.get(i).getEmail(), userFromDatabase.getEmail());
                 assertEquals(users.get(i).getId().getId(), userFromDatabase.getId().getId());
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -149,8 +205,8 @@ public class CacheDatabaseTests {
                 assertEquals(users.get(i).getEmail(), usersFromDatabase.get(i).getEmail());
                 assertEquals(users.get(i).getId().getId(), usersFromDatabase.get(i).getId().getId());
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -174,8 +230,9 @@ public class CacheDatabaseTests {
             String selectQuery = "SELECT * FROM groups;";
             Cursor cursor = mDatabase.rawQuery(selectQuery, null);
             assertTrue(!cursor.moveToFirst());
-        } catch (CacheDatabaseException exception){
-            fail();
+            cursor.close();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -204,12 +261,112 @@ public class CacheDatabaseTests {
                     cursor.moveToNext();
                 }
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
     }
+
+    /**
+     * Tests if a Group can be renamed.
+     * (Test for updateGroupName(Id groupId, String newGroupName,))
+     */
+    @Test
+    public void testDatabaseCanUpdateGroupName() {
+        try {
+            Group group = MockFactory.generateMockGroups(1).get(0);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.updateGroupName(group.getId(), "New group name");
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), "New group name");
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if a Group can have it's image changed.
+     * (Test for testDatabaseCanUpdateGroupImage(Id groupId, Bitmap newGroupImage))
+     */
+    @Test
+    public void testDatabaseCanUpdateGroupImage() {
+        try {
+            Group group = MockFactory.generateMockGroups(1).get(0);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.updateGroupImage(group.getId(),
+                    Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565));
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), group.getName());
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+            assertTrue(compareImages(Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565),
+                    fromDatabase.getImage()));
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if a User can be removed from a Group.
+     * (Test for removeUserFromGroup(Id groupId, Id userId))
+     */
+    @Test
+    public void testDatabaseCanRemoveUserFromGroup() {
+        try {
+            Group group = MockFactory.generateMockGroups(3).get(2);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.removeUserFromGroup(group.getId(), group.getUsers().get(0).getId());
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), group.getName());
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareImages(group.getImage(), fromDatabase.getImage()));
+            assertEquals(group.getUsers().size() - 1, fromDatabase.getUsers().size());
+
+            ArrayList<User> usersCopy = new ArrayList<>(group.getUsers());
+            usersCopy.remove(0);
+            assertTrue(compareUsers(fromDatabase.getUsers(), usersCopy));
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if a User can be added to a Group.
+     * (Test for addUserToGroup(Id groupId, Id userId))
+     */
+    @Test
+    public void testDatabaseCanAddUserToGroup() {
+        try {
+            Group group = MockFactory.generateMockGroups(3).get(2);
+            mDatabaseHelper.addGroup(group);
+            User userToAdd = MockFactory.generateMockUsers(15).get(14);
+            mDatabaseHelper.addUser(userToAdd);
+            mDatabaseHelper.addUserToGroup(group.getId(), userToAdd.getId());
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), group.getName());
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareImages(group.getImage(), fromDatabase.getImage()));
+            assertEquals(group.getUsers().size() + 1, fromDatabase.getUsers().size());
+
+            ArrayList<User> usersCopy = new ArrayList<>(group.getUsers());
+            usersCopy.add(userToAdd);
+            assertTrue(compareUsers(fromDatabase.getUsers(), usersCopy));
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
 
     /**
      * Tests if it can retrieve a Group.
@@ -228,8 +385,8 @@ public class CacheDatabaseTests {
                 assertEquals(groups.get(i).getId().getId(), groupFromDatabase.getId().getId());
                 assertTrue(compareUsers(groups.get(i).getUsers(), groupFromDatabase.getUsers()));
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -255,8 +412,8 @@ public class CacheDatabaseTests {
                 assertEquals(groups.get(i).getId().getId(), groupFromDatabase.getId().getId());
                 assertTrue(compareUsers(groups.get(i).getUsers(), groupFromDatabase.getUsers()));
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -279,13 +436,13 @@ public class CacheDatabaseTests {
 
             for (int i = 0; i < 30; i++) {
                 Message message = new Message("Mock node name User1 " + i, new Id(-i),
-                        user1, MockFactory.generateFakeTextContent(i), new Date(), group);
-                mDatabaseHelper.addMessage(message);
+                        user1, MockFactory.generateFakeTextContent(i), new Date());
+                mDatabaseHelper.addMessage(message, group.getId());
             }
             for (int i = 0; i < 30; i++) {
                 Message message = new Message("Mock node name User2 " + i, new Id(-i - 30),
-                        user2, MockFactory.generateFakeTextContent(i), new Date(), group);
-                mDatabaseHelper.addMessage(message);
+                        user2, MockFactory.generateFakeTextContent(i), new Date());
+                mDatabaseHelper.addMessage(message, group.getId());
             }
 
             List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 0, 10);
@@ -295,8 +452,8 @@ public class CacheDatabaseTests {
                 assertEquals("1", message.getSender().getId().getId());
                 assertEquals("Mock message #" + i, ((TextContent) message.getContent()).getText());
             }
-        } catch (CacheDatabaseException exception){
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -307,19 +464,18 @@ public class CacheDatabaseTests {
      *
      * @param cursor The row where the User information is to be checked.
      * @param user   The User which should have its data at the row pointed at by cursor.
-     * @param i      The integer used to specify which index the User has when it was created with
-     *               MockFactory.generateMockUsers(int number).
      * @return A boolean which is true if the information is correct, and false otherwise.
      */
-    private boolean checkUserInformation(Cursor cursor, User user, int i) {
-        boolean idIsCorrect = -i == cursor.getLong(cursor.getColumnIndex("nodeID"));
-        boolean userNameIsCorrect = ("Mock user name " + i).equals(
+    private boolean checkUserInformation(Cursor cursor, User user) {
+        boolean idIsCorrect = user.getId().getId().equals(cursor.getString(cursor.getColumnIndex("nodeID")));
+        boolean userNameIsCorrect = user.getName().equals(
                 cursor.getString(cursor.getColumnIndex("userName")));
-        boolean userEmailIsCorrect = ("Mock email " + i).equals(cursor.getString(
+        boolean userEmailIsCorrect = user.getEmail().equals(cursor.getString(
                 cursor.getColumnIndex("userEmail")));
-        //TODO: Find out how to check image information
-
-        return idIsCorrect && userNameIsCorrect && userEmailIsCorrect;
+        byte[] imageFromCache = cursor.getBlob(cursor.getColumnIndex("userImage"));
+        boolean userImageIsCorrect = compareImages(user.getImg(),
+                BitmapFactory.decodeByteArray(imageFromCache, 0, imageFromCache.length));
+        return idIsCorrect && userNameIsCorrect && userEmailIsCorrect && userImageIsCorrect;
     }
 
     /**
@@ -339,16 +495,17 @@ public class CacheDatabaseTests {
         StringBuilder userIDS = new StringBuilder();
         List<User> users = group.getUsers();
         for (User user : users) {
-            userIDS.append(user.getId().getId() + ",");
+            userIDS.append(user.getId().getId()).append(",");
         }
         if (users.size() != 0) {
             userIDS.deleteCharAt(userIDS.length() - 1);
         }
         boolean groupUserIDsAreCorrect = userIDS.toString().equals(
                 cursor.getString(cursor.getColumnIndex("groupUsers")));
-        //TODO: Find out how to check image information
-
-        return idIsCorrect && groupNameIsCorrect && groupUserIDsAreCorrect;
+        byte[] imageFromCache = cursor.getBlob(cursor.getColumnIndex("groupImage"));
+        boolean groupImageIsCorrect = compareImages(group.getImage(),
+                BitmapFactory.decodeByteArray(imageFromCache, 0, imageFromCache.length));
+        return idIsCorrect && groupNameIsCorrect && groupUserIDsAreCorrect && groupImageIsCorrect;
     }
 
     /**
@@ -361,7 +518,7 @@ public class CacheDatabaseTests {
     private boolean compareUser(User user1, User user2) {
         boolean sameName = user1.getName().equals(user2.getName());
         boolean sameEmail = user1.getEmail().equals(user2.getEmail());
-        boolean sameId = user1.getId().getId() == user2.getId().getId();
+        boolean sameId = user1.getId().getId().equals(user2.getId().getId());
         return sameName && sameEmail && sameId;
     }
 
@@ -377,7 +534,7 @@ public class CacheDatabaseTests {
     private boolean compareUsers(List<User> users1, List<User> users2) {
         boolean sameSize = users1.size() == users2.size();
         if (!sameSize) {
-            return sameSize;
+            return false;
         } else {
             boolean same = true;
             for (int i = 0; i < users1.size(); i++) {
@@ -385,5 +542,21 @@ public class CacheDatabaseTests {
             }
             return same;
         }
+    }
+
+    /**
+     * Compares two Images (where one of them passed through the cache).
+     *
+     * @param originalImage  The original image (didn't go through cache).
+     * @param imageFromCache The image that wen through the cache.
+     * @return True if the images are the same, false otherwise.
+     */
+    private boolean compareImages(Bitmap originalImage, Bitmap imageFromCache) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        originalImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        byte[] bytesOriginalImage = stream.toByteArray();
+        Bitmap reconstructedOriginalImage = BitmapFactory.decodeByteArray(bytesOriginalImage, 0,
+                bytesOriginalImage.length);
+        return reconstructedOriginalImage.sameAs(imageFromCache);
     }
 }

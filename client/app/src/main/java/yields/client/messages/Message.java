@@ -29,7 +29,6 @@ public class Message extends Node {
     private final User mSender;
     private final Content mContent;
     private final Date mDate;
-    private final Group mGroupReceiver;
 
     /**
      * Main constructor for a Message.
@@ -41,12 +40,10 @@ public class Message extends Node {
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, User sender, Content content,
-                   Date date, Group groupReceiver) {
+    public Message(String nodeName, Id nodeID, User sender, Content content, Date date) {
         super(nodeName, nodeID);
         this.mSender = Objects.requireNonNull(sender);
         this.mContent = Objects.requireNonNull(content);
-        this.mGroupReceiver = Objects.requireNonNull(groupReceiver);
         this.mDate = new Date(date.getTime());
     }
 
@@ -69,7 +66,6 @@ public class Message extends Node {
         this.mSender = sender;
         // TODO : Implement images !!!
         this.mContent = new TextContent(object.getString("text"));
-        this.mGroupReceiver = null;
         //TODO : Implement Groups
 
         try {
@@ -104,15 +100,6 @@ public class Message extends Node {
      */
     public java.util.Date getDate() {
         return new Date(mDate.getTime());
-    }
-
-    /**
-     * Returns the Group which receives this message.
-     *
-     * @return The Group which reveives this message.
-     */
-    public Group getReceivingGroup() {
-        return mGroupReceiver;
     }
 
     /**
