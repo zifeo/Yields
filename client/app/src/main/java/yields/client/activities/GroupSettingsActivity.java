@@ -81,11 +81,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
         mGroup = YieldsApplication.getGroup();
         mUser = YieldsApplication.getUser();
 
-        Objects.requireNonNull(mGroup,
-                "The group in YieldsApplication cannot be null when this activity is created");
-
-        Objects.requireNonNull(mUser,
-                "The user in YieldsApplication cannot be null when this activity is created");
+        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created" ;
+        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created" ;
     }
 
     /**
