@@ -192,12 +192,7 @@ public class Group extends Node {
      * @return the preview of the last message or "" if there are no messages
      */
     synchronized public String getPreviewOfLastMessage(){
-        if (mMessages.size() > 0){
-            return getLastMessage().getPreview();
-        }
-        else{
-            return "";
-        }
+        return mMessages.size() > 0 ? getLastMessage().getPreview() : "";
     }
 
     /**
