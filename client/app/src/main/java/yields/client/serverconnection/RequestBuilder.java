@@ -61,8 +61,8 @@ public class RequestBuilder {
     /**
      * Request for updating user properties.
      * @param sender The sender of the request.
-     * @param args The properties to be changed organized in a form property
-     *             -> new value
+     * @param args The properties to be changed organized in a form
+     *             property -> new value
      * @return The request.
      */
     public static Request UserUpdateRequest(Id sender,
@@ -87,8 +87,8 @@ public class RequestBuilder {
 
     /**
      * Request to receive the group list.
-     * @param sender
-     * @return
+     * @param sender The sender of the request.
+     * @return The request.
      */
     public static Request userGroupListRequest(Id sender) {
         Objects.requireNonNull(sender);
@@ -100,9 +100,9 @@ public class RequestBuilder {
 
     /**
      * Request for adding a 'contact' to the user entourage list.
-     * @param sender
+     * @param sender The sender of the request.
      * @param email Email of the new contact to add.
-     * @return
+     * @return The request.
      */
     public static Request userEntourageAddRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
@@ -117,9 +117,9 @@ public class RequestBuilder {
 
     /**
      * Request for removing a 'contact' from the user entourage list.
-     * @param sender
+     * @param sender The sender of the request.
      * @param email Email of the contact to remove.
-     * @return
+     * @return The request.
      */
     public static Request userEntourageRemoveRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
@@ -134,9 +134,9 @@ public class RequestBuilder {
 
     /**
      * Request for connecting a user to the app.
-     * @param sender
+     * @param sender The sender of the request.
      * @param email Email of the user.
-     * @return
+     * @return The request.
      */
     public static Request userConnectRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
@@ -151,8 +151,8 @@ public class RequestBuilder {
 
     /**
      * TODO : Nicolas.C explain please.
-     * @param sender
-     * @return
+     * @param sender The sender of the request.
+     * @return The request.
      */
     public static Request userUpdateRequest(Id sender) {
         Objects.requireNonNull(sender);
@@ -250,10 +250,10 @@ public class RequestBuilder {
 
     /**
      * Request for adding a new user to a group.
-     * @param sender
+     * @param sender The sender of the request.
      * @param groupId Id of the group.
      * @param newUser The user to add in this group.
-     * @return
+     * @return The request.
      */
     public static Request GroupAddRequest(Id sender, Id groupId,
                                           Id newUser) {
@@ -272,10 +272,10 @@ public class RequestBuilder {
 
     /**
      * Request for removing a user from a group.
-     * @param sender
+     * @param sender The sender of the request.
      * @param groupId Id of the group.
      * @param newUser The user to remove from  this group.
-     * @return
+     * @return The request.
      */
     public static Request GroupRemoveRequest(Id sender, Id groupId,
                                              Id newUser ) {
