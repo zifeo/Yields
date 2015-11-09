@@ -88,7 +88,10 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
         return true;
     }
 
-    // displays a toast with the given string
+    /**
+     * Displays a Toast containing the given string.
+     * @param error The string to be displyed in the toast.
+     */
     private void displayError(String error){
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
