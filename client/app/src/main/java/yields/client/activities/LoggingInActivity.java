@@ -51,6 +51,8 @@ public class LoggingInActivity extends AppCompatActivity {
                 .putExtra("email", Plus.AccountApi
                         .getAccountName(YieldsApplication.getGoogleApiClient()));
         startService(serviceIntent);
+
+        goToGroupActivity();
     }
 
     /**
