@@ -30,7 +30,7 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
   }
 
   property("UserGroupListRes") = forAll { (x: UserGroupListRes) =>
-    toAndFromJson(x).toString == x.toString
+    toAndFromJson(x) == x
   }
 
 }

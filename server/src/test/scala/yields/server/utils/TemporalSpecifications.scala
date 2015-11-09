@@ -5,9 +5,9 @@ import java.util.Date
 import org.scalacheck.{Prop, Properties}
 import yields.server.DefaultsGenerators
 
-object ConvertersSpecifications extends Properties("UtilsConverters") with DefaultsGenerators {
+object TemporalSpecifications extends Properties("TemporalUtils") with DefaultsGenerators {
 
-  import Converters._
+  import Temporal._
   import Prop.forAll
 
   property("OffsetDateTime") = forAll { (x: Date) =>

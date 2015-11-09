@@ -5,29 +5,29 @@ import yields.server._
 import yields.server.actions.groups._
 import yields.server.dbi.models._
 
-trait GroupsGenerators extends DefaultsGenerators {
+trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
 
   import Arbitrary.arbitrary
 
   implicit lazy val groupCreateArb: Arbitrary[GroupCreate] = Arbitrary {
     for {
-      name <- cleanStringGen
+      name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
     } yield GroupCreate(name, nodes)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
-    } yield GroupCreateRes(gid)
+      nid <- arbitrary[NID]
+    } yield GroupCreateRes(nid)
   }
 
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
-      name <- cleanOptionStringGen
+      nid <- arbitrary[NID]
+      name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
-    } yield GroupUpdate(gid, name, image)
+    } yield GroupUpdate(nid, name, image)
   }
 
   implicit lazy val groupUpdateResArb: Arbitrary[GroupUpdateRes] = Arbitrary {
@@ -36,9 +36,9 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
-      content <- cleanStringGen
-    } yield GroupMessage(gid, content)
+      nid <- arbitrary[NID]
+      content <- arbitrary[String]
+    } yield GroupMessage(nid, content)
   }
 
   implicit lazy val groupMessageResArb: Arbitrary[GroupMessageRes] = Arbitrary {
@@ -47,15 +47,15 @@ trait GroupsGenerators extends DefaultsGenerators {
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
     for {
-      gid <- arbitrary[GID]
-      lastNid <- arbitrary[NID]
+      nid <- arbitrary[NID]
+      lastTid <- arbitrary[TID]
       count <- arbitrary[Int]
-    } yield GroupHistory(gid, lastNid, count)
+    } yield GroupHistory(nid, lastTid, count)
   }
 
   implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
     for {
-      nodes <- arbitrary[List[Node]]
+      nodes <- arbitrary[List[FeedContent]]
     } yield GroupHistoryRes(nodes)
   }
 

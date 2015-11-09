@@ -14,30 +14,29 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   private val messageFld = "message"
 
   /**
-   * Format the message with its message type.
-   * @param obj message to pack
-   * @tparam T message type
-   * @return packed message json format
-   */
+    * Format given object with its type.
+    * @param obj object to pack
+    * @tparam T object type
+    * @return packed json object
+    */
   def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
     kindFld -> obj.getClass.getSimpleName.toJson,
     messageFld -> obj.toJson
   )
 
-  override def write(obj: Action): JsValue = {
-    val kind = obj.getClass.getSimpleName
-    obj match {
-      case x: GroupCreate => packWithKind(x)
-      case x: GroupUpdate => packWithKind(x)
-      case x: GroupMessage => packWithKind(x)
-      case x: GroupHistory => packWithKind(x)
+  override def write(obj: Action): JsValue = obj match {
+    case x: GroupCreate => packWithKind(x)
+    case x: GroupUpdate => packWithKind(x)
+    case x: GroupMessage => packWithKind(x)
+    case x: GroupHistory => packWithKind(x)
 
-      case x: UserConnect => packWithKind(x)
-      case x: UserUpdate => packWithKind(x)
-      case x: UserGroupList => packWithKind(x)
+    case x: UserConnect => packWithKind(x)
+    case x: UserUpdate => packWithKind(x)
+    case x: UserGroupList => packWithKind(x)
 
-      case _ => serializationError(s"unregistered action kind: $kind")
-    }
+    case _ =>
+      val kind = obj.getClass.getSimpleName
+      serializationError(s"unregistered action kind: $kind")
   }
 
   override def read(json: JsValue): Action =

@@ -1,23 +1,38 @@
 package yields.server.actions.groups
 
-import yields.server.dbi.models.{UID, Blob, GID}
-import yields.server.actions.{Result, Action}
+import yields.server.actions.exceptions.ActionArgumentException
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.{Group, Blob, NID}
+import yields.server.mpi.Metadata
 
 /**
  * Update a group given given specific fields.
- * @param gid group id
+ * @param nid group id
  * @param name new name
  * @param pic new profile image
+ *
+ * TODO: Update picture
  */
-case class GroupUpdate(gid: GID, name: Option[String], pic: Option[Blob]) extends Action {
+case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extends Action {
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  override def run(sender: UID): Result = {
-    GroupUpdateRes()
+  override def run(metadata: Metadata): Result = {
+    if (nid > 0) {
+      val group = Group(nid)
+
+      name match {
+        case Some(newName) if newName.nonEmpty => group.name = newName
+        case _ =>
+      }
+
+      GroupUpdateRes()
+    } else {
+      throw new ActionArgumentException("Bad nid")
+    }
   }
 
 }
