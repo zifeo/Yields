@@ -62,7 +62,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_GROUPID = "messageGroup";
     private static final String KEY_MESSAGE_SENDERID = "messageSender";
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
-    private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
+    private static final String KEY_MESSAGE_TYPE = "messageType";
     private static final String KEY_MESSAGE_DATE = "messageDate";
 
 
@@ -80,7 +80,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
             + KEY_MESSAGE_GROUPID + " TEXT," + KEY_MESSAGE_SENDERID + " TEXT,"
-            + KEY_MESSAGE_CONTENT_TYPE + " TEXT," + KEY_MESSAGE_CONTENT
+            + KEY_MESSAGE_TYPE + " TEXT," + KEY_MESSAGE_CONTENT
             + " BLOB," + KEY_MESSAGE_DATE + " DATETIME" + ")";
 
     private final SQLiteDatabase mDatabase;
@@ -126,11 +126,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deletes the given Message from the database.
      *
-     * @param message The Message to be deleted.
+     * @param messageId The Id of the Message to be deleted.
      */
-    public void deleteMessage(Message message) {
+    public void deleteMessage(Id messageId) {
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODEID + " = ?",
-                new String[]{String.valueOf(message.getId().getId())});
+                new String[]{String.valueOf(messageId.getId())});
     }
 
     /**
@@ -148,7 +148,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
             Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{message.getId().getId()});
             if (cursor.getCount() != 0) {
-                deleteMessage(message);
+                deleteMessage(message.getId());
             }
             mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId));
         } catch (CacheDatabaseException exception) {
@@ -160,11 +160,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deletes the User from the database.
      *
-     * @param user The User to be deleted.
+     * @param userId The Id of the User to be deleted.
      */
-    public void deleteUser(User user) {
+    public void deleteUser(Id userId) {
         mDatabase.delete(TABLE_USERS, KEY_USER_NODEID + " = ?",
-                new String[]{String.valueOf(user.getId().getId())});
+                new String[]{String.valueOf(userId.getId())});
     }
 
     /**
@@ -183,7 +183,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         if (cursor.getCount() == 1) {
             updateUser(user);
         } else if (cursor.getCount() > 1) { //There should not be several Users with the same Id.
-            deleteUser(user);
+            deleteUser(user.getId());
         }
 
         if (cursor.getCount() > 1 || cursor.getCount() == 0) {
@@ -758,7 +758,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
-        //values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType());
+        //values.put(KEY_MESSAGE_TYPE, message.getContent().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));

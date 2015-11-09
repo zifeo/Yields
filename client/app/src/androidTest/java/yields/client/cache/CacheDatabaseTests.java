@@ -57,6 +57,53 @@ public class CacheDatabaseTests {
     }
 
     /**
+     * Tests if Messages are correctly deleted from the database.
+     * (Test for CacheDatabaseHelper.deleteMessage(ID id))
+     */
+    @Test
+    public void testDatabaseCanDeleteMessages() {
+        try {
+            List<Message> messages = MockFactory.generateMockMessages(6);
+            for (Message message : messages) {
+                mDatabaseHelper.addMessage(message, new Id(666));
+            }
+            for (Message message : messages) {
+                mDatabaseHelper.deleteMessage(message.getId());
+            }
+
+            String selectQuery = "SELECT * FROM messages;";
+            Cursor cursor = mDatabase.rawQuery(selectQuery, null);
+            assertTrue(!cursor.moveToFirst());
+        } catch (CacheDatabaseException exception) {
+            fail();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if Messages can be added to the database.
+     * (Test for addMessage(Message message, Id groupId))
+     */
+    @Test
+    public void testDatabaseCanAddMessage(){
+        try {
+            List<Message> messages = MockFactory.generateMockMessages(3);
+            for(Message message : messages) {
+                mDatabaseHelper.addMessage(message, new Id(666));
+            }
+            Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
+            assertEquals(3, cursor.getCount());
+            assertEquals(6, cursor.getColumnCount());
+        } catch (CacheDatabaseException e) {
+            e.printStackTrace();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+
+    /**
      * Tests if users are correctly deleted from the database.
      * (Test for CacheDatabaseHelper.deleteUser(ID id))
      */
@@ -68,7 +115,7 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addUser(user);
             }
             for (User user : users) {
-                mDatabaseHelper.deleteUser(user);
+                mDatabaseHelper.deleteUser(user.getId());
             }
 
             String selectQuery = "SELECT * FROM users;";
