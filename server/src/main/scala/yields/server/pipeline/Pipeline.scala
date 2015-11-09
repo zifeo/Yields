@@ -5,7 +5,7 @@ import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import yields.server.mpi.{Metadata, Request, Response}
 import yields.server.pipeline.modules.{LoggerModule, SerializationModule}
-import yields.server.utils.{Config, Helpers}
+import yields.server.utils.{Temporal, Config}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +19,7 @@ object Pipeline {
 
   /** Returns current timed server metadata. */
   def currentServerMetadata(): Metadata =
-   Metadata(7777, Helpers.currentDatetime)
+   Metadata(7777, Temporal.current)
 
   /**
    * Creates a pipeline including the following steps:
@@ -43,7 +43,7 @@ object Pipeline {
 
     val execute = Flow[Request].mapAsyncUnordered(parallelism) { case Request(action, metadata) =>
       Future {
-        val result = action.run(metadata.sender)
+        val result = action.run(metadata)
         Response(result, currentServerMetadata())
       }
     }

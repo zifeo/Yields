@@ -1,36 +1,39 @@
 package yields.server
 
-import java.text.SimpleDateFormat
-import java.time.OffsetDateTime
+import com.redis.RedisClientPool
+import yields.server.dbi.exceptions.IllegalValueException
+import yields.server.utils.Config
 
-import com.orientechnologies.orient.`object`.db.OObjectDatabaseTx
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery
-import yields.server.utils.{Helpers, Config}
-
-import scala.collection.JavaConverters._
 import scala.language.implicitConversions
 
+/**
+  * All Redis database interface related values and functions.
+  */
 package object dbi {
 
-  private[dbi] lazy implicit val database: OObjectDatabaseTx = {
-    val db = new OObjectDatabaseTx(Config.getString("database.uri"))
-    db.open(Config.getString("database.user"), Config.getString("database.pass"))
-    db.getEntityManager.registerEntityClasses("yields.server.dbi.models")
-    db
+  private[dbi] val redis = new RedisClientPool(
+    host = Config.getString("database.addr"),
+    port = Config.getInt("database.port"),
+    secret = Some(Config.getString("database.pass")),
+    database = Config.getInt("database.id")
+  )
+
+  /** Terminates database connection. */
+  def close(): Unit = {
+    redis.withClient(_.disconnect)
+    redis.close
   }
 
-  private val databaseDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  // Gets the value if set or else throws an exception (cannot be unset).
+  private[dbi] def valueOrException[T](value: Option[T]): T =
+    value.getOrElse(throw new IllegalValueException("value should be set"))
 
-  def queryBySql[T](sql: String, params: AnyRef*)(implicit db: OObjectDatabaseTx): List[T] = {
-    val params4java = params.toArray
-    val results: java.util.List[T] = db.query(new OSQLSynchQuery[T](sql), params4java: _*)
-    results.asScala.toList
-  }
+  // Gets the value if set or else gets default value.
+  private[dbi] def valueOrDefault[T](value: Option[T], default: T): T =
+    value.getOrElse(default)
 
-  /** Returns current database formatted date and time. */
-  def databaseDateTime: String = databaseDateTime(Helpers.currentDatetime)
-
-  /** Returns given database formatted date and time. */
-  def databaseDateTime(datetime: OffsetDateTime): String =  databaseDateTimeFormat.format(datetime)
+  // Returns whether the count is one or throws an exception on error.
+  private[dbi] def hasChangeOneEntry(count: Option[Long]): Boolean =
+    valueOrException(count) == 1
 
 }

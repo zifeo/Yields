@@ -2,8 +2,9 @@ import sbt._
 
 object Dependencies {
 
-  val typeSafe = Seq(
-    "com.typesafe" % "config" % "1.3.0"
+  val meta = Seq(
+    "com.typesafe" % "config" % "1.3.0",
+    "ch.qos.logback" % "logback-classic" % "1.1.3"
   )
 
   val akka = {
@@ -15,7 +16,7 @@ object Dependencies {
     )
   }
 
-  val akkaStream = {
+  val akkaExp = {
     val version = "1.0"
     Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % version,
@@ -23,14 +24,9 @@ object Dependencies {
     )
   }
 
-  val orientDB = {
-    val version = "2.1.4"
-    Seq(
-      "com.orientechnologies" % "orientdb-core" % version,
-      "com.orientechnologies" % "orientdb-client" % version,
-      "com.orientechnologies" % "orientdb-graphdb" % version
-    )
-  }
+  val redis = Seq(
+    "net.debasishg" %% "redisclient" % "3.0"
+  )
 
   val tests = Seq(
     "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",

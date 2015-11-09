@@ -20,10 +20,12 @@ object YieldsServer extends Build {
 
     libraryDependencies ++= {
       import Dependencies._
-      typeSafe ++ akka ++ akkaStream ++ orientDB ++ tests
+      meta ++ akka ++ akkaExp ++ redis ++ tests
     },
 
-    cancelable in Global := true
+    cancelable in Global := true,
+    fork := true,
+    evictionWarningOptions in update := EvictionWarningOptions.empty
 
   )
 

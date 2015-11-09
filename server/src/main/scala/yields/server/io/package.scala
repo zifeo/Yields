@@ -4,7 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
-import yields.server.io.models.{GroupJsonFormat, UserJsonFormat}
+import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
 import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -17,6 +17,7 @@ package object io {
 
   /***** Models *****/
 
+  implicit lazy val nodeJF = NodeJsonFormat
   implicit lazy val groupJF = GroupJsonFormat
   implicit lazy val userJF = UserJsonFormat
 
@@ -52,9 +53,8 @@ package object io {
 
   /***** Message passing interface *****/
 
-  implicit lazy val requestJS = RequestJsonFormat
-  implicit lazy val responseJS = ResponseJsonFormat
-  implicit lazy val metadataJS = jsonFormat2(Metadata)
-
+  implicit lazy val requestJF = RequestJsonFormat
+  implicit lazy val responseJF = ResponseJsonFormat
+  implicit lazy val metadataJF = jsonFormat2(Metadata)
 
 }

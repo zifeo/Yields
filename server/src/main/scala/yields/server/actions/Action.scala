@@ -1,6 +1,6 @@
 package yields.server.actions
 
-import yields.server.dbi.models.UID
+import yields.server.mpi.Metadata
 
 /**
  * Every action happening in the pipeline.
@@ -9,10 +9,10 @@ trait Action {
 
   /**
    * Run the action given the sender.
-   * @param sender action requester
+   * @param metadata action requester
    * @return action result
    */
-  def run(sender: UID): Result
+  def run(metadata: Metadata): Result
 
 }
 
