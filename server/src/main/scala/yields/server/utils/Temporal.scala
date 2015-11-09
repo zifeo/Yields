@@ -3,6 +3,7 @@ package yields.server.utils
 import java.time.{ZoneId, OffsetDateTime}
 import java.util.Date
 
+/** Regroups all temporal utilities. */
 object Temporal {
 
   /** Converts an old java date to new java 8 offset datetime. */
