@@ -125,13 +125,13 @@ public class YieldService extends Service {
     /**
      * Called when a message is received from the server
      *
-     * @param groupId The group the message ud from
+     * @param group The group the message s from
      * @param message The message in question
      */
-    synchronized public void receiveMessage(Id groupId, Message message) {
+    synchronized public void receiveMessage(Group group, Message message) {
         if (mCurrentNotifiableActivity == null ||
-                mCurrentGroup.getId() != groupId) {
-            sendMessageNotification(message);
+                mCurrentGroup.getId() != group.getId()) {
+            sendMessageNotification(group, message);
         } else {
             mCurrentGroup.addMessage(message);
             mCurrentNotifiableActivity.notifyChange();
@@ -177,7 +177,7 @@ public class YieldService extends Service {
      * Create notification for message.
      * @param message The message.
      */
-    private void sendMessageNotification(Message message) {
+    private void sendMessageNotification(Group group, Message message) {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.send_icon)
@@ -185,7 +185,7 @@ public class YieldService extends Service {
                         .setContentText(message.getContent().toString().substring(0, 50));
 
         // Creates an explicit intent for an Activity in your app
-        YieldsApplication.setGroup(message.getReceivingGroup());
+        YieldsApplication.setGroup(group);
         Intent resultIntent = new Intent(this, MessageActivity.class);
 
         // The stack builder object will contain an artificial back stack for the
