@@ -66,7 +66,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_DATE = "messageDate";
 
 
-
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODEID + " TEXT,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
@@ -89,13 +88,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Main constructor, creates the database.
      */
     public CacheDatabaseHelper() {
-        super(YieldsApplication.getApplicationContext(), DATABASE_NAME, null, DATABASE_VERSION);
+        super(YieldsApplication.getApplicationContext(), DATABASE_NAME, null,
+                DATABASE_VERSION);
         mDatabase = this.getWritableDatabase();
     }
 
     /**
-     * Called when the database is created for the first time. This is where the creation of
-     * tables and the initial population of the tables should happen.
+     * Called when the database is created for the first time. This is where the
+     * creation of tables and the initial population of the tables should happen.
      *
      * @param db The database.
      */
@@ -107,9 +107,10 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Description copied from class: SQLiteOpenHelper Called when the database needs
-     * to be upgraded. The implementation should use this method to drop tables, add tables,
-     * or do anything else it needs to upgrade to the new schema version.
+     * Description copied from class: SQLiteOpenHelper Called when the database
+     * needs to be upgraded. The implementation should use this method to drop
+     * tables, add tables, or do anything else it needs to upgrade to the new
+     * schema version.
      *
      * @param db         The database.
      * @param oldVersion The old version identifier.
@@ -138,7 +139,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param message The Message to be added to the database.
      * @param groupId The Id of the Group to which this Message was sent.
-     * @throws CacheDatabaseException If the message could not be added to the database.
+     * @throws CacheDatabaseException If the message could not be added to the
+     *                                database.
      */
     public void addMessage(Message message, Id groupId)
             throws CacheDatabaseException
@@ -146,13 +148,16 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         try {
             String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
                     + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
-            Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{message.getId().getId()});
+            Cursor cursor = mDatabase.rawQuery(selectQuery,
+                    new String[]{message.getId().getId()});
             if (cursor.getCount() != 0) {
                 deleteMessage(message.getId());
             }
-            mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId));
+            mDatabase.insert(TABLE_MESSAGES, null,
+                    createContentValuesForMessage(message, groupId));
         } catch (CacheDatabaseException exception) {
-            Log.d(TAG, "Unable to insert Message with id: " + message.getId().getId(), exception);
+            Log.d(TAG, "Unable to insert Message with id: "
+                    + message.getId().getId(), exception);
             throw exception;
         }
     }
@@ -171,7 +176,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Adds the User from the database.
      *
      * @param user The User to be added.
-     * @throws CacheDatabaseException If the User could not be inserted into the database.
+     * @throws CacheDatabaseException If the User could not be inserted into the
+     *                                database.
      */
     public void addUser(User user)
             throws CacheDatabaseException
@@ -191,7 +197,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 ContentValues values = createContentValuesForUser(user);
                 mDatabase.insert(TABLE_USERS, null, values);
             } catch (CacheDatabaseException exception) {
-                Log.d(TAG, "Unable to insert User with id: " + user.getId().getId(), exception);
+                Log.d(TAG, "Unable to insert User with id: "
+                        + user.getId().getId(), exception);
                 throw exception;
             }
         }
@@ -201,7 +208,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Updates the User in the database.
      *
      * @param user The User to be updated.
-     * @throws CacheDatabaseException If the User could not be updated in the database.
+     * @throws CacheDatabaseException If the User could not be updated in the
+     *                                database.
      */
     public void updateUser(User user)
             throws CacheDatabaseException
@@ -211,18 +219,20 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
                     new String[]{user.getId().getId()});
         } catch (CacheDatabaseException exception) {
-            Log.d(TAG, "Unable to update User with id: " + user.getId().getId(), exception);
+            Log.d(TAG, "Unable to update User with id: " + user.getId().getId(),
+                    exception);
             throw exception;
         }
     }
 
     /**
-     * Retrieves a User according to its Id, returns null if such a User is not in the database.
-     * Also returns null if the User could not be correctly extracted from the database.
+     * Retrieves a User according to its Id, returns null if such a User is not
+     * in the database. Also returns null if the User could not be correctly
+     * extracted from the database.
      *
      * @param userID The Id of the wanted User.
-     * @return The User which has userID as its Id or null if there is no such User in the
-     * database.
+     * @return The User which has userID as its Id or null if there is no such
+     * User in the database.
      */
     public User getUser(Id userID) {
         String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
@@ -232,8 +242,10 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         if (!userCursor.moveToFirst()) {
             return null;
         } else {
-            String userName = userCursor.getString(userCursor.getColumnIndex(KEY_USER_NAME));
-            String userEmail = userCursor.getString(userCursor.getColumnIndex(KEY_USER_EMAIL));
+            String userName = userCursor.getString(
+                    userCursor.getColumnIndex(KEY_USER_NAME));
+            String userEmail = userCursor.getString(
+                    userCursor.getColumnIndex(KEY_USER_EMAIL));
             Bitmap userImage = deserializeBitmap(userCursor.getBlob
                     (userCursor.getColumnIndex(KEY_USER_IMAGE)));
             return new User(userName, userID, userEmail, userImage);
@@ -253,7 +265,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             return users;
         } else {
             do {
-                Id userId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_USER_NODEID)));
+                Id userId = new Id(cursor.getLong(
+                        cursor.getColumnIndex(KEY_USER_NODEID)));
                 users.add(getUser(userId));
             } while (cursor.moveToNext());
             return users;
@@ -277,7 +290,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * are not in the database already.
      *
      * @param group The Group to be added.
-     * @throws CacheDatabaseException If the Group could not be inserted into the database.
+     * @throws CacheDatabaseException If the Group could not be inserted into
+     *                                the database.
      */
     public void addGroup(Group group)
             throws CacheDatabaseException
@@ -303,10 +317,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     addMessage(message, group.getId());
                 }
             } catch (CacheDatabaseException exception) {
-                Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
+                Log.d(TAG, "Unable to add Group with id: "
+                        + group.getId().getId(), exception);
                 throw exception;
             } catch (IOException exception) {
-                Log.d(TAG, "Unable to add Group with id: " + group.getId().getId(), exception);
+                Log.d(TAG, "Unable to add Group with id: "
+                        + group.getId().getId(), exception);
                 throw new CacheDatabaseException(exception);
             }
         }
@@ -316,7 +332,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Updates the Group in the database.
      *
      * @param group The Group to be updated.
-     * @throws CacheDatabaseException If the Group could not be updated in the database.
+     * @throws CacheDatabaseException If the Group could not be updated
+     *                                in the database.
      */
     public void updateGroup(Group group)
             throws CacheDatabaseException
@@ -329,10 +346,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 addMessage(message, group.getId());
             }
         } catch (CacheDatabaseException exception) {
-            Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
+            Log.d(TAG, "Unable to update Group with id: "
+                    + group.getId().getId(), exception);
             throw exception;
         } catch (IOException exception) {
-            Log.d(TAG, "Unable to update Group with id: " + group.getId().getId(), exception);
+            Log.d(TAG, "Unable to update Group with id: "
+                    + group.getId().getId(), exception);
             throw new CacheDatabaseException(exception);
         }
     }
@@ -393,12 +412,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addUserToGroup(Id groupId, Id userId) {
         List<Id> ids = getUserIdsFromGroup(groupId);
         boolean userIsInCache = false;
-        for(Id id : ids){
-            if(id.getId().equals(userId.getId())){
+        for (Id id : ids) {
+            if (id.getId().equals(userId.getId())) {
                 userIsInCache = true;
             }
         }
-        if(!userIsInCache) {
+        if (!userIsInCache) {
             ids.add(userId);
             ContentValues values = new ContentValues();
             values.put(KEY_GROUP_USERS, getStringFromIds(ids));
@@ -415,7 +434,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Also returns null if the Group is not in the database.
      *
      * @param groupId The Group's Id.
-     * @return The Users' id from the Group, or null if there is no such Group in the database.
+     * @return The Users' id from the Group, or null if there is no such Group
+     * in the database.
      */
     public List<Id> getUserIdsFromGroup(Id groupId) {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
@@ -431,11 +451,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Retrieves a Group according to its Id, returns null if such a Group is not in the database.
-     * Also returns null if the Group could not be correctly extracted from the database.
+     * Retrieves a Group according to its Id, returns null if such a Group is
+     * not in the database. Also returns null if the Group could not be
+     * correctly extracted from the database.
      *
      * @param groupId The Id of the wanted Group.
-     * @return The Group which has groupId as its Id or null if there is no such Group
+     * @return The Group which has groupId as its Id or null if there is no
+     * such Group
      * in the database.
      */
     public Group getGroup(Id groupId) {
@@ -447,11 +469,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         if (!cursor.moveToFirst()) {
             return null;
         } else {
-            String groupName = cursor.getString(cursor.getColumnIndex(KEY_GROUP_NAME));
+            String groupName = cursor.getString(
+                    cursor.getColumnIndex(KEY_GROUP_NAME));
             Bitmap groupImage = deserializeBitmap(
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
 
-            String allUsers = cursor.getString(cursor.getColumnIndex(KEY_GROUP_USERS));
+            String allUsers = cursor.getString(
+                    cursor.getColumnIndex(KEY_GROUP_USERS));
             List<User> groupUsers = new ArrayList<>();
             if (!allUsers.equals("")) {
                 String[] usersIDs = allUsers.split(",");
@@ -480,7 +504,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             return groups;
         } else {
             do {
-                Id groupId = new Id(groupCursor.getLong(groupCursor.getColumnIndex(KEY_GROUP_NODEID)));
+                Id groupId = new Id(groupCursor.getLong(
+                        groupCursor.getColumnIndex(KEY_GROUP_NODEID)));
                 Group group = getGroup(groupId);
                 if (group != null) {
                     groups.add(group);
@@ -491,16 +516,20 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Retrieves all Messages from a specified Group which are in the interval described by the
+     * Retrieves all Messages from a specified Group which are in the interval
+     * described by the
      * boundaries.
      *
      * @param group         The Group from which we want to retrieve the Messages.
      * @param lowerBoundary The lower boundary (must be at least 1).
      * @param upperBoundary The upper boundary.
      * @return The list of Messages from the interval for the Group.
-     * @throws CacheDatabaseException If the database was unable to fetch some information.
+     * @throws CacheDatabaseException If the database was unable to fetch some
+     *                                information.
      */
-    public List<Message> getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
+    public List<Message> getMessageIntervalForGroup(Group group,
+                                                    int lowerBoundary,
+                                                    int upperBoundary)
             throws CacheDatabaseException
     {
         if (lowerBoundary < 0 || lowerBoundary > upperBoundary) {
@@ -510,10 +539,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUPID + " = ? " + " ORDER BY "
-                + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT " + (upperBoundary - lowerBoundary)
+                + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT "
+                + (upperBoundary - lowerBoundary)
                 + " OFFSET " + lowerBoundary;
 
-        Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{group.getId().getId()});
+        Cursor cursor = mDatabase.rawQuery(selectQuery,
+                new String[]{group.getId().getId()});
 
         List<Message> messages = new ArrayList<>();
         if (!cursor.moveToFirst()) {
@@ -594,7 +625,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Serializes a Content into a byte array.
      *
      * @param content The Content to be serialized.
-     * @return  The bytes corresponding to the serialization of the Content.
+     * @return The bytes corresponding to the serialization of the Content.
      * @throws CacheDatabaseException If the Content could not be serialized.
      */
     private static byte[] serializeContent(Content content)
@@ -607,7 +638,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     return serializeTextContent((TextContent) content);
                 case "image":
                     return serializeImageContent((ImageContent) content);
-                default :
+                default:
                     throw new ContentException("No such content exists !");
             }
         } catch (CacheDatabaseException exception) {
@@ -619,9 +650,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deserializes a byte array into a Content.
      *
-     * @param bytes The byte array to be deserialized.
+     * @param bytes       The byte array to be deserialized.
      * @param contentType The type of the Content.
-     * @return  The Content corresponding to the byte array.
+     * @return The Content corresponding to the byte array.
      * @throws CacheDatabaseException If the Content could not be deserialized.
      */
     private static Content deserializeContent(byte[] bytes, String contentType)
@@ -633,7 +664,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     return deserializeTextContent(bytes);
                 case "image":
                     return deserializeImageContent(bytes);
-                default :
+                default:
                     throw new ContentException("No such content exists !");
             }
         } catch (CacheDatabaseException exception) {
@@ -749,7 +780,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @param message The Message for which a ContentValues is built.
      * @param groupId The Id of the Group to which the Message is added.
      * @return A ContentValues object which corresponds to the Message.
-     * @throws CacheDatabaseException If some of the Message information could not be serialized.
+     * @throws CacheDatabaseException If some of the Message information could
+     *                                not be serialized.
      */
     private static ContentValues createContentValuesForMessage(Message message, Id groupId)
             throws CacheDatabaseException
@@ -770,7 +802,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param user The User for which a ContentValues is built.
      * @return A ContentValues object which corresponds to the User.
-     * @throws CacheDatabaseException If some of the User information could not be serialized.
+     * @throws CacheDatabaseException If some of the User information
+     *                                could not be serialized.
      */
     private static ContentValues createContentValuesForUser(User user)
             throws CacheDatabaseException
@@ -788,7 +821,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param group The Group for which a ContentValues is built.
      * @return A ContentValues object which corresponds to the Group.
-     * @throws CacheDatabaseException If some of the Group information could not be serialized.
+     * @throws CacheDatabaseException If some of the Group information
+     *                                could not be serialized.
      */
     private static ContentValues createContentValuesForGroup(Group group)
             throws CacheDatabaseException
@@ -823,7 +857,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Creates a String from a List of Ids by concatenating their values together with a comma as a
+     * Creates a String from a List of Ids by concatenating their values
+     * together with a comma as a
      * separator.
      *
      * @param ids The List of Ids from which the String is created.
