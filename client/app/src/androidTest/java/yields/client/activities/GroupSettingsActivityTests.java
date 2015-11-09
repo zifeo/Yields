@@ -63,8 +63,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         
         onView(withText("Group name changed to \"Group SWENG\"")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
-        // Wait until the toast disappear.
-        Thread.sleep(2000);
     }
 
     /**
@@ -82,7 +80,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
 
         assertEquals(Group.GroupVisibility.PRIVATE, YieldsApplication.getGroup().getVisibility());
-        Thread.sleep(2000);
     }
 
     /**
@@ -100,7 +97,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
 
         assertEquals(Group.GroupVisibility.PUBLIC, YieldsApplication.getGroup().getVisibility());
-        Thread.sleep(2000);
     }
 
     /**
@@ -114,6 +110,5 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
         onView(withText("0 user(s) added to group")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
-        Thread.sleep(2000);
     }
 }

@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import yields.client.R;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class SelectUsernameActivity extends AppCompatActivity {
     private static Toast mToast = null;
@@ -28,10 +29,12 @@ public class SelectUsernameActivity extends AppCompatActivity {
         String username = mEditTextCreateAccount.getText().toString();
 
         if (username.contains(" ")){
-            displayError(getString(R.string.messageUsernameContainsSpaces));
+            String message = getString(R.string.messageUsernameContainsSpaces);
+            YieldsApplication.showToast(getApplicationContext(), message);
         }
         else if (username.length() < 1){
-            displayError(getString(R.string.messageUsernameTooShort));
+            String message = getString(R.string.messageUsernameTooShort);
+            YieldsApplication.showToast(getApplicationContext(), message);
         }
         else {
             Intent intent = new Intent(this, CreatingAccountActivity.class);
@@ -40,17 +43,5 @@ public class SelectUsernameActivity extends AppCompatActivity {
             intent.putExtra(CreatingAccountActivity.USERNAME, username);
             startActivity(intent);
         }
-    }
-
-    private void displayError(String error){
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-
-        if (mToast != null){
-            mToast.cancel();
-        }
-
-        mToast = Toast.makeText(context, error, duration);
-        mToast.show();
     }
 }

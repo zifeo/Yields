@@ -87,14 +87,16 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
         if(mUser == null || mGroup == null) {
-            showErrorToast("Couldn't get group information.");
+            String message = "Couldn't get group information.";
+            YieldsApplication.showToast(getApplicationContext(), message);
             mActionBar.setTitle("Unknown group");
         } else {
             setHeaderBar();
             try {
                 retrieveGroupMessages();
             } catch (IOException e) {
-                showErrorToast("Couldn't load messages");
+                String message = "Couldn't load messages";
+                YieldsApplication.showToast(getApplicationContext(), message);
             }
         }
     }
@@ -169,8 +171,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             try {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (mImage != null) {
-                    Toast toast = Toast.makeText(YieldsApplication.getApplicationContext(), "Image added to message", Toast.LENGTH_SHORT);
-                    toast.show();
+                    String message = "Image added to message";
+                    YieldsApplication.showToast(getApplicationContext(), message);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -196,15 +198,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    /**
-     * Show an error message in a toast.
-     * @param errorMsg The error message to be displayed.
-     */
-    private void showErrorToast(String errorMsg){
-        Toast toast = Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT);
-        toast.show();
     }
 
     /**

@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -42,6 +43,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE = 1;
     private static final int REQUEST_ADD_USERS = 2;
+
+    private static final String TAG = "GroupSettingsActivity";
 
     /**
      * Method automatically called on the creation of the activity
@@ -104,15 +107,19 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 Bitmap image = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 if (image != null) {
 
-                    displayMessage("Group image changed");
+                    String message = "Group image changed";
+                    YieldsApplication.showToast(getApplicationContext(), message);
 
                     //TODO Change group image and send notification to server
                 }
                 else {
-                    displayMessage("Could not retrieve image");
+                    String message = "Could not retrieve image";
+                    YieldsApplication.showToast(getApplicationContext(), message);
                 }
             } catch (IOException e) {
-                displayMessage("Could not retrieve image");
+                String message = "Could not retrieve image";
+                YieldsApplication.showToast(getApplicationContext(), message);
+                Log.d(TAG, message);
             }
         }
         else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK){
@@ -134,18 +141,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 }
             }
 
-            String text = count + " user(s) added to group";
-            displayMessage(text);
+            String message = count + " user(s) added to group";
+            YieldsApplication.showToast(getApplicationContext(), message);
         }
-    }
-
-    /**
-     * Method that displays a message in a tost
-     * @param message The message to be displayed
-     */
-    private void displayMessage(String message){
-        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-        toast.show();
     }
 
     /**
@@ -162,18 +160,23 @@ public class GroupSettingsActivity extends AppCompatActivity {
          */
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Settings[] settings = Settings.values();
+            switch(settings[position]){
+                case NAME:
+                    changeNameListener();
+                    break;
 
-            if (position == Settings.NAME.ordinal()){
-                changeNameListener();
-            }
-            else if (position == Settings.TYPE.ordinal()){
-                changeTypeListener();
-            }
-            else if (position == Settings.IMAGE.ordinal()){
-                changeImageListener();
-            }
-            else {
-                addUsersListener();
+                case TYPE:
+                    changeTypeListener();
+                    break;
+
+                case IMAGE:
+                    changeImageListener();
+                    break;
+
+                default:
+                    addUsersListener();
+                    break;
             }
         }
 
@@ -189,9 +192,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String name = "Group name changed to \"" + editTextName.getText().toString() + "\"";
-
-                            displayMessage(name);
+                            String message = "Group name changed to \"" + editTextName.getText().toString() + "\"";
+                            YieldsApplication.showToast(getApplicationContext(), message);
 
                             // TODO Add change in group's name, not just display
                         }
@@ -224,9 +226,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                             type = "private";
                         }
 
-                        String text = "Group type changed to : " + type;
-
-                        displayMessage(text);
+                        String message = "Group type changed to : " + type;
+                        YieldsApplication.showToast(getApplicationContext(), message);
 
                         if (type.equals("public")) {
                             mGroup.setVisibility(Group.GroupVisibility.PUBLIC);
