@@ -22,8 +22,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import yields.client.exceptions.CacheDatabaseException;
+import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
+import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
@@ -60,7 +62,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_GROUPID = "messageGroup";
     private static final String KEY_MESSAGE_SENDERID = "messageSender";
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
+    private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
     private static final String KEY_MESSAGE_DATE = "messageDate";
+
 
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
@@ -75,7 +79,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
-            + KEY_MESSAGE_GROUPID + " TEXT," + KEY_MESSAGE_SENDERID + " TEXT," + KEY_MESSAGE_CONTENT
+            + KEY_MESSAGE_GROUPID + " TEXT," + KEY_MESSAGE_SENDERID + " TEXT,"
+            + KEY_MESSAGE_CONTENT_TYPE + " TEXT," + KEY_MESSAGE_CONTENT
             + " BLOB," + KEY_MESSAGE_DATE + " DATETIME" + ")";
 
     private final SQLiteDatabase mDatabase;
@@ -532,7 +537,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
                 try {
                     byte[] contentAsBytes = cursor.getBlob(cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
-                    Content content = deserializeTextContent(contentAsBytes);
+                    String contentType = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
+                    Content content = deserializeContent(contentAsBytes, contentType);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
                     Date date = dateFormat.parse(dateAsString);
@@ -585,6 +591,102 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Serializes a Content into a byte array.
+     *
+     * @param content The Content to be serialized.
+     * @return  The bytes corresponding to the serialization of the Content.
+     * @throws CacheDatabaseException If the Content could not be serialized.
+     */
+    private static byte[] serializeContent(Content content)
+            throws CacheDatabaseException
+    {
+        try {
+            String type = content.getType();
+            switch (type) {
+                case "text":
+                    return serializeTextContent((TextContent) content);
+                case "image":
+                    return serializeImageContent((ImageContent) content);
+                default :
+                    throw new ContentException("No such content exists !");
+            }
+        } catch (CacheDatabaseException exception) {
+            Log.d(TAG, "Could not serialize content !", exception);
+            throw new CacheDatabaseException("Could not serialize Content !");
+        }
+    }
+
+
+    private static Content deserializeContent(byte[] bytes, String contentType)
+            throws CacheDatabaseException
+    {
+        try {
+            switch (contentType) {
+                case "text":
+                    return deserializeTextContent(bytes);
+                case "image":
+                    return deserializeImageContent(bytes);
+                default :
+                    throw new ContentException("No such content exists !");
+            }
+        } catch (CacheDatabaseException exception) {
+            Log.d(TAG, "Could not deserialize content !", exception);
+            throw new CacheDatabaseException("Could not deserialize Content !");
+        }
+    }
+
+    /**
+     * Serializes the TextContent into a Byte array.
+     *
+     * @param content The TextContent to be serialized.
+     * @return The serialized version of the TextContent.
+     * @throws CacheDatabaseException if the TextContent could not be serialized.
+     */
+    private static byte[] serializeImageContent(ImageContent content)
+            throws CacheDatabaseException
+    {
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
+            outputStream.writeUTF(content.getCaption());
+            outputStream.write(serializeBitmap(content.getImage()));
+            outputStream.close();
+            byte[] bytes = byteOutputStream.toByteArray();
+            byteOutputStream.close();
+            return bytes;
+        } catch (IOException exception) {
+            Log.d(TAG, "Could not serialize ImageContent !", exception);
+            throw new CacheDatabaseException("Could not serialize ImageContent !");
+        }
+        //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
+    }
+
+    /**
+     * Deserializes a Byte array into an ImageContent.
+     *
+     * @param bytes The bytes to be deserialized.
+     * @return The deserialized version of the bytes.
+     * @throws CacheDatabaseException if the TextContent could not be deserialized.
+     */
+    private static Content deserializeImageContent(byte[] bytes)
+            throws CacheDatabaseException
+    {
+        try {
+            ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
+            String text = objectInputStream.readUTF();
+            TextContent content = new TextContent(text);
+            objectInputStream.close();
+            byteInputStream.close();
+            return content;
+        } catch (IOException exception) {
+            Log.d(TAG, "Could not deserialize TextContent !", exception);
+            throw new CacheDatabaseException("Could not deserialize Content !");
+        }
+        //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
+    }
+
+    /**
      * Serializes the TextContent into a Byte array.
      *
      * @param content The TextContent to be serialized.
@@ -602,14 +704,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             byte[] bytes = byteOutputStream.toByteArray();
             byteOutputStream.close();
             return bytes;
-        } catch (IOException e) {
+        } catch (IOException exception) {
+            Log.d(TAG, "Could not serialize TextContent !", exception);
             throw new CacheDatabaseException("Could not serialize TextContent !");
         }
         //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
     }
 
     /**
-     * Deerializes a Byte array into a TextContent.
+     * Deserializes a Byte array into a TextContent.
      *
      * @param bytes The bytes to be deserialized.
      * @return The deserialized version of the bytes.
@@ -626,7 +729,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             objectInputStream.close();
             byteInputStream.close();
             return content;
-        } catch (IOException e) {
+        } catch (IOException exception) {
+            Log.d(TAG, "Could not deserialize TextContent !", exception);
             throw new CacheDatabaseException("Could not deserialize Content !");
         }
         //TODO: Define what to do if steam could not be closed and how to ensure stream.close()
@@ -647,7 +751,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_NODEID, message.getId().getId());
         values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
-        values.put(KEY_MESSAGE_CONTENT, serializeTextContent((TextContent) message.getContent()));
+        values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType());
+        values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
         return values;
