@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import yields.client.R;
+import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.MockFactory;
 import yields.client.exceptions.NodeException;
@@ -32,6 +33,7 @@ import static java.lang.Thread.sleep;
 public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity> {
 
     private static final int MOCK_MESSAGE_COUNT = 20;
+    private Group mG;
 
     public GroupTest(){
         super(MessageActivity.class);
@@ -44,26 +46,25 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
     public void setUp() throws Exception {
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
-        YieldsApplication.setResources(getInstrumentation().getTargetContext().getResources());
+        YieldsApplication.setResources(getInstrumentation().getTargetContext().getResources());ClientUser lastUser = YieldsApplication.getUser();
+        YieldsApplication.setUser(new FakeUserGroupTest("wqef", new Id(2), "d", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565)));
+
+        mG = new Group("Group", new Id(32), new ArrayList<User>());
+        YieldsApplication.setGroup(mG);
     }
 
     @Test
     public void testTextMessagesAreCorrectlySortedByDate() throws IOException, InstantiationException {
-        ClientUser lastUser = YieldsApplication.getUser();
-        YieldsApplication.setUser(new FakeUserGroupTest("wqef", new Id(2), "d",BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.send_icon) ));
 
-        Group g = new Group("Group", new Id(32), new ArrayList<User>());
-        SortedMap<Date, Message> lastMessages = g.getLastMessages();
+        SortedMap<Date, Message> lastMessages = mG.getLastMessages();
         List<Message> messages = new ArrayList<>();
         for(Message entry : lastMessages.values()){
-            g.addMessage(entry);
             messages.add(entry);
         }
 
         for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
             assertEquals("Mock message " + i, ((TextContent) messages.get(i).getContent()).getText());
         }
-        YieldsApplication.setUser(lastUser);
     }
 
 

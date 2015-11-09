@@ -13,5 +13,5 @@ public interface NotifiableActivity {
      * Method that tells the activity
      * that the data set it holds has changed
      */
-    void notifyChange() throws IOException;
+    void notifyChange();
 }
