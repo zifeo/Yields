@@ -114,7 +114,7 @@ public class CacheDatabaseTests {
      * (Test for CacheDatabaseHelper.getUser(ID userID))
      */
     @Test
-    public void testDatabasCanGetUser() {
+    public void testDatabaseCanGetUser() {
         try {
             List<User> users = MockFactory.generateMockUsers(6);
             for (User user : users) {
@@ -208,6 +208,48 @@ public class CacheDatabaseTests {
                 }
             }
         } catch (CacheDatabaseException exception){
+            fail();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if a Group can be renamed.
+     * (Test for updateGroupName(String newGroupName, Id groupId))
+     */
+    @Test
+    public void testDatabaseCanUpdateGroupName(){
+        try {
+            Group group = MockFactory.generateMockGroups(1).get(0);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.updateGroupName("New group name", group.getId());
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), "New group name");
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+        } catch (CacheDatabaseException e) {
+            fail();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if a User can be removed from a Group.
+     * (Test for removeUserFromGroup(Id groupId, Id userId))
+     */
+    @Test
+    public void testDatabaseCanRemoveUserFromGroup(){
+        try {
+            Group group = MockFactory.generateMockGroups(3).get(2);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.removeUserFromGroup(group.getId(), group.getUsers().get(0).getId());
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), group.getName());
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertEquals(group.getUsers().size() - 1, fromDatabase.getUsers().size());
+        } catch (CacheDatabaseException e) {
             fail();
         } finally {
             mDatabaseHelper.clearDatabase();

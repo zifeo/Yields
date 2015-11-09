@@ -333,24 +333,77 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+
+    /**
+     * Updates the name of a Group in the database.
+     *
+     * @param newGroupName The new name of the Group.
+     * @param groupId The Id field of the Group that will have it's name changed.
+     */
+    public void updateGroupName(String newGroupName, Id groupId){
+        ContentValues values = new ContentValues();
+        values.put(KEY_GROUP_NAME, newGroupName);
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+                new String[]{groupId.getId()});
+    }
+
+    /**
+     * Removes a User from a Group in the database.
+     *
+     * @param groupId The Id of the Group form which the User shall be removed.
+     * @param userId The Id of the User that will bre removed from the Group.
+     */
+    public void removeUserFromGroup(Id groupId, Id userId){
+        List<Id> ids = getUserIdsFromGroup(groupId);
+        Iterator<Id> idIterator = ids.iterator();
+        while(idIterator.hasNext()){
+            if(idIterator.next().getId().equals(userId.getId())){
+                idIterator.remove();
+            }
+        }
+        ContentValues values = new ContentValues();
+        values.put(KEY_GROUP_USERS, getStringFromIds(ids));
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+                new String[]{groupId.getId()});
+    }
+
+    /**
+     * Retrieves the Ids of all the Users for a Group.
+     * Also returns null if the Group is not in the database.
+     *
+     * @param groupId The Group's Id.
+     * @return The Users' id from the Group, or null if there is no such Group in the database.
+     */
+    public List<Id> getUserIdsFromGroup(Id groupId){
+        String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
+                + KEY_GROUP_NODEID + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectQuery,
+                new String[]{groupId.getId()});
+        if(!cursor.moveToFirst()){
+            return null;
+        } else {
+            String users = cursor.getString(cursor.getColumnIndex(KEY_GROUP_USERS));
+            return getIdListFromString(users);
+        }
+    }
+
     /**
      * Retrieves a Group according to its Id, returns null if such a Group is not in the database.
      * Also returns null if the Group could not be correctly extracted from the database.
      *
-     * @param groupID The Id of the wanted Group.
-     * @return The Group which has groupID as its Id or null if there is no such Group
+     * @param groupId The Id of the wanted Group.
+     * @return The Group which has groupId as its Id or null if there is no such Group
      * in the database.
     */
-    public Group getGroup(Id groupID) {
+    public Group getGroup(Id groupId) {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{groupID.getId()});
+                new String[]{groupId.getId()});
 
         if (!cursor.moveToFirst()) {
             return null;
         } else {
-            Id groupId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_GROUP_NODEID)));
             String groupName = cursor.getString(cursor.getColumnIndex(KEY_GROUP_NAME));
             Bitmap groupImage = deserializeBitmap(
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
@@ -594,15 +647,46 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_GROUP_NODEID, group.getId().getId());
         values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getImage()));
         values.put(KEY_GROUP_NAME, group.getName());
-        StringBuilder userIDS = new StringBuilder();
+        StringBuilder userIdsAsString = new StringBuilder();
         List<User> users = group.getUsers();
-        for (User user : users) {
-            userIDS.append(user.getId().getId() + ",");
+        List<Id> userIDs = new ArrayList<>();
+        for(User user : users){
+            userIDs.add(user.getId());
         }
-        if (users.size() != 0) {
-            userIDS.deleteCharAt(userIDS.length() - 1);
-        }
-        values.put(KEY_GROUP_USERS, userIDS.toString());
+        values.put(KEY_GROUP_USERS, getStringFromIds(userIDs));
         return values;
+    }
+
+    /**
+     * Transform a String of ids concatenated with a comma into a List of Id.
+     *
+     * @param idsAsString The String of Ids.
+     * @return The List of Ids corresponding to idsAdString.
+     */
+    private static List<Id> getIdListFromString(String idsAsString) {
+        String[] idsAsArray = idsAsString.split(",");
+        List<Id> ids = new ArrayList<>();
+        for(String string : idsAsArray){
+            ids.add(new Id(string));
+        }
+        return ids;
+    }
+
+    /**
+     * Creates a String from a List of Ids by concatenating their values together with a comma as a
+     * separator.
+     *
+     * @param ids The List of Ids from which the String is created.
+     * @return The String corresponding to the List of Id.
+     */
+    private static String getStringFromIds(List<Id> ids) {
+        StringBuilder idsAsString = new StringBuilder();
+        for (Id id : ids) {
+            idsAsString.append(id.getId() + ",");
+        }
+        if (ids.size() != 0) {
+            idsAsString.deleteCharAt(idsAsString.length() - 1);
+        }
+        return idsAsString.toString();
     }
 }
