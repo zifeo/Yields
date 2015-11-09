@@ -30,23 +30,6 @@ public class LoggingInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logging_in);
 
-        // Client user call
-
-        /*// sEmailValid(googleApiClient.getEmail(), this);
-        YieldEmulatorSocketProvider socket = null;
-        try {
-            socket = new YieldEmulatorSocketProvider();
-            ConnectionManager connectionManager = new ConnectionManager(socket);
-            ServerChannel serverChannel = (ServerChannel) connectionManager.getCommunicationChannel();
-            String email = Plus.AccountApi.getAccountName(YieldsApplication.getGoogleApiClient());
-            Request connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
-            serverChannel.sendRequest(connectReq);
-
-            Log.d("LoggingInActivity", "Email = " + email);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
         Intent serviceIntent = new Intent(this, YieldService.class)
                 .putExtra("email", Plus.AccountApi
                         .getAccountName(YieldsApplication.getGoogleApiClient()));
