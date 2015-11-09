@@ -70,10 +70,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindMessageActivity", true);
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
-
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
