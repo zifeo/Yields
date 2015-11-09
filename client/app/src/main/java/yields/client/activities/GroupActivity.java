@@ -160,6 +160,7 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
 
     /**
      * Automatically called when the activity is resumed after another activity was displayed
+
      */
     @Override
     public void onResume(){
