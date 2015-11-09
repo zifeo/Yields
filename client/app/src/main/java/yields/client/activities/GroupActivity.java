@@ -210,12 +210,12 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
 
         mGroups = new ArrayList<>();
 
-        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>(), YieldsApplication.getDefaultGroupImage());
+        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>(), YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PRIVATE, true);
         group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !"), new java.util.Date(), group1));
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !"), new java.util.Date(), group1));
         mGroups.add(group1);
 
-        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>(), YieldsApplication.getDefaultGroupImage());
+        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>(), YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PRIVATE, true);
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date(), group2));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date(), group2));
         mGroups.add(group2);
