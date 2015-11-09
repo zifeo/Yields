@@ -15,6 +15,10 @@ public class SelectUsernameActivity extends AppCompatActivity {
 
     private EditText mEditTextCreateAccount;
 
+    /**
+     * OnCrate method for the SelectUsernameActivity.
+     * @param savedInstanceState The bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +46,10 @@ public class SelectUsernameActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Display a toast containing the error message given in parameter.
+     * @param error The error message.
+     */
     private void displayError(String error){
         Context context = getApplicationContext();
         int duration = Toast.LENGTH_SHORT;
