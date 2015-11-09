@@ -326,7 +326,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 + " WHERE " + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{group.getId().getId()});
-        if (cursor.getCount() == 1) {
+        if (cursor.getCount() >= 1) {
             cursor.close();
             updateGroup(group);
         } else if (cursor.getCount() > 1) { //There should not be several Groups with the same Id.
@@ -368,6 +368,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                     new String[]{group.getId().getId()});
+            for (User user : group.getUsers()) {
+                addUser(user);
+            }
             for (Message message : group.getLastMessages().values()) {
                 addMessage(message, group.getId());
             }
@@ -705,7 +708,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Could not serialize content !", exception);
-            throw new CacheDatabaseException("Could not serialize Content !");
+            throw exception;
         }
     }
 

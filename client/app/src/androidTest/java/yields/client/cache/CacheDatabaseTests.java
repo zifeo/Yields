@@ -77,7 +77,7 @@ public class CacheDatabaseTests {
             assertTrue(!cursor.moveToFirst());
             cursor.close();
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -126,7 +126,7 @@ public class CacheDatabaseTests {
             assertTrue(!cursor.moveToFirst());
             cursor.close();
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -156,7 +156,7 @@ public class CacheDatabaseTests {
                 }
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -180,7 +180,7 @@ public class CacheDatabaseTests {
                 assertEquals(users.get(i).getId().getId(), userFromDatabase.getId().getId());
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -206,7 +206,7 @@ public class CacheDatabaseTests {
                 assertEquals(users.get(i).getId().getId(), usersFromDatabase.get(i).getId().getId());
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -232,7 +232,7 @@ public class CacheDatabaseTests {
             assertTrue(!cursor.moveToFirst());
             cursor.close();
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -262,7 +262,7 @@ public class CacheDatabaseTests {
                 }
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -282,8 +282,8 @@ public class CacheDatabaseTests {
             assertEquals(fromDatabase.getName(), "New group name");
             assertEquals(fromDatabase.getId().getId(), group.getId().getId());
             assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
-        } catch (CacheDatabaseException e) {
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -306,8 +306,8 @@ public class CacheDatabaseTests {
             assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
             assertTrue(compareImages(Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565),
                     fromDatabase.getImage()));
-        } catch (CacheDatabaseException e) {
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -332,8 +332,8 @@ public class CacheDatabaseTests {
             ArrayList<User> usersCopy = new ArrayList<>(group.getUsers());
             usersCopy.remove(0);
             assertTrue(compareUsers(fromDatabase.getUsers(), usersCopy));
-        } catch (CacheDatabaseException e) {
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -360,8 +360,8 @@ public class CacheDatabaseTests {
             ArrayList<User> usersCopy = new ArrayList<>(group.getUsers());
             usersCopy.add(userToAdd);
             assertTrue(compareUsers(fromDatabase.getUsers(), usersCopy));
-        } catch (CacheDatabaseException e) {
-            fail();
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -386,7 +386,7 @@ public class CacheDatabaseTests {
                 assertTrue(compareUsers(groups.get(i).getUsers(), groupFromDatabase.getUsers()));
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -413,7 +413,7 @@ public class CacheDatabaseTests {
                 assertTrue(compareUsers(groups.get(i).getUsers(), groupFromDatabase.getUsers()));
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
@@ -453,7 +453,7 @@ public class CacheDatabaseTests {
                 assertEquals("Mock message #" + i, ((TextContent) message.getContent()).getText());
             }
         } catch (CacheDatabaseException exception) {
-            fail();
+            fail(exception.getMessage());
         } finally {
             mDatabaseHelper.clearDatabase();
         }
