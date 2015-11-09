@@ -20,6 +20,10 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class LoggingInActivity extends AppCompatActivity {
 
+    /**
+     * onCreate method for the LoggingInActivity.
+     * @param savedInstanceState The bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +48,19 @@ public class LoggingInActivity extends AppCompatActivity {
         }
     }
 
-    // Method called by clientUser when the server indicates that the account already exists
+    /**
+     * Method called by clientUser when the server indicates that the account
+     * already exists.
+     */
     public void goToGroupActivity(){
         Intent intent = new Intent(this, GroupActivity.class);
         startActivity(intent);
     }
 
-    // Method called by clientUser when the server indicates that the account doesn't exist
+    /**
+     * Method called by clientUser when the server indicates that the account
+     * doesn't exist.
+     */
     public void goToSelectUsernameActivity(){
         Intent intent = new Intent(this, SelectUsernameActivity.class);
         startActivity(intent);
