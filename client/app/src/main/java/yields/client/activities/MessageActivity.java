@@ -1,12 +1,14 @@
 package yields.client.activities;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.ListFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -18,21 +20,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
-import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
-import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.MessageViewException;
+import yields.client.exceptions.NodeException;
+import yields.client.fragment.MessageDisplayFragment;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -41,6 +44,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.service.MessageBinder;
 import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -49,6 +53,8 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity used to display messages for a group
  */
 public class MessageActivity extends AppCompatActivity implements NotifiableActivity {
+    public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
+
     private static ClientUser mUser;
     private static Group mGroup;
     private static ArrayList<Message> mMessages;
@@ -61,6 +67,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private static MessageBinder mMessageBinder;
     private static ActionBar mActionBar;
     private static ImageButton mSendButton;
+
+    private static ListFragment mListFragment;
+    private static ContentType mType;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -81,8 +90,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+        // TODO :
+        /*mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();*/
+
+        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+                .createBitmap(80, 80, Bitmap.Config.RGB_565));
+        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
+                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
+                        .GroupVisibility.PUBLIC, true);
 
         mMessages = new ArrayList<>();
         mImage = null;
@@ -90,7 +106,10 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
         mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
                 mMessages);
-        mMessageScrollLayout = (ListView) findViewById(R.id.messageScrollLayout);
+       /* mMessageScrollLayout = (ListView) findViewById(R.id
+                .messageScrollLayout);*/
+        mMessageScrollLayout = new ListView(YieldsApplication
+                .getApplicationContext());
         mMessageScrollLayout.setAdapter(mAdapter);
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
@@ -105,6 +124,18 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
+
+        // TODO :
+        mType = ContentType.GROUP_MESSAGES;
+        if (mType == ContentType.GROUP_MESSAGES) {
+            mListFragment = new ListFragment();
+            mListFragment.setListAdapter(mAdapter);
+        }
+        Log.d("MEssageActivity", "Fragment created");
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.frgLayout, mListFragment);
+        fragmentTransaction.commit();
     }
 
     /**
@@ -144,7 +175,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-
         inflater.inflate(R.menu.menu_message, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -154,7 +184,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      */
     public void onSendMessage(View v){
         String inputMessage =  mInputField.getText().toString();
-
         mInputField.setText("");
         Content content;
         if (mSendImage && mImage != null){
@@ -168,7 +197,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         Message message = new Message("message", new Id(1230), mUser, content, new Date());
         // TODO : take right name and right id.
         mMessages.add(message);
-        mMessageBinder.sendMessage(mGroup, message);
+        //mMessageBinder.sendMessage(mGroup, message);
 
         mAdapter.notifyDataSetChanged();
         mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter()
@@ -246,8 +275,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             mMessages.add(message);
         }
         mAdapter.notifyDataSetChanged();
-        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
-        lv.setSelection(lv.getAdapter().getCount() - 1);
+        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
     }
 
     /**
@@ -280,10 +308,11 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mMessageBinder = (MessageBinder) service;
-            mMessageBinder.attachActivity(MessageActivity.this);
+            /*mMessageBinder = (MessageBinder) service;
+            mMessageBinder.attachActivity(MessageActivity.this);*/
             mSendButton.setEnabled(true);
-            mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
+            /*mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date()
+                    , 20);*/
         }
 
         @Override
@@ -292,4 +321,43 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             mSendButton.setEnabled(false);
         }
     };
+
+    private class  FakeUser extends ClientUser{
+
+        public FakeUser(String name, Id id, String email, Bitmap img) throws NodeException {
+            super(name, id, email, img);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message) throws IOException {
+
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+            return null;
+        }
+
+        @Override
+        public void createNewGroup(Group group) throws IOException {
+
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+
+        }
+
+        @Override
+        public Map<User, String> getHistory(Group group, Date from) {
+            return null;
+        }
+    }
+
+    private class FakeGroup extends Group{
+
+        public FakeGroup(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
+            super(name, id, users, image, visibility, validated);
+        }
+    }
 }
