@@ -35,7 +35,6 @@ import java.util.SortedMap;
 
 import yields.client.R;
 import yields.client.exceptions.NodeException;
-import yields.client.fragment.MessageDisplayFragment;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
