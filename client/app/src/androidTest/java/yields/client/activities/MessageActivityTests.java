@@ -7,6 +7,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.app.ActionBar;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -15,6 +16,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import yields.client.R;
 import yields.client.id.Id;
@@ -77,7 +80,10 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertTrue(inputMessageField.getText().length() == 0);
 
         //Messages
-        ListView listView = (ListView) messageActivity.findViewById(R.id.messageScrollLayout);
+        LinearLayout frgLayout = (LinearLayout) messageActivity.findViewById
+                (R.id
+                .frgLayout);
+        ListView listView = (ListView) frgLayout.getChildAt(0);
 
         for(int i = 0; i < listView.getAdapter().getCount(); i ++){
             String userName = "Mock user " + i;
@@ -113,7 +119,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
-        ListView listView = (ListView) messageActivity.findViewById(R.id.messageScrollLayout);
+        ListView listView = (ListView) messageActivity.findViewById(R.id.frgLayout);
         int i = listView.getChildCount();
         MessageView messageView = (MessageView) listView.getChildAt(i-1);
         assertEquals("Mock input message 1",

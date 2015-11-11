@@ -61,14 +61,20 @@
         </activity>
         <activity
             android:name=".activities.GroupSettingsActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".activities.MessageActivity" >
+            android:parentActivityName=".activities.MessageActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+
         <service
             android:name=".service.YieldService"
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".activities.CommentActivity"
+            android:label="@string/title_activity_comment" >
+        </activity>
     </application>
 
 </manifest>
