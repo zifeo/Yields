@@ -90,14 +90,14 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         // TODO :
-        /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
 
-        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+        /*mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
                 .createBitmap(80, 80, Bitmap.Config.RGB_565));
         mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
                 Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
-                        .GroupVisibility.PUBLIC, true);
+                        .GroupVisibility.PUBLIC, true);*/
 
         mMessages = new ArrayList<>();
         mImage = null;
@@ -302,6 +302,10 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     @Override
     public void notifyChange() {
         retrieveGroupMessages();
+    }
+
+    public ListView getCurrentFragmentListView(){
+        return mListFragment.getListView();
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

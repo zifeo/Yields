@@ -21,6 +21,7 @@ import java.util.List;
 
 import yields.client.R;
 import yields.client.id.Id;
+import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -80,10 +81,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertTrue(inputMessageField.getText().length() == 0);
 
         //Messages
-        LinearLayout frgLayout = (LinearLayout) messageActivity.findViewById
-                (R.id
-                .frgLayout);
-        ListView listView = (ListView) frgLayout.getChildAt(0);
+        ListView listView = messageActivity.getCurrentFragmentListView();
 
         for(int i = 0; i < listView.getAdapter().getCount(); i ++){
             String userName = "Mock user " + i;
@@ -115,11 +113,11 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      */
     @Test
     public void testWrittenTextMessageIsCorrect(){
-        Activity messageActivity = getActivity();
+        MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
-        ListView listView = (ListView) messageActivity.findViewById(R.id.frgLayout);
+        ListView listView = messageActivity.getCurrentFragmentListView();
         int i = listView.getChildCount();
         MessageView messageView = (MessageView) listView.getChildAt(i-1);
         assertEquals("Mock input message 1",

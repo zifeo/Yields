@@ -71,10 +71,6 @@
             android:exported="true" >
         </service>
 
-        <activity
-            android:name=".activities.CommentActivity"
-            android:label="@string/title_activity_comment" >
-        </activity>
     </application>
 
 </manifest>
