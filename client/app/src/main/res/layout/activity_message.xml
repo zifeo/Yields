@@ -17,12 +17,14 @@
         >
     </android.support.v7.widget.Toolbar>
 
-    <ListView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:id="@+id/messageScrollLayout"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1.00" />
+        android:layout_weight="1.0"
+        android:id="@+id/frgLayout">
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
