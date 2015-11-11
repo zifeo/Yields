@@ -1,5 +1,6 @@
 package yields.client.activities;
 
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
@@ -20,10 +21,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.io.IOException;
@@ -67,7 +66,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private static ActionBar mActionBar;
     private static ImageButton mSendButton;
 
-    private static ListFragment mListFragment;
+    private static Fragment mFragment;
     private static ContentType mType;
 
     /**
@@ -89,15 +88,17 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        // TODO :
+        // TODO : Uncoomment for tests !!!
+        /*
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
+        */
 
-        /*mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
                 .createBitmap(80, 80, Bitmap.Config.RGB_565));
         mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
                 Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
-                        .GroupVisibility.PUBLIC, true);*/
+                        .GroupVisibility.PUBLIC, true);
 
         mMessages = new ArrayList<>();
         mImage = null;
@@ -126,15 +127,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
         // TODO :
         mType = ContentType.GROUP_MESSAGES;
-        if (mType == ContentType.GROUP_MESSAGES) {
-            mListFragment = new ListFragment();
-            mListFragment.setListAdapter(mAdapter);
-        }
-        Log.d("MEssageActivity", "Fragment created");
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.frgLayout, mListFragment);
-        fragmentTransaction.commit();
+        createFragment();
     }
 
     /**
@@ -265,6 +258,44 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     }
 
     /**
+     * Notify the activity that the
+     * data set has changed.
+     */
+    @Override
+    public void notifyChange() {
+        retrieveGroupMessages();
+    }
+
+    public ListView getCurrentFragmentListView(){
+        if (mType == ContentType.GROUP_MESSAGES) {
+            return ((ListFragment) mFragment).getListView();
+        }
+        else{
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private void launchCommentFragment(){
+        mType = ContentType.MESSAGE_COMMENTS;
+        createFragment();
+    }
+
+    private void createFragment(){
+        if (mType == ContentType.GROUP_MESSAGES) {
+            mFragment = new ListFragment();
+            ((ListFragment) mFragment).setListAdapter(mAdapter);
+        }
+        else{
+            throw new UnsupportedOperationException();
+        }
+        Log.d("MessageActivity", "Fragment created");
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.frgLayout, mFragment);
+        fragmentTransaction.commit();
+    }
+
+    /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
     private void retrieveGroupMessages() {
@@ -293,19 +324,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      */
     private void setHeaderBar(){
         mActionBar.setTitle(mGroup.getName());
-    }
-
-    /**
-     * Notify the activity that the
-     * data set has changed.
-     */
-    @Override
-    public void notifyChange() {
-        retrieveGroupMessages();
-    }
-
-    public ListView getCurrentFragmentListView(){
-        return mListFragment.getListView();
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
