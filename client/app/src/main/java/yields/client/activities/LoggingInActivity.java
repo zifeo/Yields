@@ -1,7 +1,11 @@
 package yields.client.activities;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -17,6 +21,7 @@ import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerChannel;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class LoggingInActivity extends AppCompatActivity {
@@ -34,6 +39,11 @@ public class LoggingInActivity extends AppCompatActivity {
                 .putExtra("email", Plus.AccountApi
                         .getAccountName(YieldsApplication.getGoogleApiClient()));
         startService(serviceIntent);
+
+        Intent serviceBindingIntent = new Intent(this, YieldService.class)
+                .putExtra("bindGroupActivity", true);
+
+        bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
 
         goToGroupActivity();
     }
@@ -55,4 +65,16 @@ public class LoggingInActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SelectUsernameActivity.class);
         startActivity(intent);
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            YieldsApplication.setBinder((YieldServiceBinder) service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d("DEBUG", "disconnect");
+        }
+    };
 }

@@ -58,9 +58,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private boolean mSendImage;
     private static EditText mInputField;
     private static ListView mMessageScrollLayout;
-    private static MessageBinder mMessageBinder;
     private static ActionBar mActionBar;
-    private static ImageButton mSendButton;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -103,31 +101,21 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             setHeaderBar();
         }
 
-        mSendButton = (ImageButton) findViewById(R.id.sendButton);
-        mSendButton.setEnabled(false);
     }
 
-    /**
-     * Automatically called when the activity is resumed after another activity was displayed
-     */
     @Override
     public void onResume(){
         super.onResume();
 
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindMessageActivity", true);
-
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        YieldsApplication.getBinder().attachActivity(this);
+        YieldsApplication.getBinder().addMoreGroupMessages(mGroup, new Date(), 20);
     }
 
-    /**
-     * Called to pause the activity
-     */
     @Override
     public void onPause(){
         super.onPause();
 
-        unbindService(mConnection);
+        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**
@@ -168,7 +156,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         Message message = new Message("message", new Id(1230), mUser, content, new Date());
         // TODO : take right name and right id.
         mMessages.add(message);
-        mMessageBinder.sendMessage(mGroup, message);
+        YieldsApplication.getBinder().sendMessage(mGroup, message);
 
         mAdapter.notifyDataSetChanged();
         mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter()
@@ -276,20 +264,4 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     public void notifyChange() {
         retrieveGroupMessages();
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mMessageBinder = (MessageBinder) service;
-            mMessageBinder.attachActivity(MessageActivity.this);
-            mSendButton.setEnabled(true);
-            mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date(), 20);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mMessageBinder = null;
-            mSendButton.setEnabled(false);
-        }
-    };
 }

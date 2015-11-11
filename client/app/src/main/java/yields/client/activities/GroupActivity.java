@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,8 +34,7 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
-import yields.client.service.GroupBinder;
-import yields.client.service.MessageBinder;
+import yields.client.service.YieldServiceBinder;
 import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -47,7 +45,6 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
-    private GroupBinder mGroupBinder = null;
 
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
@@ -158,28 +155,18 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         mAdapterGroups.notifyDataSetChanged();
     }
 
-    /**
-     * Automatically called when the activity is resumed after another activity was displayed
-
-     */
     @Override
     public void onResume(){
         super.onResume();
 
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindGroupActivity", true);
-
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        YieldsApplication.getBinder().attachActivity(this);
     }
 
-    /**
-     * Called to pause the activity
-     */
     @Override
     public void onPause(){
         super.onPause();
 
-        unbindService(mConnection);
+        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**
@@ -247,25 +234,13 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
         group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !"), new java.util.Date()));
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !"), new java.util.Date()));
+        group1.setValidated();
         mGroups.add(group1);
 
         Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date()));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date()));
-
+        group2.setValidated();
         mGroups.add(group2);
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mGroupBinder = (GroupBinder) service;
-            mGroupBinder.attachActivity(GroupActivity.this);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mGroupBinder = null;
-        }
-    };
 }

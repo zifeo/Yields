@@ -7,8 +7,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.Objects;
+
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.service.YieldServiceBinder;
 
 public class YieldsApplication {
     private static ClientUser mUser;
@@ -22,6 +25,8 @@ public class YieldsApplication {
 
     private static GoogleApiClient mGoogleApiClient;
     private static Toast mToast = null;
+
+    private static YieldServiceBinder mBinder = null;
 
     /**
      * Getter for the user of the application.
@@ -133,6 +138,15 @@ public class YieldsApplication {
      */
     public static Resources getResources(){
         return mResources;
+    }
+
+    public static YieldServiceBinder getBinder(){
+        return mBinder;
+    }
+
+    public static void setBinder(YieldServiceBinder binder){
+        Objects.requireNonNull(binder);
+        mBinder = binder;
     }
 
     /**
