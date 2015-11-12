@@ -43,4 +43,7 @@
     <string name="changeGroupType">Change group type</string>
     <string name="changeGroupImage">Change group image</string>
     <string name="addUsers">Add users</string>
+    <string name="search">Search</string>
+    <string name="close">Close</string>
+    <string name="searchHint">Search for a name of a tag !</string>
 </resources>

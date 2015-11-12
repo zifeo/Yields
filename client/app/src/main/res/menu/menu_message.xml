@@ -9,6 +9,4 @@
         android:layout_gravity="center"
         app:showAsAction="ifRoom"
         />
-
-
 </menu>
