@@ -52,6 +52,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      but rather waits a few seconds before doing it */
     private Timer mTimer = null;
 
+    private Timer mTemporaryTimer;
+
     /**
      * Method automatically called on the creation of the activity
      * @param savedInstanceState the previous instance of the activity
@@ -149,11 +151,11 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
         mEditTextSearch.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
-                if (mTimer != null){
+                if (mTimer != null) {
                     mTimer.cancel();
                 }
 
-                mTimer = new Timer("RequestTimer");
+                mTimer = new Timer("DelayedRequestTimer");
                 mTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -186,11 +188,28 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      * Method called when the text in the tool bar is modified
      * @param text The new text to search for
      */
-    private void launchSearch(String text){
+    private void launchSearch(final String text){
+        // Need to run on the UI thread because some views are modified
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 setWaitingState();
+
+                mTemporaryTimer = new Timer("FakeRequestTimer");
+                mTemporaryTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        mCurrentGroups.clear();
+
+                        for (int i = 0; i < mGlobalGroups.size(); i++){
+                            if (mGlobalGroups.get(i).getName().startsWith(text)){
+                                mCurrentGroups.add(mGlobalGroups.get(i));
+                            }
+                        }
+
+                        notifyChange();
+                    }
+                }, 5000);
             }
         });
     }
@@ -232,7 +251,19 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      */
     @Override
     public void notifyChange() {
-
+        // Need to run on the UI thread because some views are modified
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mCurrentGroups.size() == 0){
+                    setNoResultsState();
+                }
+                else {
+                    setNewResultsState();
+                }
+                mAdapterCurrentGroups.notifyDataSetChanged();
+            }
+        });
     }
 
     // To be removed soon
