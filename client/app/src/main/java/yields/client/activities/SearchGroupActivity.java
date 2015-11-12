@@ -51,6 +51,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      /*Used to not launch requests each time the user types a new character
      but rather waits a few seconds before doing it */
     private Timer mTimer = null;
+    private int mRequestsCount;
 
     private Timer mTemporaryTimer;
 
@@ -151,6 +152,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
         mEditTextSearch.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
+                setWaitingState();
+
                 if (mTimer != null) {
                     mTimer.cancel();
                 }
@@ -193,16 +196,18 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                setWaitingState();
+                mRequestsCount++;
 
                 mTemporaryTimer = new Timer("FakeRequestTimer");
                 mTemporaryTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        mRequestsCount--;
+
                         mCurrentGroups.clear();
 
-                        for (int i = 0; i < mGlobalGroups.size(); i++){
-                            if (mGlobalGroups.get(i).getName().startsWith(text)){
+                        for (int i = 0; i < mGlobalGroups.size(); i++) {
+                            if (mGlobalGroups.get(i).getName().startsWith(text)) {
                                 mCurrentGroups.add(mGlobalGroups.get(i));
                             }
                         }
@@ -218,9 +223,9 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      * This methods changes the look of the activity to 'waiting'
      */
     private void setWaitingState(){
-        mTextViewInfo.setVisibility(View.INVISIBLE);
+        mTextViewInfo.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
-        mListView.setVisibility(View.INVISIBLE);
+        mListView.setVisibility(View.GONE);
     }
 
     /**
@@ -228,8 +233,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      * when new result is received
      */
     private void setNewResultsState(){
-        mTextViewInfo.setVisibility(View.INVISIBLE);
-        mProgressBar.setVisibility(View.INVISIBLE);
+        mTextViewInfo.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.GONE);
         mListView.setVisibility(View.VISIBLE);
     }
 
@@ -239,8 +244,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      */
     private void setNoResultsState(){
         mTextViewInfo.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.INVISIBLE);
-        mListView.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.GONE);
+        mListView.setVisibility(View.GONE);
 
         mTextViewInfo.setText(getText(R.string.noGroupFound));
     }
@@ -255,13 +260,18 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mCurrentGroups.size() == 0){
-                    setNoResultsState();
+                if (mRequestsCount == 0){
+                    if (mCurrentGroups.size() == 0){
+                        setNoResultsState();
+                    }
+                    else {
+                        setNewResultsState();
+                    }
+                    mAdapterCurrentGroups.notifyDataSetChanged();
                 }
                 else {
-                    setNewResultsState();
+                    setWaitingState();
                 }
-                mAdapterCurrentGroups.notifyDataSetChanged();
             }
         });
     }
