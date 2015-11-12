@@ -50,6 +50,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
         mMenuClose = menu.findItem(R.id.actionCloseSearch);
 
+        openSearch();
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -71,8 +73,6 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = null;
-
         switch (item.getItemId()) {
             case R.id.actionSearch:
                 openSearch();
@@ -95,13 +95,11 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         mMenuSearch.setVisible(false);
         mMenuClose.setVisible(true);
 
-        mActionBar.setDisplayShowCustomEnabled(true); //enable it to display a
-        // custom view in the action bar.
-        mActionBar.setCustomView(R.layout.search_bar_layout);//add the custom view
+        mActionBar.setDisplayShowCustomEnabled(true);
+        mActionBar.setCustomView(R.layout.search_bar_layout);
 
-        mEditTextSearch = (EditText)mActionBar.getCustomView().findViewById(R.id.editTextSearch); //the text editor
+        mEditTextSearch = (EditText)mActionBar.getCustomView().findViewById(R.id.editTextSearch);
 
-        //this is a listener to do a search when the user clicks on search button
         mEditTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -113,12 +111,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
             }
         });
 
-
         mEditTextSearch.requestFocus();
-
-        //open the keyboard focused in the edtSearch
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mEditTextSearch, InputMethodManager.SHOW_IMPLICIT);
     }
 
     /**
@@ -127,6 +120,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
     private void closeSearch(){
         mMenuSearch.setVisible(true);
         mMenuClose.setVisible(false);
+
+        mActionBar.setDisplayShowCustomEnabled(false);
     }
 
     /**
