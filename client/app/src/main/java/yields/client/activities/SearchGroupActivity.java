@@ -206,8 +206,17 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
                         mCurrentGroups.clear();
 
+                        // match for the names
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
                             if (mGlobalGroups.get(i).getName().startsWith(text)) {
+                                mCurrentGroups.add(mGlobalGroups.get(i));
+                            }
+                        }
+
+                        //match for the tags
+                        for (int i = 0; i < mGlobalGroups.size(); i++) {
+                            if (mGlobalGroups.get(i).matchToTag(text) &&
+                                    !mCurrentGroups.contains(mGlobalGroups.get(i))) {
                                 mCurrentGroups.add(mGlobalGroups.get(i));
                             }
                         }
@@ -279,9 +288,22 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
     // To be removed soon
     private void createFakeGroups(){
         mGlobalGroups = new ArrayList<>();
-        mGlobalGroups.add(new Group("SWENG", new Id(666), new ArrayList<User>()));
-        mGlobalGroups.add(new Group("Hello", new Id(667), new ArrayList<User>()));
-        mGlobalGroups.add(new Group("Nature", new Id(668), new ArrayList<User>()));
-        mGlobalGroups.add(new Group("HelloNature", new Id(669), new ArrayList<User>()));
+        Group g1 = new Group("SWENG", new Id(666), new ArrayList<User>());
+        g1.addTag("hard");
+        mGlobalGroups.add(g1);
+
+        Group g2 = new Group("Hello", new Id(667), new ArrayList<User>());
+        g2.addTag("nice");
+        mGlobalGroups.add(g2);
+
+        Group g3 = new Group("nature", new Id(668), new ArrayList<User>());
+        g3.addTag("wild");
+        g3.addTag("nature");
+        mGlobalGroups.add(g3);
+
+        Group g4 = new Group("HelloNature", new Id(668), new ArrayList<User>());
+        g4.addTag("wild");
+        g4.addTag("nice");
+        mGlobalGroups.add(g4);
     }
 }
