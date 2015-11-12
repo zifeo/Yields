@@ -17,4 +17,29 @@
         android:paddingRight="0sp">
     </android.support.v7.widget.Toolbar>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/startSearchInfo"
+        android:id="@+id/textViewInfoSearch"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="50dp" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarSearch"
+        android:layout_gravity="center_horizontal" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/listViewGroupsSearched"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1.00"
+        >
+    </ListView>
+
 </LinearLayout>
