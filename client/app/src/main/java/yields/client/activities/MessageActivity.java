@@ -178,19 +178,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v){
-        if (mType == ContentType.GROUP_MESSAGES){
-            ((ListFragment) mFragment).getListView().setOnItemClickListener
-                    (new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            mCommentMessage = (Message) ((ListFragment)
-                                    mFragment)
-                                    .getListView().getAdapter().getItem(0);
-                            launchCommentFragment();
-                        }
-                    });
-        }
-        String inputMessage =  mInputField.getText().toString();
+        String inputMessage =  mInputField.getText().toString().trim();
         mInputField.setText("");
         Content content;
         if (mSendImage && mImage != null){
@@ -203,7 +191,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         }
         Message message = new Message("message", new Id(1230), mUser, content, new Date());
         // TODO : take right name and right id.
-        mMessages.add(message);
+        //mMessages.add(message);
+        mAdapter.add(message);
         //mMessageBinder.sendMessage(mGroup, message);
 
         mAdapter.notifyDataSetChanged();
@@ -217,7 +206,12 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      */
     public void onClickAddImage(View v){
         mSendImage = true;
-        pickImageFromGallery();
+        // TODO : remove comment
+        //pickImageFromGallery();
+        if (mType == ContentType.GROUP_MESSAGES){
+            mCommentMessage = mAdapter.getItem(0);
+            launchCommentFragment();
+        }
     }
 
     /**
@@ -296,23 +290,23 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     }
 
     private void createFragment(){
+        Fragment fragment = null;
         if (mType == ContentType.GROUP_MESSAGES) {
             mActionBar.setTitle(mGroup.getName());
-            mFragment = new ListFragment();
-            ((ListFragment) mFragment).setListAdapter(mAdapter);
+            fragment = new ListFragment();
+            ((ListFragment) fragment).setListAdapter(mAdapter);
         }
         else{
             mActionBar.setTitle("Message from " + mCommentMessage.getSender()
                     .getName());
-            mFragment = new CommentFragment();
-            ((CommentFragment) mFragment).setAdapter(mAdapter);
-            ((CommentFragment) mFragment).setMessage(mCommentMessage);
-            mAdapter.notifyDataSetChanged();
+            fragment = new CommentFragment();
+            ((CommentFragment) fragment).setAdapter(mAdapter);
+            ((CommentFragment) fragment).setMessage(mCommentMessage);
         }
         Log.d("MessageActivity", "Fragment created");
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frgLayout, mFragment);
+        fragmentTransaction.replace(R.id.frgLayout, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

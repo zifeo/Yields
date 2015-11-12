@@ -8,13 +8,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import yields.client.R;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class CommentFragment extends Fragment{
-    private static LinearLayout mLayout;
+    private static View mLayout;
     private static ListView mCommentList;
     private static Message mMessage;
     private static View mMessageView;
@@ -36,15 +37,23 @@ public class CommentFragment extends Fragment{
 
     public void setAdapter(ListAdapterMessages adapter){
         mAdapter = adapter;
-        mCommentList.setAdapter(mAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
-        mLayout.setOrientation(LinearLayout.VERTICAL);
-        mLayout.addView(mMessageView);
-        mLayout.addView(mCommentList);
+        mLayout = inflater.inflate(R.layout
+                        .comment_fragment_layout, container, false);
+        LinearLayout messageContainer = (LinearLayout) mLayout.findViewById(R
+                .id.messageContainer);
+        messageContainer.removeAllViews();
+        messageContainer.addView(mMessageView);
+        ListView listView = (ListView) mLayout.findViewById(R.id.commentList);
+        listView.setAdapter(mAdapter);
+        for (int i = 0 ; i < 10 ; i ++){
+            mAdapter.add(mMessage);
+        }
+        mAdapter.notifyDataSetChanged();
         return mLayout;
     }
 }
