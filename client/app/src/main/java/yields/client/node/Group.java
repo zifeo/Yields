@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -26,7 +28,7 @@ public class Group extends Node {
     private List<User> mUsers;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
-
+    private Set<String> mTags;
 
      /** Constructor for groups
      *
@@ -47,6 +49,7 @@ public class Group extends Node {
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
+        mTags = new HashSet<>();
     }
 
     /** Overloaded constructor for groups for default validation.
@@ -152,6 +155,29 @@ public class Group extends Node {
      */
     public Bitmap getImage(){
         return mImage;
+    }
+
+    /**
+     * Add a tag to the group
+     * @param tag The tag we want to add, without spaces, in lowercase
+     */
+    public void addTag(String tag){
+        if (tag.contains(" ")){
+            throw new IllegalArgumentException("Tag cannot contain spaces");
+        }
+        if (!tag.toLowerCase().equals(tag)){
+            throw new IllegalArgumentException("Tag must be in lowercase");
+        }
+        mTags.add(tag);
+    }
+
+    /**
+     * Indicate whether the group can be matched with a given tag
+     * @param tag The tag we want to test
+     * @return true iff the group contains the given tag
+     */
+    public boolean matchToTag(String tag){
+        return mTags.contains(tag);
     }
 
     /**
