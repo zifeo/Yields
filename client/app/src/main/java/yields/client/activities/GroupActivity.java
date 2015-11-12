@@ -10,14 +10,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.service.GroupBinder;
-import yields.client.service.MessageBinder;
 import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -113,7 +110,7 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
             break;
 
             case R.id.actionDiscover:
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, SearchGroupActivity.class);
             break;
 
             case R.id.actionCreate:
