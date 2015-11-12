@@ -46,4 +46,6 @@
     <string name="search">Search</string>
     <string name="close">Close</string>
     <string name="searchHint">Search for a name or a tag !</string>
+    <string name="startSearchInfo">Start typing to search for nodes !</string>
+    <string name="noGroupFound">No group found ...</string>
 </resources>

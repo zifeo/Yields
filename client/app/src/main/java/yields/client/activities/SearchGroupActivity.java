@@ -6,22 +6,51 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import yields.client.R;
+import yields.client.id.Id;
+import yields.client.listadapter.ListAdapterGroups;
+import yields.client.listadapter.ListAdapterSearchedGroups;
+import yields.client.node.Group;
+import yields.client.node.User;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class SearchGroupActivity extends AppCompatActivity implements NotifiableActivity{
     private MenuItem mMenuSearch;
     private MenuItem mMenuClose;
     private EditText mEditTextSearch;
     private ActionBar mActionBar;
+    private List<Group> mCurrentGroups;
+    private List<Group> mGlobalGroups; // to be removed
+    private ListAdapterSearchedGroups mAdapterCurrentGroups;
+
+    private TextView mTextViewInfo;
+    private ListView mListView;
+    private ProgressBar mProgressBar;
+
+     /*Used to not launch requests each time the user types a new character
+     but rather waits a few seconds before doing it */
+    private Timer mTimer = null;
 
     /**
      * Method automatically called on the creation of the activity
@@ -37,6 +66,24 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(null);
         mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
+
+        createFakeGroups();
+
+        mCurrentGroups = new ArrayList<>();
+
+        mAdapterCurrentGroups = new ListAdapterSearchedGroups(getApplicationContext(),
+                R.layout.group_searched_layout, mCurrentGroups);
+
+        mListView = (ListView) findViewById(R.id.listViewGroupsSearched);
+        mListView.setAdapter(mAdapterCurrentGroups);
+        mListView.setVisibility(View.INVISIBLE);
+
+        mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
+
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBarSearch);
+        mProgressBar.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -100,14 +147,25 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
         mEditTextSearch = (EditText)mActionBar.getCustomView().findViewById(R.id.editTextSearch);
 
-        mEditTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    //doSearch();
-                    return true;
+        mEditTextSearch.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+                if (mTimer != null){
+                    mTimer.cancel();
                 }
-                return false;
+
+                mTimer = new Timer("RequestTimer");
+                mTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        launchSearch(mEditTextSearch.getText().toString());
+                    }
+                }, 1000);
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
 
@@ -125,11 +183,64 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
     }
 
     /**
+     * Method called when the text in the tool bar is modified
+     * @param text The new text to search for
+     */
+    private void launchSearch(String text){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setWaitingState();
+            }
+        });
+    }
+
+    /**
+     * This methods changes the look of the activity to 'waiting'
+     */
+    private void setWaitingState(){
+        mTextViewInfo.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mListView.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * This methods sets the appropriate views to visible or invisible
+     * when new result is received
+     */
+    private void setNewResultsState(){
+        mTextViewInfo.setVisibility(View.INVISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
+        mListView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * This methods sets the appropriate views to visible or invisible when
+     * no new result is received
+     */
+    private void setNoResultsState(){
+        mTextViewInfo.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.INVISIBLE);
+        mListView.setVisibility(View.INVISIBLE);
+
+        mTextViewInfo.setText(getText(R.string.noGroupFound));
+    }
+
+    /**
      * Notify the activity that the
      * data set has changed
      */
     @Override
     public void notifyChange() {
 
+    }
+
+    // To be removed soon
+    private void createFakeGroups(){
+        mGlobalGroups = new ArrayList<>();
+        mGlobalGroups.add(new Group("SWENG", new Id(666), new ArrayList<User>()));
+        mGlobalGroups.add(new Group("Hello", new Id(667), new ArrayList<User>()));
+        mGlobalGroups.add(new Group("Nature", new Id(668), new ArrayList<User>()));
+        mGlobalGroups.add(new Group("HelloNature", new Id(669), new ArrayList<User>()));
     }
 }
