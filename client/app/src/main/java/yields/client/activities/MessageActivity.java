@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -34,6 +35,7 @@ import java.util.SortedMap;
 
 import yields.client.R;
 import yields.client.exceptions.NodeException;
+import yields.client.fragments.CommentFragment;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -68,6 +70,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     private static Fragment mFragment;
     private static ContentType mType;
+    private static Message mCommentMessage;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -175,6 +178,18 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v){
+        if (mType == ContentType.GROUP_MESSAGES){
+            ((ListFragment) mFragment).getListView().setOnItemClickListener
+                    (new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            mCommentMessage = (Message) ((ListFragment)
+                                    mFragment)
+                                    .getListView().getAdapter().getItem(0);
+                            launchCommentFragment();
+                        }
+                    });
+        }
         String inputMessage =  mInputField.getText().toString();
         mInputField.setText("");
         Content content;
@@ -282,16 +297,23 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     private void createFragment(){
         if (mType == ContentType.GROUP_MESSAGES) {
+            mActionBar.setTitle(mGroup.getName());
             mFragment = new ListFragment();
             ((ListFragment) mFragment).setListAdapter(mAdapter);
         }
         else{
-            throw new UnsupportedOperationException();
+            mActionBar.setTitle("Message from " + mCommentMessage.getSender()
+                    .getName());
+            mFragment = new CommentFragment();
+            ((CommentFragment) mFragment).setAdapter(mAdapter);
+            ((CommentFragment) mFragment).setMessage(mCommentMessage);
+            mAdapter.notifyDataSetChanged();
         }
         Log.d("MessageActivity", "Fragment created");
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.frgLayout, mFragment);
+        fragmentTransaction.replace(R.id.frgLayout, mFragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
