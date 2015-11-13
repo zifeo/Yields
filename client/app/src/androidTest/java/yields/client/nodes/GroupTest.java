@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,8 +32,9 @@ import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
+import static yields.client.node.Group.*;
 
-public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity> {
+public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>{
 
     private static final int MOCK_MESSAGE_COUNT = 20;
     private Group mG;
@@ -68,7 +70,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         }
 
         for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
-            assertEquals("Mock message " + i, ((TextContent) messages.get(i).getContent()).getText());
+            Assert.assertEquals("Mock message " + i, ((TextContent) messages.get(i).getContent()).getText());
         }
     }
 

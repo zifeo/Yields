@@ -234,7 +234,7 @@ public class Group extends Node {
     /**
      * Class used to represent a tag, which defines the subjects of the group
      */
-    public class Tag{
+    public static class Tag {
         private String mText;
 
         /**
@@ -247,6 +247,14 @@ public class Group extends Node {
             }
             if (!text.toLowerCase().equals(text)){
                 throw new IllegalArgumentException("Tag must be in lowercase");
+            }
+            if (text.length() < 2){
+                throw new IllegalArgumentException(
+                        "Length of a Tag must be at least 2 characters");
+            }
+            if (text.length() > 20){
+                throw new IllegalArgumentException(
+                        "Length of a Tag cannot be more than 20 characters");
             }
 
             mText = Objects.requireNonNull(text);

@@ -207,6 +207,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                         mCurrentGroups.clear();
 
                         String lowerCaseText = text.toLowerCase();
+                        Group.Tag tag = new Group.Tag(text.toLowerCase());
 
                         // match for the names
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
@@ -217,7 +218,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
                         //match for the tags
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
-                            if (mGlobalGroups.get(i).matchToTag(lowerCaseText) &&
+                            if (mGlobalGroups.get(i).matchToTag(tag) &&
                                     !mCurrentGroups.contains(mGlobalGroups.get(i))) {
                                 mCurrentGroups.add(mGlobalGroups.get(i));
                             }
@@ -291,21 +292,21 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
     private void createFakeGroups(){
         mGlobalGroups = new ArrayList<>();
         Group g1 = new Group("SWENG", new Id(666), new ArrayList<User>());
-        g1.addTag("hard");
+        g1.addTag(new Group.Tag("hard"));
         mGlobalGroups.add(g1);
 
         Group g2 = new Group("Hello", new Id(667), new ArrayList<User>());
-        g2.addTag("nice");
+        g2.addTag(new Group.Tag("nice"));
         mGlobalGroups.add(g2);
 
         Group g3 = new Group("nature", new Id(668), new ArrayList<User>());
-        g3.addTag("wild");
-        g3.addTag("nature");
+        g3.addTag(new Group.Tag("wild"));
+        g3.addTag(new Group.Tag("nature"));
         mGlobalGroups.add(g3);
 
         Group g4 = new Group("HelloNature", new Id(668), new ArrayList<User>());
-        g4.addTag("wild");
-        g4.addTag("nice");
+        g4.addTag(new Group.Tag("wild"));
+        g4.addTag(new Group.Tag("nice"));
         mGlobalGroups.add(g4);
     }
 }
