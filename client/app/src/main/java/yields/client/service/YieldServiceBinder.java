@@ -81,9 +81,6 @@ public class YieldServiceBinder extends Binder {
     public void sendMessage(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        Request groupMessageReq = createRequestForMessageToSend(group, message);
-        Log.d("REQUEST", "sendMessage = " + groupMessageReq.message());
-        mService.sendRequest(groupMessageReq);
     }
 
     /**
@@ -101,32 +98,5 @@ public class YieldServiceBinder extends Binder {
                 .GroupHistoryRequest(group.getId(), lastDate, messageCount);
         mService.sendRequest(groupHistoryRequest);
         Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
-    }
-
-    /**
-     * Build a request for sending a message to a group.
-     * @param group The group receiving the message.
-     * @param message The message to be sent to the group.
-     * @return The request.
-     */
-    private static Request createRequestForMessageToSend(Group group, Message message){
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(message);
-        Request req;
-        switch (message.getContent().getType()) {
-            case "image":
-                req = RequestBuilder
-                        .GroupImageMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", (ImageContent) message.getContent());
-                break;
-            case "text":
-                req = RequestBuilder
-                        .GroupTextMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", ((TextContent) message
-                                        .getContent()).getText());
-                break;
-            default : throw new IllegalArgumentException("type unknown");
-        }
-        return req;
     }
 }
