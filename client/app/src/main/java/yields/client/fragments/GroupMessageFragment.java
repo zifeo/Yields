@@ -12,26 +12,45 @@ import android.widget.ListView;
 import yields.client.R;
 import yields.client.listadapter.ListAdapterMessages;
 
+/**
+ * Class representing a fragment responsible to display the messages of a
+ * given group.
+ * The Fragment is a Simple ListView containing the messages.
+ */
 public class GroupMessageFragment extends Fragment{
     private static View mLayout;
     private static ListAdapterMessages mAdapter;
     private static ListView mMessageList;
     private static AdapterView.OnItemClickListener mListOnClickListener;
 
-    public GroupMessageFragment(){
-
-    }
-
+    /**
+     * Setter for the adapter to be used in the list view containing the
+     * messages.
+     * @param adapterMessages The adpater.
+     */
     public void setAdapter(ListAdapterMessages adapterMessages){
         mAdapter = adapterMessages;
     }
 
+    /**
+     * Setter for the OnItemClickListener of the List View containing the
+     * messages.
+     * @param ocl The listener.
+     */
     public void setMessageListOnClickListener(AdapterView.OnItemClickListener
                                                       ocl){
         mListOnClickListener = ocl;
     }
 
 
+    /**
+     * Override of the onCreateView method, called every time the fragment is
+     * created and put into a fragment container.
+     * @param inflater The inflater used to create the layout of this fragment.
+     * @param container The container if this fragment.
+     * @param savedInstanceState The bundle to be used during the construction.
+     * @return The View of the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
@@ -44,6 +63,10 @@ public class GroupMessageFragment extends Fragment{
         return mLayout;
     }
 
+    /**
+     * Getter for the ListView containing the messages.
+     * @return The list view containing the messages.
+     */
     public ListView getMessageListView(){
         return mMessageList;
     }
