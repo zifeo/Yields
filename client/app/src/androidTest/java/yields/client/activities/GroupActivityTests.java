@@ -7,9 +7,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.junit.After;
+
 import yields.client.R;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.node.Group;
+import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -31,6 +34,11 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         getActivity();
+    }
+
+    @Override
+    public void tearDown(){
+        YieldsApplication.cancelToast();
     }
 
     /**

@@ -4,6 +4,7 @@ import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
 import yields.client.R;
+import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -25,6 +26,11 @@ public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+    }
+
+    @Override
+    public void tearDown(){
+        YieldsApplication.cancelToast();
     }
 
     public void testCannotEnterTooShortUsername(){
