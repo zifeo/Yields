@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.Objects;
+
 import yields.client.R;
 import yields.client.listadapter.ListAdapterMessages;
 
@@ -29,6 +31,7 @@ public class GroupMessageFragment extends Fragment{
      * @param adapterMessages The adpater.
      */
     public void setAdapter(ListAdapterMessages adapterMessages){
+        Objects.requireNonNull(adapterMessages);
         mAdapter = adapterMessages;
     }
 
@@ -39,6 +42,7 @@ public class GroupMessageFragment extends Fragment{
      */
     public void setMessageListOnClickListener(AdapterView.OnItemClickListener
                                                       ocl){
+        Objects.requireNonNull(ocl);
         mListOnClickListener = ocl;
     }
 
@@ -54,6 +58,13 @@ public class GroupMessageFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
+        Objects.requireNonNull(inflater);
+        Objects.requireNonNull(container);
+        Objects.requireNonNull(savedInstanceState);
+        Objects.requireNonNull(mAdapter, "Error adapter not set yet.");
+        Objects.requireNonNull(mListOnClickListener, "Error, " +
+                "OnClickItemListener not set yet.");
+
         Log.d("GroupMessageFragment", "onCreateView");
         mLayout = inflater.inflate(R.layout
                 .group_message_fragment_layout, container, false);
@@ -68,6 +79,8 @@ public class GroupMessageFragment extends Fragment{
      * @return The list view containing the messages.
      */
     public ListView getMessageListView(){
+        Objects.requireNonNull(mMessageList, "Error : MessageList not yet " +
+                "created");
         return mMessageList;
     }
 }
