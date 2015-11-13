@@ -281,5 +281,13 @@ public class Group extends Node {
         public int hashCode() {
             return mText.hashCode();
         }
+
+        /**
+         * Returns the text of the tag
+         * @return The text of the tag
+         */
+        public String getText(){
+            return mText;
+        }
     }
 }
