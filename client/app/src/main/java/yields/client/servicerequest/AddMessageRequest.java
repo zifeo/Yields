@@ -37,8 +37,8 @@ public class AddMessageRequest extends ServiceRequest {
      * @return The type of this ServiceRequest as a String.
      */
     @Override
-    public String getType() {
-        return MessageKind.GROUPMESSAGE.getValue();
+    public String getType(){
+        return "AddMessage";
     }
 
     /**
@@ -47,9 +47,40 @@ public class AddMessageRequest extends ServiceRequest {
      * @return The Request corresponding to this ServiceRequest.
      */
     @Override
-    public Request parseRequestForServer() {
-        Group group = getReceivingGroup();
-        Message message = getMessage();
+    public Request parseRequestForServer(){
+        return createRequestForMessageToSend(mReceivingGroup, mMessage);
+    }
+
+    @Override
+    public void serviceActionOnResponse(Service service, Response response) {
+
+    }
+
+    /**
+     * Getter method for the Message of this ServiceRequest.
+     *
+     * @return The Message of this ServiceRequest.
+     */
+    public Message getMessage(){
+        return mMessage;
+    }
+
+    /**
+     * Getter method for the receiving Group of this ServiceRequest.
+     *
+     * @return The receiving Group of this ServiceRequest.
+     */
+    public Group getReceivingGroup(){
+        return mReceivingGroup;
+    }
+
+    /**
+     * Build a request for sending a message to a group.
+     * @param group The group receiving the message.
+     * @param message The message to be sent to the group.
+     * @return The request.
+     */
+    private static Request createRequestForMessageToSend(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
         Request req;
@@ -65,32 +96,9 @@ public class AddMessageRequest extends ServiceRequest {
                                 "text", ((TextContent) message
                                         .getContent()).getText());
                 break;
-            default:
-                throw new IllegalArgumentException("Message type not found !");
+
+            default : throw new IllegalArgumentException("type unknown");
         }
         return req;
-    }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
-
-    /**
-     * Getter method for the Message of this ServiceRequest.
-     *
-     * @return The Message of this ServiceRequest.
-     */
-    public Message getMessage() {
-        return mMessage;
-    }
-
-    /**
-     * Getter method for the receiving Group of this ServiceRequest.
-     *
-     * @return The receiving Group of this ServiceRequest.
-     */
-    public Group getReceivingGroup() {
-        return mReceivingGroup;
     }
 }
