@@ -141,11 +141,18 @@ public class YieldsApplication {
      * @param text The message to write on the toast
      */
     public static void showToast(Context context, String text){
-        if (mToast != null){
-            mToast.cancel();
-        }
+        cancelToast();
 
         mToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
         mToast.show();
+    }
+
+    /**
+     * Cancels the current displayed toast, if any
+     */
+    public static void cancelToast(){
+        if (mToast != null){
+            mToast.cancel();
+        }
     }
 }

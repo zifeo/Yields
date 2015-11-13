@@ -206,16 +206,18 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
                         mCurrentGroups.clear();
 
+                        String lowerCaseText = text.toLowerCase();
+
                         // match for the names
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
-                            if (mGlobalGroups.get(i).getName().startsWith(text)) {
+                            if (mGlobalGroups.get(i).getName().toLowerCase().startsWith(lowerCaseText)) {
                                 mCurrentGroups.add(mGlobalGroups.get(i));
                             }
                         }
 
                         //match for the tags
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
-                            if (mGlobalGroups.get(i).matchToTag(text) &&
+                            if (mGlobalGroups.get(i).matchToTag(lowerCaseText) &&
                                     !mCurrentGroups.contains(mGlobalGroups.get(i))) {
                                 mCurrentGroups.add(mGlobalGroups.get(i));
                             }
@@ -223,7 +225,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
                         notifyChange();
                     }
-                }, 5000);
+                }, 2000);
             }
         });
     }
