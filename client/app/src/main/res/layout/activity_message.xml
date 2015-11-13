@@ -24,6 +24,14 @@
         android:layout_gravity="center_horizontal"
         android:layout_weight="1.0"
         android:id="@+id/frgLayout">
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragmentPlaceHolder"
+            android:layout_gravity="center_horizontal"
+            android:name="yields.client.fragments.GroupMessageFragment"/>
+
     </LinearLayout>
 
     <LinearLayout
