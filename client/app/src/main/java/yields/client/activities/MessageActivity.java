@@ -281,6 +281,15 @@ public class MessageActivity extends AppCompatActivity
         retrieveGroupMessages();
     }
 
+    /**
+     * Return the list view of the current fragment.
+     * @return  If the current fragment is a groupMessageFragment then the
+     * method returns the list view containing the messages (currently in
+     * local memory) of the group.
+     *           If the current fragment is a commentFragment then the method
+     *           returns the list view containing the comments for the
+     *           message the user had clicked on.
+     */
     public ListView getCurrentFragmentListView(){
         if (mType == ContentType.GROUP_MESSAGES) {
             return ((GroupMessageFragment) mCurrentFragment)
@@ -292,6 +301,10 @@ public class MessageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Creates a comment fragment and put it in the fragment container of the
+     * MessageActivity (id fragmentPlaceHolder).
+     */
     private void createCommentFragment(){
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -299,6 +312,8 @@ public class MessageActivity extends AppCompatActivity
         mActionBar.setTitle("Message from " + mCommentMessage.getSender()
                 .getName());
         mCurrentFragment = new CommentFragment();
+        mCommentAdapter.clear();
+        // TODO : Retrieve comments from the server using the message binder.
         ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
         ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
         Log.d("MessageActivity", "Fragment created");
@@ -306,6 +321,10 @@ public class MessageActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
+    /**
+     * Creates a group message fragment and put it in the fragment container of
+     * the MessageActivity (id fragmentPlaceHolder).
+     */
     private void createGroupMessageFragment(){
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -329,6 +348,12 @@ public class MessageActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
+    /**
+     * Listener for the back button.
+     * When the back button is pressed we need to know if we are going from a
+     * comment fragment to a group message fragment or if we  are quitting
+     * the activity.
+     */
     @Override
     public void onBackPressed() {
         if (mType == ContentType.GROUP_MESSAGES){
@@ -390,6 +415,9 @@ public class MessageActivity extends AppCompatActivity
         }
     };
 
+    /**
+     * Private class for quick testing purposes.
+     */
     private class  FakeUser extends ClientUser{
 
         public FakeUser(String name, Id id, String email, Bitmap img)
@@ -425,6 +453,9 @@ public class MessageActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Private class for quick testing purposes.
+     */
     private class FakeGroup extends Group{
 
         public FakeGroup(String name, Id id, List<User> users, Bitmap image,
