@@ -52,18 +52,16 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends AppCompatActivity implements NotifiableActivity {
+public class MessageActivity extends AppCompatActivity
+        implements NotifiableActivity {
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
     private static ClientUser mUser;
     private static Group mGroup;
-    private static ArrayList<Message> mMessages;
-    private static ListAdapterMessages mAdapter;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
-    private static ListView mMessageScrollLayout;
     private static MessageBinder mMessageBinder;
     private static ActionBar mActionBar;
     private static ImageButton mSendButton;
@@ -71,10 +69,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private static ContentType mType;
     private static Message mCommentMessage;
     private static FragmentManager mFragmentManager;
+    private static Fragment mCurrentFragment;
+
+    private static ListAdapterMessages mGroupMessageAdapter;
+    private static ListAdapterMessages mCommentAdapter;
+
 
     /**
-     * Starts the activity by displaying the group info and showing the most recent
-     * messages.
+     * Starts the activity by displaying the group info and showing the most
+     * recent messages.
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -91,7 +94,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        // TODO : Uncoomment for tests !!!
+        // TODO : Uncomment for tests !!!
         /*
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
@@ -102,18 +105,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
                 Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
                         .GroupVisibility.PUBLIC, true);
-
-        mMessages = new ArrayList<>();
         mImage = null;
         mSendImage = false;
 
-        mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
-                mMessages);
-       /* mMessageScrollLayout = (ListView) findViewById(R.id
-                .messageScrollLayout);*/
-        mMessageScrollLayout = new ListView(YieldsApplication
-                .getApplicationContext());
-        mMessageScrollLayout.setAdapter(mAdapter);
+        mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
+                .getApplicationContext(), R.layout.messagelayout,
+                new ArrayList<Message>());
+        mCommentAdapter = new ListAdapterMessages((YieldsApplication
+                .getApplicationContext()), R.layout.messagelayout, new
+                ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
@@ -128,14 +128,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
 
-        // TODO : Choose right type
+        // By default, we show the messages of the group.
         mType = ContentType.GROUP_MESSAGES;
         mFragmentManager =  getFragmentManager();
         createFragment();
     }
 
     /**
-     * Automatically called when the activity is resumed after another activity was displayed
+     * Automatically called when the activity is resumed after another
+     * activity  was displayed
      */
     @Override
     public void onResume(){
@@ -153,7 +154,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     @Override
     public void onPause(){
         super.onPause();
-
         unbindService(mConnection);
     }
 
@@ -190,15 +190,21 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(1230), mUser, content, new Date());
-        // TODO : take right name and right id.
-        //mMessages.add(message);
-        mAdapter.add(message);
-        //mMessageBinder.sendMessage(mGroup, message);
+        Message message = new Message("message", new Id(0), mUser, content,
+                new Date());
+        if (mType == ContentType.GROUP_MESSAGES){
+            mGroupMessageAdapter.add(message);
+            mGroupMessageAdapter.notifyDataSetChanged();
+            // TODO : uncomment this to allow communication with the app Service.
+            //mMessageBinder.sendMessage(mGroup, message);
+        }
+        else{
+            mCommentAdapter.add(message);
+            mCommentAdapter.notifyDataSetChanged();
+            // TODO : implement method to send comments in the message binder.
+            // mMessageBinder.sendComment(...);
+        }
 
-        mAdapter.notifyDataSetChanged();
-        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter()
-                .getCount() - 1);
     }
 
     /**
@@ -215,28 +221,31 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      * @param newMessages The new message(s) received.
      */
     public void receiveNewMessage(List<Message> newMessages){
-        mMessages.addAll(newMessages);
-        mAdapter.notifyDataSetChanged();
+        mGroupMessageAdapter.addAll(newMessages);
+        mGroupMessageAdapter.notifyDataSetChanged();
     }
 
 
     /**
-     * Is called once the image picking is finished. It displays a toast informing the
-     * user that he added a message to his message.
+     * Is called once the image picking is finished. It displays a toast
+     * informing the user that he added a message to his message.
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK &&
+                data != null && data.getData() != null) {
 
             Uri uri = data.getData();
 
             try {
-                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(),
+                        uri);
                 if (mImage != null) {
                     String message = "Image added to message";
-                    YieldsApplication.showToast(getApplicationContext(), message);
+                    YieldsApplication.showToast(getApplicationContext(),message);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -274,10 +283,12 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     public ListView getCurrentFragmentListView(){
         if (mType == ContentType.GROUP_MESSAGES) {
-            throw new UnsupportedOperationException();
+            return ((GroupMessageFragment) mCurrentFragment)
+                    .getMessageListView();
         }
         else{
-            throw new UnsupportedOperationException();
+            return ((CommentFragment) mCurrentFragment)
+                    .getCommentListView();
         }
     }
 
@@ -287,17 +298,19 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     }
 
     private void createFragment(){
-        Fragment fragment = null;
-        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+        FragmentTransaction fragmentTransaction = mFragmentManager.
+                beginTransaction();
         if (mType == ContentType.GROUP_MESSAGES) {
             mActionBar.setTitle(mGroup.getName());
-            fragment = new GroupMessageFragment();
-            ((GroupMessageFragment) fragment).setAdapter(mAdapter);
-            ((GroupMessageFragment) fragment).setMessageListOnClickListener
+            mCurrentFragment = new GroupMessageFragment();
+            ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
+            ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
                     (new AdapterView.OnItemClickListener() {
                         @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            mCommentMessage = mAdapter.getItem(position);
+                        public void onItemClick(AdapterView<?> parent,
+                                            View view, int position, long id) {
+                            mCommentMessage = mGroupMessageAdapter.
+                                    getItem(position);
                             launchCommentFragment();
                         }
                     });
@@ -305,12 +318,12 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         else{
             mActionBar.setTitle("Message from " + mCommentMessage.getSender()
                     .getName());
-            fragment = new CommentFragment();
-            ((CommentFragment) fragment).setAdapter(mAdapter);
-            ((CommentFragment) fragment).setMessage(mCommentMessage);
+            mCurrentFragment = new CommentFragment();
+            ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
+            ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
         }
         Log.d("MessageActivity", "Fragment created");
-        fragmentTransaction.replace(R.id.fragmentPlaceHolder, fragment);
+        fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
     }
 
@@ -321,7 +334,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             super.onBackPressed();
         }
         else{
-            Log.d("MessageActivity", "Launch group message fragment");
+            Log.d("MessageActivity", "Back to group message fragment");
             mType = ContentType.GROUP_MESSAGES;
             createFragment();
         }
@@ -334,21 +347,21 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
-            mMessages.add(message);
+            mGroupMessageAdapter.add(message);
         }
-        mAdapter.notifyDataSetChanged();
-        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter().getCount() - 1);
+        mGroupMessageAdapter.notifyDataSetChanged();
     }
 
     /**
-     * Starts the activity which allows the user to pick which image from his gallery
-     * he wants to send.
+     * Starts the activity which allows the user to pick which image from his
+     * gallery he wants to send.
      */
     private void pickImageFromGallery(){
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),
+                PICK_IMAGE_REQUEST);
     }
 
     /**
@@ -377,17 +390,20 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     private class  FakeUser extends ClientUser{
 
-        public FakeUser(String name, Id id, String email, Bitmap img) throws NodeException {
+        public FakeUser(String name, Id id, String email, Bitmap img)
+                throws NodeException {
             super(name, id, email, img);
         }
 
         @Override
-        public void sendMessage(Group group, Message message) throws IOException {
+        public void sendMessage(Group group, Message message)
+                throws IOException {
 
         }
 
         @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
+        public List<Message> getGroupMessages(Group group, Date lastDate)
+                throws IOException {
             return null;
         }
 
@@ -409,7 +425,8 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     private class FakeGroup extends Group{
 
-        public FakeGroup(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
+        public FakeGroup(String name, Id id, List<User> users, Bitmap image,
+                         GroupVisibility visibility, boolean validated) {
             super(name, id, users, image, visibility, validated);
         }
     }
