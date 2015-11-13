@@ -59,11 +59,6 @@ public class GroupMessageFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
         Objects.requireNonNull(inflater);
-        Objects.requireNonNull(container);
-        Objects.requireNonNull(savedInstanceState);
-        Objects.requireNonNull(mAdapter, "Error adapter not set yet.");
-        Objects.requireNonNull(mListOnClickListener, "Error, " +
-                "OnClickItemListener not set yet.");
 
         Log.d("GroupMessageFragment", "onCreateView");
         mLayout = inflater.inflate(R.layout
