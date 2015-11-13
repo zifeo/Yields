@@ -49,7 +49,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
     private ProgressBar mProgressBar;
 
      /*Used to not launch requests each time the user types a new character
-     but rather waits a few seconds before doing it */
+     but rather waits a second before doing it */
     private Timer mTimer = null;
     private int mRequestsCount;
 

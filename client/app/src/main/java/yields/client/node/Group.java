@@ -28,7 +28,7 @@ public class Group extends Node {
     private List<User> mUsers;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
-    private Set<String> mTags;
+    private Set<Tag> mTags;
 
      /** Constructor for groups
      *
@@ -161,14 +161,8 @@ public class Group extends Node {
      * Add a tag to the group
      * @param tag The tag we want to add, without spaces, in lowercase
      */
-    public void addTag(String tag){
-        if (tag.contains(" ")){
-            throw new IllegalArgumentException("Tag cannot contain spaces");
-        }
-        if (!tag.toLowerCase().equals(tag)){
-            throw new IllegalArgumentException("Tag must be in lowercase");
-        }
-        mTags.add(tag);
+    public void addTag(Tag tag){
+        mTags.add(Objects.requireNonNull(tag));
     }
 
     /**
@@ -176,8 +170,16 @@ public class Group extends Node {
      * @param tag The tag we want to test
      * @return true iff the group contains the given tag
      */
-    public boolean matchToTag(String tag){
+    public boolean matchToTag(Tag tag){
         return mTags.contains(tag);
+    }
+
+    /**
+     * Returns a list containing all the tags of the group
+     * @return A list containing all the tags of the group, in a random order
+     */
+    public List<Tag> getTagList(){
+        return new ArrayList<>(mTags);
     }
 
     /**
@@ -227,5 +229,49 @@ public class Group extends Node {
      */
     private Message getLastMessage(){
         return mMessages.firstEntry().getValue();
+    }
+
+    /**
+     * Class used to represent a tag, which defines the subjects of the group
+     */
+    public class Tag{
+        private String mText;
+
+        /**
+         * Default constructor for tags
+         * @param text The text of the tag
+         */
+        public Tag(String text){
+            if (text.contains(" ")){
+                throw new IllegalArgumentException("Tag cannot contain spaces");
+            }
+            if (!text.toLowerCase().equals(text)){
+                throw new IllegalArgumentException("Tag must be in lowercase");
+            }
+
+            mText = Objects.requireNonNull(text);
+        }
+
+        /**
+         * Compares a tag and another object
+         * @param o The object we want to test
+         * @return true iff the two objects are equal
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Tag){
+                return ((Tag) o).mText.equals(mText);
+            }
+            return super.equals(o);
+        }
+
+        /**
+         * Gives the hashcode of a tag
+         * @return The hash of this tag
+         */
+        @Override
+        public int hashCode() {
+            return mText.hashCode();
+        }
     }
 }

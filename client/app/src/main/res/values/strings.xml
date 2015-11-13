@@ -48,4 +48,5 @@
     <string name="searchHint">Search for a name or a tag !</string>
     <string name="startSearchInfo">Start typing to search for nodes !</string>
     <string name="noGroupFound">No group found ...</string>
+    <string name="groupImage">Group image</string>
 </resources>

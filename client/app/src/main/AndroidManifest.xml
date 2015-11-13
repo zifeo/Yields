@@ -69,14 +69,16 @@
             android:parentActivityName=".activities.GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".activities.GroupInfoActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
 
         <service
             android:name=".service.YieldService"
             android:enabled="true"
             android:exported="true" >
         </service>
-
-
     </application>
 
 </manifest>
