@@ -131,7 +131,7 @@ public class MessageActivity extends AppCompatActivity
         // By default, we show the messages of the group.
         mType = ContentType.GROUP_MESSAGES;
         mFragmentManager =  getFragmentManager();
-        createFragment();
+        createGroupMessageFragment();
     }
 
     /**
@@ -292,36 +292,38 @@ public class MessageActivity extends AppCompatActivity
         }
     }
 
-    private void launchCommentFragment(){
-        mType = ContentType.MESSAGE_COMMENTS;
-        createFragment();
-    }
-
-    private void createFragment(){
+    private void createCommentFragment(){
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
-        if (mType == ContentType.GROUP_MESSAGES) {
-            mActionBar.setTitle(mGroup.getName());
-            mCurrentFragment = new GroupMessageFragment();
-            ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
-            ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
-                    (new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent,
+        assert (mType == ContentType.MESSAGE_COMMENTS);
+        mActionBar.setTitle("Message from " + mCommentMessage.getSender()
+                .getName());
+        mCurrentFragment = new CommentFragment();
+        ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
+        ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
+        Log.d("MessageActivity", "Fragment created");
+        fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
+        fragmentTransaction.commit();
+    }
+
+    private void createGroupMessageFragment(){
+        FragmentTransaction fragmentTransaction = mFragmentManager.
+                beginTransaction();
+        assert (mType == ContentType.GROUP_MESSAGES);
+        mActionBar.setTitle(mGroup.getName());
+        mCurrentFragment = new GroupMessageFragment();
+        ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
+        ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
+                (new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent,
                                             View view, int position, long id) {
-                            mCommentMessage = mGroupMessageAdapter.
-                                    getItem(position);
-                            launchCommentFragment();
-                        }
-                    });
-        }
-        else{
-            mActionBar.setTitle("Message from " + mCommentMessage.getSender()
-                    .getName());
-            mCurrentFragment = new CommentFragment();
-            ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
-            ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
-        }
+                        mCommentMessage = mGroupMessageAdapter.
+                                getItem(position);
+                        mType = ContentType.MESSAGE_COMMENTS;
+                        createCommentFragment();
+                    }
+                });
         Log.d("MessageActivity", "Fragment created");
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
@@ -336,7 +338,7 @@ public class MessageActivity extends AppCompatActivity
         else{
             Log.d("MessageActivity", "Back to group message fragment");
             mType = ContentType.GROUP_MESSAGES;
-            createFragment();
+            createGroupMessageFragment();
         }
     }
 
