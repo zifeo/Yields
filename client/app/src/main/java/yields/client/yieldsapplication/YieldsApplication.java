@@ -140,10 +140,20 @@ public class YieldsApplication {
         return mResources;
     }
 
+    /**
+     * Gets the binder to the service.
+     *
+     * @return The sus-mentioned binder.
+     */
     public static YieldServiceBinder getBinder(){
         return mBinder;
     }
 
+    /**
+     * Sets the binder to the service
+     *
+     * @param binder The sus-mentioned binder.
+     */
     public static void setBinder(YieldServiceBinder binder){
         Objects.requireNonNull(binder);
         mBinder = binder;

@@ -78,6 +78,12 @@ public class YieldService extends Service {
         return mBinder;
     }
 
+    /**
+     * What's happen when we unbind from server
+     *
+     * @param intent The unbinding intent
+     * @return true to authorize rebinding
+     */
     @Override
     public boolean onUnbind(Intent intent){
         Log.d("DEBUG", "unbind : " +
@@ -159,6 +165,7 @@ public class YieldService extends Service {
      * Called when an error is received from the server
      *
      * @param errorMsg The content of the error
+     * @param time The time of the Toast
      */
     public void receiveError(String errorMsg, int time) {
         if (time != Toast.LENGTH_SHORT && time != Toast.LENGTH_LONG) {
@@ -169,6 +176,11 @@ public class YieldService extends Service {
         toast.show();
     }
 
+    /**
+     * Called when an error is received from the server
+     *
+     * @param errorMsg The content of the error
+     */
     public void receiveError(String errorMsg) {
         receiveError(errorMsg, Toast.LENGTH_SHORT);
     }
