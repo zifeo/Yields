@@ -29,6 +29,7 @@ public class YieldServiceBinder extends Binder {
      * @param service The Service concerned
      */
     public YieldServiceBinder(YieldService service) {
+        Objects.requireNonNull(service);
         mService = service;
     }
 
@@ -51,6 +52,7 @@ public class YieldServiceBinder extends Binder {
      * @param group the group to create
      */
     public void createNewGroup(Group group) {
+        Objects.requireNonNull(group);
         List<Id> memberIDs = new ArrayList<>();
         List<User> members = group.getUsers();
         for (User u : members){
@@ -77,6 +79,8 @@ public class YieldServiceBinder extends Binder {
      * @throws IOException in case of communication errors
      */
     public void sendMessage(Group group, Message message){
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(message);
         Request groupMessageReq = createRequestForMessageToSend(group, message);
         Log.d("REQUEST", "sendMessage = " + groupMessageReq.message());
         mService.sendRequest(groupMessageReq);
@@ -91,6 +95,8 @@ public class YieldServiceBinder extends Binder {
      */
     public void addMoreGroupMessages(Group group,
                                      Date lastDate, int messageCount) {
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(lastDate);
         Request groupHistoryRequest = RequestBuilder
                 .GroupHistoryRequest(group.getId(), lastDate, messageCount);
         mService.sendRequest(groupHistoryRequest);
