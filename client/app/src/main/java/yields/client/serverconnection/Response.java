@@ -3,6 +3,8 @@ package yields.client.serverconnection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 /**
  * The response object which represents a response to be send to the server.
  */
@@ -16,7 +18,7 @@ public class Response{
      * @throws JSONException In case of problems parsing the response
      */
     public Response(String rawResponse) throws JSONException {
-        //Objects.requireNonNull(rawResponse);
+        Objects.requireNonNull(rawResponse);
         this.mRawResponse = new JSONObject();
     }
 
