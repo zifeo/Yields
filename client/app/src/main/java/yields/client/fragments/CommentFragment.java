@@ -2,6 +2,7 @@ package yields.client.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,10 +51,6 @@ public class CommentFragment extends Fragment{
         messageContainer.addView(mMessageView);
         ListView listView = (ListView) mLayout.findViewById(R.id.commentList);
         listView.setAdapter(mAdapter);
-        for (int i = 0 ; i < 10 ; i ++){
-            mAdapter.add(mMessage);
-        }
-        mAdapter.notifyDataSetChanged();
         return mLayout;
     }
 }
