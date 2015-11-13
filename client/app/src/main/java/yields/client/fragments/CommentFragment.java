@@ -53,4 +53,8 @@ public class CommentFragment extends Fragment{
         listView.setAdapter(mAdapter);
         return mLayout;
     }
+
+    public ListView getCommentListView(){
+        return mCommentList;
+    }
 }

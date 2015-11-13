@@ -44,23 +44,7 @@ public class GroupMessageFragment extends Fragment{
         return mLayout;
     }
 
-    @Override
-    public void onStop(){
-        super.onStop();
-        Log.d("GroupMessageFragment", "onStop");
+    public ListView getMessageListView(){
+        return mMessageList;
     }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        Log.d("GroupMessageFragment", "onPause");
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        Log.d("GroupMessageFragment", "onResume");
-    }
-
-
 }
