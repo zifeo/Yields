@@ -24,6 +24,11 @@ import yields.client.service.YieldService;
 import yields.client.service.YieldServiceBinder;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Activity which is displayed until a response from
+ * the server is received, indicating that the user
+ * is now connected.
+ */
 public class LoggingInActivity extends AppCompatActivity {
 
     /**
