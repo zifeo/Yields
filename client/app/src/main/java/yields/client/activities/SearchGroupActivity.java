@@ -1,26 +1,21 @@
 package yields.client.activities;
 
-import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +24,6 @@ import java.util.TimerTask;
 
 import yields.client.R;
 import yields.client.id.Id;
-import yields.client.listadapter.ListAdapterGroups;
 import yields.client.listadapter.ListAdapterSearchedGroups;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -82,6 +76,15 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         mListView = (ListView) findViewById(R.id.listViewGroupsSearched);
         mListView.setAdapter(mAdapterCurrentGroups);
         mListView.setVisibility(View.INVISIBLE);
+        mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                YieldsApplication.setGroup(mCurrentGroups.get(position));
+
+                Intent intent = new Intent(SearchGroupActivity.this, GroupInfoActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
 
