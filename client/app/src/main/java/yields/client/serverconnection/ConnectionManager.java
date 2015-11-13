@@ -1,5 +1,7 @@
 package yields.client.serverconnection;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -48,18 +50,38 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
                         new OutputStreamWriter(
                                 mSocket.getOutputStream()));
 
-        BufferedReader receiver = new BufferedReader(
-                new InputStreamReader(mSocket.getInputStream()));
-
-        return new ServerChannel(sender, receiver, this);
+        return new ServerChannel(sender, this);
     }
 
     /**
      * subscribes to the push connection
      */
     @Override
-    public void subscribeToConnection() {
-        //TODO : Implement listener
+    public void subscribeToConnection(ConnectionSubscriber subscriber) {
+        //TODO connect to controller (not created yet)
+
+        BufferedReader receiver = null;
+
+        try {
+           receiver = new BufferedReader(
+                    new InputStreamReader(mSocket.getInputStream()));
+        } catch (IOException e) {
+            subscriber.updateOnConnectionProblem(e);
+        }
+
+        if(receiver != null) {
+            while (!mSocket.isInputShutdown()) {
+                try {
+                    String pushMessage = receiver.readLine();
+                    Response response = new Response(pushMessage);
+                    subscriber.updateOn(response);
+                } catch (IOException e) {
+                    subscriber.updateOnConnectionProblem(e);
+                } catch (JSONException e) {
+                    subscriber.updateOnParsingProblem(e);
+                }
+            }
+        }
     }
 
     /**

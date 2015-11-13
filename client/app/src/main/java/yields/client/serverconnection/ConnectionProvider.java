@@ -6,7 +6,7 @@ public interface ConnectionProvider {
 
     CommunicationChannel getCommunicationChannel() throws IOException;
 
-    void subscribeToConnection();
+    void subscribeToConnection(ConnectionSubscriber subscriber);
 
     void close() throws IOException;
 }
