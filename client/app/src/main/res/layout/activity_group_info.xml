@@ -26,7 +26,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageGroup"
+            android:id="@+id/imageViewGroup"
             android:contentDescription="@string/groupImage"
             android:src="@drawable/default_group_image"
             android:layout_marginTop="30dp"
@@ -42,8 +42,8 @@
             android:id="@+id/textViewGroupName"
             android:textSize="30sp"
             android:layout_marginStart="15dp"
-            android:layout_alignTop="@+id/imageGroup"
-            android:layout_toEndOf="@+id/imageGroup" />
+            android:layout_alignTop="@+id/imageViewGroup"
+            android:layout_toEndOf="@+id/imageViewGroup" />
 
     </RelativeLayout>
 
@@ -53,14 +53,14 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_marginTop="30dp"
         android:text="Tags : "
-        android:id="@+id/textView2"
+        android:id="@+id/textViewTags"
         android:layout_gravity="center_horizontal" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:text="Users"
+        android:text="@string/users"
         android:id="@+id/button2"
         android:layout_gravity="center_horizontal" />
 
@@ -69,7 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="Join Group !"
+        android:text="@string/joinGroup"
         android:id="@+id/button"
         android:layout_gravity="center_horizontal" />
 
