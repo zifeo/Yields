@@ -10,6 +10,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Objects;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
@@ -124,7 +125,7 @@ public class YieldsApplication {
      * @param groups The group.
      */
     public static void setGroupsSearched(List<Group> groups){
-        mGroupsSearched = Collections.unmodifiableList(groups);
+        mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
     }
 
     /**

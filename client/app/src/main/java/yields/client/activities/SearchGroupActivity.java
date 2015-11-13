@@ -211,7 +211,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                     public void run() {
                         mRequestsCount--;
 
-                        mCurrentGroups.clear();
+                        List<Group> newGroupsSearched = new ArrayList<>();
 
                         String lowerCaseText = text.toLowerCase();
 
@@ -219,22 +219,24 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                         // match for the names
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
                             if (mGlobalGroups.get(i).getName().toLowerCase().startsWith(lowerCaseText)) {
-                                mCurrentGroups.add(mGlobalGroups.get(i));
+                                newGroupsSearched.add(mGlobalGroups.get(i));
                             }
                         }
 
                         if (text.length() > Group.Tag.MIN_TAG_LENGTH
-                                && text.length() < Group.Tag.MAX_TAG_LENGTH){
+                                && text.length() < Group.Tag.MAX_TAG_LENGTH) {
                             Group.Tag tag = new Group.Tag(text.toLowerCase());
 
                             //match for the tags
                             for (int i = 0; i < mGlobalGroups.size(); i++) {
                                 if (mGlobalGroups.get(i).matchToTag(tag) &&
                                         !mCurrentGroups.contains(mGlobalGroups.get(i))) {
-                                    mCurrentGroups.add(mGlobalGroups.get(i));
+                                    newGroupsSearched.add(mGlobalGroups.get(i));
                                 }
                             }
                         }
+
+                        YieldsApplication.setGroupsSearched(newGroupsSearched);
 
                         notifyChange();
                     }
@@ -292,20 +294,22 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
      */
     @Override
     public void notifyChange() {
+
         // Need to run on the UI thread because some views are modified
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mRequestsCount == 0){
-                    if (mCurrentGroups.size() == 0){
+                mCurrentGroups.clear();
+                mCurrentGroups.addAll(YieldsApplication.getGroupsSearched());
+
+                if (mRequestsCount == 0) {
+                    if (mCurrentGroups.size() == 0) {
                         setNoResultsState();
-                    }
-                    else {
+                    } else {
                         setNewResultsState();
                     }
                     mAdapterCurrentGroups.notifyDataSetChanged();
-                }
-                else {
+                } else {
                     setWaitingState();
                 }
             }
