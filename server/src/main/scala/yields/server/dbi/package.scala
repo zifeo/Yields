@@ -11,19 +11,12 @@ import scala.language.implicitConversions
   */
 package object dbi {
 
-  private[dbi] val redis = {
-    println("Redis connection")
-    println(Config.getString("database.addr"))
-    println(Config.getString("database.port"))
-    println(Config.getString("database.pass"))
-    println(Config.getString("database.id"))
-    new RedisClientPool(
+  private[dbi] val redis = new RedisClientPool(
     host = Config.getString("database.addr"),
     port = Config.getInt("database.port"),
     secret = Some(Config.getString("database.pass")),
     database = Config.getInt("database.id")
   )
-  }
 
   /** Terminates database connection. */
   def close(): Unit = {
