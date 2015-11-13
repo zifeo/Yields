@@ -3,7 +3,6 @@ package yields.client.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ListFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +35,7 @@ import java.util.SortedMap;
 import yields.client.R;
 import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
+import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -68,9 +68,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     private static ActionBar mActionBar;
     private static ImageButton mSendButton;
 
-    private static Fragment mFragment;
     private static ContentType mType;
     private static Message mCommentMessage;
+    private static FragmentManager mFragmentManager;
 
     /**
      * Starts the activity by displaying the group info and showing the most recent
@@ -128,8 +128,9 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
 
-        // TODO :
+        // TODO : Choose right type
         mType = ContentType.GROUP_MESSAGES;
+        mFragmentManager =  getFragmentManager();
         createFragment();
     }
 
@@ -206,12 +207,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      */
     public void onClickAddImage(View v){
         mSendImage = true;
-        // TODO : remove comment
-        //pickImageFromGallery();
-        if (mType == ContentType.GROUP_MESSAGES){
-            mCommentMessage = mAdapter.getItem(0);
-            launchCommentFragment();
-        }
+        pickImageFromGallery();
     }
 
     /**
@@ -222,6 +218,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mMessages.addAll(newMessages);
         mAdapter.notifyDataSetChanged();
     }
+
 
     /**
      * Is called once the image picking is finished. It displays a toast informing the
@@ -277,7 +274,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     public ListView getCurrentFragmentListView(){
         if (mType == ContentType.GROUP_MESSAGES) {
-            return ((ListFragment) mFragment).getListView();
+            throw new UnsupportedOperationException();
         }
         else{
             throw new UnsupportedOperationException();
@@ -291,10 +288,19 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
 
     private void createFragment(){
         Fragment fragment = null;
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         if (mType == ContentType.GROUP_MESSAGES) {
             mActionBar.setTitle(mGroup.getName());
-            fragment = new ListFragment();
-            ((ListFragment) fragment).setListAdapter(mAdapter);
+            fragment = new GroupMessageFragment();
+            ((GroupMessageFragment) fragment).setAdapter(mAdapter);
+            ((GroupMessageFragment) fragment).setMessageListOnClickListener
+                    (new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            mCommentMessage = mAdapter.getItem(position);
+                            launchCommentFragment();
+                        }
+                    });
         }
         else{
             mActionBar.setTitle("Message from " + mCommentMessage.getSender()
@@ -304,11 +310,21 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
             ((CommentFragment) fragment).setMessage(mCommentMessage);
         }
         Log.d("MessageActivity", "Fragment created");
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frgLayout, fragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.fragmentPlaceHolder, fragment);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mType == ContentType.GROUP_MESSAGES){
+            Log.d("MessageActivity", "Quit activity");
+            super.onBackPressed();
+        }
+        else{
+            Log.d("MessageActivity", "Launch group message fragment");
+            mType = ContentType.GROUP_MESSAGES;
+            createFragment();
+        }
     }
 
     /**
