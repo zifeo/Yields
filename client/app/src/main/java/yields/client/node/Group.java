@@ -236,6 +236,8 @@ public class Group extends Node {
      */
     public static class Tag {
         private String mText;
+        public static final int MIN_TAG_LENGTH = 2;
+        public static final int MAX_TAG_LENGTH = 20;
 
         /**
          * Default constructor for tags
@@ -248,13 +250,13 @@ public class Group extends Node {
             if (!text.toLowerCase().equals(text)){
                 throw new IllegalArgumentException("Tag must be in lowercase");
             }
-            if (text.length() < 2){
+            if (text.length() < MIN_TAG_LENGTH){
                 throw new IllegalArgumentException(
-                        "Length of a Tag must be at least 2 characters");
+                        "Length of a Tag must be at least " + MIN_TAG_LENGTH + " characters");
             }
-            if (text.length() > 20){
+            if (text.length() > MAX_TAG_LENGTH){
                 throw new IllegalArgumentException(
-                        "Length of a Tag cannot be more than 20 characters");
+                        "Length of a Tag cannot be more than " + MAX_TAG_LENGTH + " characters");
             }
 
             mText = Objects.requireNonNull(text);

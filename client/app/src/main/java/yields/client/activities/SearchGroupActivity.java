@@ -75,7 +75,6 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
         mListView = (ListView) findViewById(R.id.listViewGroupsSearched);
         mListView.setAdapter(mAdapterCurrentGroups);
-        mListView.setVisibility(View.INVISIBLE);
         mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -89,7 +88,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSearch);
-        mProgressBar.setVisibility(View.INVISIBLE);
+
+        setStartingState();
     }
 
     /**
@@ -155,19 +155,23 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
         mEditTextSearch.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
-                setWaitingState();
-
                 if (mTimer != null) {
                     mTimer.cancel();
                 }
 
-                mTimer = new Timer("DelayedRequestTimer");
-                mTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        launchSearch(mEditTextSearch.getText().toString());
-                    }
-                }, 1000);
+                if (mEditTextSearch.length() == 0) {
+                    setStartingState();
+                } else {
+                    setWaitingState();
+
+                    mTimer = new Timer("DelayedRequestTimer");
+                    mTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            launchSearch(mEditTextSearch.getText().toString());
+                        }
+                    }, 1000);
+                }
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -210,7 +214,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                         mCurrentGroups.clear();
 
                         String lowerCaseText = text.toLowerCase();
-                        Group.Tag tag = new Group.Tag(text.toLowerCase());
+
 
                         // match for the names
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
@@ -219,11 +223,16 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                             }
                         }
 
-                        //match for the tags
-                        for (int i = 0; i < mGlobalGroups.size(); i++) {
-                            if (mGlobalGroups.get(i).matchToTag(tag) &&
-                                    !mCurrentGroups.contains(mGlobalGroups.get(i))) {
-                                mCurrentGroups.add(mGlobalGroups.get(i));
+                        if (text.length() > Group.Tag.MIN_TAG_LENGTH
+                                && text.length() < Group.Tag.MAX_TAG_LENGTH){
+                            Group.Tag tag = new Group.Tag(text.toLowerCase());
+
+                            //match for the tags
+                            for (int i = 0; i < mGlobalGroups.size(); i++) {
+                                if (mGlobalGroups.get(i).matchToTag(tag) &&
+                                        !mCurrentGroups.contains(mGlobalGroups.get(i))) {
+                                    mCurrentGroups.add(mGlobalGroups.get(i));
+                                }
                             }
                         }
 
@@ -232,6 +241,18 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                 }, 2000);
             }
         });
+    }
+
+    /**
+     * This methods changes the look of the activity to 'starting',
+     * with a message indicating that the user can search for groups
+     */
+    private void setStartingState(){
+        mTextViewInfo.setVisibility(View.VISIBLE);
+        mTextViewInfo.setText(getText(R.string.startSearchInfo));
+
+        mProgressBar.setVisibility(View.GONE);
+        mListView.setVisibility(View.GONE);
     }
 
     /**
