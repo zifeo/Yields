@@ -78,7 +78,7 @@ public class YieldServiceBinder extends Binder {
      * @param message The message itself
      * @throws IOException in case of communication errors
      */
-    public void sendMessage(Group group, Message message){
+    public void sendMessage(Group group, Message message) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
     }

@@ -32,7 +32,6 @@ public class AddMessageRequest extends ServiceRequest {
         mMessage = message;
         mReceivingGroup = receivingGroup;
     }
-
     /**
      * Returns the type of this ServiceRequest as a String.
      *
@@ -56,7 +55,6 @@ public class AddMessageRequest extends ServiceRequest {
     public Message getMessage(){
         return mMessage;
     }
-
     /**
      * Getter method for the receiving Group of this ServiceRequest.
      *
