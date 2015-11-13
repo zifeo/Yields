@@ -48,6 +48,9 @@ public class GroupInfoActivity extends AppCompatActivity {
         if (tags.size() == 0){
             textViewTags.setText("No tags for this group");
         }
+        else if (tags.size() == 1){
+            textViewTags.setText("Tag : " + tags.get(0).getText());
+        }
         else {
             StringBuilder builder = new StringBuilder("Tags : ");
             for (int i = 0; i < MAX_TAGS && i < tags.size(); i++){
