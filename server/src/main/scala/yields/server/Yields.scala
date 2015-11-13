@@ -37,9 +37,4 @@ object Yields extends App {
     flow.join(pipeline).run()
   }
 
-  // Kindly terminate
-  StdIn.readLine()
-  system.terminate()
-  dbi.close()
-
 }
