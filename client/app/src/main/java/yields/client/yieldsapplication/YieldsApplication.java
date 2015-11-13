@@ -8,6 +8,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.Objects;
+import java.util.Collections;
+import java.util.List;
 
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
@@ -16,6 +18,7 @@ import yields.client.service.YieldServiceBinder;
 public class YieldsApplication {
     private static ClientUser mUser;
     private static Group mGroup;
+    private static List<Group> mGroupsSearched;
 
     private static Context mApplicationContext;
     private static Resources mResources;
@@ -42,6 +45,14 @@ public class YieldsApplication {
      */
     public static Group getGroup(){
         return mGroup;
+    }
+
+    /**
+     * Getter for the list of groups currently displayed in the SearchGroupActivity.
+     * @return The list of groups displayed.
+     */
+    public static List<Group> getGroupsSearched(){
+        return mGroupsSearched;
     }
 
     /**
@@ -106,6 +117,14 @@ public class YieldsApplication {
      */
     public static void setUser(ClientUser u){
         mUser = u;
+    }
+
+    /**
+     * Setter for the group list to be displayed in SearchGroupActivity
+     * @param groups The group.
+     */
+    public static void setGroupsSearched(List<Group> groups){
+        mGroupsSearched = Collections.unmodifiableList(groups);
     }
 
     /**
