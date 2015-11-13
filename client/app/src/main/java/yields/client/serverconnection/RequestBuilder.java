@@ -16,29 +16,12 @@ import java.util.Objects;
 import yields.client.id.Id;
 import yields.client.messages.ImageContent;
 import yields.client.node.Group;
+import yields.client.servicerequest.ServiceRequest;
 
 /**
  * A builder for requests that will be send to the server
  */
 public class RequestBuilder {
-
-    /**
-     * The Kind of messages possible
-     */
-    private enum MessageKind {
-        PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdate"),
-        USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
-        USERENTOURAGEREMOVE("UserEntourageRemove"), USERSTATUS("UserStatus"),
-        GROUPCREATE("GroupCreate"), GROUPUPDATENAME("GroupUpdateName"),
-        GROUPUPDATEVISIBILITY("GroupUpdateVisibility"), GROUPUPDATEIMAGE
-                ("GroupUpdateImage"),
-        GROUPADD("GroupAdd"), GROUPREMOVE("GroupRemove"),
-        GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");
-
-        private final String name;
-        MessageKind(String name) { this.name = name; }
-        public String getValue() { return name; }
-    }
 
     /**
      * The Fields possible for the request
@@ -54,7 +37,7 @@ public class RequestBuilder {
         public String getValue() { return name; }
     }
 
-    private final MessageKind mKind;
+    private final ServiceRequest.MessageKind mKind;
     private final Id mSender;
     private final Map<String, Object> mConstructingMap;
 
@@ -70,7 +53,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(args);
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERUPDATE, sender);
+                ServiceRequest.MessageKind.USERUPDATE, sender);
 
         if (args.containsKey(Fields.EMAIL)) {
             builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
@@ -93,7 +76,7 @@ public class RequestBuilder {
     public static Request userGroupListRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERGROUPLIST, sender);
+                ServiceRequest.MessageKind.USERGROUPLIST, sender);
 
         return builder.request();
     }
@@ -108,7 +91,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERENTOURAGEADD, sender);
+                ServiceRequest.MessageKind.USERENTOURAGEADD, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -125,7 +108,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERENTOURAGEREMOVE, sender);
+                ServiceRequest.MessageKind.USERENTOURAGEREMOVE, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -142,7 +125,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERCONNECT, sender);
+                ServiceRequest.MessageKind.USERCONNECT, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -157,7 +140,7 @@ public class RequestBuilder {
     public static Request userUpdateRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.USERSTATUS, sender);
+                ServiceRequest.MessageKind.USERSTATUS, sender);
 
         return builder.request();
     }
@@ -181,7 +164,7 @@ public class RequestBuilder {
         }
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPCREATE, sender);
+                ServiceRequest.MessageKind.GROUPCREATE, sender);
 
         builder.addField(Fields.NAME, name);
         builder.addField(Fields.NODES, nodes);
@@ -201,7 +184,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newName);
 
-        RequestBuilder builder = new RequestBuilder(MessageKind.GROUPUPDATENAME, sender);
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.MessageKind.GROUPUPDATENAME, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
@@ -220,7 +203,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newVisibility);
 
-        RequestBuilder builder = new RequestBuilder(MessageKind
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.MessageKind
                 .GROUPUPDATEVISIBILITY, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
@@ -240,7 +223,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newImage);
 
-        RequestBuilder builder = new RequestBuilder(MessageKind
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.MessageKind
                 .GROUPUPDATEIMAGE, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.IMAGE, newImage.getImage());
@@ -262,7 +245,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newUser);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPADD, sender);
+                ServiceRequest.MessageKind.GROUPADD, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NID, newUser);
@@ -284,7 +267,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newUser);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPREMOVE, sender);
+                ServiceRequest.MessageKind.GROUPREMOVE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NID, newUser);
@@ -309,7 +292,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPMESSAGE, sender);
+                ServiceRequest.MessageKind.GROUPMESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.KIND, kind);
@@ -335,7 +318,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPMESSAGE, sender);
+                ServiceRequest.MessageKind.GROUPMESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.KIND, kind);
@@ -359,7 +342,7 @@ public class RequestBuilder {
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.GROUPHISTORY, groupId);
+                ServiceRequest.MessageKind.GROUPHISTORY, groupId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
@@ -377,7 +360,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                MessageKind.PING, new Id(0l));
+                ServiceRequest.MessageKind.PING, new Id(0l));
 
         builder.addField(Fields.CONTENT, content);
 
@@ -389,7 +372,7 @@ public class RequestBuilder {
      * @param kind The kind of request to be built.
      * @param sender The sender of the request.
      */
-    private RequestBuilder(MessageKind kind, Id sender){
+    private RequestBuilder(ServiceRequest.MessageKind kind, Id sender){
         this.mKind = kind;
         this.mSender = sender;
         this.mConstructingMap = new ArrayMap<>();
@@ -442,7 +425,7 @@ public class RequestBuilder {
      */
     private Request request() {
         Map<String, Object> request = new ArrayMap<>();
-        request.put("kind", mKind.name);
+        request.put("kind", mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
         metadata.put("sender", mSender.getId());
