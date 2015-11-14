@@ -11,8 +11,10 @@ import yields.client.node.Group;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
-import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Request asking the Service to add a Message to a Group.
+ */
 public class AddMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
