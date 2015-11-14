@@ -41,16 +41,6 @@ public class AddMessageRequest extends ServiceRequest {
         return "AddMessage";
     }
 
-    /**
-     * Build a Request for sending a message to a group.
-     *
-     * @return The Request corresponding to this ServiceRequest.
-     */
-    @Override
-    public Request parseRequestForServer(){
-        return createRequestForMessageToSend(mReceivingGroup, mMessage);
-    }
-
     @Override
     public void serviceActionOnResponse(Service service, Response response) {
 
@@ -75,12 +65,14 @@ public class AddMessageRequest extends ServiceRequest {
     }
 
     /**
-     * Build a request for sending a message to a group.
-     * @param group The group receiving the message.
-     * @param message The message to be sent to the group.
-     * @return The request.
+     * Build a Request for sending a message to a group.
+     *
+     * @return The Request corresponding to this ServiceRequest.
      */
-    private static Request createRequestForMessageToSend(Group group, Message message){
+    @Override
+    public Request parseRequestForServer() {
+        Group group = getReceivingGroup();
+        Message message = getMessage();
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
         Request req;
@@ -96,8 +88,8 @@ public class AddMessageRequest extends ServiceRequest {
                                 "text", ((TextContent) message
                                         .getContent()).getText());
                 break;
-
-            default : throw new IllegalArgumentException("type unknown");
+            default:
+                throw new IllegalArgumentException("Message type not found !");
         }
         return req;
     }
