@@ -44,12 +44,11 @@ public class ServerChannelTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 
-        ServerChannel channel = new ServerChannel(toWriter(output),
-                toReade(input), simpleStatus(true));
+        ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(true));
 
 
         try {
-            Response response = channel.sendRequest(simpleRequest);
+            channel.sendRequest(simpleRequest);
             Assert.assertEquals(sSimpleRequest
                     .replace("TIME", DateSerialization.toString(new Date())),
                     output.toString());
@@ -66,8 +65,7 @@ public class ServerChannelTest {
                 FAKE_RESPONSE.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        ServerChannel channel = new ServerChannel(toWriter(output),
-                toReade(input), simpleStatus(false));
+        ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(false));
 
         try {
             channel.sendRequest(simpleRequest);
