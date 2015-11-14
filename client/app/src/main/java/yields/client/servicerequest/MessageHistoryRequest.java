@@ -9,6 +9,9 @@ import yields.client.serverconnection.Request;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 
+/**
+ * Request asking the Service to retrieve Messages from a Group.
+ */
 public class MessageHistoryRequest extends ServiceRequest {
 
     public static final int MESSAGE_COUNT = 10;

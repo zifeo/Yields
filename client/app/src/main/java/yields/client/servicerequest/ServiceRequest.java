@@ -6,6 +6,9 @@ import android.app.Service;
 import yields.client.serverconnection.Request;
 import yields.client.serverconnection.Response;
 
+/**
+ * Abstract class for Requests to the Service.
+ */
 public abstract class ServiceRequest{
 
     /**
