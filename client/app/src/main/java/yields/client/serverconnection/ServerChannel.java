@@ -27,23 +27,23 @@ public class ServerChannel implements CommunicationChannel {
     }
 
     /**
-     * Sends a request by this communication channels
+     * Sends a serverRequest by this communication channels
      *
-     * @param request Request to send
-     * @return The Response of the request
-     * @throws IOException If we have trouble sending the request
+     * @param serverRequest ServerRequest to send
+     * @return The Response of the serverRequest
+     * @throws IOException If we have trouble sending the serverRequest
      */
     @Override
     public void sendRequest(Request request)
             throws IOException {
 
-        Objects.requireNonNull(request);
+        Objects.requireNonNull(serverRequest);
 
         if (!mConnectionStatus.working()) {
             throw new IOException("Not connected to server");
         }
 
-        mSender.write(request.message());
+        mSender.write(serverRequest.message());
         mSender.newLine();
         mSender.flush();
     }

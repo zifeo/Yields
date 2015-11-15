@@ -11,15 +11,7 @@ import android.util.Log;
 
 import com.google.android.gms.plus.Plus;
 
-import java.io.IOException;
-
 import yields.client.R;
-import yields.client.id.Id;
-import yields.client.serverconnection.ConnectionManager;
-import yields.client.serverconnection.Request;
-import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.ServerChannel;
-import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.service.YieldService;
 import yields.client.service.YieldServiceBinder;
 import yields.client.yieldsapplication.YieldsApplication;

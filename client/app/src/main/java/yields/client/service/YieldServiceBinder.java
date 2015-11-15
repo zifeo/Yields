@@ -9,16 +9,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import yields.client.activities.GroupActivity;
-import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
 import yields.client.id.Id;
-import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
-import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 
 public class YieldServiceBinder extends Binder {
@@ -58,10 +54,10 @@ public class YieldServiceBinder extends Binder {
         for (User u : members){
             memberIDs.add(u.getId());
         }
-        Request groupAddRequest = RequestBuilder
+        ServerRequest groupAddServerRequest = RequestBuilder
                 .GroupCreateRequest(group.getUsers().get(0).getId(), group.getName(), memberIDs);
         Log.d("REQUEST", "Add new group");
-        mService.sendRequest(groupAddRequest);
+        mService.sendRequest(groupAddServerRequest);
     }
 
     /**
@@ -94,9 +90,9 @@ public class YieldServiceBinder extends Binder {
                                      Date lastDate, int messageCount) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(lastDate);
-        Request groupHistoryRequest = RequestBuilder
+        ServerRequest groupHistoryServerRequest = RequestBuilder
                 .GroupHistoryRequest(group.getId(), lastDate, messageCount);
-        mService.sendRequest(groupHistoryRequest);
-        Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
+        mService.sendRequest(groupHistoryServerRequest);
+        Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
     }
 }

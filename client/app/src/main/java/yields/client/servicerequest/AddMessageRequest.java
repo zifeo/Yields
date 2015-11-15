@@ -4,16 +4,17 @@ import android.app.Service;
 
 import java.util.Objects;
 
+import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 
 /**
- * Request asking the Service to add a Message to a Group.
+ * ServerRequest asking the Service to add a Message to a Group.
  */
 public class AddMessageRequest extends ServiceRequest {
 
@@ -65,32 +66,17 @@ public class AddMessageRequest extends ServiceRequest {
     }
 
     /**
-     * Build a Request for sending a message to a group.
+     * Build a ServerRequest for sending a message to a group.
      *
-     * @return The Request corresponding to this ServiceRequest.
+     * @return The ServerRequest corresponding to this ServiceRequest.
      */
     @Override
-    public Request parseRequestForServer() {
+    public ServerRequest parseRequestForServer() {
         Group group = getReceivingGroup();
         Message message = getMessage();
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        Request req;
-        switch (message.getContent().getType()) {
-            case "image":
-                req = RequestBuilder
-                        .GroupImageMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", (ImageContent) message.getContent());
-                break;
-            case "text":
-                req = RequestBuilder
-                        .GroupTextMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", ((TextContent) message
-                                        .getContent()).getText());
-                break;
-            default:
-                throw new IllegalArgumentException("Message type not found !");
-        }
-        return req;
+        return RequestBuilder.GroupMessageRequest(message.getSender().getId(), group.getId(),
+                message.getContent());
     }
 }

@@ -37,7 +37,7 @@ public class ServerChannelTest {
 
     @Test
     public void testWorkingSendRequestAndReadResponse() throws JSONException{
-        Request simpleRequest = RequestBuilder.pingRequest("test");
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -59,7 +59,7 @@ public class ServerChannelTest {
 
     @Test
     public void testNonWorkingConnection() throws IOException{
-        Request simpleRequest = RequestBuilder.pingRequest("test");
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -68,7 +68,7 @@ public class ServerChannelTest {
         ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(false));
 
         try {
-            channel.sendRequest(simpleRequest);
+            channel.sendRequest(simpleServerRequest);
             Assert.fail("");
         } catch (IOException e) {
         }

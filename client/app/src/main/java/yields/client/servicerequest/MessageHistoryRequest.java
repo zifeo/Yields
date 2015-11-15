@@ -5,12 +5,12 @@ import android.app.Service;
 import java.util.Date;
 
 import yields.client.id.Id;
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 
 /**
- * Request asking the Service to retrieve Messages from a Group.
+ * ServerRequest asking the Service to retrieve Messages from a Group.
  */
 public class MessageHistoryRequest extends ServiceRequest {
 
@@ -37,17 +37,17 @@ public class MessageHistoryRequest extends ServiceRequest {
      * @return The type of this ServiceRequest as a String.
      */
     @Override
-    public String getType() {
-        return MessageKind.GROUPHISTORY.getValue();
+    public MessageKind getType() {
+        return MessageKind.GROUPHISTORY;
     }
 
     /**
-     * Build a Request for sending a message to a group.
+     * Build a ServerRequest for sending a message to a group.
      *
-     * @return The Request corresponding to this ServiceRequest.
+     * @return The ServerRequest corresponding to this ServiceRequest.
      */
     @Override
-    public Request parseRequestForServer() {
+    public ServerRequest parseRequestForServer() {
         return RequestBuilder.GroupHistoryRequest(getGroupId(), getDate(), MESSAGE_COUNT);
     }
 

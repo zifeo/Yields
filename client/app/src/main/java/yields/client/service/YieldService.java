@@ -22,7 +22,7 @@ import yields.client.activities.NotifiableActivity;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.Group;
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -56,7 +56,7 @@ public class YieldService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getBooleanExtra("newUser", false)) {
             String email = intent.getStringExtra("email");
-            Request connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
+            ServerRequest connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
             sendRequest(connectReq);
         }
 
@@ -93,12 +93,12 @@ public class YieldService extends Service {
     }
 
     /**
-     * Sends request to server
+     * Sends serverRequest to server
      *
-     * @param request The request to send
+     * @param serverRequest The serverRequest to send
      */
-    public void sendRequest(Request request) {
-        new SendRequestTask().execute(request);
+    public void sendRequest(ServerRequest serverRequest) {
+        new SendRequestTask().execute(serverRequest);
     }
 
     /**
@@ -213,10 +213,10 @@ public class YieldService extends Service {
     /**
      * AsncTask sending th requests.
      */
-    private static class SendRequestTask extends AsyncTask<Request, Void, Void> {
+    private static class SendRequestTask extends AsyncTask<ServerRequest, Void, Void> {
         @Override
-        protected Void doInBackground(Request... params) {
-            //TODO : send Request to Server
+        protected Void doInBackground(ServerRequest... params) {
+            //TODO : send ServerRequest to Server
             return null;
         }
     }

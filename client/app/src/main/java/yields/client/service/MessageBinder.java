@@ -12,7 +12,7 @@ import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 
 public class MessageBinder extends Binder {
@@ -50,7 +50,7 @@ public class MessageBinder extends Binder {
      * @throws IOException in case of communication errors
      */
     public void sendMessage(Group group, Message message){
-        Request groupMessageReq = createRequestForMessageToSend(group, message);
+        ServerRequest groupMessageReq = createRequestForMessageToSend(group, message);
         Log.d("REQUEST", "sendMessage = " + groupMessageReq.message());
         mService.sendRequest(groupMessageReq);
     }
@@ -64,10 +64,10 @@ public class MessageBinder extends Binder {
      */
     public void addMoreGroupMessages(Group group,
                                  Date lastDate, int messageCount) {
-        Request groupHistoryRequest = RequestBuilder
+        ServerRequest groupHistoryServerRequest = RequestBuilder
                 .GroupHistoryRequest(group.getId(), lastDate, messageCount);
-        mService.sendRequest(groupHistoryRequest);
-        Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
+        mService.sendRequest(groupHistoryServerRequest);
+        Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
     }
 
     /**
@@ -76,25 +76,12 @@ public class MessageBinder extends Binder {
      * @param message The message to be sent to the group.
      * @return The request.
      */
-    private static Request createRequestForMessageToSend(Group group, Message message){
+    private static ServerRequest createRequestForMessageToSend(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        Request req;
-        switch (message.getContent().getType()) {
-            case "image":
-                req = RequestBuilder
-                        .GroupImageMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", (ImageContent) message.getContent());
-                break;
-            case "text":
-                req = RequestBuilder
-                        .GroupTextMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", ((TextContent) message
-                                        .getContent()).getText());
-                break;
-            default : throw new IllegalArgumentException("type unknown");
-        }
-        return req;
+        return RequestBuilder.GroupMessageRequest(message.getSender().getId(), group.getId(),
+                message
+               .getContent());
     }
 
     /**
