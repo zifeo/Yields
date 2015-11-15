@@ -413,6 +413,7 @@ public class MessageActivity extends AppCompatActivity
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            // TODO : use message Binder
             /*mMessageBinder = (MessageBinder) service;
             mMessageBinder.attachActivity(MessageActivity.this);*/
             mSendButton.setEnabled(true);
