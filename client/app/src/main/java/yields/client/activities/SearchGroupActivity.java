@@ -152,6 +152,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         mActionBar.setCustomView(R.layout.search_bar_layout);
 
         mEditTextSearch = (EditText)mActionBar.getCustomView().findViewById(R.id.editTextSearch);
+        mEditTextSearch.requestFocus();
 
         mEditTextSearch.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {

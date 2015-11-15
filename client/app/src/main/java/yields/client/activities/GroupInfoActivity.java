@@ -46,7 +46,7 @@ public class GroupInfoActivity extends AppCompatActivity {
         TextView textViewTags = (TextView) findViewById(R.id.textViewTags);
 
         if (tags.size() == 0){
-            textViewTags.setText("No tags for this group");
+            textViewTags.setText(getString(R.string.noTags));
         }
         else if (tags.size() == 1){
             textViewTags.setText("Tag : " + tags.get(0).getText());
