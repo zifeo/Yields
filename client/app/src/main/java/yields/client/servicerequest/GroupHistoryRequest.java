@@ -8,6 +8,7 @@ import yields.client.id.Id;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * ServerRequest asking the Service to retrieve Messages from a Group.
@@ -48,7 +49,8 @@ public class GroupHistoryRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.GroupHistoryRequest(getGroupId(), getDate(), MESSAGE_COUNT);
+        return RequestBuilder.GroupHistoryRequest(YieldsApplication.getUser().getId(),
+                getGroupId(), getDate(), MESSAGE_COUNT);
     }
 
     @Override

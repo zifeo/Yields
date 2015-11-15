@@ -64,10 +64,11 @@ public class MessageBinder extends Binder {
      */
     public void addMoreGroupMessages(Group group,
                                  Date lastDate, int messageCount) {
-        ServerRequest groupHistoryServerRequest = RequestBuilder
-                .GroupHistoryRequest(group.getId(), lastDate, messageCount);
-        mService.sendRequest(groupHistoryServerRequest);
-        Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
+        /*ServerRequest groupHistoryServerRequest = RequestBuilder
+                .GroupHistoryRequest(group.getId(), lastDate, messageCount);*/
+        //TODO : Stuff
+        //mService.sendRequest(groupHistoryServerRequest);
+        //Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
     }
 
     /**

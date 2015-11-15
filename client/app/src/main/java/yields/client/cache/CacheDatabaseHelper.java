@@ -478,7 +478,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             values.put(KEY_GROUP_USERS, getStringFromIds(ids));
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                     new String[]{groupId.getId()});
-
         }
     }
 

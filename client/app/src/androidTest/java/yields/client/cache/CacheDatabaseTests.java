@@ -28,6 +28,9 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
+/**
+ * Test for the CacheDatbaseHelper class.
+ */
 public class CacheDatabaseTests {
 
     private CacheDatabaseHelper mDatabaseHelper;
