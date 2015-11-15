@@ -252,7 +252,7 @@ public class CacheDatabaseTests {
 
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM groups;", null);
             assertEquals(7, cursor.getCount());
-            assertEquals(5, cursor.getColumnCount());
+            assertEquals(6, cursor.getColumnCount());
             cursor.moveToFirst();
 
             for (int i = 0; i < 6; i++) {
@@ -281,6 +281,7 @@ public class CacheDatabaseTests {
             Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
             assertEquals(fromDatabase.getName(), "New group name");
             assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PRIVATE);
             assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
         } catch (CacheDatabaseException exception) {
             fail(exception.getMessage());
@@ -304,8 +305,29 @@ public class CacheDatabaseTests {
             assertEquals(fromDatabase.getName(), group.getName());
             assertEquals(fromDatabase.getId().getId(), group.getId().getId());
             assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+            assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PRIVATE);
             assertTrue(compareImages(Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565),
                     fromDatabase.getImage()));
+        } catch (CacheDatabaseException exception) {
+            fail(exception.getMessage());
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    @Test
+    public void testDatabaseCanUpdateGroupVisibility() {
+        try {
+            Group group = MockFactory.generateMockGroups(1).get(0);
+            mDatabaseHelper.addGroup(group);
+            mDatabaseHelper.updateGroupVisibility(group.getId(), Group.GroupVisibility.PUBLIC);
+            Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+            assertEquals(fromDatabase.getName(), group.getName());
+            assertEquals(fromDatabase.getId().getId(), group.getId().getId());
+            assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
+            assertTrue(compareImages(group.getImage(),
+                    fromDatabase.getImage()));
+            assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PUBLIC);
         } catch (CacheDatabaseException exception) {
             fail(exception.getMessage());
         } finally {

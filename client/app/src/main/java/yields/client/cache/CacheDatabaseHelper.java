@@ -58,6 +58,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GROUP_NAME = "groupName";
     private static final String KEY_GROUP_USERS = "groupUsers";
     private static final String KEY_GROUP_IMAGE = "groupImage";
+    private static final String KEY_GROUP_VISIBILITY = "groupVisibility";
+
 
     private static final String KEY_MESSAGE_NODEID = "nodeID";
     private static final String KEY_MESSAGE_GROUPID = "messageGroup";
@@ -75,7 +77,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " TEXT,"
             + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
-            + " BLOB" + ")";
+            + " BLOB," + KEY_GROUP_VISIBILITY + " TEXT" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
@@ -415,6 +417,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Updates the visibility of a Group in the database.
+     *
+     * @param groupId    The Id field of the Group that will have it's visibility changed.
+     * @param visibility The new visibility of the Group.
+     */
+    public void updateGroupVisibility(Id groupId, Group.GroupVisibility visibility) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(visibility);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_GROUP_VISIBILITY, visibility.getValue());
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+                new String[]{groupId.getId()});
+    }
+
+    /**
      * Removes a User from a Group in the database.
      *
      * @param groupId The Id of the Group form which the User shall be removed.
@@ -499,7 +517,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * such Group
      * in the database.
      */
-    public Group getGroup(Id groupId) {
+    public Group getGroup(Id groupId)
+            throws CacheDatabaseException
+    {
         Objects.requireNonNull(groupId);
 
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
@@ -515,6 +535,18 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     cursor.getColumnIndex(KEY_GROUP_NAME));
             Bitmap groupImage = deserializeBitmap(
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
+            Group.GroupVisibility groupVisibility;
+            switch (cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY))){
+                case "Public":
+                    groupVisibility = Group.GroupVisibility.PUBLIC;
+                    break;
+                case "Private":
+                    groupVisibility = Group.GroupVisibility.PRIVATE;
+                    break;
+                default:
+                    throw new CacheDatabaseException("Couldn't retrieve Group visibility from " +
+                            "Cache, Group Id was : " + groupId.getId());
+            }
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
@@ -529,7 +561,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
             }
             cursor.close();
-            return new Group(groupName, groupId, groupUsers, groupImage);
+            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility);
         }
     }
 
@@ -538,7 +570,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @return An exhaustive List of all Groups in the database.
      */
-    public List<Group> getAllGroups() {
+    public List<Group> getAllGroups()
+            throws CacheDatabaseException
+    {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS;
         Cursor groupCursor = mDatabase.rawQuery(selectQuery, null);
 
@@ -650,7 +684,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deletes the Database file in the file system.
      */
-    public static void deleteDatbase(){
+    public static void deleteDatbase() {
         YieldsApplication.getApplicationContext().deleteDatabase(DATABASE_NAME);
     }
 
@@ -902,8 +936,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NODEID, group.getId().getId());
         values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getImage()));
+        values.put(KEY_GROUP_VISIBILITY, group.getVisibility().getValue());
         values.put(KEY_GROUP_NAME, group.getName());
-        StringBuilder userIdsAsString = new StringBuilder();
         List<User> users = group.getUsers();
         List<Id> userIDs = new ArrayList<>();
         for (User user : users) {

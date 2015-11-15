@@ -18,7 +18,19 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
 
-    public enum GroupVisibility {PRIVATE, PUBLIC};
+    public enum GroupVisibility {
+        PRIVATE("Private"), PUBLIC("Public");
+
+        private final String mName;
+
+        GroupVisibility(String name) {
+            mName = name;
+        }
+
+        public String getValue() {
+            return mName;
+        }
+    }
 
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
@@ -28,14 +40,15 @@ public class Group extends Node {
     private GroupVisibility mVisibility;
 
 
-     /** Constructor for groups
+    /**
+     * Constructor for groups
      *
-     * @param name The name of the group
-     * @param id The id of the group
-     * @param users The current users of the group
-     * @param image The current image of the group
+     * @param name       The name of the group
+     * @param id         The id of the group
+     * @param users      The current users of the group
+     * @param image      The current image of the group
      * @param visibility The visibility of the group
-	 * @param validated If the group has been validated by the server
+     * @param validated  If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
@@ -49,23 +62,27 @@ public class Group extends Node {
         mVisibility = visibility;
     }
 
-    /** Overloaded constructor for groups for default validation.
-    * By default a group is not validated yet.
-    * @param name The name of the group
-    * @param id The id of the group
-    * @param users The current users of the group
-    * @param image The current image of the group
-    * @param visibility The visibility of the group
-    * @throws NodeException If nodes or image is null
-            */
+    /**
+     * Overloaded constructor for groups for default validation.
+     * By default a group is not validated yet.
+     *
+     * @param name       The name of the group
+     * @param id         The id of the group
+     * @param users      The current users of the group
+     * @param image      The current image of the group
+     * @param visibility The visibility of the group
+     * @throws NodeException If nodes or image is null
+     */
     public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
         this(name, id, users, image, visibility, false);
     }
 
-    /** Overloaded constructor for groups for default visibility.
+    /**
+     * Overloaded constructor for groups for default visibility.
      * By default a group is set to private.
-     * @param name The name of the group
-     * @param id The id of the group
+     *
+     * @param name  The name of the group
+     * @param id    The id of the group
      * @param users The current users of the group
      * @param image The current image of the group
      * @throws NodeException If nodes or image is null
@@ -76,8 +93,9 @@ public class Group extends Node {
 
     /**
      * Overloaded constructor.
-     * @param name The name of the group
-     * @param id The id of the group
+     *
+     * @param name  The name of the group
+     * @param id    The id of the group
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
@@ -87,40 +105,45 @@ public class Group extends Node {
 
     /**
      * Set the visibility of a group.
+     *
      * @param visibility The new visibility.
      */
-    public void setVisibility(GroupVisibility visibility){
+    public void setVisibility(GroupVisibility visibility) {
         mVisibility = visibility;
     }
 
     /**
      * Getter for the group visibility.
+     *
      * @return The visibility attribute of the group.
      */
-    public GroupVisibility getVisibility(){
+    public GroupVisibility getVisibility() {
         return mVisibility;
     }
 
     /**
      * Add a user to the group
+     *
      * @param user The user we want to add
      */
-    public void addUser(User user){
+    public void addUser(User user) {
         Objects.requireNonNull(user);
         mUsers.add(user);
     }
 
     /**
      * Indicates if a user belongs to the group
+     *
      * @param user The user we want to test
      */
-    public boolean containsUser(User user){
+    public boolean containsUser(User user) {
         Objects.requireNonNull(user);
         return mUsers.contains(user);
     }
 
     /**
      * Add a new message to the group messages.
+     *
      * @param newMessage Message to be added
      */
     synchronized public void addMessage(Message newMessage) {
@@ -129,6 +152,7 @@ public class Group extends Node {
 
     /**
      * Add a new message to the group messages.
+     *
      * @param newMessageList Messages to be added.
      */
     synchronized public void addMessages(List<Message> newMessageList) {
@@ -140,17 +164,19 @@ public class Group extends Node {
 
     /**
      * Set the image to the group
+     *
      * @param image A squared image which this method will make circular
      */
-    public void setImage(Bitmap image){
+    public void setImage(Bitmap image) {
         mImage = Objects.requireNonNull(image);
     }
 
     /**
      * Returns the group's image
+     *
      * @return the group's image, uncropped
      */
-    public Bitmap getImage(){
+    public Bitmap getImage() {
         return mImage;
     }
 
@@ -158,20 +184,22 @@ public class Group extends Node {
      * Indicate that the server has validated
      * the created group
      */
-    public void setValidated(){
+    public void setValidated() {
         mValidated = true;
     }
 
     /**
-     *  Indicate if the group has been validated by the server
+     * Indicate if the group has been validated by the server
+     *
      * @return true iff the group has been validated by the server
      */
-    public boolean isValidated(){
+    public boolean isValidated() {
         return mValidated;
     }
 
     /**
-     *  Returns the lasts messages of the group (up to a certain date util the user scrolls up).
+     * Returns the lasts messages of the group (up to a certain date util the user scrolls up).
+     *
      * @return A sorted map containing the messages sorted by date.
      * @throws IOException In case the user cannot retreive the messages.
      */
@@ -181,6 +209,7 @@ public class Group extends Node {
 
     /**
      * Returns the users of the group.
+     *
      * @return the users.
      */
     public List<User> getUsers() {
@@ -189,17 +218,19 @@ public class Group extends Node {
 
     /**
      * Returns the preview of the last message posted on this group
+     *
      * @return the preview of the last message or "" if there are no messages
      */
-    synchronized public String getPreviewOfLastMessage(){
+    synchronized public String getPreviewOfLastMessage() {
         return mMessages.size() > 0 ? getLastMessage().getPreview() : "";
     }
 
     /**
      * Return the very last message.
+     *
      * @return The last message.
      */
-    private Message getLastMessage(){
+    private Message getLastMessage() {
         return mMessages.firstEntry().getValue();
     }
 }
