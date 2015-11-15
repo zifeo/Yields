@@ -27,8 +27,7 @@ import yields.client.serverconnection.RequestBuilder;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
-    private Binder mMessageBinder;
-    private Binder mGroupBinder;
+    private Binder mBinder;
     private NotifiableActivity mCurrentNotifiableActivity;
     private Group mCurrentGroup;
     private List<Group> mWaitingUpdateGroup;
@@ -40,9 +39,9 @@ public class YieldService extends Service {
      */
     @Override
     public void onCreate() {
-        mMessageBinder = new MessageBinder(this);
-        mGroupBinder = new GroupBinder(this);
+        mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
+        Log.d("DEBUG", "create Yield Service");
         //TODO connect to server
     }
 
@@ -67,23 +66,30 @@ public class YieldService extends Service {
     }
 
     /**
-     * Returns the correct binder depending on the activity binding
+     * Returns the binder for the running application
      *
-     * @param intent The intent of the binding which contains a boolean that states
-     *               which binder to send
-     * @return The Binder concerned null if no information on the binding is given
+     * @param intent The intent of the binding
+     * @return The Binder concerned
      */
     @Override
     public IBinder onBind(Intent intent) {
         Log.d("DEBUG", "Service binds to an activity");
         // A client is binding to the service with bindService()
-        if (intent.getBooleanExtra("bindMessageActivity", false)) {
-            return mMessageBinder;
-        } else if (intent.getBooleanExtra("bindGroupActivity", false)) {
-            return mGroupBinder;
-        } else {
-            return null;
-        }
+        return mBinder;
+    }
+
+    /**
+     * What's happen when we unbind from server
+     *
+     * @param intent The unbinding intent
+     * @return true to authorize rebinding
+     */
+    @Override
+    public boolean onUnbind(Intent intent){
+        Log.d("DEBUG", "unbind : " +
+                (intent.getBooleanExtra("bindMessageActivity", false) ?
+                        "messageActivity" : "groupActivity"));
+        return true;
     }
 
     /**
@@ -111,6 +117,7 @@ public class YieldService extends Service {
      * @param notifiableActivity The concerned messageActivity
      */
     synchronized public void setNotifiableActivity(NotifiableActivity notifiableActivity) {
+        Log.d("DEBUG","add activity");
         mCurrentNotifiableActivity = notifiableActivity;
         mCurrentGroup = YieldsApplication.getGroup();
     }
@@ -119,6 +126,7 @@ public class YieldService extends Service {
      * Unset the current messageActivity
      */
     synchronized public void unsetMessageActivity() {
+        Log.d("DEBUG","remove activity");
         mCurrentNotifiableActivity = null;
     }
 
@@ -157,6 +165,7 @@ public class YieldService extends Service {
      * Called when an error is received from the server
      *
      * @param errorMsg The content of the error
+     * @param time The time of the Toast
      */
     public void receiveError(String errorMsg, int time) {
         if (time != Toast.LENGTH_SHORT && time != Toast.LENGTH_LONG) {
@@ -167,6 +176,11 @@ public class YieldService extends Service {
         toast.show();
     }
 
+    /**
+     * Called when an error is received from the server
+     *
+     * @param errorMsg The content of the error
+     */
     public void receiveError(String errorMsg) {
         receiveError(errorMsg, Toast.LENGTH_SHORT);
     }

@@ -1,5 +1,6 @@
 package yields.client.activities;
 
+import android.content.ServiceConnection;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import yields.client.R;
+import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.node.Group;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -17,6 +19,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupActivity> {
     public GroupActivityTests() {
         super(GroupActivity.class);
+
+        ServiceTestConnection.connectActivityToService();
     }
 
     /**
@@ -26,13 +30,14 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+        getActivity();
     }
 
     /**
      * Test that runs through all activities related to group creation
      */
     public void testGroupCreation(){
-        getActivity();
+
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion"));
@@ -59,7 +64,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * Test that runs through all activities related to group creation, including adding users
      */
     public void testGroupCreationWithContactAdded(){
-        getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion2"));
@@ -91,7 +95,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * to public
      */
     public void testGroupCreationSetPublicVisibility(){
-        getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"));
@@ -122,7 +125,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * to private
      */
     public void testGroupCreationSetPrivateVisibility(){
-        getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"));
@@ -154,7 +156,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * through public and private, and set the new group to public
      */
     public void testGroupCreationFlipBetweenVisibilityButtonPublic(){
-        getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"));
@@ -188,7 +189,6 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * through public and private, and set the new group to private
      */
     public void testGroupCreationFlipBetweenVisibilityButtonPrivate(){
-        getActivity();
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"));

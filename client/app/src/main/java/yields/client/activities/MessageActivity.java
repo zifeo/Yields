@@ -64,7 +64,7 @@ public class MessageActivity extends AppCompatActivity
     private static EditText mInputField;
     private static MessageBinder mMessageBinder;
     private static ActionBar mActionBar;
-    private static ImageButton mSendButton;
+    private ImageButton mSendButton;
 
     private static ContentType mType;
     private static Message mCommentMessage;
@@ -116,7 +116,6 @@ public class MessageActivity extends AppCompatActivity
         } else {
             setHeaderBar();
         }
-
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
         mSendButton.setEnabled(false);
 
@@ -146,7 +145,7 @@ public class MessageActivity extends AppCompatActivity
     @Override
     public void onPause(){
         super.onPause();
-        unbindService(mConnection);
+        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**
@@ -196,7 +195,6 @@ public class MessageActivity extends AppCompatActivity
             // TODO : implement method to send comments in the message binder.
             // mMessageBinder.sendComment(...);
         }
-
     }
 
     /**
