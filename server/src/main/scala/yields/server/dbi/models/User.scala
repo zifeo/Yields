@@ -3,7 +3,7 @@ package yields.server.dbi.models
 import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.NewUserExistException
+import yields.server.actions.exceptions.{UnauthorizeActionException, NewUserExistException}
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{KeyNotSetException, IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
@@ -178,8 +178,9 @@ object User {
   }
 
   /** Prepares user model for retrieving data given an user id. */
-  def apply(uid: UID): User =
+  def apply(uid: UID): User = {
     new User(uid)
+  }
 
 
   /** Retrieves user model given an user email. */
