@@ -30,6 +30,8 @@ case class GroupHistory(nid: NID, lastTid: TID, count: Int) extends Action {
 
 }
 
-/** [[GroupHistory]] result. */
+/** [[GroupHistory]] result.
+  * @param nodes a sequence of messages
+  */
 case class GroupHistoryRes(nodes: Seq[FeedContent]) extends Result
 

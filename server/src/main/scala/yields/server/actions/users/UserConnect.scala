@@ -27,5 +27,8 @@ case class UserConnect(email: Email) extends Action {
 
 }
 
-/** [[UserConnect]] result. */
+/**
+  * [[UserConnect]] result.
+  * @param uid users uid
+  */
 case class UserConnectRes(uid: UID) extends Result

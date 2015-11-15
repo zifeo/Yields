@@ -33,5 +33,8 @@ case class UserGroupList(uid: UID) extends Action {
 
 }
 
-/** [[UserGroupList]] result. */
+/**
+  * [[UserGroupList]] result.
+  * @param groups sequence of nid, name and last activity
+  */
 case class UserGroupListRes(groups: Seq[(NID, String, OffsetDateTime)]) extends Result
