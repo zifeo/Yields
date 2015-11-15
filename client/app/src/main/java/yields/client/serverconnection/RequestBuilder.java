@@ -377,17 +377,18 @@ public class RequestBuilder {
      * @param messageCount The max number of message we want
      * @return The request itself
      */
-    public static ServerRequest GroupHistoryRequest(Id groupId, Date last,
+    public static ServerRequest GroupHistoryRequest(Id senderId, Id groupId, Date last,
                                                     int messageCount) {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(last);
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPHISTORY, groupId);
+                ServiceRequest.RequestKind.GROUPHISTORY, senderId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
+        builder.addField(Fields.GID, groupId);
 
         return builder.request();
     }
@@ -470,7 +471,7 @@ public class RequestBuilder {
      */
     private ServerRequest request() {
         Map<String, Object> request = new ArrayMap<>();
-        request.put("kind", mKind.getValue());
+        request.put(Fields.KIND.getValue(), mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
         metadata.put("sender", mSender.getId());

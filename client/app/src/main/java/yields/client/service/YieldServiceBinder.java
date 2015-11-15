@@ -91,9 +91,10 @@ public class YieldServiceBinder extends Binder {
                                      Date lastDate, int messageCount) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(lastDate);
-        ServerRequest groupHistoryServerRequest = RequestBuilder
-                .GroupHistoryRequest(group.getId(), lastDate, messageCount);
-        mService.sendRequest(groupHistoryServerRequest);
-        Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
+        /*ServerRequest groupHistoryServerRequest = RequestBuilder
+                .GroupHistoryRequest(group.getId(), lastDate, messageCount);*/
+        //TODO : stuff
+        //mService.sendRequest(groupHistoryServerRequest);
+        //Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
     }
 }
