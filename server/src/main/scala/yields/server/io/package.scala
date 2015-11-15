@@ -9,19 +9,19 @@ import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
 /**
- * Provides json format for read/write specification.
- */
+  * Provides json format for read/write specification.
+  */
 package object io {
 
   implicit lazy val offsetDateTimeJF = OffsetDateTimeJsonFormat
 
-  /***** Models *****/
+  /** *** Models *****/
 
   implicit lazy val nodeJF = NodeJsonFormat
   implicit lazy val groupJF = GroupJsonFormat
   implicit lazy val userJF = UserJsonFormat
 
-  /***** Actions  *****/
+  /** *** Actions  *****/
 
   implicit lazy val actionJF = ActionJsonFormat
   implicit lazy val resultJF = ResultJsonFormat
@@ -54,7 +54,10 @@ package object io {
   implicit lazy val userUpdateJF = jsonFormat4(UserUpdate)
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
 
-  /***** Message passing interface *****/
+  implicit lazy val userCreateJF = jsonFormat2(UserCreate)
+  implicit lazy val userCreateResJF = jsonFormat1(UserCreateRes)
+
+  /** *** Message passing interface *****/
 
   implicit lazy val requestJF = RequestJsonFormat
   implicit lazy val responseJF = ResponseJsonFormat

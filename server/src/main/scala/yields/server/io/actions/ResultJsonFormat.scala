@@ -27,8 +27,8 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
   /**
     * Serializes the result of an action in a json format
     * Format :
-    *   kind: ...               // Performed action e.g GroupCreateRes, UserConnectRes, etc
-    *   message: ...            // Result of the action e.g a group, an user, list of groups, etc
+    * kind: ...               // Performed action e.g GroupCreateRes, UserConnectRes, etc
+    * message: ...            // Result of the action e.g a group, an user, list of groups, etc
     *
     * @param obj the result of an action
     * @return the json object corresponding
@@ -45,6 +45,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case x: UserConnectRes => packWithKind(x)
       case x: UserUpdateRes => packWithKind(x)
       case x: UserGroupListRes => packWithKind(x)
+      case x: UserCreateRes => packWithKind(x)
 
       case _ => serializationError(s"unregistered action kind: $kind")
     }
@@ -63,6 +64,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "UserConnectRes" => message.convertTo[UserConnectRes]
           case "UserUpdateRes" => message.convertTo[UserUpdateRes]
           case "UserGroupListRes" => message.convertTo[UserGroupListRes]
+          case "UserCreateRes" => message.convertTo[UserCreateRes]
 
           case _ => deserializationError(s"unregistered action kind: $kind")
         }
