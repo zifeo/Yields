@@ -28,7 +28,7 @@ package object io {
 
   // Groups
 
-  implicit lazy val groupCreateJF = jsonFormat2(GroupCreate)
+  implicit lazy val groupCreateJF = jsonFormat3(GroupCreate)
   implicit lazy val groupCreateResJF = jsonFormat1(GroupCreateRes)
 
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
@@ -39,6 +39,9 @@ package object io {
 
   implicit lazy val groupHistoryJF = jsonFormat3(GroupHistory)
   implicit lazy val groupHistoryResJF = jsonFormat1(GroupHistoryRes)
+
+  implicit lazy val groupSearchJF = jsonFormat1(GroupSearch)
+  implicit lazy val groupSearchResJF = jsonFormat1(GroupSearchRes)
 
   // Users
 
