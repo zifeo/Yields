@@ -10,7 +10,7 @@ import yields.server.mpi.Metadata
   * @param name group name
   * @param nodes grouped nodes
   */
-case class GroupCreate(name: String, nodes: Seq[NID]) extends Action {
+case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID]) extends Action {
 
   /**
     * Run the action given the sender.
@@ -21,6 +21,7 @@ case class GroupCreate(name: String, nodes: Seq[NID]) extends Action {
     if (!name.isEmpty) {
       val group = Group.createGroup(name)
       nodes.foreach(group.addNode)
+      users.foreach(group.addUser)
       GroupCreateRes(group.nid)
     } else {
       throw new ActionArgumentException(s"Empty name : ${this.getClass.getSimpleName}")
