@@ -292,7 +292,7 @@ public class CacheDatabaseTests {
 
     /**
      * Tests if a Group can have it's image changed.
-     * (Test for testDatabaseCanUpdateGroupImage(Id groupId, Bitmap newGroupImage))
+     * (Test for updateGroupImage(Id groupId, Bitmap newGroupImage))
      */
     @Test
     public void testDatabaseCanUpdateGroupImage() {
@@ -315,6 +315,10 @@ public class CacheDatabaseTests {
         }
     }
 
+    /**
+     * Tests if a Group can have it's visibility changed.
+     * (Test for updateGroupVisibility(Id groupId, Group.GroupVisibility visibility))
+     */
     @Test
     public void testDatabaseCanUpdateGroupVisibility() {
         try {

@@ -14,7 +14,7 @@ public abstract class ServiceRequest {
     /**
      * The Kind of messages possible
      */
-    public enum MessageKind {
+    public enum RequestKind {
         PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdate"),
         USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
         USERENTOURAGEREMOVE("UserEntourageRemove"), USERSTATUS("UserStatus"),
@@ -26,7 +26,7 @@ public abstract class ServiceRequest {
 
         private final String mName;
 
-        MessageKind(String name) {
+        RequestKind(String name) {
             mName = name;
         }
 
@@ -46,7 +46,7 @@ public abstract class ServiceRequest {
         return sNextId++;
     }
 
-    abstract public MessageKind getType();
+    abstract public RequestKind getType();
 
     abstract public ServerRequest parseRequestForServer();
 

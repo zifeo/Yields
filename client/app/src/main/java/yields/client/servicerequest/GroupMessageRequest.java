@@ -4,10 +4,7 @@ import android.app.Service;
 
 import java.util.Objects;
 
-import yields.client.messages.Content;
-import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
-import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
@@ -39,8 +36,23 @@ public class GroupMessageRequest extends ServiceRequest {
      * @return The type of this ServiceRequest as a String.
      */
     @Override
-    public String getType(){
-        return "AddMessage";
+    public RequestKind getType() {
+        return RequestKind.GROUPMESSAGE;
+    }
+
+    /**
+     * Build a ServerRequest for sending a message to a group.
+     *
+     * @return The ServerRequest corresponding to this ServiceRequest.
+     */
+    @Override
+    public ServerRequest parseRequestForServer() {
+        Group group = getReceivingGroup();
+        Message message = getMessage();
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(message);
+        return RequestBuilder.GroupMessageRequest(message.getSender().getId(), group.getId(),
+                message.getContent());
     }
 
     @Override
@@ -63,20 +75,5 @@ public class GroupMessageRequest extends ServiceRequest {
      */
     public Group getReceivingGroup(){
         return mReceivingGroup;
-    }
-
-    /**
-     * Build a ServerRequest for sending a message to a group.
-     *
-     * @return The ServerRequest corresponding to this ServiceRequest.
-     */
-    @Override
-    public ServerRequest parseRequestForServer() {
-        Group group = getReceivingGroup();
-        Message message = getMessage();
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(message);
-        return RequestBuilder.GroupMessageRequest(message.getSender().getId(), group.getId(),
-                message.getContent());
     }
 }
