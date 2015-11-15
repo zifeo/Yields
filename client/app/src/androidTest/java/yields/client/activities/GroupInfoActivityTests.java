@@ -46,7 +46,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
     }
 
     /**
-     * Test that the correct, unique tag, is displayed
+     * Test that no tag is displayed
      */
     public void testCorrectNoTags(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
