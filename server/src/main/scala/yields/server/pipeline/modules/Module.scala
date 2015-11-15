@@ -24,7 +24,7 @@ trait Module[-In1, +Out1, -In2, +Out2] {
    * @return bidirectional module
    */
   def create: BidiFlow[In1, Out1, In2, Out2, Unit] =
-    BidiFlow(incoming, outgoing)
+    BidiFlow.fromFunctions(incoming, outgoing)
 
   /**
    * Incoming flow transformation or effect.
