@@ -4,10 +4,7 @@ import android.app.Service;
 
 import java.util.Objects;
 
-import yields.client.messages.Content;
-import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
-import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
@@ -40,8 +37,8 @@ public class GroupMessageRequest extends ServiceRequest {
      * @return The type of this ServiceRequest as a String.
      */
     @Override
-    public MessageKind getType() {
-        return MessageKind.GROUPMESSAGE;
+    public RequestKind getType() {
+        return RequestKind.GROUPMESSAGE;
     }
 
     /**

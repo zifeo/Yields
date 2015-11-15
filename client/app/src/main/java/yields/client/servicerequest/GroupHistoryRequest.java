@@ -37,8 +37,8 @@ public class GroupHistoryRequest extends ServiceRequest {
      * @return The type of this ServiceRequest as a String.
      */
     @Override
-    public MessageKind getType() {
-        return MessageKind.GROUPHISTORY;
+    public RequestKind getType() {
+        return RequestKind.GROUPHISTORY;
     }
 
     /**

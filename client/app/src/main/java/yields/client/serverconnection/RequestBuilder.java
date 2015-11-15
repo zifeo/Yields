@@ -46,7 +46,7 @@ public class RequestBuilder {
         }
     }
 
-    private final ServiceRequest.MessageKind mKind;
+    private final ServiceRequest.RequestKind mKind;
     private final Id mSender;
     private final Map<String, Object> mConstructingMap;
 
@@ -63,7 +63,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(args);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.USERUPDATE, sender);
+                ServiceRequest.RequestKind.USERUPDATE, sender);
 
         if (args.containsKey(Fields.EMAIL)) {
             builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
@@ -87,7 +87,7 @@ public class RequestBuilder {
     public static ServerRequest userGroupListRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.USERGROUPLIST, sender);
+                ServiceRequest.RequestKind.USERGROUPLIST, sender);
 
         return builder.request();
     }
@@ -103,7 +103,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.USERENTOURAGEADD, sender);
+                ServiceRequest.RequestKind.USERENTOURAGEADD, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -121,7 +121,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.USERENTOURAGEREMOVE, sender);
+                ServiceRequest.RequestKind.USERENTOURAGEREMOVE, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -139,7 +139,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.USERCONNECT, sender);
+                ServiceRequest.RequestKind.USERCONNECT, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -155,7 +155,7 @@ public class RequestBuilder {
     public static ServerRequest userUpdateRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.USERSTATUS, sender);
+                ServiceRequest.RequestKind.USERSTATUS, sender);
 
         return builder.request();
     }
@@ -179,7 +179,7 @@ public class RequestBuilder {
         }
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.GROUPCREATE, sender);
+                ServiceRequest.RequestKind.GROUPCREATE, sender);
 
         builder.addField(Fields.NAME, name);
         builder.addField(Fields.NODES, nodes);
@@ -200,7 +200,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newName);
 
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.MessageKind.GROUPUPDATENAME, sender);
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUPUPDATENAME, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
@@ -220,7 +220,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newVisibility);
 
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.MessageKind
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
                 .GROUPUPDATEVISIBILITY, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
@@ -241,7 +241,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newImage);
 
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.MessageKind
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
                 .GROUPUPDATEIMAGE, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.IMAGE, newImage.getImage());
@@ -264,7 +264,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newUser);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.GROUPADD, sender);
+                ServiceRequest.RequestKind.GROUPADD, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NID, newUser);
@@ -287,7 +287,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newUser);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.GROUPREMOVE, sender);
+                ServiceRequest.RequestKind.GROUPREMOVE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NID, newUser);
@@ -333,7 +333,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.GROUPMESSAGE, sender);
+                ServiceRequest.RequestKind.GROUPMESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.KIND, kind);
@@ -360,7 +360,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.GROUPMESSAGE, sender);
+                ServiceRequest.RequestKind.GROUPMESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.KIND, kind);
@@ -384,7 +384,7 @@ public class RequestBuilder {
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.GROUPHISTORY, groupId);
+                ServiceRequest.RequestKind.GROUPHISTORY, groupId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
@@ -402,7 +402,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.MessageKind.PING, new Id(0l));
+                ServiceRequest.RequestKind.PING, new Id(0l));
 
         builder.addField(Fields.CONTENT, content);
 
@@ -415,7 +415,7 @@ public class RequestBuilder {
      * @param kind   The kind of request to be built.
      * @param sender The sender of the request.
      */
-    private RequestBuilder(ServiceRequest.MessageKind kind, Id sender) {
+    private RequestBuilder(ServiceRequest.RequestKind kind, Id sender) {
         this.mKind = kind;
         this.mSender = sender;
         this.mConstructingMap = new ArrayMap<>();
