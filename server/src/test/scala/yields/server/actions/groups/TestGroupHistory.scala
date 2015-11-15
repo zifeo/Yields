@@ -2,40 +2,40 @@ package yields.server.actions.groups
 
 import org.scalacheck.Prop._
 import org.scalacheck.{Arbitrary, Gen, Properties}
-import yields.server.actions.ActionsGenerators
+import org.scalatest.{Matchers, FlatSpec}
+import yields.server.dbi.models.ModelsGenerators
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
 import Arbitrary.arbitrary
 
-object TestGroupHistory extends Properties("GroupHistory") with ActionsGenerators {
+/**
+  * Test class for group history action
+  * TODO test getting messages with first tid not existing
+  * TODO test getting negative number of messages
+  */
+class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators {
 
-  lazy val m = new Metadata(1, Temporal.current)
+  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
-  /* val propGroupHistoryWithMsg = forAll { (a: GroupHistory) =>
-    val g = Group(a.nid)
-
-    val msgList = for {
+  def add10Msgs(nid: NID) = {
+    val g = Group(nid)
+    for {
       i <- 1 until 10
       msg <- arbitrary[FeedContent].sample
-    } yield msg
-    msgList.foreach(g.addMessage)
-
-    val res = a.run(m)
-
-    res match {
-      case GroupHistoryRes(x) => msgList.take(a.count)
-      case _ => false
-    }
+    } yield g.addMessage(msg)
   }
 
-  val propGroupHistoryNoMsg = forAll { (a: GroupHistory) =>
-    val res = a.run(m)
-
+  "retrieving n messages from a group" should "return the n messages" in {
+    val group = Group.createGroup("name")
+    add10Msgs(group.nid)
+    val n = 5
+    val action = new GroupHistory(group.nid, 0, n)
+    val res = action.run(m)
     res match {
-      case GroupHistoryRes(List()) =>
-      case _ => false
+      case GroupHistoryRes(x) =>
+        x.length should be(n)
     }
-  } */
+  }
 
 }

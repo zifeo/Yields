@@ -11,6 +11,7 @@ import yields.server.utils.{Config, Temporal}
 /**
   * Test if GroupCreate action performed well
   * TODO flush database before and after
+  * TODO test GroupCreate without users
   */
 class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
 
