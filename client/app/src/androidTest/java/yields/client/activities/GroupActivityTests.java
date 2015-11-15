@@ -42,6 +42,11 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         YieldsApplication.cancelToast();
     }
 
+    @Override
+    public void tearDown(){
+        YieldsApplication.cancelToast();
+    }
+
     /**
      * Test that runs through all activities related to group creation
      */
