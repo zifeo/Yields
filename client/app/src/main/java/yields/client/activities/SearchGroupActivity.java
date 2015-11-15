@@ -236,7 +236,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                             //match for the tags
                             for (int i = 0; i < mGlobalGroups.size(); i++) {
                                 if (mGlobalGroups.get(i).matchToTag(tag) &&
-                                        !mCurrentGroups.contains(mGlobalGroups.get(i))) {
+                                        !newGroupsSearched.contains(mGlobalGroups.get(i))) {
                                     newGroupsSearched.add(mGlobalGroups.get(i));
                                 }
                             }
@@ -344,6 +344,16 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         Group g4 = new Group("HelloNature", new Id(668), new ArrayList<User>());
         g4.addTag(new Group.Tag("wild"));
         g4.addTag(new Group.Tag("nice"));
+        g4.addTag(new Group.Tag("nice1"));
+        g4.addTag(new Group.Tag("nice2"));
+        g4.addTag(new Group.Tag("nice3"));
+        g4.addTag(new Group.Tag("nic4e"));
+        g4.addTag(new Group.Tag("nice5"));
+        g4.addTag(new Group.Tag("nice6"));
+        g4.addTag(new Group.Tag("nice7"));
+        g4.addTag(new Group.Tag("nice8"));
+        g4.addTag(new Group.Tag("nice9"));
+        g4.addTag(new Group.Tag("nice11"));
         mGlobalGroups.add(g4);
     }
 }
