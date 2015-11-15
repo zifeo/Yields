@@ -1,11 +1,17 @@
 package yields.client.activities;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.UiController;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.app.ActionBar;
 import android.test.ActivityInstrumentationTestCase2;
+import android.text.Layout;
+import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -18,8 +24,10 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.R;
+import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
@@ -29,10 +37,16 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+import static android.support.test.espresso.Espresso.closeSoftKeyboard;
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.pressBack;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Tests which test the MessageActivity (display and interaction).
@@ -119,7 +133,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.sendButton)).perform(click());
         ListView listView = messageActivity.getCurrentFragmentListView();
         int i = listView.getChildCount();
-        MessageView messageView = (MessageView) listView.getChildAt(i-1);
+        MessageView messageView = (MessageView) listView.getChildAt(i - 1);
         assertEquals("Mock input message 1",
                 ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
@@ -146,5 +160,134 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         inputMessageField.clearComposingText();
 
         messageActivity.finish();
+    }
+
+    @Test
+    public void testInitialTypeIsGroupMessage(){
+        MessageActivity messageActivity = getActivity();
+        assertEquals(MessageActivity.ContentType.GROUP_MESSAGES,
+                messageActivity.getType());
+    }
+
+    @Test
+    public void testPressingOnMessageChangeType(){
+        MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        String input = "Mock message #1";
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R
+                .id.groupMessageFragmentList);
+        int tag = 0;
+        messageList.getChildAt(0).setTag((Object) tag);
+        View message = messageList.findViewWithTag((Object) tag);
+        onView(withTagValue(is((Object) tag))).perform(click());
+        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS,
+                messageActivity.getType());
+    }
+
+    @Test
+    public void testWrittenCommentIsCorrect(){
+        MessageActivity messageActivity = getActivity();
+        YieldsApplication.setResources(messageActivity.getResources());
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
+        onView(withId(R.id.sendButton)).perform(click());
+
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R
+                .id.groupMessageFragmentList);
+        int tag = 0;
+        messageList.getChildAt(0).setTag((Object) tag);
+        View message = messageList.findViewWithTag((Object) tag);
+        onView(withTagValue(is((Object) tag))).perform(click());
+
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock comment" +
+                " message 1"));
+        onView(withId(R.id.sendButton)).perform(click());
+
+        fragment = messageActivity.getCurrentFragment();
+        ListView listView = (ListView) fragment.getView().findViewById(R
+                .id.commentList);
+        int i = listView.getChildCount();
+        Log.d("MessageActivityTests", "i = " + i);
+        MessageView messageView = (MessageView) listView.getChildAt(i - 1);
+        assertEquals("Mock comment message 1",
+                ((TextContent) messageView.getMessage().getContent()).getText());
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        assertTrue(inputMessageField.getText().length() == 0);
+
+        messageActivity.finish();
+    }
+
+    @Test
+    public void testParentMessageIsCorrect() throws InterruptedException {
+        MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        String input = "Mock comment";
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R
+                .id.groupMessageFragmentList);
+        int tag = 0;
+        messageList.getChildAt(0).setTag((Object) tag);
+        View message = messageList.findViewWithTag((Object) tag);
+        onView(withTagValue(is((Object) tag))).perform(click());
+
+        fragment = messageActivity.getCurrentFragment();
+        LinearLayout messageContainer = (LinearLayout) fragment.getView()
+                .findViewById(R.id.messageContainer);
+
+        MessageView messageView = (MessageView) messageContainer.getChildAt(0);
+        assertEquals("Mock comment",
+                ((TextContent) messageView.getMessage().getContent()).getText());
+    }
+
+    @Test
+    public void testInputFieldIsFlushedTheSameDuringFragChange(){
+        MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        String input = "Mock message #1";
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+        input = "Should be flushed";
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R
+                .id.groupMessageFragmentList);
+        int tag = 0;
+        messageList.getChildAt(0).setTag((Object) tag);
+        View message = messageList.findViewWithTag((Object) tag);
+        onView(withTagValue(is((Object) tag))).perform(click());
+        assertEquals("", inputMessageField.getText().toString());
+    }
+
+    @Test
+    public void testPressBackButtonReturnsToGroupMessage() throws InterruptedException {
+        final MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        String input = "Mock message #1";
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R
+                .id.groupMessageFragmentList);
+        int tag = 0;
+        messageList.getChildAt(0).setTag((Object) tag);
+        View message = messageList.findViewWithTag((Object) tag);
+        onView(withTagValue(is((Object) tag))).perform(click());
+        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS,
+                messageActivity.getType());
+        closeSoftKeyboard();
+        messageActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                messageActivity.onBackPressed();
+            }
+        });
+        Thread.sleep(1000);
+        assertEquals(MessageActivity.ContentType.GROUP_MESSAGES,
+                messageActivity.getType());
     }
 }

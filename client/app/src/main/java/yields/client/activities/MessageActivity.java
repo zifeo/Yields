@@ -95,10 +95,10 @@ public class MessageActivity extends AppCompatActivity
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         // TODO : Uncomment for tests !!!
-        /*
+
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
-        */
+
 
         mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
                 .createBitmap(80, 80, Bitmap.Config.RGB_565));
@@ -292,13 +292,23 @@ public class MessageActivity extends AppCompatActivity
      */
     public ListView getCurrentFragmentListView(){
         if (mType == ContentType.GROUP_MESSAGES) {
+            Log.d("MessageActivity", "GROUP_MESSAGE ListView");
             return ((GroupMessageFragment) mCurrentFragment)
                     .getMessageListView();
         }
         else{
+            Log.d("MessageActivity", "MESSAGE_COMMENT ListView");
             return ((CommentFragment) mCurrentFragment)
                     .getCommentListView();
         }
+    }
+
+    public Fragment getCurrentFragment(){
+        return mCurrentFragment;
+    }
+
+    public ContentType getType(){
+        return mType;
     }
 
     /**
@@ -306,6 +316,7 @@ public class MessageActivity extends AppCompatActivity
      * MessageActivity (id fragmentPlaceHolder).
      */
     private void createCommentFragment(){
+        mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
@@ -326,6 +337,7 @@ public class MessageActivity extends AppCompatActivity
      * the MessageActivity (id fragmentPlaceHolder).
      */
     private void createGroupMessageFragment(){
+        mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.GROUP_MESSAGES);

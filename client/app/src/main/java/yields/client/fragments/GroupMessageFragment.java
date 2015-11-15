@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import java.util.Objects;
 
@@ -33,6 +34,7 @@ public class GroupMessageFragment extends Fragment{
     public void setAdapter(ListAdapterMessages adapterMessages){
         Objects.requireNonNull(adapterMessages);
         mAdapter = adapterMessages;
+
     }
 
     /**
@@ -63,7 +65,7 @@ public class GroupMessageFragment extends Fragment{
         Log.d("GroupMessageFragment", "onCreateView");
         mLayout = inflater.inflate(R.layout
                 .group_message_fragment_layout, container, false);
-        mMessageList = (ListView) mLayout.findViewById(R.id.messagesList);
+        mMessageList = (ListView) mLayout.findViewById(R.id.groupMessageFragmentList);
         mMessageList.setAdapter(mAdapter);
         mMessageList.setOnItemClickListener(mListOnClickListener);
         return mLayout;
