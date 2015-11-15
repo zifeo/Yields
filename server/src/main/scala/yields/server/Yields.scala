@@ -1,10 +1,14 @@
 package yields.server
 
+import java.util.logging.LogManager
+
 import akka.actor.ActorSystem
 import akka.io.Tcp.SO
 import akka.stream.scaladsl.Tcp
 import akka.stream.scaladsl.Tcp.IncomingConnection
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
+import akka.stream.stage._
+import akka.stream.{Supervision, ActorMaterializer, ActorMaterializerSettings}
+import akka.util.ByteString
 import yields.server.pipeline.Pipeline
 import yields.server.utils.Config
 
@@ -15,6 +19,9 @@ import scala.util.control.NonFatal
   * Yields server daemon.
   */
 object Yields extends App {
+
+  val manager = LogManager.getLogManager
+  manager.readConfiguration()
 
   // Starts system and enable flow errors logging
   implicit val system = ActorSystem("Yields-server")
