@@ -69,7 +69,5 @@ public class GroupInfoActivity extends AppCompatActivity {
             }
             textViewTags.setText(builder.toString());
         }
-
-
     }
 }

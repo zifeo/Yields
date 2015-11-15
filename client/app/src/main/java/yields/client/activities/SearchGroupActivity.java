@@ -29,6 +29,10 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Activity where the user can search for new groups, based
+ * on their name or tags.
+ */
 public class SearchGroupActivity extends AppCompatActivity implements NotifiableActivity{
     private MenuItem mMenuSearch;
     private MenuItem mMenuClose;
@@ -67,9 +71,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
 
         createFakeGroups();
-
         mCurrentGroups = new ArrayList<>();
-
         mAdapterCurrentGroups = new ListAdapterSearchedGroups(getApplicationContext(),
                 R.layout.group_searched_layout, mCurrentGroups);
 
@@ -86,7 +88,6 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         });
 
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
-
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSearch);
 
         setStartingState();
@@ -215,23 +216,21 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                 mTemporaryTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        mRequestsCount--;
-
                         List<Group> newGroupsSearched = new ArrayList<>();
 
-                        String lowerCaseText = text.toLowerCase();
+                        String tagText = text.toLowerCase().replace(' ', '_');
 
 
                         // match for the names
                         for (int i = 0; i < mGlobalGroups.size(); i++) {
-                            if (mGlobalGroups.get(i).getName().toLowerCase().startsWith(lowerCaseText)) {
+                            if (mGlobalGroups.get(i).getName().toLowerCase().startsWith(tagText)) {
                                 newGroupsSearched.add(mGlobalGroups.get(i));
                             }
                         }
 
                         if (text.length() > Group.Tag.MIN_TAG_LENGTH
                                 && text.length() < Group.Tag.MAX_TAG_LENGTH) {
-                            Group.Tag tag = new Group.Tag(text.toLowerCase());
+                            Group.Tag tag = new Group.Tag(tagText);
 
                             //match for the tags
                             for (int i = 0; i < mGlobalGroups.size(); i++) {
@@ -305,6 +304,8 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                mRequestsCount--;
+
                 mCurrentGroups.clear();
                 mCurrentGroups.addAll(YieldsApplication.getGroupsSearched());
 
@@ -344,16 +345,6 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         Group g4 = new Group("HelloNature", new Id(668), new ArrayList<User>());
         g4.addTag(new Group.Tag("wild"));
         g4.addTag(new Group.Tag("nice"));
-        g4.addTag(new Group.Tag("nice1"));
-        g4.addTag(new Group.Tag("nice2"));
-        g4.addTag(new Group.Tag("nice3"));
-        g4.addTag(new Group.Tag("nic4e"));
-        g4.addTag(new Group.Tag("nice5"));
-        g4.addTag(new Group.Tag("nice6"));
-        g4.addTag(new Group.Tag("nice7"));
-        g4.addTag(new Group.Tag("nice8"));
-        g4.addTag(new Group.Tag("nice9"));
-        g4.addTag(new Group.Tag("nice11"));
         mGlobalGroups.add(g4);
     }
 }
