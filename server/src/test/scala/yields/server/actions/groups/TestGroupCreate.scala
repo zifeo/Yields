@@ -6,6 +6,7 @@ import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.dbi.models.{Node, Group, UID, User}
 import yields.server.mpi.Metadata
 import yields.server.utils.{Config, Temporal}
+import yields.server.dbi._
 
 
 /**
@@ -16,22 +17,22 @@ import yields.server.utils.{Config, Temporal}
 class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
 
   /** Switch on test database */
-  /* before {
+  before {
     redis.withClient(_.select(Config.getInt("test.database.id")))
     redis.withClient(_.flushdb)
-  } */
+  }
 
   /** Switch back on main database */
-  /* after {
+  after {
     redis.withClient(_.flushdb)
     redis.withClient(_.select(Config.getInt("database.id")))
-  } */
+  }
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
-  lazy val users: List[User] = List(User.create("e1"), User.create("e2"), User.create("e3"), User.create("e4"))
-  lazy val nodes: List[Node] = List(Group.createGroup("g1"), Group.createGroup("g2"), Group.createGroup("g3"))
 
   "running groupCreate action with all parameters set" should "create a group" in {
+    val users: List[User] = List(User.create("e1@epfl.ch"), User.create("e2@epfl.ch"), User.create("e3@epfl.ch"), User.create("e4@epfl.ch"))
+    val nodes: List[Node] = List(Group.createGroup("g1"), Group.createGroup("g2"), Group.createGroup("g3"))
     val action = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid))
     val res = action.run(m)
     res match {
@@ -44,6 +45,8 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "running groupCreate without name" should "throw an exception" in {
+    val users: List[User] = List(User.create("e12@email.com"), User.create("e22@email.com"), User.create("e32@email.com"), User.create("e42@email.com"))
+    val nodes: List[Node] = List(Group.createGroup("g1"), Group.createGroup("g2"), Group.createGroup("g3"))
     val action = new GroupCreate("", nodes.map(_.nid), users.map(_.uid))
     an[ActionArgumentException] should be thrownBy action.run(m)
   }

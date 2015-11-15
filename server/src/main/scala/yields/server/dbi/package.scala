@@ -11,7 +11,7 @@ import scala.language.implicitConversions
   */
 package object dbi {
 
-  private[dbi] val redis = new RedisClientPool(
+  /* private[dbi] */ val redis = new RedisClientPool(
     host = Config.getString("database.addr"),
     port = Config.getInt("database.port"),
     secret = Some(Config.getString("database.pass")),

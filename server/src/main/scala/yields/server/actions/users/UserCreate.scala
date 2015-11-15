@@ -11,7 +11,7 @@ import yields.server.mpi.Metadata
   * @param email new user's email
   * @param name new user's name
   *
-  * TODO validate information
+  * TODO validate information email : \b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b
   */
 case class UserCreate(email: String, name: String) extends Action {
   /**

@@ -2,11 +2,12 @@ package yields.server.actions.groups
 
 import org.scalacheck.Prop._
 import org.scalacheck.{Arbitrary, Gen, Properties}
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
+import yields.server.dbi._
 import yields.server.dbi.models.ModelsGenerators
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
+import yields.server.utils.{Config, Temporal}
 import Arbitrary.arbitrary
 
 /**
@@ -14,7 +15,19 @@ import Arbitrary.arbitrary
   * TODO test getting messages with first tid not existing
   * TODO test getting negative number of messages
   */
-class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators {
+class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with BeforeAndAfter {
+
+  /** Switch on test database */
+  before {
+    redis.withClient(_.select(Config.getInt("test.database.id")))
+    redis.withClient(_.flushdb)
+  }
+
+  /** Switch back on main database */
+  after {
+    redis.withClient(_.flushdb)
+    redis.withClient(_.select(Config.getInt("database.id")))
+  }
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
@@ -34,7 +47,7 @@ class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators {
     val res = action.run(m)
     res match {
       case GroupHistoryRes(x) =>
-        x.length should be(n)
+        x.length should be(n+1)
     }
   }
 

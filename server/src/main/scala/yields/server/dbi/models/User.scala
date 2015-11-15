@@ -3,6 +3,7 @@ package yields.server.dbi.models
 import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
+import yields.server.actions.exceptions.NewUserExistException
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{KeyNotSetException, IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
@@ -162,16 +163,18 @@ object User {
     * @return user
     */
   def create(email: String): User = {
-    val uid = redis.withClient(_.incr(StaticKey.uid))
-      .getOrElse(throw new UnincrementableIdentifierException("new user identifier (uid) fails"))
-    val user = User(uid)
-    redis.withClient { r =>
-      import user.Key
-      val infos = List((Key.created_at, Temporal.current), (Key.email, email))
-      r.hmset(user.Key.user, infos)
-      r.hset(StaticKey.emailIndex, email, uid)
-    }
-    user
+    if (!redis.withClient(_.hexists(StaticKey.emailIndex, email))) {
+      val uid = redis.withClient(_.incr(StaticKey.uid))
+        .getOrElse(throw new UnincrementableIdentifierException("new user identifier (uid) fails"))
+      val user = User(uid)
+      redis.withClient { r =>
+        import user.Key
+        val infos = List((Key.created_at, Temporal.current), (Key.email, email))
+        r.hmset(user.Key.user, infos)
+        r.hset(StaticKey.emailIndex, email, uid)
+      }
+      user
+    } else throw new NewUserExistException("email already registered")
   }
 
   /** Prepares user model for retrieving data given an user id. */
