@@ -12,7 +12,7 @@ import yields.client.serverconnection.Response;
 /**
  * ServerRequest asking the Service to retrieve Messages from a Group.
  */
-public class MessageHistoryRequest extends ServiceRequest {
+public class GroupHistoryRequest extends ServiceRequest {
 
     public static final int MESSAGE_COUNT = 10;
 
@@ -25,7 +25,7 @@ public class MessageHistoryRequest extends ServiceRequest {
      * @param groupId      The Id of the Group from which the Messages should be retrieved.
      * @param furthestDate The furthest Date from which Messages will be retrieved.
      */
-    public MessageHistoryRequest(Id groupId, Date furthestDate) {
+    public GroupHistoryRequest(Id groupId, Date furthestDate) {
         super();
         mFurthestDate = new Date(furthestDate.getTime());
         mGroupId = groupId;

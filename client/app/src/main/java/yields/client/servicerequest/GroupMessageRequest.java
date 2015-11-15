@@ -16,7 +16,7 @@ import yields.client.serverconnection.Response;
 /**
  * ServerRequest asking the Service to add a Message to a Group.
  */
-public class AddMessageRequest extends ServiceRequest {
+public class GroupMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
     private final Group mReceivingGroup;
@@ -27,7 +27,7 @@ public class AddMessageRequest extends ServiceRequest {
      * @param message        The Message that should be sent.
      * @param receivingGroup The Group to which the Message should be added.
      */
-    public AddMessageRequest(Message message, Group receivingGroup) {
+    public GroupMessageRequest(Message message, Group receivingGroup) {
         Objects.requireNonNull(message);
         Objects.requireNonNull(receivingGroup);
         mMessage = message;
