@@ -265,12 +265,12 @@ public class Group extends Node {
         /**
          * Compares a tag and another object
          * @param o The object we want to test
-         * @return true iff the two objects are equal
+         * @return true iff the two objects are equals
          */
         @Override
         public boolean equals(Object o) {
             if (o instanceof Tag){
-                return ((Tag) o).mText.equals(mText);
+                return ((Tag) o).mText.equals(this.mText);
             }
             return super.equals(o);
         }

@@ -14,11 +14,19 @@ import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Activity where the main information of a group are displayed :
+ * name, image, tags.
+ */
 public class GroupInfoActivity extends AppCompatActivity {
     private Group mGroup;
 
     private static final int MAX_TAGS = 10;
 
+    /**
+     * Method automatically called on the creation of the activity
+     * @param savedInstanceState the previous instance of the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -35,7 +35,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
     private EditText mEditTextSearch;
     private ActionBar mActionBar;
     private List<Group> mCurrentGroups;
-    private List<Group> mGlobalGroups; // to be removed
+    private List<Group> mGlobalGroups; // to be removed when the requests are operational
     private ListAdapterSearchedGroups mAdapterCurrentGroups;
 
     private TextView mTextViewInfo;
@@ -206,6 +206,11 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
             public void run() {
                 mRequestsCount++;
 
+                /**
+                 * When the search request is operational, the whole
+                 * part below should be removed and replaced by a
+                 * call to the service
+                 */
                 mTemporaryTimer = new Timer("FakeRequestTimer");
                 mTemporaryTimer.schedule(new TimerTask() {
                     @Override
@@ -279,7 +284,7 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
 
     /**
      * This methods sets the appropriate views to visible or invisible when
-     * no new result is received
+     * no groups match the query
      */
     private void setNoResultsState(){
         mTextViewInfo.setVisibility(View.VISIBLE);
@@ -317,7 +322,10 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
         });
     }
 
-    // To be removed soon
+    /**
+     * To be removed when the requests are operational, and the actual searched
+     * groups can be fetched from the server
+     */
     private void createFakeGroups(){
         mGlobalGroups = new ArrayList<>();
         Group g1 = new Group("SWENG", new Id(666), new ArrayList<User>());
