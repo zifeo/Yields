@@ -88,10 +88,10 @@ public class CacheDatabaseTests {
      * (Test for addMessage(Message message, Id groupId))
      */
     @Test
-    public void testDatabaseCanAddMessage(){
+    public void testDatabaseCanAddMessage() {
         try {
             List<Message> messages = MockFactory.generateMockMessages(3);
-            for(Message message : messages) {
+            for (Message message : messages) {
                 mDatabaseHelper.addMessage(message, new Id(666));
             }
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);

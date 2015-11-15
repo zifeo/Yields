@@ -37,7 +37,7 @@ public class ServerChannelTest {
 
     @Test
     public void testWorkingSendRequestAndReadResponse() throws JSONException{
-        Request simpleRequest = RequestBuilder.pingRequest("test");
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -49,7 +49,7 @@ public class ServerChannelTest {
 
 
         try {
-            Response response = channel.sendRequest(simpleRequest);
+            Response response = channel.sendRequest(simpleServerRequest);
             Assert.assertEquals(sSimpleRequest
                     .replace("TIME", DateSerialization.toString(new Date())),
                     output.toString());
@@ -60,7 +60,7 @@ public class ServerChannelTest {
 
     @Test
     public void testNonWorkingConnection() throws IOException{
-        Request simpleRequest = RequestBuilder.pingRequest("test");
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest("test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -70,7 +70,7 @@ public class ServerChannelTest {
                 toReade(input), simpleStatus(false));
 
         try {
-            channel.sendRequest(simpleRequest);
+            channel.sendRequest(simpleServerRequest);
             Assert.fail("");
         } catch (IOException e) {
         }

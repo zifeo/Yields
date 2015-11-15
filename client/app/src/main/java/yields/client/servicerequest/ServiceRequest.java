@@ -3,13 +3,13 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.Response;
 
 /**
  * Abstract class for Requests to the Service.
  */
-public abstract class ServiceRequest{
+public abstract class ServiceRequest {
 
     /**
      * The Kind of messages possible
@@ -24,9 +24,15 @@ public abstract class ServiceRequest{
         GROUPADD("GroupAdd"), GROUPREMOVE("GroupRemove"),
         GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");
 
-        private final String name;
-        MessageKind(String name) { this.name = name; }
-        public String getValue() { return name; }
+        private final String mName;
+
+        MessageKind(String name) {
+            mName = name;
+        }
+
+        public String getValue() {
+            return mName;
+        }
     }
 
     private static int sNextId = 0;
@@ -40,9 +46,9 @@ public abstract class ServiceRequest{
         return sNextId++;
     }
 
-    abstract public String getType();
+    abstract public MessageKind getType();
 
-    abstract public Request parseRequestForServer();
+    abstract public ServerRequest parseRequestForServer();
 
     abstract public void serviceActionOnResponse(Service service, Response response);
 }

@@ -7,15 +7,15 @@ import java.util.Objects;
 /**
  * The request object which represents a request to be send to the server.
  */
-public class Request{
+public class ServerRequest {
     private JSONObject mRequest;
 
     /**
      * Creates a request thanks to a Json Object
      *
-     * @param request The Request in Json format
+     * @param request The ServerRequest in Json format
      */
-    public Request(JSONObject request){
+    public ServerRequest(JSONObject request){
         this.mRequest = Objects.requireNonNull(request);
     }
 
