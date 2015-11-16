@@ -165,24 +165,9 @@ public class YieldService extends Service {
      * Called when an error is received from the server
      *
      * @param errorMsg The content of the error
-     * @param time The time of the Toast
-     */
-    public void receiveError(String errorMsg, int time) {
-        if (time != Toast.LENGTH_SHORT && time != Toast.LENGTH_LONG) {
-            throw new IllegalArgumentException("not a valid toast length");
-        }
-
-        Toast toast = Toast.makeText(this, errorMsg, time);
-        toast.show();
-    }
-
-    /**
-     * Called when an error is received from the server
-     *
-     * @param errorMsg The content of the error
      */
     public void receiveError(String errorMsg) {
-        receiveError(errorMsg, Toast.LENGTH_SHORT);
+        YieldsApplication.showToast(this, errorMsg);
     }
 
     // TODO : receive a response from server (an error message)

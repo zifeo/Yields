@@ -43,4 +43,13 @@
     <string name="changeGroupType">Change group type</string>
     <string name="changeGroupImage">Change group image</string>
     <string name="addUsers">Add users</string>
+    <string name="search">Search</string>
+    <string name="close">Close</string>
+    <string name="searchHint">Search for a name or a tag !</string>
+    <string name="startSearchInfo">Start typing to search for nodes !</string>
+    <string name="noGroupFound">No group found ...</string>
+    <string name="groupImage">Group image</string>
+    <string name="users">Users</string>
+    <string name="joinGroup">Join Group !</string>
+    <string name="noTags">No tags for this group</string>
 </resources>

@@ -2,6 +2,8 @@ package yields.client.listadapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +18,15 @@ import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
 
 /**
- * Class used to represent a list of groups, in a listview
+ * Class used to represent a list of groups, in a compact way, for the
+ * search activity
  */
-public class ListAdapterGroups extends ArrayAdapter<Group> {
+public class ListAdapterSearchedGroups extends ArrayAdapter<Group> {
     private Context mContext;
     private int mGroupLayout;
     private List<Group> mGroups;
 
-    public ListAdapterGroups(Context context, int groupLayout, List<Group> groups) {
+    public ListAdapterSearchedGroups(Context context, int groupLayout, List<Group> groups) {
         super(context, groupLayout, groups);
         mContext = context;
         mGroupLayout = groupLayout;
@@ -40,29 +43,20 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View singleGroup = inflater.inflate(mGroupLayout, parent, false);
-
-        TextView textViewGroupName = (TextView) singleGroup.findViewById(R.id.textViewGroupName);
-        TextView textViewGroupLastMessage = (TextView)
-                singleGroup.findViewById(R.id.textViewGroupLastMessage);
-        ImageView imageGroup = (ImageView) singleGroup.findViewById(R.id.imageViewGroup);
 
         Group group = mGroups.get(position);
 
-        textViewGroupName.setText(group.getName());
-        textViewGroupLastMessage.setText(group.getPreviewOfLastMessage());
+        View groupSearched = inflater.inflate(mGroupLayout, parent, false);
 
-        Bitmap groupImage = group.getImage();
-        imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(groupImage,
+        ImageView imageGroupSearched = (ImageView) groupSearched.findViewById(
+                R.id.imageGroupSearched);
+        imageGroupSearched.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(group.getImage(),
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
-        return singleGroup;
-    }
+        TextView textViewGroupSearched = (TextView) groupSearched.findViewById(
+                R.id.textViewGroupSearched);
+        textViewGroupSearched.setText(group.getName());
 
-    @Override
-    public boolean isEnabled(int position) {
-        Group group = mGroups.get(position);
-        return group.isValidated();
+        return groupSearched;
     }
-
 }

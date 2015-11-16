@@ -63,6 +63,17 @@
             android:name=".activities.GroupSettingsActivity"
             android:parentActivityName=".activities.MessageActivity"
             android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
+        <activity
+            android:name=".activities.SearchGroupActivity"
+            android:parentActivityName=".activities.GroupActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".activities.GroupInfoActivity"
+            android:parentActivityName=".activities.SearchGroupActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
 
         <service
