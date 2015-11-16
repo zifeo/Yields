@@ -40,10 +40,12 @@ class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
     }
   }
 
-  /* "Test with 2 groups in list" should "return the group list" in {
+  "Test with 2 groups in list" should "return the group list" in {
     val u = User.create("an@email.com")
     val g1 = Group.createGroup("g1")
+    g1.name = "n1"
     val g2 = Group.createGroup("g2")
+    g2.name = "n2"
     u.addToGroups(g1.nid)
     u.addToGroups(g2.nid)
     val action = new UserGroupList(u.uid)
@@ -51,9 +53,11 @@ class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
     res match {
       case UserGroupListRes(x) =>
         x.length should be(2)
-         x.toSet should contain((g1.nid, g1.name))
-        x.toSet should contain((g2.nid, g2.name))
+        x.map(_._1).toSet should contain(g1.nid)
+        x.map(_._1).toSet should contain(g2.nid)
+        x.map(_._2).toSet should contain(g1.name)
+        x.map(_._2).toSet should contain(g2.name)
     }
-  } */
+  }
 
 }
