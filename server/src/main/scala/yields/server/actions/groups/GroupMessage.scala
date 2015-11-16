@@ -1,5 +1,7 @@
 package yields.server.actions.groups
 
+import java.time.OffsetDateTime
+
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
@@ -24,7 +26,7 @@ case class GroupMessage(nid: NID, content: String) extends Action {
         val group = Group(nid)
         val c = (Temporal.current, metadata.sender, None, content)
         group.addMessage(c)
-        GroupMessageRes()
+        GroupMessageRes(c._1)
       } else {
         throw new ActionArgumentException("Empty content")
       }
@@ -36,4 +38,4 @@ case class GroupMessage(nid: NID, content: String) extends Action {
 }
 
 /** [[GroupMessage]] result. */
-case class GroupMessageRes() extends Result
+case class GroupMessageRes(datetime: OffsetDateTime) extends Result

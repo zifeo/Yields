@@ -18,7 +18,6 @@ import yields.server.dbi.models._
  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
  * nodes:[nid]:users Zset[UID] with score datetime
  * nodes:[nid]:nodes Zset[NID] with score datetime
- * nodes:[nid]:tid Long - last time id created
  * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
  */
 abstract class Node {
@@ -33,7 +32,6 @@ abstract class Node {
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
-    val tid = s"$node:tid"
   }
 
   val nid: NID
@@ -118,9 +116,7 @@ abstract class Node {
 
   /** Add message */
   def addMessage(content: FeedContent): Boolean = {
-    val tid = redis.withClient(_.incr(NodeKey.tid)
-      .getOrElse(throw new UnincrementableIdentifierException(s"time identifier (tid) from node $nid fails")))
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, content._1.toEpochSecond, content)))
   }
 
   /** Fill the model with the database content */
