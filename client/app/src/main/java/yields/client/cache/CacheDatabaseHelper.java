@@ -756,9 +756,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         try {
             switch (contentType) {
-                case "Text":
+                case "text":
                     return deserializeTextContent(bytes);
-                case "Image":
+                case "image":
                     return deserializeImageContent(bytes);
                 default:
                     throw new ContentException("No such content exists !");

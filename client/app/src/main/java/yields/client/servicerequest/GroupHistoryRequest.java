@@ -49,7 +49,7 @@ public class GroupHistoryRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.GroupHistoryRequest(YieldsApplication.getUser().getId(),
+        return RequestBuilder.groupHistoryRequest(YieldsApplication.getUser().getId(),
                 getGroupId(), getDate(), MESSAGE_COUNT);
     }
 

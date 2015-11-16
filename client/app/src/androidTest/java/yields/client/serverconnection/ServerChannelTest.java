@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 
+import yields.client.id.Id;
+
 public class ServerChannelTest {
     private final static String FAKE_RESPONSE = "{" +
             "\"type\":\"test\"," +
@@ -32,12 +34,12 @@ public class ServerChannelTest {
             "\"datetime\":\"TIME\"}," +
             "\"kind\":\"PING\"," +
             "\"message\":" +
-            "{\"content\":\"test\"}" +
+            "{\"text\":\"test\"}" +
             "}\n";
 
     @Test
-    public void testWorkingSendRequestAndReadResponse() throws JSONException{
-        ServerRequest simpleServerRequest = RequestBuilder.pingRequest("test");
+    public void testWorkingSendRequestAndReadResponse() {
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -58,8 +60,8 @@ public class ServerChannelTest {
     }
 
     @Test
-    public void testNonWorkingConnection() throws IOException{
-        ServerRequest simpleServerRequest = RequestBuilder.pingRequest("test");
+    public void testNonWorkingConnection() {
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -71,6 +73,7 @@ public class ServerChannelTest {
             channel.sendRequest(simpleServerRequest);
             Assert.fail("");
         } catch (IOException e) {
+            //Assert.fail(e.getMessage());
         }
 
         Assert.assertEquals("", output.toString());

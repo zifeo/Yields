@@ -51,7 +51,7 @@ public class GroupMessageRequest extends ServiceRequest {
         Message message = getMessage();
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        return RequestBuilder.GroupMessageRequest(message.getSender().getId(), group.getId(),
+        return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
                 message.getContent());
     }
 
