@@ -20,8 +20,8 @@ public class GroupRemoveRequest extends ServiceRequest {
     /**
      * Main constructor for this type of ServiceRequest (removing a User from a Group).
      *
-     * @param sender       The User that created this request.
-     * @param group        The Group that should a User removed from it.
+     * @param sender  The User that created this request.
+     * @param group   The Group that should a User removed from it.
      * @param userToRemove The User that should be removed from the Group.
      */
     public GroupRemoveRequest(User sender, Group group, User userToRemove) {
@@ -33,7 +33,7 @@ public class GroupRemoveRequest extends ServiceRequest {
 
     /**
      * Returns the type of this ServiceRequest.
-     *g
+     *
      * @return The type of this ServiceRequest.
      */
     @Override
