@@ -60,7 +60,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GROUP_IMAGE = "groupImage";
     private static final String KEY_GROUP_VISIBILITY = "groupVisibility";
 
-
     private static final String KEY_MESSAGE_NODEID = "nodeID";
     private static final String KEY_MESSAGE_GROUPID = "messageGroup";
     private static final String KEY_MESSAGE_SENDERID = "messageSender";
@@ -594,14 +593,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Retrieves all Messages from a specified Group which are in the interval
-     * described by the
-     * boundaries.
+     * Retrieves all Messages from a specified Group which are older than the Date
+     * passed as an argument. Only messageCount Messages are retrieves, or less if
+     * there aren't as many.
      *
      * @param group         The Group from which we want to retrieve the Messages.
-     * @param furthestDate The lower boundary (must be at least 1).
-     * @param messageCount The upper boundary.
-     * @return The list of Messages from the interval for the Group.
+     * @param furthestDate The Date boundary.
+     * @param messageCount The number of Messages that should be retrieved..
+     * @return The list of Messages from the Group.
      * @throws CacheDatabaseException If the database was unable to fetch some
      *                                information.
      */
@@ -650,6 +649,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                         foundUser = true;
                     }
                 }
+
                 try {
                     byte[] contentAsBytes = cursor.getBlob(
                             cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
