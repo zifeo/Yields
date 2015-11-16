@@ -57,8 +57,8 @@ package object io {
   implicit lazy val userCreateJF = jsonFormat2(UserCreate)
   implicit lazy val userCreateResJF = jsonFormat1(UserCreateRes)
 
-  implicit lazy val userGetEntourageJF = jsonFormat1(UserGetEntourage)
-  implicit lazy val userGetEntourageResJF = jsonFormat1(UserGetEntourageRes)
+  implicit lazy val userInfoJF = jsonFormat1(UserInfo)
+  implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
 
   /** *** Message passing interface *****/
 

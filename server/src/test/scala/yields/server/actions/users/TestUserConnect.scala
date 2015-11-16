@@ -17,14 +17,14 @@ class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
 
   /** Switch on test database */
   before {
-    redis.withClient(_.select(Config.getInt("test.database.id")))
-    redis.withClient(_.flushdb)
+    redis(_.select(Config.getInt("test.database.id")))
+    redis(_.flushdb)
   }
 
   /** Switch back on main database */
   after {
-    redis.withClient(_.flushdb)
-    redis.withClient(_.select(Config.getInt("database.id")))
+    redis(_.flushdb)
+    redis(_.select(Config.getInt("database.id")))
   }
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)

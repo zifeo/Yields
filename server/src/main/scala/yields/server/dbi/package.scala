@@ -1,6 +1,6 @@
 package yields.server
 
-import com.redis.RedisClientPool
+import com.redis.{RedisClient, RedisClientPool}
 import yields.server.dbi.exceptions.IllegalValueException
 import yields.server.utils.Config
 
@@ -11,12 +11,20 @@ import scala.language.implicitConversions
   */
 package object dbi {
 
-  /* private[dbi] */ val redis = new RedisClientPool(
+  private[dbi] val redis = new RedisClientPool(
     host = Config.getString("database.addr"),
     port = Config.getInt("database.port"),
     secret = Some(Config.getString("database.pass")),
     database = Config.getInt("database.id")
   )
+
+  /**
+    * Public accessor to database via local redis object
+    * @param query
+    * @tparam T
+    * @return
+    */
+  def redis[T](query: RedisClient => T): T = redis.withClient(query)
 
   /** Terminates database connection. */
   def close(): Unit = {

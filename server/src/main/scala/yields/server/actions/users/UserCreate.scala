@@ -28,8 +28,14 @@ case class UserCreate(email: String, name: String) extends Action {
         u.name = name
 
         UserCreateRes(u.uid)
-      } else throw new ActionArgumentException(s"invalid email in : ${this.getClass.getSimpleName}")
-    } else throw new ActionArgumentException(s"empty email and/or name in : ${this.getClass.getSimpleName}")
+      } else {
+        val errorMessage = getClass.getSimpleName
+        throw new ActionArgumentException(s"invalid email in : $errorMessage")
+      }
+    } else {
+      val errorMessage = getClass.getSimpleName
+      throw new ActionArgumentException(s"empty email and/or name in : $errorMessage")
+    }
   }
 
 }

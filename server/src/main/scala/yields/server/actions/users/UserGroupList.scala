@@ -23,10 +23,11 @@ case class UserGroupList(uid: UID) extends Action {
     if (uid > 0) {
       val user = User(uid)
       val groups = user.groups.toSeq
-      val list = groups.map(x => (x, "", Temporal.notYet))
+      val list = groups.map(x => (x, Group(x).name, Group(x).updated_at))
       UserGroupListRes(list)
     } else {
-      throw new ActionArgumentException("Bad uid")
+      val errorMessage = getClass.getSimpleName
+      throw new ActionArgumentException(s"Bad uid in : $errorMessage")
     }
 
   }

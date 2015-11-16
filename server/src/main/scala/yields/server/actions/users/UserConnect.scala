@@ -20,7 +20,9 @@ case class UserConnect(email: Email) extends Action {
 
     User.fromEmail(email) match {
       case Some(user) => UserConnectRes(user.uid)
-      case _ => throw new UnauthorizeActionException("Invalid email")
+      case _ =>
+        val errorMessage = getClass.getSimpleName
+        throw new UnauthorizeActionException(s"Invalid email in : $errorMessage")
     }
 
   }

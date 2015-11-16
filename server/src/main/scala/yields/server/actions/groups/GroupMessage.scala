@@ -26,10 +26,12 @@ case class GroupMessage(nid: NID, content: String) extends Action {
         group.addMessage(c)
         GroupMessageRes()
       } else {
-        throw new ActionArgumentException("Empty content")
+        val errorMessage = getClass.getSimpleName
+        throw new ActionArgumentException(s"Empty content in : $errorMessage")
       }
     } else {
-      throw new ActionArgumentException("Bad nid value")
+      val errorMessage = getClass.getSimpleName
+      throw new ActionArgumentException(s"Bad nid value in : $errorMessage")
     }
   }
 

@@ -34,7 +34,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     case x: UserUpdate => packWithKind(x)
     case x: UserGroupList => packWithKind(x)
     case x: UserCreate => packWithKind(x)
-    case x: UserGetEntourage => packWithKind(x)
+    case x: UserInfo => packWithKind(x)
 
     case _ =>
       val kind = obj.getClass.getSimpleName
@@ -54,7 +54,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "UserUpdate" => message.convertTo[UserUpdate]
           case "UserGroupList" => message.convertTo[UserGroupList]
           case "UserCreate" => message.convertTo[UserCreate]
-          case "UserGetEntourage" => message.convertTo[UserGetEntourage]
+          case "UserInfo" => message.convertTo[UserInfo]
 
           case _ => deserializationError(s"unregistered action kind: $kind")
         }
