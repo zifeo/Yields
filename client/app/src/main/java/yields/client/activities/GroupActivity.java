@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -110,7 +109,7 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
             break;
 
             case R.id.actionDiscover:
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, SearchGroupActivity.class);
             break;
 
             case R.id.actionCreate:

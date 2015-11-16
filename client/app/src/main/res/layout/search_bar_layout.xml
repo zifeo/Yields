@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="#A0A0A0">
+
+    <EditText
+        android:id="@+id/editTextSearch"
+        android:layout_width="1000dp"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
+        android:hint="@string/searchHint"
+        />
+
+</LinearLayout>
