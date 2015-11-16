@@ -1,6 +1,7 @@
 package yields.client.cache;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -89,11 +90,19 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Main constructor, creates the database.
      */
-    public CacheDatabaseHelper() {
-        super(YieldsApplication.getApplicationContext(), DATABASE_NAME, null,
-                DATABASE_VERSION);
+    public CacheDatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
         mDatabase = this.getWritableDatabase();
     }
+
+    /**
+     * Main constructor, creates the database.
+     */
+    public CacheDatabaseHelper() {
+        this(YieldsApplication.getApplicationContext());
+    }
+
+
 
     /**
      * Called when the database is created for the first time. This is where the

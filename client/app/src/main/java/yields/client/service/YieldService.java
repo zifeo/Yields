@@ -245,7 +245,8 @@ public class YieldService extends Service {
         protected Void doInBackground(Void... params) {
 
             synchronized (this) {
-                mServiceRequestController = new ServiceRequestController(new CacheDatabaseHelper(),
+                mServiceRequestController = new ServiceRequestController(
+                        new CacheDatabaseHelper(getApplicationContext()),
                         YieldService.this);
             }
 

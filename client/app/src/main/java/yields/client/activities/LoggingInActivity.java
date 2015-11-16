@@ -32,6 +32,8 @@ public class LoggingInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logging_in);
 
+        YieldsApplication.setApplicationContext(getApplicationContext());
+
         Intent serviceIntent = new Intent(this, YieldService.class)
                 .putExtra("email", Plus.AccountApi
                         .getAccountName(YieldsApplication.getGoogleApiClient()));
