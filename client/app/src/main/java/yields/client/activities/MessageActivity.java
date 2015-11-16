@@ -61,7 +61,6 @@ public class MessageActivity extends AppCompatActivity
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
-    private static YieldServiceBinder mServiceBinder;
     private static ActionBar mActionBar;
     private ImageButton mSendButton;
 
@@ -116,7 +115,6 @@ public class MessageActivity extends AppCompatActivity
             setHeaderBar();
         }
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
-        mSendButton.setEnabled(false);
 
         // By default, we show the messages of the group.
         mType = ContentType.GROUP_MESSAGES;
@@ -131,11 +129,7 @@ public class MessageActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
-
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindMessageActivity", true);
-
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        YieldsApplication.getBinder().attachActivity(this);
     }
 
     /**
@@ -186,7 +180,7 @@ public class MessageActivity extends AppCompatActivity
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             // TODO : uncomment this to allow communication with the app Service.
-            //mMessageBinder.sendMessage(mGroup, message);
+            YieldsApplication.getBinder().sendMessage(mGroup, message);
         }
         else{
             mCommentAdapter.add(message);
@@ -406,22 +400,4 @@ public class MessageActivity extends AppCompatActivity
     private void setHeaderBar(){
         mActionBar.setTitle(mGroup.getName());
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // TODO : use message Binder
-            /*mMessageBinder = (MessageBinder) service;
-            mMessageBinder.attachActivity(MessageActivity.this);*/
-            mSendButton.setEnabled(true);
-            /*mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date()
-                    , 20);*/
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mServiceBinder = null;
-            mSendButton.setEnabled(false);
-        }
-    };
 }
