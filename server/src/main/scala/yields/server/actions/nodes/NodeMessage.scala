@@ -1,5 +1,7 @@
 package yields.server.actions.nodes
 
+import java.time.OffsetDateTime
+
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
@@ -21,6 +23,7 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
   override def run(metadata: Metadata): Result = {
     if (nid > 0) {
       val group = Group(nid)
+      val datetime = Temporal.current
 
       val media = for {
         cntType <- contentType
@@ -28,15 +31,18 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
       } yield Media.createMedia(cntType, cnt, metadata.sender)
 
       media match {
-        case Some(x) => group.addMessage((Temporal.current, metadata.sender, Some(x.nid), text.getOrElse("")))
-        case None => group.addMessage((Temporal.current, metadata.sender, None, text.getOrElse("")))
+        case Some(x) => group.addMessage((datetime, metadata.sender, Some(x.nid), text.getOrElse("")))
+        case None => group.addMessage((datetime, metadata.sender, None, text.getOrElse("")))
       }
 
+      NodeMessageRes(datetime)
+    } else {
+      val errorMessage = getClass.getSimpleName
+      throw new ActionArgumentException(s"Bad nid value in : $errorMessage")
     }
-    NodeMessageRes(nid)
   }
 
 }
 
 /** [[NodeMessage]] result. */
-case class NodeMessageRes(nid: NID) extends Result
+case class NodeMessageRes(datetime: OffsetDateTime) extends Result

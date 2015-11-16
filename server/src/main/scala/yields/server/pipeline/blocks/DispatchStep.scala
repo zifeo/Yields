@@ -17,7 +17,6 @@ class DispatchStep(logger: LoggingAdapter) extends PushPullStage[Response, Respo
       case Response(broadcast: BroadcastResult, metadata) =>
       case Response(result: Result, metadata) =>
     }
-
     ctx.push(elem)
   }
 

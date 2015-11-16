@@ -7,26 +7,22 @@ import yields.server.utils.{Temporal, Config}
 
 /**
  * Encapsulate sender, time and security data to allow independent checking from running.
- * @param sender message emitter
+ * @param client message emitter
  * @param datetime sending time
  */
-case class Metadata(sender: UID, receiver: UID, datetime: OffsetDateTime) {
+case class Metadata(client: UID, datetime: OffsetDateTime) {
 
-  /** Creates new metadata for replying to sender UID from the server. */
-  def reply: Metadata = {
-    assert(receiver == Metadata.serverUID, "request receiver must be the server")
-    copy(sender = Metadata.serverUID, receiver = sender, datetime = Temporal.current)
-  }
+  /** Creates new metadata for replying from the server. */
+  def replied: Metadata =
+    copy(datetime = Temporal.current)
 
 }
 
 /** [[Metadata]] companion. */
 object Metadata {
 
-  private val serverUID = Config.getLong("serverUID")
-
   /** Creates new metadata for sending to a UID from the server. */
-  def to(uid: UID): Metadata =
-    Metadata(serverUID, uid, Temporal.current)
+  def apply(uid: UID): Metadata =
+    Metadata(uid, Temporal.current)
 
 }
