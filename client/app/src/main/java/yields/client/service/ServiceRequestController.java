@@ -14,9 +14,11 @@ import yields.client.servicerequest.ServiceRequest;
 public class ServiceRequestController {
 
     private final CacheDatabaseHelper mCacheHelper;
+    //TODO : Add connection
 
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper) {
         mCacheHelper = cacheDatabaseHelper;
+        //TODO : Set Instance of connection
     }
 
     public void handleServiceRequest(ServiceRequest serviceRequest) {
@@ -127,12 +129,25 @@ public class ServiceRequestController {
         try {
             mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingGroup().getId());
         } catch (CacheDatabaseException e) {
-            //TODO : Decide what happens if cache adding failed.
+            //TODO : @Nroussel Decide what happens if cache adding failed.
         }
-        //TODO :
+        //TODO : Send serverRequest to Server
+        /*
+        if(sending failed){
+            mCacheHelper.deleteMessage(serviceRequest.getMessage().getId());
+        }
+
+        notifyApp();
+        */
     }
 
     private void handleGroupHistoryRequest(GroupHistoryRequest serviceRequest) {
-
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        try {
+            mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
+                    serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
+        } catch (CacheDatabaseException e) {
+            //TODO : @Nroussel Decide what happens if cache adding failed.
+        }
     }
 }
