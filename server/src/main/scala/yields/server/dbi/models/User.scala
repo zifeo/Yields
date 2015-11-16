@@ -1,6 +1,7 @@
 package yields.server.dbi.models
 
 import java.time.OffsetDateTime
+import java.util.regex.{Matcher, Pattern}
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.actions.exceptions.{UnauthorizeActionException, NewUserExistException}
@@ -185,7 +186,20 @@ object User {
 
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): Option[User] = {
-    redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
+    if (checkValidEmail(email)) {
+      redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
+    } else throw new UnauthorizeActionException(s"invalid email in fromEmail method")
+  }
+
+  /**
+    * Check if an email is valid
+    * @param email email to test
+    * @return boolean
+    */
+  def checkValidEmail(email: String): Boolean = {
+    val p: Pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
+    val m: Matcher = p.matcher(email)
+    m.find
   }
 
 }
