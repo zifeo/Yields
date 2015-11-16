@@ -16,6 +16,8 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
+import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 
 public class YieldServiceBinder extends Binder {
     private final YieldService mService;
@@ -76,6 +78,7 @@ public class YieldServiceBinder extends Binder {
         Objects.requireNonNull(message);
 
         //TODO: Finish request
+        mService.sendRequest(new GroupMessageRequest(message, group));
     }
 
     /**
@@ -83,13 +86,13 @@ public class YieldServiceBinder extends Binder {
      *
      * @param group The group we want to retrieve from
      * @param lastDate The last date we have in the history
-     * @param messageCount The max number of message we want
      */
     public void addMoreGroupMessages(Group group,
-                                     Date lastDate, int messageCount) {
+                                     Date lastDate) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(lastDate);
 
         //TODO: Finish request
+        mService.sendRequest(new GroupHistoryRequest(group, lastDate));
     }
 }
