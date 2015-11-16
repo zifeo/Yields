@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import yields.server.mpi.{Metadata, Request, Response}
-import yields.server.pipeline.modules.{LoggerModule, SerializationModule}
+import yields.server.pipeline.blocks.{LoggerModule, SerializationModule}
 import yields.server.utils.{Temporal, Config}
 
 import scala.concurrent.Future
