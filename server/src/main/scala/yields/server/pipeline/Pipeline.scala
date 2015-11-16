@@ -42,7 +42,7 @@ object Pipeline {
     val execute = Flow[Request].mapAsyncUnordered(parallelism) { case Request(action, metadata) =>
       Future {
         val result = action.run(metadata)
-        result
+        Response(result, metadata.reply)
       }
     }
 

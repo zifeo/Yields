@@ -1,28 +1,24 @@
 package yields.server.pipeline.blocks
 
+import akka.event.LoggingAdapter
 import akka.stream.Supervision
 import akka.stream.stage._
 import yields.server.actions.{BroadcastResult, Result}
-import yields.server.mpi.{Metadata, Response}
-import yields.server.utils.Temporal
+import yields.server.mpi.Response
 
 /**
   * Dispatch step takes care of handling [[BroadcastResult]].
   * Its sends to all of the receiver if a corresponding TCP socket flow is found.
   */
-class DispatchStep extends PushPullStage[Result, Response] {
+class DispatchStep(logger: LoggingAdapter) extends PushPullStage[Response, Response] {
 
-  /** Returns current timed server metadata. */
-  def currentServerMetadata(): Metadata =
-    Metadata(7777, Temporal.current)
-
-  override def onPush(elem: Result, ctx: Context[Response]): SyncDirective = {
+  override def onPush(elem: Response, ctx: Context[Response]): SyncDirective = {
     elem match {
-      case broadcast: BroadcastResult =>
-      case result: Result =>
+      case Response(broadcast: BroadcastResult, metadata) =>
+      case Response(result: Result, metadata) =>
     }
 
-    ctx.push(Response(elem, currentServerMetadata()))
+    ctx.push(elem)
   }
 
   override def onPull(ctx: Context[Response]): SyncDirective = {
@@ -42,12 +38,14 @@ class DispatchStep extends PushPullStage[Result, Response] {
 
   override def decide(t: Throwable): Supervision.Directive = super.decide(t)
 
-  override def restart(): Stage[Result, Response] = super.restart()
+  override def restart(): Stage[Response, Response] = super.restart()
 
 }
 
+/** [[DispatchStep]] companion. */
 object DispatchStep {
 
-  def apply(): DispatchStep = new DispatchStep()
+  /** Creates a new dispatch step */
+  def apply()(implicit logger: LoggingAdapter): DispatchStep = new DispatchStep(logger)
 
 }
