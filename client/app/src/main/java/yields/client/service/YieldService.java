@@ -11,7 +11,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -25,6 +24,7 @@ import yields.client.messages.Message;
 import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
@@ -32,7 +32,7 @@ public class YieldService extends Service {
     private NotifiableActivity mCurrentNotifiableActivity;
     private Group mCurrentGroup;
     private int mIdLastNotification;
-    private ServiceRequestController serviceRequestController;
+    private ServiceRequestController mServiceRequestController;
 
     /**
      * Connects the service to the server when it is created and
@@ -43,7 +43,7 @@ public class YieldService extends Service {
         mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
         Log.d("DEBUG", "create Yield Service");
-        serviceRequestController = new ServiceRequestController(new CacheDatabaseHelper());
+        mServiceRequestController = new ServiceRequestController(new CacheDatabaseHelper(), this);
     }
 
     /**
@@ -55,11 +55,12 @@ public class YieldService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.getBooleanExtra("newUser", false)) {
+        //TODO : to be defined what to do when starting a connection
+        /*if (intent != null && intent.getBooleanExtra("newUser", false)) {
             String email = intent.getStringExtra("email");
             ServerRequest connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
             sendRequest(connectReq);
-        }
+        }*/
 
         Log.d("DEBUG", "Starting yield service");
 
@@ -96,10 +97,10 @@ public class YieldService extends Service {
     /**
      * Sends serverRequest to server
      *
-     * @param serverRequest The serverRequest to send
+     * @param serviceRequest The serviceRequest to send
      */
-    public void sendRequest(ServerRequest serverRequest) {
-        new SendRequestTask().execute(serverRequest);
+    public void sendRequest(ServiceRequest serviceRequest) {
+        new SendRequestTask().execute(serviceRequest);
     }
 
     /**
@@ -214,10 +215,10 @@ public class YieldService extends Service {
     /**
      * AsncTask sending th requests.
      */
-    private static class SendRequestTask extends AsyncTask<ServerRequest, Void, Void> {
+    private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override
-        protected Void doInBackground(ServerRequest... params) {
-            //TODO : send ServerRequest to Server
+        protected Void doInBackground(ServiceRequest... params) {
+            mServiceRequestController.handleServiceRequest(params[0]);
             return null;
         }
     }

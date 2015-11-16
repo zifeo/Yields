@@ -44,9 +44,8 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.service.MessageBinder;
 import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -62,7 +61,7 @@ public class MessageActivity extends AppCompatActivity
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
-    private static MessageBinder mMessageBinder;
+    private static YieldServiceBinder mServiceBinder;
     private static ActionBar mActionBar;
     private ImageButton mSendButton;
 
@@ -421,7 +420,7 @@ public class MessageActivity extends AppCompatActivity
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mMessageBinder = null;
+            mServiceBinder = null;
             mSendButton.setEnabled(false);
         }
     };

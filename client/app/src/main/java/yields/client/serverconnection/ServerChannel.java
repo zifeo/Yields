@@ -1,5 +1,7 @@
 package yields.client.serverconnection;
 
+import android.util.Log;
+
 import org.json.JSONException;
 
 import java.io.BufferedReader;
@@ -42,6 +44,8 @@ public class ServerChannel implements CommunicationChannel {
         if (!mConnectionStatus.working()) {
             throw new IOException("Not connected to server");
         }
+
+        Log.d("DEBUG", "sending : " + serverRequest.message());
 
         mSender.write(serverRequest.message());
         mSender.newLine();

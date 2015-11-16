@@ -1,10 +1,17 @@
 package yields.client.service;
 
+import android.util.Log;
+
+import java.io.IOException;
+
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ServiceRequestException;
 import yields.client.messages.Message;
+import yields.client.serverconnection.CommunicationChannel;
+import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ServerRequest;
+import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -15,11 +22,22 @@ import yields.client.servicerequest.ServiceRequest;
 public class ServiceRequestController {
 
     private final CacheDatabaseHelper mCacheHelper;
-    //TODO : Add connection
+    private final YieldService mService;
+    // Not final because we may have to recreate it in case of connection error
+    private CommunicationChannel mCommunicationChannel;
 
-    public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper) {
+    public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
-        //TODO : Set Instance of connection
+        mService = service;
+
+        try {
+            ConnectionManager connectionManager = new ConnectionManager(
+                    new YieldEmulatorSocketProvider());
+            mCommunicationChannel = connectionManager.getCommunicationChannel();
+        } catch (IOException e) {
+            mService.receiveError("problem connecting to server : " + e.getMessage());
+        }
+
     }
 
     public void handleServiceRequest(ServiceRequest serviceRequest) {
@@ -132,8 +150,12 @@ public class ServiceRequestController {
         } catch (CacheDatabaseException e) {
             //TODO : @Nroussel Decide what happens if cache adding failed.
         }
-        //TODO : notifyApp();
-        //TODO : Send serverRequest to Server
+
+        try {
+            mCommunicationChannel.sendRequest(serverRequest);
+        } catch (IOException e) {
+            mService.receiveError("no connection available : " + e.getMessage());
+        }
     }
 
     private void handleGroupHistoryRequest(GroupHistoryRequest serviceRequest) {
@@ -144,8 +166,13 @@ public class ServiceRequestController {
         } catch (CacheDatabaseException e) {
             //TODO : @Nroussel Decide what happens if cache adding failed.
         }
-        //TODO : notifyApp();
-        //TODO : Send serverRequest to Server
+
+        try {
+            mCommunicationChannel.sendRequest(serverRequest);
+        } catch (IOException e) {
+            mService.receiveError("no connection available : " + e.getMessage());
+        }
+
         //Once response is received add all Messages to cache.
         /*
         for(Message message : receivedMessages){
