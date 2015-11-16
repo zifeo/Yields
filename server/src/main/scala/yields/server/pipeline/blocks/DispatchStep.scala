@@ -3,30 +3,30 @@ package yields.server.pipeline.blocks
 import akka.event.LoggingAdapter
 import akka.stream.Supervision
 import akka.stream.stage._
-import yields.server.actions.{BroadcastResult, Result}
-import yields.server.mpi.Response
+import yields.server.actions.BroadcastResult
+import yields.server.mpi.{Metadata, Response}
 
 /**
   * Dispatch step takes care of handling [[BroadcastResult]].
   * Its sends to all of the receiver if a corresponding TCP socket flow is found.
   */
-class DispatchStep(logger: LoggingAdapter) extends PushPullStage[Response, Response] {
+class DispatchStep(logger: LoggingAdapter) extends StatefulStage[Response, Response] {
 
-  override def onPush(elem: Response, ctx: Context[Response]): SyncDirective = {
-    elem match {
-      case Response(broadcast: BroadcastResult, metadata) =>
-      case Response(result: Result, metadata) =>
+  override def initial: StageState[Response, Response] = new StageState {
+
+    override def onPush(elem: Response, ctx: Context[Response]): SyncDirective = elem match {
+      case current @ Response(broadcast: BroadcastResult, metadata) =>
+        val results = broadcast.receivers.map(uid => Response(broadcast, Metadata(uid)))
+        emit((current +: results).iterator, ctx)
+      case _ =>
+        ctx.push(elem)
     }
-    ctx.push(elem)
-  }
 
-  override def onPull(ctx: Context[Response]): SyncDirective = {
-    ctx.pull()
   }
-
-  override def preStart(ctx: LifecycleContext): Unit = super.preStart(ctx)
 
   override def onUpstreamFinish(ctx: Context[Response]): TerminationDirective = super.onUpstreamFinish(ctx)
+
+  override def preStart(ctx: LifecycleContext): Unit = super.preStart(ctx)
 
   override def onDownstreamFinish(ctx: Context[Response]): TerminationDirective = super.onDownstreamFinish(ctx)
 
