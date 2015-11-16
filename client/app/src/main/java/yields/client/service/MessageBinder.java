@@ -80,7 +80,7 @@ public class MessageBinder extends Binder {
     private static ServerRequest createRequestForMessageToSend(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        return RequestBuilder.GroupMessageRequest(message.getSender().getId(), group.getId(),
+        return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
                 message
                .getContent());
     }

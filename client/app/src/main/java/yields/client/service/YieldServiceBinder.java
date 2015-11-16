@@ -55,7 +55,8 @@ public class YieldServiceBinder extends Binder {
             memberIDs.add(u.getId());
         }
         ServerRequest groupAddServerRequest = RequestBuilder
-                .GroupCreateRequest(group.getUsers().get(0).getId(), group.getName(), memberIDs);
+                .groupCreateRequest(group.getUsers().get(0).getId(), group.getName(),
+                        group.getVisibility(), memberIDs);
         Log.d("REQUEST", "Add new group");
         mService.sendRequest(groupAddServerRequest);
     }

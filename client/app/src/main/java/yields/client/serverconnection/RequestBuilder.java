@@ -30,10 +30,11 @@ public class RequestBuilder {
      * The Fields possible for the request
      */
     public enum Fields {
-        EMAIL("email"), CONTENT("content"), NAME("name"),
+        EMAIL("email"), TEXT("text"), NAME("name"),
         NODES("nodes"), GID("gid"), KIND("kind"),
         LAST("dateLast"), TO("to"), COUNT("count"),
-        IMAGE("image"), NID("nid"), VISIBILITY("visibility");
+        IMAGE("image"), NID("nid"), VISIBILITY("visibility"),
+        CONTENT_TYPE("contentType");
 
         private final String name;
 
@@ -58,7 +59,7 @@ public class RequestBuilder {
      *               property -> new value
      * @return The request.
      */
-    public static ServerRequest UserUpdateRequest(Id sender,
+    public static ServerRequest userUpdateRequest(Id sender,
                                                   Map<Fields, String> args) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(args);
@@ -81,13 +82,13 @@ public class RequestBuilder {
     /**
      * ServerRequest to receive the group list.
      *
-     * @param sender The sender of the request.
+     * @param senderId The senderId of the request.
      * @return The request.
      */
-    public static ServerRequest userGroupListRequest(Id sender) {
-        Objects.requireNonNull(sender);
+    public static ServerRequest userGroupListRequest(Id senderId) {
+        Objects.requireNonNull(senderId);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERGROUPLIST, sender);
+                ServiceRequest.RequestKind.USERGROUPLIST, senderId);
 
         return builder.request();
     }
@@ -163,12 +164,14 @@ public class RequestBuilder {
     /**
      * Creates a Group create request
      *
-     * @param sender The id of the sender
-     * @param name   The new name of the group
-     * @param nodes  The nodes attached to the group
+     * @param sender     The id of the sender
+     * @param name       The new name of the group
+     * @param visibility The visibility of the group.
+     * @param nodes      The nodes attached to the group
      * @return The request itself
      */
-    public static ServerRequest GroupCreateRequest(Id sender, String name,
+    public static ServerRequest groupCreateRequest(Id sender, String name,
+                                                   Group.GroupVisibility visibility,
                                                    List<Id> nodes) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(name);
@@ -183,6 +186,7 @@ public class RequestBuilder {
 
         builder.addField(Fields.NAME, name);
         builder.addField(Fields.NODES, nodes);
+        builder.addField(Fields.VISIBILITY, visibility);
 
         return builder.request();
     }
@@ -195,7 +199,7 @@ public class RequestBuilder {
      * @param newName New name for the group.
      * @return The request.
      */
-    public static ServerRequest GroupUpdateNameRequest(Id sender, Id groupId, String newName) {
+    public static ServerRequest groupUpdateNameRequest(Id sender, Id groupId, String newName) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newName);
@@ -214,7 +218,7 @@ public class RequestBuilder {
      * @param newVisibility The new visibility of the group.
      * @return The request.
      */
-    public static ServerRequest GroupUpdateVisibilityRequest(Id sender, Id groupId,
+    public static ServerRequest groupUpdateVisibilityRequest(Id sender, Id groupId,
                                                              Group.GroupVisibility newVisibility) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
@@ -230,13 +234,13 @@ public class RequestBuilder {
     /**
      * ServerRequest for updating the group image.
      *
-     * @param sender   Sender of the reauest.
+     * @param sender   Sender of the request.
      * @param groupId  Id of the group having its image changed.
      * @param newImage The new Image
      * @return The request.
      */
-    public static ServerRequest GroupUpdateImageRequest(Id sender, Id groupId,
-                                                        ImageContent newImage) {
+    public static ServerRequest groupUpdateImageRequest(Id sender, Id groupId,
+                                                        Bitmap newImage) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newImage);
@@ -244,7 +248,7 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
                 .GROUPUPDATEIMAGE, sender);
         builder.addField(Fields.GID, groupId);
-        builder.addField(Fields.IMAGE, newImage.getImage());
+        builder.addField(Fields.IMAGE, newImage);
         return builder.request();
     }
 
@@ -257,7 +261,7 @@ public class RequestBuilder {
      * @param newUser The user to add in this group.
      * @return The request.
      */
-    public static ServerRequest GroupAddRequest(Id sender, Id groupId,
+    public static ServerRequest groupAddRequest(Id sender, Id groupId,
                                                 Id newUser) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
@@ -275,22 +279,22 @@ public class RequestBuilder {
     /**
      * ServerRequest for removing a user from a group.
      *
-     * @param sender  The sender of the request.
-     * @param groupId Id of the group.
-     * @param newUser The user to remove from  this group.
+     * @param sender       The sender of the request.
+     * @param groupId      Id of the group.
+     * @param userToRemove The user to remove from  this group.
      * @return The request.
      */
-    public static ServerRequest GroupRemoveRequest(Id sender, Id groupId,
-                                                   Id newUser) {
+    public static ServerRequest groupRemoveRequest(Id sender, Id groupId,
+                                                   Id userToRemove) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
-        Objects.requireNonNull(newUser);
+        Objects.requireNonNull(userToRemove);
 
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUPREMOVE, sender);
 
         builder.addField(Fields.GID, groupId);
-        builder.addField(Fields.NID, newUser);
+        builder.addField(Fields.NID, userToRemove);
 
         return builder.request();
     }
@@ -303,14 +307,12 @@ public class RequestBuilder {
      * @param content The Content of the Message that is sent.
      * @return The request itself.
      */
-    public static ServerRequest GroupMessageRequest(Id sender, Id groupId, Content content) {
+    public static ServerRequest groupMessageRequest(Id sender, Id groupId, Content content) {
         switch (content.getType()) {
             case TEXT:
-                return GroupTextMessageRequest(sender, groupId, content.getType().getType(), (TextContent)
-                        content);
+                return groupTextMessageRequest(sender, groupId, (TextContent) content);
             case IMAGE:
-                return GroupImageMessageRequest(sender, groupId, content.getType().getType(),
-                        (ImageContent) content);
+                return groupImageMessageRequest(sender, groupId, (ImageContent) content);
             default:
                 throw new ContentException("No such ContentType exists !");
         }
@@ -321,23 +323,21 @@ public class RequestBuilder {
      *
      * @param sender  The id of the sender.
      * @param groupId The group id to send the message to.
-     * @param kind    The kind of the message should be text.
      * @param content The content of the message.
      * @return The request itself.
      */
-    public static ServerRequest GroupTextMessageRequest(Id sender, Id groupId,
-                                                        String kind, TextContent content) {
+    public static ServerRequest groupTextMessageRequest(Id sender, Id groupId,
+                                                        TextContent content) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
-        Objects.requireNonNull(kind);
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUPMESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
-        builder.addField(Fields.KIND, kind);
-        builder.addField(Fields.CONTENT, content.getText());
+        builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
+        builder.addField(Fields.TEXT, content.getText());
 
         return builder.request();
     }
@@ -347,37 +347,35 @@ public class RequestBuilder {
      *
      * @param sender  The id of the sender.
      * @param groupId The group id of the recipient.
-     * @param kind    The kind of the message should be image.
-     * @param content The image to send.
+     * @param content The ImageContent to send.
      * @return The request itself.
      */
-    public static ServerRequest GroupImageMessageRequest(Id sender, Id groupId,
-                                                         String kind,
+    public static ServerRequest groupImageMessageRequest(Id sender, Id groupId,
                                                          ImageContent content) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
-        Objects.requireNonNull(kind);
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUPMESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
-        builder.addField(Fields.KIND, kind);
+        builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
+        builder.addField(Fields.TEXT, content.getCaption());
         builder.addField(Fields.IMAGE, content.getImage());
 
         return builder.request();
     }
 
     /**
-     * Creates a group history request
+     * Creates a group history request.
      *
-     * @param groupId      The id of the group you want the history from
-     * @param last         The last time we got a message from this group
-     * @param messageCount The max number of message we want
-     * @return The request itself
+     * @param groupId      The id of the group you want the history from.
+     * @param last         The last time we got a message from this group.
+     * @param messageCount The max number of message we want.
+     * @return The request itself.
      */
-    public static ServerRequest GroupHistoryRequest(Id senderId, Id groupId, Date last,
+    public static ServerRequest groupHistoryRequest(Id senderId, Id groupId, Date last,
                                                     int messageCount) {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(last);
@@ -394,24 +392,26 @@ public class RequestBuilder {
     }
 
     /**
-     * Creates a simple ping request
+     * Creates a simple ping request.
      *
-     * @param content A string of content
-     * @return The request itself
+     * @param senderId The Id of the sender of this request.
+     * @param content  A string that is added to the ping.
+     * @return The request itself.
      */
-    public static ServerRequest pingRequest(String content) {
+    public static ServerRequest pingRequest(Id senderId, String content) {
+        Objects.requireNonNull(senderId);
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.PING, new Id(0l));
+                ServiceRequest.RequestKind.PING, senderId);
 
-        builder.addField(Fields.CONTENT, content);
+        builder.addField(Fields.TEXT, content);
 
         return builder.request();
     }
 
     /**
-     * Constructor of a RequestBuilder
+     * Constructor of a RequestBuilder.
      *
      * @param kind   The kind of request to be built.
      * @param sender The sender of the request.
@@ -461,7 +461,7 @@ public class RequestBuilder {
     }
 
     private void addField(Fields fieldType, Group.GroupVisibility field) {
-        this.mConstructingMap.put(fieldType.getValue(), field.toString());
+        this.mConstructingMap.put(fieldType.getValue(), field.getValue());
     }
 
     /**
