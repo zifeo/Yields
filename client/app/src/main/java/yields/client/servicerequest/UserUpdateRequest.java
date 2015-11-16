@@ -8,7 +8,7 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServiceRequest asking the Service to update the User.
+ * ServiceRequest asking the Service to update a User.
  */
 public class UserUpdateRequest extends ServiceRequest {
 
@@ -19,7 +19,7 @@ public class UserUpdateRequest extends ServiceRequest {
      *
      * @param user The ClientUser sending the request.
      */
-    public UserUpdateRequest(User user){
+    public UserUpdateRequest(User user) {
         super();
         mUser = user;
     }

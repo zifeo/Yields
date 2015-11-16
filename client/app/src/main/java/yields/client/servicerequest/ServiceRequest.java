@@ -56,11 +56,11 @@ public abstract class ServiceRequest {
      */
     abstract public RequestKind getType();
 
-   /**
-    * Build a ServerRequest for this ServiceRequest.
-    *
-    * @return The ServerRequest corresponding to this ServiceRequest.
-    */
+    /**
+     * Build a ServerRequest for this ServiceRequest.
+     *
+     * @return The ServerRequest corresponding to this ServiceRequest.
+     */
     abstract public ServerRequest parseRequestForServer();
 
     abstract public void serviceActionOnResponse(Service service, Response response);

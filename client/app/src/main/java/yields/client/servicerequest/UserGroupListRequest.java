@@ -19,7 +19,7 @@ public class UserGroupListRequest extends ServiceRequest {
      *
      * @param user The ClientUser sending the request.
      */
-    public UserGroupListRequest(User user){
+    public UserGroupListRequest(User user) {
         super();
         mUser = user;
     }

@@ -19,7 +19,7 @@ public class UserConnectRequest extends ServiceRequest {
      *
      * @param clientUser The ClientUser sending the request.
      */
-    public UserConnectRequest(ClientUser clientUser){
+    public UserConnectRequest(ClientUser clientUser) {
         super();
         mClientUser = clientUser;
     }

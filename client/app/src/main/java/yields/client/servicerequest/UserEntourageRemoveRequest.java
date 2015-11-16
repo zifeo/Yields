@@ -8,23 +8,24 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServiceRequest asking the Service to add a User to another User's entourage.
+ * ServiceRequest asking the Service to remove a User of another User's entourage.
  */
-public class UserEntourageAddRequest extends ServiceRequest {
+public class UserEntourageRemoveRequest extends ServiceRequest {
 
     private final User mUser;
-    private final User mUserToAdd;
+    private final User mUserToRemove;
 
     /**
-     * Main constructor for this type of ServiceRequest (adding a User to another User's entourage).
+     * Main constructor for this type of ServiceRequest (removing a User from another User's
+     * entourage).
      *
-     * @param user          The User that send this request and which wants it's entourage modified.
-     * @param userToBeAdded The User that will be added to user's entourage.
+     * @param user            The User sending the request, and who wants his entourage modified..
+     * @param userToBeRemoved The User that will be removed from user's entourage.
      */
-    public UserEntourageAddRequest(User user, User userToBeAdded) {
+    public UserEntourageRemoveRequest(User user, User userToBeRemoved) {
         super();
         mUser = user;
-        mUserToAdd = userToBeAdded;
+        mUserToRemove = userToBeRemoved;
     }
 
     /**
@@ -34,7 +35,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USERENTOURAGEADD;
+        return RequestKind.USERENTOURAGEREMOVE;
     }
 
     /**
@@ -44,7 +45,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userEntourageAddRequest(mUser.getId(), mUserToAdd.getEmail());
+        return RequestBuilder.userEntourageRemoveRequest(mUser.getId(), mUserToRemove.getEmail());
     }
 
     @Override

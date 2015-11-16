@@ -18,10 +18,10 @@ public class PingRequest extends ServiceRequest {
     /**
      * Main constructor for this type of ServiceRequest (pinging the server).
      *
-     * @param clientUser The ClientUser sending the ping.
+     * @param clientUser  The ClientUser sending the ping.
      * @param pingContent The content, a String, added to the ping.
      */
-    public PingRequest(ClientUser clientUser, String pingContent){
+    public PingRequest(ClientUser clientUser, String pingContent) {
         super();
         mClientUser = clientUser;
         mContent = pingContent;

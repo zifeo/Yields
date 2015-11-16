@@ -2,29 +2,33 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServiceRequest asking the Service to add a User to another User's entourage.
+ * ServerRequest asking the Service to rename a Group.
  */
-public class UserEntourageAddRequest extends ServiceRequest {
+public class GroupUpdateNameRequest extends ServiceRequest {
 
-    private final User mUser;
-    private final User mUserToAdd;
+    private final User mSender;
+    private final Group mGroup;
+    private final String mName;
 
     /**
-     * Main constructor for this type of ServiceRequest (adding a User to another User's entourage).
+     * Main constructor for this type of ServiceRequest (creating a Group).
      *
-     * @param user          The User that send this request and which wants it's entourage modified.
-     * @param userToBeAdded The User that will be added to user's entourage.
+     * @param sender The User that created this request.
+     * @param group  The Group that should be renamed.
+     * @param name   The new name of the Group.
      */
-    public UserEntourageAddRequest(User user, User userToBeAdded) {
+    public GroupUpdateNameRequest(User sender, Group group, String name) {
         super();
-        mUser = user;
-        mUserToAdd = userToBeAdded;
+        mSender = sender;
+        mGroup = group;
+        mName = name;
     }
 
     /**
@@ -34,7 +38,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USERENTOURAGEADD;
+        return RequestKind.GROUPUPDATENAME;
     }
 
     /**
@@ -44,11 +48,11 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userEntourageAddRequest(mUser.getId(), mUserToAdd.getEmail());
+        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroup.getId(), mName);
     }
 
     @Override
     public void serviceActionOnResponse(Service service, Response response) {
-
+        //TODO : @Trofleb
     }
 }
