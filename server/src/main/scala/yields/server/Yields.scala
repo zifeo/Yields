@@ -6,9 +6,7 @@ import akka.actor.ActorSystem
 import akka.io.Tcp.SO
 import akka.stream.scaladsl.Tcp
 import akka.stream.scaladsl.Tcp.IncomingConnection
-import akka.stream.stage._
-import akka.stream.{Supervision, ActorMaterializer, ActorMaterializerSettings}
-import akka.util.ByteString
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import yields.server.pipeline.Pipeline
 import yields.server.utils.Config
 
@@ -39,7 +37,7 @@ object Yields extends App {
   val connections = Tcp().bind(
     interface = Config.getString("addr"),
     port = Config.getInt("port"),
-    options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = false)),
+    options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = true)),
     halfClose = false,
     idleTimeout = Duration.Inf
   )
