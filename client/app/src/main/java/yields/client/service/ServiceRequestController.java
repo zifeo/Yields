@@ -79,50 +79,51 @@ public class ServiceRequestController {
     }
 
     private void handleUserEntourageRemoveRequest() {
-
+        //TODO
     }
 
     private void handleUserStatusRequest() {
-
+        //TODO
     }
 
     private void handleGroupCreateRequest() {
-
+        //TODO
     }
 
     private void handleUserEntourageAddRequest() {
-
+        //TODO
     }
 
     private void handleGroupUpdateVisibilityRequest() {
-
+        //TODO
     }
 
     private void handleGroupUpdateImageRequest() {
-
+        //TODO
     }
 
     private void handleGroupUpdateNameRequest() {
-
+        //TODO
     }
 
     private void handleGroupAddRequest() {
-
+        //TODO
     }
 
     private void handleGroupRemoveRequest() {
-
+        //TODO
     }
 
     private void handleUserUpdateRequest() {
-
+        //TODO
     }
 
     private void handleUserConnectRequest() {
+        //TODO
     }
 
     private void handlePingRequest() {
-
+        //TODO
     }
 
     private void handleGroupMessageRequest(GroupMessageRequest serviceRequest) {

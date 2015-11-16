@@ -6,12 +6,12 @@ import java.util.Objects;
 
 import yields.client.messages.Message;
 import yields.client.node.Group;
-import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
+import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServerRequest asking the Service to add a Message to a Group.
+ * ServiceRequest asking the Service to add a Message to a Group.
  */
 public class GroupMessageRequest extends ServiceRequest {
 
@@ -32,9 +32,9 @@ public class GroupMessageRequest extends ServiceRequest {
     }
 
     /**
-     * Returns the type of this ServiceRequest as a String.
+     * Returns the type of this ServiceRequest.
      *
-     * @return The type of this ServiceRequest as a String.
+     * @return The type of this ServiceRequest.
      */
     @Override
     public RequestKind getType() {
