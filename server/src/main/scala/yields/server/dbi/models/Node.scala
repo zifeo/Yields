@@ -108,9 +108,13 @@ abstract class Node {
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
   /** Get n messages starting from some point */
-  // TODO: Check that TID (expanding Long) is a valid int
-  def getMessagesInRange(start: TID, n: Int): List[FeedContent] = {
-    _feed = redis.withClient(_.zrange[FeedContent](NodeKey.feed, start.toInt, n))
+  def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
+    _feed = redis.withClient(_.zrangebyscore[FeedContent](
+      NodeKey.feed,
+      min = datetime.toEpochSecond,
+      max = Temporal.current.toEpochSecond,
+      limit = Some((0, count))
+    ))
     valueOrException(_feed)
   }
 
