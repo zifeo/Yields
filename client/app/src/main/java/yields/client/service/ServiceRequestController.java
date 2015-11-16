@@ -2,6 +2,8 @@ package yields.client.service;
 
 import android.util.Log;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 
 import yields.client.cache.CacheDatabaseHelper;
@@ -10,6 +12,8 @@ import yields.client.exceptions.ServiceRequestException;
 import yields.client.messages.Message;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
+import yields.client.serverconnection.ConnectionSubscriber;
+import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.servicerequest.GroupHistoryRequest;
@@ -31,13 +35,24 @@ public class ServiceRequestController {
         mService = service;
 
         try {
-            ConnectionManager connectionManager = new ConnectionManager(
+            final ConnectionManager connectionManager = new ConnectionManager(
                     new YieldEmulatorSocketProvider());
             mCommunicationChannel = connectionManager.getCommunicationChannel();
+
+            new Thread(new ServerListener() {
+                public void run() {
+                    connectionManager.subscribeToConnection(this);
+                }
+            }).start();
+
         } catch (IOException e) {
-            mService.receiveError("problem connecting to server : " + e.getMessage());
+            handleConnectionError(e);
         }
 
+    }
+
+    public void handleConnectionError(IOException e){
+        mService.receiveError("problem connecting to server : " + e.getMessage());
     }
 
     public void handleServiceRequest(ServiceRequest serviceRequest) {
@@ -89,6 +104,16 @@ public class ServiceRequestController {
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceRequest type !");
+        }
+    }
+
+    public void handleServerRespponse(Response serverResponse) {
+        switch (serverResponse.getKind()) {
+            case GROUPHISTORYRES:
+                break;
+            default:
+                throw new ServiceRequestException("No such ServiceResponse type !");
+                //TODO: In need of another exception ?
         }
     }
 
@@ -186,4 +211,23 @@ public class ServiceRequestController {
         //BUT I'D APPRECIATE NOT HAVING TO CHANGE MY IMPLEMENTATION EVRY OTHER WEEK
         //K THX BYE
     }
+
+    private abstract class ServerListener implements Runnable, ConnectionSubscriber {
+
+        @Override
+        public void updateOn(Response response) {
+            handleServerRespponse(response);
+        }
+
+        @Override
+        public void updateOnConnectionProblem(IOException exception) {
+            handleConnectionError(exception);
+        }
+
+        @Override
+        public void updateOnParsingProblem(JSONException exception) {
+            mService.receiveError("Received wrong input from server (should I be sharing this ?)");
+        }
+    }
+
 }
