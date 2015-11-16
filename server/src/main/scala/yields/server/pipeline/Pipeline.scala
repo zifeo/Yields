@@ -5,10 +5,10 @@ import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import yields.server.mpi.{Metadata, Request, Response}
 import yields.server.pipeline.modules.{LoggerModule, SerializationModule}
-import yields.server.utils.{Temporal, Config}
+import yields.server.utils.{Config, Temporal}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
  * Pipeline creator object.

@@ -1,7 +1,7 @@
 package yields.server.io.models
 
-import spray.json._
 import spray.json.DefaultJsonProtocol._
+import spray.json._
 import yields.server.dbi.models.User
 
 /** Json format for [[yields.server.dbi.models.User]]. */

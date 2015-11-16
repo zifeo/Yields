@@ -2,24 +2,26 @@ package yields.server.actions.groups
 
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Group, Blob, NID}
+import yields.server.dbi.models.{Blob, Group, NID}
 import yields.server.mpi.Metadata
 
 /**
- * Update a group given given specific fields.
- * @param nid group id
- * @param name new name
- * @param pic new profile image
- *
- * TODO: Update picture
- */
+  * Update a group given given specific fields.
+  * @param nid group id
+  * @param name new name
+  * @param pic new profile image
+  *
+  *            TODO: Update picture
+  */
 case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extends Action {
 
+  lazy val errorMessage = getClass.getSimpleName
+
   /**
-   * Run the action given the sender.
-   * @param metadata action requester
-   * @return action result
-   */
+    * Run the action given the sender.
+    * @param metadata action requester
+    * @return action result
+    */
   override def run(metadata: Metadata): Result = {
     if (nid > 0) {
       val group = Group(nid)
@@ -31,7 +33,7 @@ case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extend
 
       GroupUpdateRes()
     } else {
-      throw new ActionArgumentException("Bad nid")
+      throw new ActionArgumentException(s"Bad nid in : $errorMessage")
     }
   }
 

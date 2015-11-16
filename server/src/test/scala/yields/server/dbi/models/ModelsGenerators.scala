@@ -2,8 +2,8 @@ package yields.server.dbi.models
 
 import java.time.OffsetDateTime
 
-import yields.server._
 import org.scalacheck.Arbitrary
+import yields.server._
 
 trait ModelsGenerators extends DefaultsGenerators {
 

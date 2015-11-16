@@ -9,26 +9,26 @@ import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
 /**
- * Provides json format for read/write specification.
- */
+  * Provides json format for read/write specification.
+  */
 package object io {
 
   implicit lazy val offsetDateTimeJF = OffsetDateTimeJsonFormat
 
-  /***** Models *****/
+  /** *** Models *****/
 
   implicit lazy val nodeJF = NodeJsonFormat
   implicit lazy val groupJF = GroupJsonFormat
   implicit lazy val userJF = UserJsonFormat
 
-  /***** Actions  *****/
+  /** *** Actions  *****/
 
   implicit lazy val actionJF = ActionJsonFormat
   implicit lazy val resultJF = ResultJsonFormat
 
   // Groups
 
-  implicit lazy val groupCreateJF = jsonFormat2(GroupCreate)
+  implicit lazy val groupCreateJF = jsonFormat3(GroupCreate)
   implicit lazy val groupCreateResJF = jsonFormat1(GroupCreateRes)
 
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
@@ -39,6 +39,9 @@ package object io {
 
   implicit lazy val groupHistoryJF = jsonFormat3(GroupHistory)
   implicit lazy val groupHistoryResJF = jsonFormat1(GroupHistoryRes)
+
+  implicit lazy val groupSearchJF = jsonFormat1(GroupSearch)
+  implicit lazy val groupSearchResJF = jsonFormat1(GroupSearchRes)
 
   // Users
 
@@ -51,7 +54,13 @@ package object io {
   implicit lazy val userUpdateJF = jsonFormat4(UserUpdate)
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
 
-  /***** Message passing interface *****/
+  implicit lazy val userCreateJF = jsonFormat2(UserCreate)
+  implicit lazy val userCreateResJF = jsonFormat1(UserCreateRes)
+
+  implicit lazy val userInfoJF = jsonFormat1(UserInfo)
+  implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
+
+  /** *** Message passing interface *****/
 
   implicit lazy val requestJF = RequestJsonFormat
   implicit lazy val responseJF = ResponseJsonFormat

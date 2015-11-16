@@ -2,31 +2,32 @@ package yields.server.dbi.models
 
 import java.time.OffsetDateTime
 
-import com.redis.serialization.Parse.Implicits._
+import yields.server.actions.exceptions.{NewUserExistException, UnauthorizeActionException}
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
 
 /**
- * User model with linked database interface.
- *
- * Each attribute can be load separately on its own call to improve performance.
- * However work involving many of those, should manually call [[hydrate()]] to load all data.
- * Attributes new values are saved on respective setters.
- *
- * Database structure:
- * users:uid Long - last user id created
- * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at
- * users:[uid]:groups Zset[NID] with score datetime
- * users:[uid]:entourage Zset[UID] with score datetime
- * users:indexes:email Map[Email, UID] - email
- *
- * TODO : improve setters by only settings if the value is different.
- * TODO : what about a `save()` method? are there any use cases?
- * TODO : check for groups/users existance before adding/removing to groups/entourage
- *
- * @param uid user id
- */
+  * User model with linked database interface.
+  *
+  * Each attribute can be load separately on its own call to improve performance.
+  * However work involving many of those, should manually call [[hydrate()]] to load all data.
+  * Attributes new values are saved on respective setters.
+  *
+  * Database structure:
+  * users:uid Long - last user id created
+  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at
+  * users:[uid]:groups Zset[NID] with score datetime
+  * users:[uid]:entourage Zset[UID] with score datetime
+  * users:indexes:email Map[Email, UID] - email
+  *
+  * TODO : improve setters by only settings if the value is different.
+  * TODO : what about a `save()` method? are there any use cases?
+  * TODO : check for groups/users existance before adding/removing to groups/entourage
+  * TODO : check if uid exists before trying to get an user with apply
+  *
+  * @param uid user id
+  */
 final class User private(val uid: UID) {
 
   object Key {
@@ -122,10 +123,10 @@ final class User private(val uid: UID) {
     hasChangeOneEntry(redis.withClient(_.zrem(Key.entourage, uid)))
 
   /**
-   * Loads the entire model for intensive usage (except entourage and groups).
-   * Makes the hypothesis that the values are valid, if this is not the case, a second attempt to get them will be done
-   * on the concerned getter call and issue either the default value or a corresponding exception.
-   */
+    * Loads the entire model for intensive usage (except entourage and groups).
+    * Makes the hypothesis that the values are valid, if this is not the case, a second attempt to get them will be done
+    * on the concerned getter call and issue either the default value or a corresponding exception.
+    */
   def hydrate(): Unit = {
     val values = redis.withClient(_.hgetall[String, String](Key.user))
       .getOrElse(throw new IllegalValueException("node should have some data"))
@@ -154,32 +155,41 @@ object User {
   }
 
   /**
-   * Creates an user with an email and returns its new corresponding user.
-   * User id incrementation is done at each creation.
-   *
-   * @param email user email
-   * @return user
-   */
+    * Creates an user with an email and returns its new corresponding user.
+    * User id incrementation is done at each creation.
+    *
+    * @param email user email
+    * @return user
+    */
   def create(email: String): User = {
-    val uid = redis.withClient(_.incr(StaticKey.uid))
-      .getOrElse(throw new UnincrementableIdentifierException("new user identifier (uid) fails"))
-    val user = User(uid)
-    redis.withClient { r =>
-      import user.Key
-      val infos = List((Key.created_at, Temporal.current), (Key.email, email))
-      r.hmset(user.Key.user, infos)
-      r.hset(StaticKey.emailIndex, email, uid)
-    }
-    user
+    if (!redis.withClient(_.hexists(StaticKey.emailIndex, email))) {
+      val uid = redis.withClient(_.incr(StaticKey.uid))
+        .getOrElse(throw new UnincrementableIdentifierException("new user identifier (uid) fails"))
+      val user = User(uid)
+      redis.withClient { r =>
+        import user.Key
+        val infos = List((Key.created_at, Temporal.current), (Key.email, email))
+        r.hmset(user.Key.user, infos)
+        r.hset(StaticKey.emailIndex, email, uid)
+      }
+      user
+    } else throw new NewUserExistException("email already registered")
   }
 
   /** Prepares user model for retrieving data given an user id. */
-  def apply(uid: UID): User =
+  def apply(uid: UID): User = {
     new User(uid)
+  }
+
 
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): Option[User] = {
-    redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
+
+    import yields.server.actions._
+
+    if (checkValidEmail(email)) {
+      redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
+    } else throw new UnauthorizeActionException(s"invalid email in fromEmail method")
   }
 
 }

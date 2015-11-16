@@ -1,6 +1,6 @@
 package yields.server.utils
 
-import java.time.{ZoneId, OffsetDateTime}
+import java.time.{OffsetDateTime, ZoneId}
 import java.util.Date
 
 /** Regroups all temporal utilities. */

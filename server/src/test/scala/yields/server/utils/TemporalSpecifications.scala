@@ -7,8 +7,8 @@ import yields.server.DefaultsGenerators
 
 object TemporalSpecifications extends Properties("TemporalUtils") with DefaultsGenerators {
 
-  import Temporal._
   import Prop.forAll
+  import Temporal._
 
   property("OffsetDateTime") = forAll { (x: Date) =>
     offsetDateTime2Date(date2OffsetDateTime(x)) == x

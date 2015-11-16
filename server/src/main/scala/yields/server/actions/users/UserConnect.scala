@@ -1,8 +1,8 @@
 package yields.server.actions.users
 
 import yields.server.actions.exceptions.UnauthorizeActionException
-import yields.server.dbi.models.{User, UID, Email}
-import yields.server.actions.{Result, Action}
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.{Email, UID, User}
 import yields.server.mpi.Metadata
 
 /**
@@ -10,6 +10,8 @@ import yields.server.mpi.Metadata
  * @param email user mail
  */
 case class UserConnect(email: Email) extends Action {
+
+  lazy val errorMessage = getClass.getSimpleName
 
   /**
    * Run the action given the sender.
@@ -20,12 +22,15 @@ case class UserConnect(email: Email) extends Action {
 
     User.fromEmail(email) match {
       case Some(user) => UserConnectRes(user.uid)
-      case _ => throw new UnauthorizeActionException("Invalid email")
+      case _ => throw new UnauthorizeActionException(s"Invalid email in : $errorMessage")
     }
 
   }
 
 }
 
-/** [[UserConnect]] result. */
+/**
+  * [[UserConnect]] result.
+  * @param uid users uid
+  */
 case class UserConnectRes(uid: UID) extends Result
