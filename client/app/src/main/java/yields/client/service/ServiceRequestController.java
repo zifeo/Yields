@@ -1,10 +1,12 @@
 package yields.client.service;
 
-import android.util.Log;
-
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
@@ -107,13 +109,28 @@ public class ServiceRequestController {
         }
     }
 
-    public void handleServerRespponse(Response serverResponse) {
+    public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
             case GROUPHISTORYRES:
+                handleAddMessagesToGroup(serverResponse);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
                 //TODO: In need of another exception ?
+        }
+    }
+
+    private void handleAddMessagesToGroup(Response response) {
+        try {
+            JSONArray array = response.getMessage().getJSONArray("nodes");
+            ArrayList<Message> list = new ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                list.add(new Message(array.getJSONObject(i)));
+            }
+
+            //mService.receiveMessages();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -216,7 +233,7 @@ public class ServiceRequestController {
 
         @Override
         public void updateOn(Response response) {
-            handleServerRespponse(response);
+            handleServerResponse(response);
         }
 
         @Override

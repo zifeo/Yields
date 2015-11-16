@@ -32,7 +32,7 @@ public class RequestBuilder {
     public enum Fields {
         EMAIL("email"), TEXT("content"), NAME("name"),
         NODES("nodes"), KIND("kind"),
-        LAST("dateLast"), TO("to"), COUNT("count"),
+        LAST("datetime"), TO("to"), COUNT("count"),
         IMAGE("image"), NID("nid"), VISIBILITY("visibility"),
         CONTENT_TYPE("contentType");
 

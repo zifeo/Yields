@@ -64,33 +64,25 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
 
         BufferedReader receiver = null;
 
-        Log.d("DEBUG", "Before !");
         try {
            receiver = new BufferedReader(
                     new InputStreamReader(mSocket.getInputStream()));
-            Log.d("DEBUG", "GOOD2");
         } catch (IOException e) {
             subscriber.updateOnConnectionProblem(e);
-            Log.d("DEBUG", "BAD2");
         }
-
-        Log.d("DEBUG", "After !");
 
         if(receiver != null) {
             while (!mSocket.isInputShutdown()) {
                 try {
-                    Log.d("DEBUG", "waiting !");
                     String pushMessage = receiver.readLine();
-                    Log.d("DEBUG", "parsing !");
                     Response response = new Response(pushMessage);
-                    Log.d("DEBUG", "updating !");
                     subscriber.updateOn(response);
                 } catch (IOException e) {
                     subscriber.updateOnConnectionProblem(e);
-                    Log.d("DEBUG", "BAD");
+                    Log.d("DEBUG", e.getMessage());
                 } catch (JSONException e) {
                     subscriber.updateOnParsingProblem(e);
-                    Log.d("DEBUG", "BAD3");
+                    Log.d("DEBUG", e.getMessage());
                 }
             }
         }

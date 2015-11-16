@@ -120,6 +120,8 @@ public class MessageActivity extends AppCompatActivity
         mType = ContentType.GROUP_MESSAGES;
         mFragmentManager =  getFragmentManager();
         createGroupMessageFragment();
+
+        YieldsApplication.getBinder().addMoreGroupMessages(mGroup, new Date());
     }
 
     /**

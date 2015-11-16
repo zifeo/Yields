@@ -28,7 +28,7 @@ public class Response{
         public String getValue() { return name; }
         public static ResKind getEnumbyName(String name){
             for(ResKind e : ResKind.values()){
-                if(name == e.name) return e;
+                if(name.equals(e.name)) return e;
             }
             return null;
         }
