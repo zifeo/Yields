@@ -1,12 +1,14 @@
 package yields.client.activities;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -18,21 +20,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
-import java.util.concurrent.ExecutionException;
 
 import yields.client.R;
-import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.MessageViewException;
+import yields.client.exceptions.NodeException;
+import yields.client.fragments.CommentFragment;
+import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterMessages;
 import yields.client.messages.Content;
@@ -41,6 +44,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.service.MessageBinder;
 import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -48,21 +52,32 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends AppCompatActivity implements NotifiableActivity {
+public class MessageActivity extends AppCompatActivity
+        implements NotifiableActivity {
+    public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
+
     private static ClientUser mUser;
     private static Group mGroup;
-    private static ArrayList<Message> mMessages;
-    private static ListAdapterMessages mAdapter;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
-    private static ListView mMessageScrollLayout;
+    private static MessageBinder mMessageBinder;
     private static ActionBar mActionBar;
+    private ImageButton mSendButton;
+
+    private static ContentType mType;
+    private static Message mCommentMessage;
+    private static FragmentManager mFragmentManager;
+    private static Fragment mCurrentFragment;
+
+    private static ListAdapterMessages mGroupMessageAdapter;
+    private static ListAdapterMessages mCommentAdapter;
+
 
     /**
-     * Starts the activity by displaying the group info and showing the most recent
-     * messages.
+     * Starts the activity by displaying the group info and showing the most
+     * recent messages.
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -82,14 +97,15 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
-        mMessages = new ArrayList<>();
         mImage = null;
         mSendImage = false;
 
-        mAdapter = new ListAdapterMessages(YieldsApplication.getApplicationContext(), R.layout.messagelayout,
-                mMessages);
-        mMessageScrollLayout = (ListView) findViewById(R.id.messageScrollLayout);
-        mMessageScrollLayout.setAdapter(mAdapter);
+        mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
+                .getApplicationContext(), R.layout.messagelayout,
+                new ArrayList<Message>());
+        mCommentAdapter = new ListAdapterMessages((YieldsApplication
+                .getApplicationContext()), R.layout.messagelayout, new
+                ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
@@ -100,21 +116,35 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         } else {
             setHeaderBar();
         }
+        mSendButton = (ImageButton) findViewById(R.id.sendButton);
+        mSendButton.setEnabled(false);
 
+        // By default, we show the messages of the group.
+        mType = ContentType.GROUP_MESSAGES;
+        mFragmentManager =  getFragmentManager();
+        createGroupMessageFragment();
     }
 
+    /**
+     * Automatically called when the activity is resumed after another
+     * activity  was displayed
+     */
     @Override
     public void onResume(){
         super.onResume();
 
-        YieldsApplication.getBinder().attachActivity(this);
-        YieldsApplication.getBinder().addMoreGroupMessages(mGroup, new Date(), 20);
+        Intent serviceIntent = new Intent(this, YieldService.class)
+                .putExtra("bindMessageActivity", true);
+
+        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
     }
 
+    /**
+     * Called to pause the activity
+     */
     @Override
     public void onPause(){
         super.onPause();
-
         YieldsApplication.getBinder().unsetMessageActivity();
     }
 
@@ -132,7 +162,6 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-
         inflater.inflate(R.menu.menu_message, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -141,8 +170,7 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      * Listener called when the user sends a message to the group.
      */
     public void onSendMessage(View v){
-        String inputMessage =  mInputField.getText().toString();
-
+        String inputMessage =  mInputField.getText().toString().trim();
         mInputField.setText("");
         Content content;
         if (mSendImage && mImage != null){
@@ -153,14 +181,20 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(1230), mUser, content, new Date());
-        // TODO : take right name and right id.
-        mMessages.add(message);
-        YieldsApplication.getBinder().sendMessage(mGroup, message);
-
-        mAdapter.notifyDataSetChanged();
-        mMessageScrollLayout.setSelection(mMessageScrollLayout.getAdapter()
-                .getCount() - 1);
+        Message message = new Message("message", new Id(0), mUser, content,
+                new Date());
+        if (mType == ContentType.GROUP_MESSAGES){
+            mGroupMessageAdapter.add(message);
+            mGroupMessageAdapter.notifyDataSetChanged();
+            // TODO : uncomment this to allow communication with the app Service.
+            //mMessageBinder.sendMessage(mGroup, message);
+        }
+        else{
+            mCommentAdapter.add(message);
+            mCommentAdapter.notifyDataSetChanged();
+            // TODO : implement method to send comments in the message binder.
+            // mMessageBinder.sendComment(...);
+        }
     }
 
     /**
@@ -177,27 +211,31 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
      * @param newMessages The new message(s) received.
      */
     public void receiveNewMessage(List<Message> newMessages){
-        mMessages.addAll(newMessages);
-        mAdapter.notifyDataSetChanged();
+        mGroupMessageAdapter.addAll(newMessages);
+        mGroupMessageAdapter.notifyDataSetChanged();
     }
 
+
     /**
-     * Is called once the image picking is finished. It displays a toast informing the
-     * user that he added a message to his message.
+     * Is called once the image picking is finished. It displays a toast
+     * informing the user that he added a message to his message.
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK &&
+                data != null && data.getData() != null) {
 
             Uri uri = data.getData();
 
             try {
-                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(),
+                        uri);
                 if (mImage != null) {
                     String message = "Image added to message";
-                    YieldsApplication.showToast(getApplicationContext(), message);
+                    YieldsApplication.showToast(getApplicationContext(),message);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -225,28 +263,142 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
     }
 
     /**
+     * Notify the activity that the
+     * data set has changed.
+     */
+    @Override
+    public void notifyChange() {
+        retrieveGroupMessages();
+    }
+
+    /**
+     * Return the list view of the current fragment.
+     * @return  If the current fragment is a groupMessageFragment then the
+     * method returns the list view containing the messages (currently in
+     * local memory) of the group.
+     *           If the current fragment is a commentFragment then the method
+     *           returns the list view containing the comments for the
+     *           message the user had clicked on.
+     */
+    public ListView getCurrentFragmentListView(){
+        if (mType == ContentType.GROUP_MESSAGES) {
+            Log.d("MessageActivity", "GROUP_MESSAGE ListView");
+            return ((GroupMessageFragment) mCurrentFragment)
+                    .getMessageListView();
+        }
+        else{
+            Log.d("MessageActivity", "MESSAGE_COMMENT ListView");
+            return ((CommentFragment) mCurrentFragment)
+                    .getCommentListView();
+        }
+    }
+
+    /**
+     * Getter for the fragment currently displayed.
+     * @return The current fragment.
+     */
+    public Fragment getCurrentFragment(){
+        return mCurrentFragment;
+    }
+
+    /**
+     * Getter for the type of fragment.
+     * @return The type of the fragment currently displayed.
+     */
+    public ContentType getType(){
+        return mType;
+    }
+
+    /**
+     * Creates a comment fragment and put it in the fragment container of the
+     * MessageActivity (id fragmentPlaceHolder).
+     */
+    private void createCommentFragment(){
+        mInputField.setText("");
+        FragmentTransaction fragmentTransaction = mFragmentManager.
+                beginTransaction();
+        assert (mType == ContentType.MESSAGE_COMMENTS);
+        mActionBar.setTitle("Message from " + mCommentMessage.getSender()
+                .getName());
+        mCurrentFragment = new CommentFragment();
+        mCommentAdapter.clear();
+        // TODO : Retrieve comments from the server using the message binder.
+        ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
+        ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
+        Log.d("MessageActivity", "Fragment created");
+        fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
+        fragmentTransaction.commit();
+    }
+
+    /**
+     * Creates a group message fragment and put it in the fragment container of
+     * the MessageActivity (id fragmentPlaceHolder).
+     */
+    private void createGroupMessageFragment(){
+        mInputField.setText("");
+        FragmentTransaction fragmentTransaction = mFragmentManager.
+                beginTransaction();
+        assert (mType == ContentType.GROUP_MESSAGES);
+        mActionBar.setTitle(mGroup.getName());
+        mCurrentFragment = new GroupMessageFragment();
+        ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
+        ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
+                (new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent,
+                                            View view, int position, long id) {
+                        mCommentMessage = mGroupMessageAdapter.
+                                getItem(position);
+                        mType = ContentType.MESSAGE_COMMENTS;
+                        createCommentFragment();
+                    }
+                });
+        Log.d("MessageActivity", "Fragment created");
+        fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
+        fragmentTransaction.commit();
+    }
+
+    /**
+     * Listener for the back button.
+     * When the back button is pressed we need to know if we are going from a
+     * comment fragment to a group message fragment or if we  are quitting
+     * the activity.
+     */
+    @Override
+    public void onBackPressed() {
+        if (mType == ContentType.GROUP_MESSAGES){
+            Log.d("MessageActivity", "Quit activity");
+            super.onBackPressed();
+        }
+        else{
+            Log.d("MessageActivity", "Back to group message fragment");
+            mType = ContentType.GROUP_MESSAGES;
+            createGroupMessageFragment();
+        }
+    }
+
+    /**
      * Retrieve message from the server and puts them in the mMessages attribute.
      */
     private void retrieveGroupMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
-            mMessages.add(message);
+            mGroupMessageAdapter.add(message);
         }
-        mAdapter.notifyDataSetChanged();
-        ListView lv = (ListView) findViewById(R.id.messageScrollLayout);
-        lv.setSelection(lv.getAdapter().getCount() - 1);
+        mGroupMessageAdapter.notifyDataSetChanged();
     }
 
     /**
-     * Starts the activity which allows the user to pick which image from his gallery
-     * he wants to send.
+     * Starts the activity which allows the user to pick which image from his
+     * gallery he wants to send.
      */
     private void pickImageFromGallery(){
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),
+                PICK_IMAGE_REQUEST);
     }
 
     /**
@@ -256,12 +408,21 @@ public class MessageActivity extends AppCompatActivity implements NotifiableActi
         mActionBar.setTitle(mGroup.getName());
     }
 
-    /**
-     * Notify the activity that the
-     * data set has changed.
-     */
-    @Override
-    public void notifyChange() {
-        retrieveGroupMessages();
-    }
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // TODO : use message Binder
+            /*mMessageBinder = (MessageBinder) service;
+            mMessageBinder.attachActivity(MessageActivity.this);*/
+            mSendButton.setEnabled(true);
+            /*mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date()
+                    , 20);*/
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMessageBinder = null;
+            mSendButton.setEnabled(false);
+        }
+    };
 }

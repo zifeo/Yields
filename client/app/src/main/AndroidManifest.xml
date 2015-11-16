@@ -63,6 +63,7 @@
             android:name=".activities.GroupSettingsActivity"
             android:parentActivityName=".activities.MessageActivity"
             android:theme="@style/AppTheme.NoActionBar" >
+
         </activity>
         <activity
             android:name=".activities.SearchGroupActivity"
@@ -80,6 +81,7 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
     </application>
 
 </manifest>
