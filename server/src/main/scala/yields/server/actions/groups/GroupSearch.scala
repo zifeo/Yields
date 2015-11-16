@@ -9,6 +9,8 @@ import yields.server.dbi._
 /**
   * Action searching for nodes matching the pattern
   * @param pattern pattern to satisfy
+  *
+  *                TODO implementation
   */
 case class GroupSearch(pattern: String) extends Action {
   /**
