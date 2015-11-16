@@ -1,6 +1,7 @@
 package yields.client.servicerequest;
 
 import android.app.Service;
+import android.graphics.Bitmap;
 
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -11,24 +12,24 @@ import yields.client.serverconnection.ServerRequest;
 /**
  * ServerRequest asking the Service to rename a Group.
  */
-public class GroupUpdateNameRequest extends ServiceRequest {
+public class GroupUpdateImageRequest extends ServiceRequest {
 
     private final User mSender;
     private final Group mGroup;
-    private final String mName;
+    private final Bitmap mImage;
 
     /**
-     * Main constructor for this type of ServiceRequest (renaming a Group).
+     * Main constructor for this type of ServiceRequest (updating a Group's image).
      *
      * @param sender The User that created this request.
-     * @param group  The Group that should be renamed.
-     * @param name   The new name of the Group.
+     * @param group  The Group that should have it's image updated.
+     * @param image  The new image for Group.
      */
-    public GroupUpdateNameRequest(User sender, Group group, String name) {
+    public GroupUpdateImageRequest(User sender, Group group, Bitmap image) {
         super();
         mSender = sender;
         mGroup = group;
-        mName = name;
+        mImage = image.copy(image.getConfig(), true);
     }
 
     /**
@@ -38,7 +39,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPUPDATENAME;
+        return RequestKind.GROUPUPDATEIMAGE;
     }
 
     /**
@@ -48,7 +49,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroup.getId(), mName);
+        return RequestBuilder.groupUpdateImageRequest(mSender.getId(), mGroup.getId(), mImage);
     }
 
     @Override

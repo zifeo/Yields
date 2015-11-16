@@ -9,26 +9,26 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServerRequest asking the Service to rename a Group.
+ * ServerRequest asking the Service to update a Group's visibility.
  */
-public class GroupUpdateNameRequest extends ServiceRequest {
+public class GroupUpdateVisibilityRequest extends ServiceRequest {
 
     private final User mSender;
     private final Group mGroup;
-    private final String mName;
+    private final Group.GroupVisibility mVisibility;
 
     /**
-     * Main constructor for this type of ServiceRequest (renaming a Group).
+     * Main constructor for this type of ServiceRequest (updating a Group's visibility).
      *
-     * @param sender The User that created this request.
-     * @param group  The Group that should be renamed.
-     * @param name   The new name of the Group.
+     * @param sender     The User that created this request.
+     * @param group      The Group that should have it's visibility changed.
+     * @param visibility The new visibility of the Group
      */
-    public GroupUpdateNameRequest(User sender, Group group, String name) {
+    public GroupUpdateVisibilityRequest(User sender, Group group, Group.GroupVisibility visibility) {
         super();
         mSender = sender;
         mGroup = group;
-        mName = name;
+        mVisibility = visibility;
     }
 
     /**
@@ -38,7 +38,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPUPDATENAME;
+        return RequestKind.GROUPUPDATEVISIBILITY;
     }
 
     /**
@@ -48,7 +48,8 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroup.getId(), mName);
+        return RequestBuilder.groupUpdateVisibilityRequest(mSender.getId(), mGroup.getId(),
+                mVisibility);
     }
 
     @Override
