@@ -22,8 +22,6 @@ import yields.client.cache.CacheDatabaseHelper;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.Group;
-import yields.client.serverconnection.ServerRequest;
-import yields.client.serverconnection.RequestBuilder;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -33,6 +31,7 @@ public class YieldService extends Service {
     private Group mCurrentGroup;
     private int mIdLastNotification;
     private ServiceRequestController mServiceRequestController;
+    private ConnectControllerTask mConnectControllerTask;
 
     /**
      * Connects the service to the server when it is created and
@@ -43,7 +42,8 @@ public class YieldService extends Service {
         mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
         Log.d("DEBUG", "create Yield Service");
-        mServiceRequestController = new ServiceRequestController(new CacheDatabaseHelper(), this);
+        mConnectControllerTask = new ConnectControllerTask();
+        mConnectControllerTask.execute();
     }
 
     /**
@@ -169,7 +169,7 @@ public class YieldService extends Service {
      * @param errorMsg The content of the error
      */
     public void receiveError(String errorMsg) {
-        YieldsApplication.showToast(this, errorMsg);
+        //YieldsApplication.showToast(this, errorMsg);
     }
 
     // TODO : receive a response from server (an error message)
@@ -212,13 +212,43 @@ public class YieldService extends Service {
     }
 
 
+
+
     /**
      * AsncTask sending th requests.
      */
     private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override
         protected Void doInBackground(ServiceRequest... params) {
+            synchronized (this) {
+                while (mServiceRequestController == null) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
             mServiceRequestController.handleServiceRequest(params[0]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Connect to server (Maybe)
+     */
+    private class ConnectControllerTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            synchronized (this) {
+                mServiceRequestController = new ServiceRequestController(new CacheDatabaseHelper(),
+                        YieldService.this);
+            }
+
             return null;
         }
     }

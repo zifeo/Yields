@@ -11,5 +11,5 @@ public interface CommunicationChannel {
      * @return the response of the server
      * @throws IOException if there was an error with the retrieval of the message
      */
-    void sendRequest(Request request) throws IOException;
+    void sendRequest(ServerRequest request) throws IOException;
 }

@@ -36,7 +36,7 @@ public class ServerChannel implements CommunicationChannel {
      * @throws IOException If we have trouble sending the serverRequest
      */
     @Override
-    public void sendRequest(Request request)
+    public void sendRequest(ServerRequest serverRequest)
             throws IOException {
 
         Objects.requireNonNull(serverRequest);
