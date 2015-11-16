@@ -19,6 +19,7 @@ import yields.client.R;
 import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
+import yields.client.cache.CacheDatabaseHelper;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.Group;
@@ -30,8 +31,8 @@ public class YieldService extends Service {
     private Binder mBinder;
     private NotifiableActivity mCurrentNotifiableActivity;
     private Group mCurrentGroup;
-    private List<Group> mWaitingUpdateGroup;
     private int mIdLastNotification;
+    private ServiceRequestController serviceRequestController;
 
     /**
      * Connects the service to the server when it is created and
@@ -42,7 +43,7 @@ public class YieldService extends Service {
         mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
         Log.d("DEBUG", "create Yield Service");
-        //TODO connect to server
+        serviceRequestController = new ServiceRequestController(new CacheDatabaseHelper());
     }
 
     /**
