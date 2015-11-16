@@ -83,7 +83,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
             + KEY_MESSAGE_GROUPID + " TEXT," + KEY_MESSAGE_SENDERID + " TEXT,"
             + KEY_MESSAGE_TYPE + " TEXT," + KEY_MESSAGE_CONTENT
-            + " BLOB," + KEY_MESSAGE_DATE + " DATETIME" + ")";
+            + " BLOB," + KEY_MESSAGE_DATE + " TEXT" + ")";
 
     private final SQLiteDatabase mDatabase;
 
@@ -599,29 +599,28 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * boundaries.
      *
      * @param group         The Group from which we want to retrieve the Messages.
-     * @param lowerBoundary The lower boundary (must be at least 1).
-     * @param upperBoundary The upper boundary.
+     * @param furthestDate The lower boundary (must be at least 1).
+     * @param messageCount The upper boundary.
      * @return The list of Messages from the interval for the Group.
      * @throws CacheDatabaseException If the database was unable to fetch some
      *                                information.
      */
-    public List<Message> getMessageIntervalForGroup(Group group,
-                                                    int lowerBoundary,
-                                                    int upperBoundary)
+    public List<Message> getMessagesForGroup(Group group,
+                                             Date furthestDate,
+                                             int messageCount)
             throws CacheDatabaseException
     {
         Objects.requireNonNull(group);
+        Objects.requireNonNull(furthestDate);
 
-        if (lowerBoundary < 0 || lowerBoundary > upperBoundary) {
-            throw new IllegalArgumentException("Illegal boundaries ! The upper boundary must be "
-                    + "greater than the lower boundary which can not be negative");
+        if (messageCount < 0) {
+            throw new IllegalArgumentException("Illegal messageCount ! The number of messages must" +
+                    "be equal or grater than 0 !");
         }
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUPID + " = ? " + " ORDER BY "
-                + "datetime(" + KEY_MESSAGE_DATE + ")" + " ASC LIMIT "
-                + (upperBoundary - lowerBoundary)
-                + " OFFSET " + lowerBoundary;
+                + "strftime('%Y-%m-%d %H:%M:%f', " + KEY_MESSAGE_DATE + ") DESC";
 
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{group.getId().getId()});
@@ -629,8 +628,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         List<Message> messages = new ArrayList<>();
         if (!cursor.moveToFirst()) {
             cursor.close();
-            return messages;
+            return new ArrayList<>();
+        } else if(!goToFirstOccurrenceOfEarlierDate(cursor, furthestDate)) {
+            cursor.close();
+            return new ArrayList<>();
         } else {
+            int counter = 0;
             do {
                 Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODEID)));
                 String nodeName = ""; //TODO: Define message's Node name attribute
@@ -654,7 +657,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                             cursor.getColumnIndex(KEY_MESSAGE_TYPE));
                     Content content = deserializeContent(contentAsBytes, contentType);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                     Date date = dateFormat.parse(dateAsString);
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
@@ -665,10 +668,46 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     throw new CacheDatabaseException("Unable to retrieve Messages from Group "
                             + group.getId().getId());
                 }
-            } while (cursor.moveToNext());
+                counter++;
+            } while (cursor.moveToNext() && counter < 10);
             cursor.close();
             return messages;
         }
+    }
+
+    /**
+     * Moves the Cursor passed as an argument to the first occurrence of a row where the DATE field
+     * contains a Date that is older than the Date passed as an argument.
+     * It returns true if the row exists and false otherwise.
+     *
+     * @param cursor The cursor than is moved until it reaches an accepting row.
+     * @param furthestDate  The Date that serves as a limit to this search.
+     * @return True if there exists such a row, false otherwise.
+     * @throws CacheDatabaseException If one row that the cursor passed couldn't be read.
+     */
+    private boolean goToFirstOccurrenceOfEarlierDate(Cursor cursor, Date furthestDate)
+            throws CacheDatabaseException
+    {
+        boolean done = false;
+        boolean retValue = false;
+        while(!done) {
+            try {
+                String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                Date date = dateFormat.parse(dateAsString);
+                if(date.compareTo(furthestDate) <= 0){
+                    done = true;
+                    retValue =  true;
+                }
+                else if(!cursor.moveToNext()) {
+                    done = true;
+                    retValue = false;
+                }
+            } catch (ParseException e) {
+                throw new CacheDatabaseException("Unable to retrieve Message !");
+            }
+        }
+        return retValue;
     }
 
     /**
@@ -683,7 +722,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deletes the Database file in the file system.
      */
-    public static void deleteDatbase() {
+    public static void deleteDatabase() {
         YieldsApplication.getApplicationContext().deleteDatabase(DATABASE_NAME);
     }
 
@@ -893,7 +932,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
         values.put(KEY_MESSAGE_TYPE, message.getContent().getType().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
         return values;
     }

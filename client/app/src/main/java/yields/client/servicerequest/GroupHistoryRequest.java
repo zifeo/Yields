@@ -5,6 +5,7 @@ import android.app.Service;
 import java.util.Date;
 
 import yields.client.id.Id;
+import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
@@ -17,19 +18,19 @@ public class GroupHistoryRequest extends ServiceRequest {
 
     public static final int MESSAGE_COUNT = 10;
 
-    private final Id mGroupId;
+    private final Group mGroup;
     private final Date mFurthestDate;
 
     /**
      * Main constructor for this type of ServiceRequest (retrieving Messages from a Group).
      *
-     * @param groupId      The Id of the Group from which the Messages should be retrieved.
+     * @param group        The Group from which the Messages should be retrieved.
      * @param furthestDate The furthest Date from which Messages will be retrieved.
      */
-    public GroupHistoryRequest(Id groupId, Date furthestDate) {
+    public GroupHistoryRequest(Group group, Date furthestDate) {
         super();
         mFurthestDate = new Date(furthestDate.getTime());
-        mGroupId = groupId;
+        mGroup = group;
     }
 
     /**
@@ -50,7 +51,7 @@ public class GroupHistoryRequest extends ServiceRequest {
     @Override
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.groupHistoryRequest(YieldsApplication.getUser().getId(),
-                getGroupId(), getDate(), MESSAGE_COUNT);
+                getGroup().getId(), getDate(), MESSAGE_COUNT);
     }
 
     @Override
@@ -68,11 +69,11 @@ public class GroupHistoryRequest extends ServiceRequest {
     }
 
     /**
-     * Getter method for the Id of the Group of this ServiceRequest.
+     * Getter method for the Group of this ServiceRequest.
      *
-     * @return The Id of the Group of this ServiceRequest.
+     * @return The Group of this ServiceRequest.
      */
-    public Id getGroupId() {
-        return mGroupId;
+    public Group getGroup() {
+        return mGroup;
     }
 }

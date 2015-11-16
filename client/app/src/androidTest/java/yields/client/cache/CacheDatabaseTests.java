@@ -45,7 +45,7 @@ public class CacheDatabaseTests {
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
         YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bobby", new Id(123),
                 "lol@gmail.com", YieldsApplication.getDefaultGroupImage()));
-        CacheDatabaseHelper.deleteDatbase();
+        CacheDatabaseHelper.deleteDatabase();
         mDatabaseHelper = new CacheDatabaseHelper();
         mDatabase = mDatabaseHelper.getWritableDatabase();
         mDatabaseHelper.clearDatabase();
@@ -449,10 +449,10 @@ public class CacheDatabaseTests {
     }
 
     /**
-     * Test for getMessageIntervalForGroup(Group group, int lowerBoundary, int upperBoundary)
+     * Test for getMessagesForGroup(Group group, int lowerBoundary, int upperBoundary)
      */
     @Test
-    public void testDatabaseGetMessageIntervalForGroup() {
+    public void testDatabaseGetMessagesForGroup() {
         try {
             User user1 = MockFactory.generateFakeUser("User 1", new Id(1), "u@j.ch");
             User user2 = MockFactory.generateFakeUser("User 2", new Id(2), "u@j.fr");
@@ -467,22 +467,27 @@ public class CacheDatabaseTests {
                 Message message = new Message("Mock node name User1 " + i, new Id(-i),
                         user1, MockFactory.generateFakeTextContent(i), new Date());
                 mDatabaseHelper.addMessage(message, group.getId());
+                Thread.sleep(15);
             }
             for (int i = 0; i < 30; i++) {
                 Message message = new Message("Mock node name User2 " + i, new Id(-i - 30),
-                        user2, MockFactory.generateFakeTextContent(i), new Date());
+                        user2, MockFactory.generateFakeTextContent(i + 30), new Date());
                 mDatabaseHelper.addMessage(message, group.getId());
+                Thread.sleep(15);
             }
 
-            List<Message> messagesFromDatabase = mDatabaseHelper.getMessageIntervalForGroup(group, 0, 10);
+            List<Message> messagesFromDatabase = mDatabaseHelper.getMessagesForGroup(group,
+                    new Date(), 10);
             assertEquals(10, messagesFromDatabase.size());
             for (int i = 0; i < 10; i++) {
                 Message message = messagesFromDatabase.get(i);
-                assertEquals("1", message.getSender().getId().getId());
-                assertEquals("Mock message #" + i, ((TextContent) message.getContent()).getText());
+                assertEquals("2", message.getSender().getId().getId());
+                assertEquals("Mock message #" + (59-i), ((TextContent) message.getContent()).getText());
             }
         } catch (CacheDatabaseException exception) {
             fail(exception.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             mDatabaseHelper.clearDatabase();
         }
