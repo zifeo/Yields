@@ -3,10 +3,10 @@ package yields.server.actions.groups
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.dbi.models.{Node, Group, UID, User}
+import yields.server.dbi._
+import yields.server.dbi.models.{Group, Node, UID, User}
 import yields.server.mpi.Metadata
 import yields.server.utils.{Config, Temporal}
-import yields.server.dbi._
 
 
 /**
@@ -18,14 +18,14 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
 
   /** Switch on test database */
   before {
-    redis.withClient(_.select(Config.getInt("test.database.id")))
-    redis.withClient(_.flushdb)
+    redis(_.select(Config.getInt("test.database.id")))
+    redis(_.flushdb)
   }
 
   /** Switch back on main database */
   after {
-    redis.withClient(_.flushdb)
-    redis.withClient(_.select(Config.getInt("database.id")))
+    redis(_.flushdb)
+    redis(_.select(Config.getInt("database.id")))
   }
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)

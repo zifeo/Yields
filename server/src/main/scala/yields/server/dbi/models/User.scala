@@ -1,12 +1,10 @@
 package yields.server.dbi.models
 
 import java.time.OffsetDateTime
-import java.util.regex.{Matcher, Pattern}
 
-import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.{UnauthorizeActionException, NewUserExistException}
+import yields.server.actions.exceptions.{NewUserExistException, UnauthorizeActionException}
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{KeyNotSetException, IllegalValueException, UnincrementableIdentifierException}
+import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
 
 /**

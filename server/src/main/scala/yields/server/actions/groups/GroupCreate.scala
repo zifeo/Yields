@@ -12,6 +12,8 @@ import yields.server.mpi.Metadata
   */
 case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID]) extends Action {
 
+  lazy val errorMessage = getClass.getSimpleName
+
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -20,11 +22,11 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID]) extends A
   override def run(metadata: Metadata): Result = {
     if (!name.isEmpty) {
       val group = Group.createGroup(name)
-      nodes.foreach(group.addNode)
-      users.foreach(group.addUser)
+      group.addMultipleNodes(nodes)
+      group.addMultipleUser(users)
       GroupCreateRes(group.nid)
     } else {
-      throw new ActionArgumentException(s"Empty name : ${this.getClass.getSimpleName}")
+      throw new ActionArgumentException(s"Empty name : $errorMessage")
     }
   }
 

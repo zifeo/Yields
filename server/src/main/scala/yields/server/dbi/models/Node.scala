@@ -2,25 +2,23 @@ package yields.server.dbi.models
 
 import java.time.OffsetDateTime
 
-import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
-import yields.server.dbi.models._
 
 /**
- * Model of a node with link to the database
- *
- * Node is abstract superclass of every possible kind of nodes like Group, Image etc
- *
- * Database structure :
- * nodes:nid Long - last node id created
- * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
- * nodes:[nid]:users Zset[UID] with score datetime
- * nodes:[nid]:nodes Zset[NID] with score datetime
- * nodes:[nid]:tid Long - last time id created
- * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
- */
+  * Model of a node with link to the database
+  *
+  * Node is abstract superclass of every possible kind of nodes like Group, Image etc
+  *
+  * Database structure :
+  * nodes:nid Long - last node id created
+  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
+  * nodes:[nid]:users Zset[UID] with score datetime
+  * nodes:[nid]:nodes Zset[NID] with score datetime
+  * nodes:[nid]:tid Long - last time id created
+  * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
+  */
 abstract class Node {
 
   object NodeKey {
@@ -122,6 +120,14 @@ abstract class Node {
       .getOrElse(throw new UnincrementableIdentifierException(s"time identifier (tid) from node $nid fails")))
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
   }
+
+  /** Add multiple users to the group */
+  def addMultipleUser(users: Seq[UID]): Unit =
+    users.foreach(addUser)
+
+  /** Add multiple nodes to the group */
+  def addMultipleNodes(nodes: Seq[NID]): Unit =
+    nodes.foreach(addNode)
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {

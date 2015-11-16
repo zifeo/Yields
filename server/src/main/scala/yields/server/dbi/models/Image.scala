@@ -1,8 +1,7 @@
 package yields.server.dbi.models
 
-import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{UnincrementableIdentifierException, IllegalValueException}
+import yields.server.dbi.exceptions.IllegalValueException
 
 /**
  * Represent a image ressource

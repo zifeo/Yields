@@ -1,12 +1,9 @@
 package yields.server.actions.users
 
-import java.util.regex.{Matcher, Pattern}
-
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{User, UID}
+import yields.server.actions.{Action, Result, _}
+import yields.server.dbi.models.{UID, User}
 import yields.server.mpi.Metadata
-import yields.server.actions._
 
 
 /**
@@ -15,6 +12,8 @@ import yields.server.actions._
   * @param name new user's name
   */
 case class UserCreate(email: String, name: String) extends Action {
+
+  lazy val errorMessage = getClass.getSimpleName
 
   /**
     * Run the action given the sender.
@@ -28,8 +27,8 @@ case class UserCreate(email: String, name: String) extends Action {
         u.name = name
 
         UserCreateRes(u.uid)
-      } else throw new ActionArgumentException(s"invalid email in : ${this.getClass.getSimpleName}")
-    } else throw new ActionArgumentException(s"empty email and/or name in : ${this.getClass.getSimpleName}")
+      } else throw new ActionArgumentException(s"invalid email in : $errorMessage")
+    } else throw new ActionArgumentException(s"empty email and/or name in : $errorMessage")
   }
 
 }

@@ -1,14 +1,11 @@
 package yields.server.actions.groups
 
-import org.scalacheck.Prop._
-import org.scalacheck.{Arbitrary, Gen, Properties}
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import yields.server.dbi._
-import yields.server.dbi.models.ModelsGenerators
-import yields.server.dbi.models._
+import yields.server.dbi.models.{ModelsGenerators, _}
 import yields.server.mpi.Metadata
 import yields.server.utils.{Config, Temporal}
-import Arbitrary.arbitrary
 
 /**
   * Test class for group history action
@@ -19,14 +16,14 @@ class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with
 
   /** Switch on test database */
   before {
-    redis.withClient(_.select(Config.getInt("test.database.id")))
-    redis.withClient(_.flushdb)
+    redis(_.select(Config.getInt("test.database.id")))
+    redis(_.flushdb)
   }
 
   /** Switch back on main database */
   after {
-    redis.withClient(_.flushdb)
-    redis.withClient(_.select(Config.getInt("database.id")))
+    redis(_.flushdb)
+    redis(_.select(Config.getInt("database.id")))
   }
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
@@ -43,11 +40,11 @@ class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with
     val group = Group.createGroup("name")
     add10Msgs(group.nid)
     val n = 5
-    val action = new GroupHistory(group.nid, 0, n)
+    val action = new GroupHistory(group.nid, 1, n)
     val res = action.run(m)
     res match {
       case GroupHistoryRes(x) =>
-        x.length should be(n+1)
+        x.length should be(n)
     }
   }
 
