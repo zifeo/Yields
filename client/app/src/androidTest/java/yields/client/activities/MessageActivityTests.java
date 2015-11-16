@@ -73,7 +73,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         YieldsApplication.setGroup(MOCK_GROUP);
 
-        ClientUser MOCK_CLIENT_USER =  MockFactory.generateFakeClientUser("Mock client user",
+        ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
                 new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
         YieldsApplication.setUser(MOCK_CLIENT_USER);
         assertTrue(YieldsApplication.getUser().getImg() != null);
@@ -83,7 +83,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      * Test if the starting display for that activity is correct. Given a 4 text messages
      */
     @Test
-    public void testStartingDisplay(){
+    public void testStartingDisplay() {
         MessageActivity messageActivity = getActivity();
 
         //Group info
@@ -97,10 +97,10 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         //Messages
         ListView listView = messageActivity.getCurrentFragmentListView();
 
-        for(int i = 0; i < listView.getAdapter().getCount(); i ++){
+        for (int i = 0; i < listView.getAdapter().getCount(); i++) {
             String userName = "Mock user " + i;
             String email = "Mock email " + i;
-            String nodeName =  "Mock node name " + i;
+            String nodeName = "Mock node name " + i;
             Id id = new Id(-i);
             String textContent = "Mock message #" + i;
 
@@ -116,7 +116,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
             //Content Info
             assertEquals("text", messageView.getMessage().getContent().getType());
-            assertEquals(textContent,((TextContent)messageView.getMessage().getContent()).getText());
+            assertEquals(textContent, ((TextContent) messageView.getMessage().getContent()).getText());
         }
         messageActivity.finish();
     }
@@ -126,7 +126,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      * And if the input field is then empty.
      */
     @Test
-    public void testWrittenTextMessageIsCorrect(){
+    public void testWrittenTextMessageIsCorrect() {
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
@@ -146,7 +146,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
      * Tests if the inputField autoscrolls to the bottom for a long input
      */
     @Test
-    public void testIfInputFieldAutoscrolls(){
+    public void testIfInputFieldAutoscrolls() {
         Activity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" +
@@ -163,40 +163,37 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     }
 
     @Test
-    public void testInitialTypeIsGroupMessage(){
+    public void testInitialTypeIsGroupMessage() {
         MessageActivity messageActivity = getActivity();
         assertEquals(MessageActivity.ContentType.GROUP_MESSAGES,
                 messageActivity.getType());
     }
 
     @Test
-    public void testPressingOnMessageChangeType(){
+    public void testPressingOnMessageChangeType() {
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
-        ListView messageList = (ListView) fragment.getView().findViewById(R
-                .id.groupMessageFragmentList);
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
         messageList.getChildAt(0).setTag((Object) tag);
         View message = messageList.findViewWithTag((Object) tag);
         onView(withTagValue(is((Object) tag))).perform(click());
-        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS,
-                messageActivity.getType());
+        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS, messageActivity.getType());
     }
 
     @Test
-    public void testWrittenCommentIsCorrect(){
+    public void testWrittenCommentIsCorrect() {
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
 
         Fragment fragment = messageActivity.getCurrentFragment();
-        ListView messageList = (ListView) fragment.getView().findViewById(R
-                .id.groupMessageFragmentList);
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
         messageList.getChildAt(0).setTag((Object) tag);
         View message = messageList.findViewWithTag((Object) tag);
@@ -207,13 +204,11 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.sendButton)).perform(click());
 
         fragment = messageActivity.getCurrentFragment();
-        ListView listView = (ListView) fragment.getView().findViewById(R
-                .id.commentList);
+        ListView listView = (ListView) fragment.getView().findViewById(R.id.commentList);
         int i = listView.getChildCount();
         Log.d("MessageActivityTests", "i = " + i);
         MessageView messageView = (MessageView) listView.getChildAt(i - 1);
-        assertEquals("Mock comment message 1",
-                ((TextContent) messageView.getMessage().getContent()).getText());
+        assertEquals("Mock comment message 1", ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         assertTrue(inputMessageField.getText().length() == 0);
 
@@ -228,24 +223,21 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
-        ListView messageList = (ListView) fragment.getView().findViewById(R
-                .id.groupMessageFragmentList);
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
         messageList.getChildAt(0).setTag((Object) tag);
         View message = messageList.findViewWithTag((Object) tag);
         onView(withTagValue(is((Object) tag))).perform(click());
 
         fragment = messageActivity.getCurrentFragment();
-        LinearLayout messageContainer = (LinearLayout) fragment.getView()
-                .findViewById(R.id.messageContainer);
+        LinearLayout messageContainer = (LinearLayout) fragment.getView().findViewById(R.id.messageContainer);
 
         MessageView messageView = (MessageView) messageContainer.getChildAt(0);
-        assertEquals("Mock comment",
-                ((TextContent) messageView.getMessage().getContent()).getText());
+        assertEquals("Mock comment", ((TextContent) messageView.getMessage().getContent()).getText());
     }
 
     @Test
-    public void testInputFieldIsFlushedTheSameDuringFragChange(){
+    public void testInputFieldIsFlushedTheSameDuringFragChange() {
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
@@ -254,8 +246,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         input = "Should be flushed";
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         Fragment fragment = messageActivity.getCurrentFragment();
-        ListView messageList = (ListView) fragment.getView().findViewById(R
-                .id.groupMessageFragmentList);
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
         messageList.getChildAt(0).setTag((Object) tag);
         View message = messageList.findViewWithTag((Object) tag);
@@ -271,14 +262,12 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
-        ListView messageList = (ListView) fragment.getView().findViewById(R
-                .id.groupMessageFragmentList);
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
         messageList.getChildAt(0).setTag((Object) tag);
         View message = messageList.findViewWithTag((Object) tag);
         onView(withTagValue(is((Object) tag))).perform(click());
-        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS,
-                messageActivity.getType());
+        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS, messageActivity.getType());
         closeSoftKeyboard();
         messageActivity.runOnUiThread(new Runnable() {
             @Override
@@ -287,7 +276,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
             }
         });
         Thread.sleep(1000);
-        assertEquals(MessageActivity.ContentType.GROUP_MESSAGES,
-                messageActivity.getType());
+        assertEquals(MessageActivity.ContentType.GROUP_MESSAGES, messageActivity.getType());
     }
 }
