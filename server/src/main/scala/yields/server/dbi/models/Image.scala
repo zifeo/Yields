@@ -75,7 +75,7 @@ object Image {
     new Image(n)
   }
 
-  def createHash(content: String): String = {
+  private def createHash(content: String): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
     val ha = new sun.misc.BASE64Encoder().encode(md.digest(content.getBytes))
     ha
