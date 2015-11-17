@@ -57,9 +57,4 @@ public class GroupUpdateVisibilityRequest extends ServiceRequest {
         return RequestBuilder.groupUpdateVisibilityRequest(mSender.getId(), mGroup.getId(),
                 mVisibility);
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
 }

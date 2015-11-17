@@ -47,9 +47,4 @@ public class UserGroupListRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userGroupListRequest(mUser.getId());
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
-    }
 }

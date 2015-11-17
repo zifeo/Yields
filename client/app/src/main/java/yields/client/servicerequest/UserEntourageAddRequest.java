@@ -51,9 +51,4 @@ public class UserEntourageAddRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userEntourageAddRequest(mUser.getId(), mUserToAdd.getEmail());
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
-    }
 }

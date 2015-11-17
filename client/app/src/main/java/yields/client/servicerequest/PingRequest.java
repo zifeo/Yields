@@ -51,9 +51,4 @@ public class PingRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.pingRequest(mClientUser.getId(), mContent);
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
-    }
 }

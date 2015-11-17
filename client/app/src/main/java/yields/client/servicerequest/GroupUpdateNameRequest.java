@@ -56,9 +56,4 @@ public class GroupUpdateNameRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroup.getId(), mName);
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
 }

@@ -57,8 +57,4 @@ public class GroupRemoveRequest extends ServiceRequest {
         return RequestBuilder.groupRemoveRequest(mSender.getId(), mGroup.getId(), mUser.getId());
     }
 
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
 }

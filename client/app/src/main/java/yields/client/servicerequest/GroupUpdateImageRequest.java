@@ -57,9 +57,4 @@ public class GroupUpdateImageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.groupUpdateImageRequest(mSender.getId(), mGroup.getId(), mImage);
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
 }

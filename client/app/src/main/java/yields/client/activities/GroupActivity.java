@@ -141,7 +141,12 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
      */
     @Override
     public void notifyChange(){
-        mAdapterGroups.notifyDataSetChanged();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAdapterGroups.notifyDataSetChanged();
+            }
+        });
     }
 
     /**

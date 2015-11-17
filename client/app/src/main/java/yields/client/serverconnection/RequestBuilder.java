@@ -209,7 +209,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newName);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, sender);
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
     }
@@ -230,7 +230,7 @@ public class RequestBuilder {
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
                 .GROUP_UPDATE_VISIBILITY, sender);
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
 
         return builder.request();

@@ -30,11 +30,11 @@ public class ServerChannelTest {
 
     private static String sSimpleRequest = "{" +
             "\"metadata\":{" +
-            "\"sender\":\"0\"," +
+            "\"sender\":0," +
             "\"datetime\":\"TIME\"}," +
             "\"kind\":\"PING\"," +
             "\"message\":" +
-            "{\"text\":\"test\"}" +
+            "{\"content\":\"test\"}" +
             "}\n";
 
     @Test
@@ -50,11 +50,7 @@ public class ServerChannelTest {
 
 
         try {
-<<<<<<< HEAD
             channel.sendRequest(simpleServerRequest);
-=======
-            Response response = channel.sendRequest(simpleServerRequest);
->>>>>>> master
             Assert.assertEquals(sSimpleRequest
                     .replace("TIME", DateSerialization.toString(new Date())),
                     output.toString());

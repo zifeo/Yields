@@ -47,9 +47,4 @@ public class UserUpdateRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userUpdateRequest(mUser.getId());
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
-    }
 }

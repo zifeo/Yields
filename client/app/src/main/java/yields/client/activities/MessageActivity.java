@@ -260,7 +260,12 @@ public class MessageActivity extends AppCompatActivity
      */
     @Override
     public void notifyChange() {
-        retrieveGroupMessages();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                retrieveGroupMessages();
+            }
+        });
     }
 
     /**
