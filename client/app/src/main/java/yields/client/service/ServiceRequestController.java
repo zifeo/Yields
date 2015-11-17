@@ -233,6 +233,9 @@ public class ServiceRequestController {
         //K THX BYE
     }
 
+    /**
+     * Listener
+     */
     private abstract class ServerListener implements Runnable, ConnectionSubscriber {
 
         @Override

@@ -238,7 +238,7 @@ public class YieldService extends Service {
     }
 
     /**
-     * Connect to server (Maybe)
+     * Connects to server // TODO: If not try again later
      */
     private class ConnectControllerTask extends AsyncTask<Void, Void, Void> {
 
