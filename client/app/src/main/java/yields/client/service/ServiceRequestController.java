@@ -22,6 +22,10 @@ public class ServiceRequestController {
         //TODO : Set Instance of connection
     }
 
+    /**
+     * Handles any given ServiceRequest.
+     * @param serviceRequest
+     */
     public void handleServiceRequest(ServiceRequest serviceRequest) {
         switch (serviceRequest.getType()) {
             case PING:
@@ -74,58 +78,100 @@ public class ServiceRequestController {
         }
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserGroupListRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserEntourageRemoveRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserStatusRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupCreateRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserEntourageAddRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupUpdateVisibilityRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupUpdateImageRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupUpdateNameRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupAddRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupRemoveRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserUpdateRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserConnectRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handlePingRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupMessageRequest(GroupMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
@@ -137,6 +183,9 @@ public class ServiceRequestController {
         //TODO : Send serverRequest to Server
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupHistoryRequest(GroupHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
@@ -153,11 +202,5 @@ public class ServiceRequestController {
             mCacheHelper.add(message, serverRequest.getGroup.getId());
         }
          */
-
-        //ALL NODE ID'S MOST BE UNIQUE, OR ELSE WHEN ADDING TO CACHE ALL PREVIOUS
-        //NODES WITH SAME ID ARE DELETED
-        //THIS CAN BE CHANGED EASILY
-        //BUT I'D APPRECIATE NOT HAVING TO CHANGE MY IMPLEMENTATION EVRY OTHER WEEK
-        //K THX BYE
     }
 }

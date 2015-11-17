@@ -1,12 +1,14 @@
 package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.ArrayMap;
 import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
@@ -450,14 +452,9 @@ public class RequestBuilder {
     }
 
     private void addField(Fields fieldType, Bitmap field) {
-        int size = field.getRowBytes() * field.getHeight();
-        ByteBuffer b = ByteBuffer.allocate(size);
-
-        field.copyPixelsToBuffer(b);
-
-        byte[] byteImage = b.array();
-        this.mConstructingMap.put(fieldType.getValue(), Base64
-                .encodeToString(byteImage, Base64.DEFAULT));
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        field.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        this.mConstructingMap.put(fieldType.getValue(), stream.toByteArray());
     }
 
     private void addField(Fields fieldType, Group.GroupVisibility field) {
