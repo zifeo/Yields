@@ -24,7 +24,7 @@ case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends 
     if (nid > 0 && count > 0) {
       val group = Group(nid)
       val content = group.getMessagesInRange(datetime, count)
-      GroupHistoryRes(content)
+      GroupHistoryRes(nid, content)
     } else {
       throw new ActionArgumentException("Bad arguments value")
     }
@@ -33,5 +33,5 @@ case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends 
 }
 
 /** [[GroupHistory]] result. */
-case class GroupHistoryRes(nodes: Seq[FeedContent]) extends Result
+case class GroupHistoryRes(nid: NID, nodes: Seq[FeedContent]) extends Result
 
