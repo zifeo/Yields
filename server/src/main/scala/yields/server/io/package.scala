@@ -2,9 +2,10 @@ package yields.server
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
+import yields.server.actions.images._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
-import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
+import yields.server.io.models.{ImageJsonFormat, GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
 import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -20,6 +21,7 @@ package object io {
   implicit lazy val nodeJF = NodeJsonFormat
   implicit lazy val groupJF = GroupJsonFormat
   implicit lazy val userJF = UserJsonFormat
+  implicit lazy val imageJF = ImageJsonFormat
 
   /** *** Actions  *****/
 
@@ -59,6 +61,15 @@ package object io {
 
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
   implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
+
+  // Images
+
+  implicit lazy val imageGetJF = jsonFormat1(ImageGet)
+  implicit lazy val imageGetResJF = jsonFormat1(ImageGetRes)
+
+  implicit lazy val imageSetJF = jsonFormat1(ImageSet)
+  implicit lazy val imageSetResJF = jsonFormat1(ImageSetRes)
+
 
   /** *** Message passing interface *****/
 
