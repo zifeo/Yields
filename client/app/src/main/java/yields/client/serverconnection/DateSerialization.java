@@ -7,7 +7,7 @@ import java.util.TimeZone;
 
 public class DateSerialization {
     private static SimpleDateFormat dateFormatISO6101 =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ");
 
     /**
      * Gets the string representation of the Date

@@ -155,9 +155,9 @@ public class YieldService extends Service {
      * @param messages The message in question
      */
     synchronized public void receiveMessages(Id groupId, List<Message> messages) {
+        //TODO: To be refactor !
         if (mCurrentNotifiableActivity != null &&
-                mCurrentGroup.getId() == groupId) {
-
+                mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
             mCurrentNotifiableActivity.notifyChange();
         }

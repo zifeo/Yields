@@ -5,12 +5,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ServiceRequestException;
+import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
@@ -125,11 +127,11 @@ public class ServiceRequestController {
             JSONArray array = response.getMessage().getJSONArray("nodes");
             ArrayList<Message> list = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
-                list.add(new Message(array.getJSONObject(i)));
+                list.add(new Message(array.getJSONArray(i)));
             }
 
-            //mService.receiveMessages();
-        } catch (JSONException e) {
+            mService.receiveMessages(new Id(response.getMessage().getLong("nid")), list);
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
     }
