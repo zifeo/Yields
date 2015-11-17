@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -179,12 +180,16 @@ public class RequestBuilder {
         if (nodes.size() < 1) {
             throw new IllegalArgumentException("No nodes to add...");
         }
+        List<String> nodeIds = new ArrayList<>();
+        for (Id id : nodes) {
+            nodeIds.add(id.getId());
+        }
 
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_CREATE, sender);
 
         builder.addField(Fields.NAME, name);
-        builder.addField(Fields.NODES, nodes);
+        builder.addField(Fields.NODES, nodeIds);
         builder.addField(Fields.VISIBILITY, visibility);
 
         return builder.request();

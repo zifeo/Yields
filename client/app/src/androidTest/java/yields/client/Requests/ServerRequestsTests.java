@@ -2,18 +2,23 @@ package yields.client.Requests;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import yields.client.activities.MockFactory;
 import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
@@ -125,19 +130,19 @@ public class ServerRequestsTests {
      */
     @Test
     public void testGroupCreateRequest(){
-        //TODO : Need confirmation of how GroupCreateRequests are handled on server side.
-        /*
         try {
             Id senderId = new Id(11);
             String groupName = "Dank AF";
             List<User> users = MockFactory.generateMockUsers(3);
+            List<String> nodeIdsAsString = new ArrayList<>();
             List<Id> nodeIds = new ArrayList<>();
             for(User user : users){
+                nodeIdsAsString.add(user.getId().getId());
                 nodeIds.add(user.getId());
             }
 
             ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId, groupName,
-                    nodeIds);
+                    Group.GroupVisibility.PRIVATE, nodeIds);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -147,10 +152,10 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME.getValue()),
                     groupName);
             assertEquals(json.getJSONObject("message").getJSONArray(RequestBuilder.Fields.NODES.getValue()),
-                    new JSONArray(nodeIds));
+                    new JSONArray(nodeIdsAsString));
         } catch (JSONException e) {
             fail("Request was not built correctly !");
-        }*/
+        }
     }
 
 
