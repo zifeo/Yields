@@ -33,11 +33,15 @@ class Image private(override val nid: NID) extends Node {
   /** Image content getter */
   def content: String = {
     import scala.io._
-    if (_path.isDefined) {
-      val p = _path.get
-      val source = Source.fromFile(s"$p")
-      val lines = try source.mkString finally source.close()
-      lines
+    if (_path.isDefined && _hash.isDefined) {
+      if (checkFileExist(_hash.get)) {
+        val p = _path.get
+        val source = Source.fromFile(s"$p")
+        val lines = try source.mkString finally source.close()
+        lines
+      } else {
+        throw new Exception("Content doesnt exist on disk")
+      }
     } else {
       throw new Exception("Cannot read from non-existent path")
     }
@@ -111,6 +115,7 @@ object Image {
     val i = new Image(n)
     i.path = i.hash
     i
+    
   }
 
   def createHash(content: String): String = {

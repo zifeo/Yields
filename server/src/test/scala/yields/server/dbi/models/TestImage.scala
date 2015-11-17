@@ -32,7 +32,6 @@ class TestImage extends FlatSpec with Matchers with BeforeAndAfter {
 
   "a created image" should "exists on disk" in {
     val img = Image.createImage(contentTest)
-    println(img.path)
     val exists = Image.checkFileExist(img.hash)
     exists should be(true)
   }
@@ -46,7 +45,6 @@ class TestImage extends FlatSpec with Matchers with BeforeAndAfter {
 
   "creating an image with some content" should "return the image with the same content" in {
     val img = Image.createImage(contentTest)
-
     val img2 = Image(img.nid)
 
     img2.content should be(img.content)
