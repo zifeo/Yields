@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
@@ -24,6 +26,9 @@ public class UserEntourageRemoveRequest extends ServiceRequest {
      */
     public UserEntourageRemoveRequest(User user, User userToBeRemoved) {
         super();
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(userToBeRemoved);
+
         mUser = user;
         mUserToRemove = userToBeRemoved;
     }
@@ -35,7 +40,7 @@ public class UserEntourageRemoveRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USERENTOURAGEREMOVE;
+        return RequestKind.USER_ENTOURAGE_REMOVE;
     }
 
     /**

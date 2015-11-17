@@ -25,8 +25,10 @@ public class GroupMessageRequest extends ServiceRequest {
      * @param receivingGroup The Group to which the Message should be added.
      */
     public GroupMessageRequest(Message message, Group receivingGroup) {
+        super();
         Objects.requireNonNull(message);
         Objects.requireNonNull(receivingGroup);
+
         mMessage = message;
         mReceivingGroup = receivingGroup;
     }
@@ -38,7 +40,7 @@ public class GroupMessageRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPMESSAGE;
+        return RequestKind.GROUP_MESSAGE;
     }
 
     /**
@@ -50,8 +52,6 @@ public class GroupMessageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         Group group = getReceivingGroup();
         Message message = getMessage();
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(message);
         return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
                 message.getContent());
     }

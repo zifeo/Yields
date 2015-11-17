@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
@@ -26,6 +28,10 @@ public class GroupUpdateVisibilityRequest extends ServiceRequest {
      */
     public GroupUpdateVisibilityRequest(User sender, Group group, Group.GroupVisibility visibility) {
         super();
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(visibility);
+
         mSender = sender;
         mGroup = group;
         mVisibility = visibility;
@@ -38,7 +44,7 @@ public class GroupUpdateVisibilityRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPUPDATEVISIBILITY;
+        return RequestKind.GROUP_UPDATE_VISIBILITY;
     }
 
     /**

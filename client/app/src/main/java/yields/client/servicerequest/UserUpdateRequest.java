@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
@@ -21,6 +23,8 @@ public class UserUpdateRequest extends ServiceRequest {
      */
     public UserUpdateRequest(User user) {
         super();
+        Objects.requireNonNull(user);
+
         mUser = user;
     }
 
@@ -31,7 +35,7 @@ public class UserUpdateRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USERUPDATE;
+        return RequestKind.USER_UPDATE;
     }
 
     /**

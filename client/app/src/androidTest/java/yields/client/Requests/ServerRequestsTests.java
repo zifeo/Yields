@@ -1,14 +1,12 @@
 package yields.client.Requests;
 
 import android.graphics.Bitmap;
-import android.util.Base64;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 import java.util.Date;
 
 import yields.client.id.Id;
@@ -44,7 +42,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USERGROUPLIST.getValue());
+                    ServiceRequest.RequestKind.USER_GROUP_LIST.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
         } catch (JSONException e) {
@@ -65,7 +63,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USERENTOURAGEADD.getValue());
+                    ServiceRequest.RequestKind.USER_ENTOURAGE_ADD.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
@@ -88,7 +86,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USERENTOURAGEREMOVE.getValue());
+                    ServiceRequest.RequestKind.USER_ENTOURAGE_REMOVE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
@@ -111,7 +109,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USERCONNECT.getValue());
+                    ServiceRequest.RequestKind.USER_CONNECT.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
@@ -142,7 +140,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPCREATE.getValue());
+                    ServiceRequest.RequestKind.GROUP_CREATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME.getValue()),
@@ -171,7 +169,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPUPDATENAME.getValue());
+                    ServiceRequest.RequestKind.GROUP_UPDATE_NAME.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME.getValue()),
@@ -198,7 +196,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPUPDATEVISIBILITY.getValue());
+                    ServiceRequest.RequestKind.GROUP_UPDATE_VISIBILITY.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
@@ -211,7 +209,7 @@ public class ServerRequestsTests {
             json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPUPDATEVISIBILITY.getValue());
+                    ServiceRequest.RequestKind.GROUP_UPDATE_VISIBILITY.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
@@ -242,7 +240,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPUPDATEIMAGE.getValue());
+                    ServiceRequest.RequestKind.GROUP_UPDATE_IMAGE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
@@ -271,7 +269,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPADD.getValue());
+                    ServiceRequest.RequestKind.GROUP_ADD.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
@@ -299,7 +297,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPREMOVE.getValue());
+                    ServiceRequest.RequestKind.GROUP_REMOVE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
@@ -332,7 +330,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPMESSAGE.getValue());
+                    ServiceRequest.RequestKind.GROUP_MESSAGE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.GID.getValue()),
@@ -347,7 +345,7 @@ public class ServerRequestsTests {
             json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPMESSAGE.getValue());
+                    ServiceRequest.RequestKind.GROUP_MESSAGE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.GID.getValue()),
@@ -380,7 +378,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPMESSAGE.getValue());
+                    ServiceRequest.RequestKind.GROUP_MESSAGE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.GID.getValue()),
@@ -414,7 +412,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPMESSAGE.getValue());
+                    ServiceRequest.RequestKind.GROUP_MESSAGE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.GID.getValue()),
@@ -447,7 +445,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUPHISTORY.getValue());
+                    ServiceRequest.RequestKind.GROUP_HISTORY.getValue());
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.LAST.getValue()),

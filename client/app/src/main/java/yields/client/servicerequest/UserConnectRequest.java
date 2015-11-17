@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.ClientUser;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
@@ -21,6 +23,8 @@ public class UserConnectRequest extends ServiceRequest {
      */
     public UserConnectRequest(ClientUser clientUser) {
         super();
+        Objects.requireNonNull(clientUser);
+
         mClientUser = clientUser;
     }
 
@@ -31,7 +35,7 @@ public class UserConnectRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USERCONNECT;
+        return RequestKind.USER_CONNECT;
     }
 
     /**

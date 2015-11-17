@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
@@ -26,6 +28,10 @@ public class GroupRemoveRequest extends ServiceRequest {
      */
     public GroupRemoveRequest(User sender, Group group, User userToRemove) {
         super();
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(userToRemove);
+
         mSender = sender;
         mGroup = group;
         mUser = userToRemove;
@@ -38,7 +44,7 @@ public class GroupRemoveRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPREMOVE;
+        return RequestKind.GROUP_REMOVE;
     }
 
     /**

@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
@@ -23,6 +25,9 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     public UserEntourageAddRequest(User user, User userToBeAdded) {
         super();
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(userToBeAdded);
+
         mUser = user;
         mUserToAdd = userToBeAdded;
     }
@@ -34,7 +39,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USERENTOURAGEADD;
+        return RequestKind.USER_ENTOURAGE_ADD;
     }
 
     /**

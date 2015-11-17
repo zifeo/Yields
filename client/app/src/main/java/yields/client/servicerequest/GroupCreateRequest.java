@@ -4,6 +4,7 @@ import android.app.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.id.Id;
 import yields.client.node.Group;
@@ -28,6 +29,9 @@ public class GroupCreateRequest extends ServiceRequest {
      */
     public GroupCreateRequest(User creator, Group group) {
         super();
+        Objects.requireNonNull(creator);
+        Objects.requireNonNull(group);
+
         mCreator = creator;
         mGroup = group;
     }
@@ -39,7 +43,7 @@ public class GroupCreateRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPCREATE;
+        return RequestKind.GROUP_CREATE;
     }
 
     /**

@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.ClientUser;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
@@ -23,6 +25,9 @@ public class PingRequest extends ServiceRequest {
      */
     public PingRequest(ClientUser clientUser, String pingContent) {
         super();
+        Objects.requireNonNull(clientUser);
+        Objects.requireNonNull(pingContent);
+
         mClientUser = clientUser;
         mContent = pingContent;
     }

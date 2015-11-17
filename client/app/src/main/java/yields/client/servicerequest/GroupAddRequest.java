@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
@@ -26,6 +28,10 @@ public class GroupAddRequest extends ServiceRequest {
      */
     public GroupAddRequest(User sender, Group group, User newUser) {
         super();
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(newUser);
+
         mSender = sender;
         mGroup = group;
         mUser = newUser;
@@ -38,7 +44,7 @@ public class GroupAddRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPADD;
+        return RequestKind.GROUP_ADD;
     }
 
     /**

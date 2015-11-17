@@ -1,15 +1,12 @@
 package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.ArrayMap;
-import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +63,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(args);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERUPDATE, sender);
+                ServiceRequest.RequestKind.USER_UPDATE, sender);
 
         if (args.containsKey(Fields.EMAIL)) {
             builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
@@ -90,7 +87,7 @@ public class RequestBuilder {
     public static ServerRequest userGroupListRequest(Id senderId) {
         Objects.requireNonNull(senderId);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERGROUPLIST, senderId);
+                ServiceRequest.RequestKind.USER_GROUP_LIST, senderId);
 
         return builder.request();
     }
@@ -106,7 +103,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERENTOURAGEADD, sender);
+                ServiceRequest.RequestKind.USER_ENTOURAGE_ADD, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -124,7 +121,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERENTOURAGEREMOVE, sender);
+                ServiceRequest.RequestKind.USER_ENTOURAGE_REMOVE, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -142,7 +139,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(email);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERCONNECT, sender);
+                ServiceRequest.RequestKind.USER_CONNECT, sender);
 
         builder.addField(Fields.EMAIL, email);
 
@@ -158,7 +155,7 @@ public class RequestBuilder {
     public static ServerRequest userUpdateRequest(Id sender) {
         Objects.requireNonNull(sender);
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USERSTATUS, sender);
+                ServiceRequest.RequestKind.USER_STATUS, sender);
 
         return builder.request();
     }
@@ -184,7 +181,7 @@ public class RequestBuilder {
         }
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPCREATE, sender);
+                ServiceRequest.RequestKind.GROUP_CREATE, sender);
 
         builder.addField(Fields.NAME, name);
         builder.addField(Fields.NODES, nodes);
@@ -206,7 +203,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newName);
 
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUPUPDATENAME, sender);
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
@@ -227,7 +224,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newVisibility);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
-                .GROUPUPDATEVISIBILITY, sender);
+                .GROUP_UPDATE_VISIBILITY, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
         return builder.request();
@@ -248,7 +245,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newImage);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
-                .GROUPUPDATEIMAGE, sender);
+                .GROUP_UPDATE_IMAGE, sender);
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.IMAGE, newImage);
         return builder.request();
@@ -270,7 +267,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newUser);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPADD, sender);
+                ServiceRequest.RequestKind.GROUP_ADD, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NID, newUser);
@@ -293,7 +290,7 @@ public class RequestBuilder {
         Objects.requireNonNull(userToRemove);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPREMOVE, sender);
+                ServiceRequest.RequestKind.GROUP_REMOVE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.NID, userToRemove);
@@ -335,7 +332,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPMESSAGE, sender);
+                ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
@@ -359,7 +356,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPMESSAGE, sender);
+                ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
 
         builder.addField(Fields.GID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
@@ -384,7 +381,7 @@ public class RequestBuilder {
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUPHISTORY, senderId);
+                ServiceRequest.RequestKind.GROUP_HISTORY, senderId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);

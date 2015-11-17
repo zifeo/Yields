@@ -3,6 +3,8 @@ package yields.client.servicerequest;
 import android.app.Service;
 import android.graphics.Bitmap;
 
+import java.util.Objects;
+
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
@@ -27,6 +29,10 @@ public class GroupUpdateImageRequest extends ServiceRequest {
      */
     public GroupUpdateImageRequest(User sender, Group group, Bitmap image) {
         super();
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(image);
+
         mSender = sender;
         mGroup = group;
         mImage = image.copy(image.getConfig(), true);
@@ -39,7 +45,7 @@ public class GroupUpdateImageRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPUPDATEIMAGE;
+        return RequestKind.GROUP_UPDATE_IMAGE;
     }
 
     /**

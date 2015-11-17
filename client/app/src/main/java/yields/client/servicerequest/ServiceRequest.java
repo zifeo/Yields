@@ -15,14 +15,14 @@ public abstract class ServiceRequest {
      * The Kind of messages possible
      */
     public enum RequestKind {
-        PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdateRequest"),
-        USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
-        USERENTOURAGEREMOVE("UserEntourageRemove"), USERSTATUS("UserStatus"),
-        GROUPCREATE("GroupCreate"), GROUPUPDATENAME("GroupUpdateName"),
-        GROUPUPDATEVISIBILITY("GroupUpdateVisibility"), GROUPUPDATEIMAGE
+        PING("PING"), USER_CONNECT("UserConnect"), USER_UPDATE("UserUpdateRequest"),
+        USER_GROUP_LIST("UserGroupList"), USER_ENTOURAGE_ADD("UserEntourageAdd"),
+        USER_ENTOURAGE_REMOVE("UserEntourageRemove"), USER_STATUS("UserStatus"),
+        GROUP_CREATE("GroupCreate"), GROUP_UPDATE_NAME("GroupUpdateName"),
+        GROUP_UPDATE_VISIBILITY("GroupUpdateVisibility"), GROUP_UPDATE_IMAGE
                 ("GroupUpdateImage"),
-        GROUPADD("GroupAdd"), GROUPREMOVE("GroupRemove"),
-        GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");
+        GROUP_ADD("GroupAdd"), GROUP_REMOVE("GroupRemove"),
+        GROUP_MESSAGE("GroupMessage"), GROUP_HISTORY("GroupHistory");
 
         private final String mName;
 

@@ -2,6 +2,8 @@ package yields.client.servicerequest;
 
 import android.app.Service;
 
+import java.util.Objects;
+
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
@@ -26,6 +28,10 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     public GroupUpdateNameRequest(User sender, Group group, String name) {
         super();
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(name);
+
         mSender = sender;
         mGroup = group;
         mName = name;
@@ -38,7 +44,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPUPDATENAME;
+        return RequestKind.GROUP_UPDATE_NAME;
     }
 
     /**
