@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -38,7 +40,7 @@ public class Group extends Node {
     private List<User> mUsers;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
-
+    private Set<Tag> mTags;
 
     /**
      * Constructor for groups
@@ -60,6 +62,7 @@ public class Group extends Node {
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
+        mTags = new HashSet<>();
     }
 
     /**
@@ -181,6 +184,31 @@ public class Group extends Node {
     }
 
     /**
+     * Add a tag to the group
+     * @param tag The tag we want to add, without spaces, in lowercase
+     */
+    public void addTag(Tag tag){
+        mTags.add(Objects.requireNonNull(tag));
+    }
+
+    /**
+     * Indicate whether the group can be matched with a given tag
+     * @param tag The tag we want to test
+     * @return true iff the group contains the given tag
+     */
+    public boolean matchToTag(Tag tag){
+        return mTags.contains(tag);
+    }
+
+    /**
+     * Returns a list containing all the tags of the group
+     * @return A list containing all the tags of the group, in a random order
+     */
+    public List<Tag> getTagList(){
+        return new ArrayList<>(mTags);
+    }
+
+    /**
      * Indicate that the server has validated
      * the created group
      */
@@ -232,5 +260,67 @@ public class Group extends Node {
      */
     private Message getLastMessage() {
         return mMessages.firstEntry().getValue();
+    }
+
+    /**
+     * Class used to represent a tag, which defines the subjects of the group
+     */
+    public static class Tag {
+        private String mText;
+        public static final int MIN_TAG_LENGTH = 2;
+        public static final int MAX_TAG_LENGTH = 20;
+
+        /**
+         * Default constructor for tags
+         * @param text The text of the tag
+         */
+        public Tag(String text){
+            if (text.contains(" ")){
+                throw new IllegalArgumentException("Tag cannot contain spaces");
+            }
+            if (!text.toLowerCase().equals(text)){
+                throw new IllegalArgumentException("Tag must be in lowercase");
+            }
+            if (text.length() < MIN_TAG_LENGTH){
+                throw new IllegalArgumentException(
+                        "Length of a Tag must be at least " + MIN_TAG_LENGTH + " characters");
+            }
+            if (text.length() > MAX_TAG_LENGTH){
+                throw new IllegalArgumentException(
+                        "Length of a Tag cannot be more than " + MAX_TAG_LENGTH + " characters");
+            }
+
+            mText = Objects.requireNonNull(text);
+        }
+
+        /**
+         * Compares a tag and another object
+         * @param o The object we want to test
+         * @return true iff the two objects are equals
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Tag){
+                return ((Tag) o).mText.equals(this.mText);
+            }
+            return super.equals(o);
+        }
+
+        /**
+         * Gives the hashcode of a tag
+         * @return The hash of this tag
+         */
+        @Override
+        public int hashCode() {
+            return mText.hashCode();
+        }
+
+        /**
+         * Returns the text of the tag
+         * @return The text of the tag
+         */
+        public String getText(){
+            return mText;
+        }
     }
 }

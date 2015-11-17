@@ -45,7 +45,7 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         TextView textViewGroupName = (TextView) singleGroup.findViewById(R.id.textViewGroupName);
         TextView textViewGroupLastMessage = (TextView)
                 singleGroup.findViewById(R.id.textViewGroupLastMessage);
-        ImageView imageGroup = (ImageView) singleGroup.findViewById(R.id.imageGroup);
+        ImageView imageGroup = (ImageView) singleGroup.findViewById(R.id.imageViewGroup);
 
         Group group = mGroups.get(position);
 

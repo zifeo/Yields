@@ -40,8 +40,10 @@ public class ListAdapterMessages extends ArrayAdapter<Message> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Message message = getItem(position);
         MessageView messageView = null;
+        int tag = this.getCount();
         try {
             messageView = new MessageView(YieldsApplication.getApplicationContext(), message);
+            messageView.setTag((Object) tag);
         } catch (MessageViewException e) {
             Log.d("ListAdapterMessages", "Couldn't add view to message list");
         }

@@ -7,12 +7,16 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.junit.After;
+
 import yields.client.R;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.node.Group;
+import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
@@ -33,6 +37,11 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         getActivity();
     }
 
+    @Override
+    public void tearDown(){
+        YieldsApplication.cancelToast();
+    }
+
     /**
      * Test that runs through all activities related to group creation
      */
@@ -40,7 +49,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
 
         onView(withId(R.id.actionCreate)).perform(click());
 
-        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion"));
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion"), closeSoftKeyboard());
         onView(withId(R.id.actionDoneSelectName)).perform(click());
 
         onView(withId(R.id.actionDoneCreateGroup)).perform(click());
@@ -66,7 +75,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void testGroupCreationWithContactAdded(){
         onView(withId(R.id.actionCreate)).perform(click());
 
-        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion2"));
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion2"), closeSoftKeyboard());
         onView(withId(R.id.actionDoneSelectName)).perform(click());
 
         onView(withId(R.id.actionAddContactToGroup)).perform(click());
@@ -97,7 +106,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void testGroupCreationSetPublicVisibility(){
         onView(withId(R.id.actionCreate)).perform(click());
 
-        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"));
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"), closeSoftKeyboard());
         onView(withId(R.id.actionDoneSelectName)).perform(click());
 
         onView(withId(R.id.actionDoneCreateGroup)).perform(click());
@@ -127,7 +136,8 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void testGroupCreationSetPrivateVisibility(){
         onView(withId(R.id.actionCreate)).perform(click());
 
-        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"));
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"), closeSoftKeyboard());
+
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
         onView(withId(R.id.actionDoneSelectName)).perform(click());
 
@@ -158,7 +168,8 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void testGroupCreationFlipBetweenVisibilityButtonPublic(){
         onView(withId(R.id.actionCreate)).perform(click());
 
-        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"));
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"), closeSoftKeyboard());
+
         onView(withId(R.id.radioButtonPublicGroup)).perform(click());
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
         onView(withId(R.id.radioButtonPublicGroup)).perform(click());
@@ -191,7 +202,8 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void testGroupCreationFlipBetweenVisibilityButtonPrivate(){
         onView(withId(R.id.actionCreate)).perform(click());
 
-        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"));
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"), closeSoftKeyboard());
+
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
         onView(withId(R.id.radioButtonPublicGroup)).perform(click());
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());

@@ -9,29 +9,33 @@ import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
 
 /**
- * Lists the groups of the user.
- * @param uid user id
- */
+  * Lists the groups of the user.
+  * @param uid user id
+  */
 case class UserGroupList(uid: UID) extends Action {
 
   /**
-   * Run the action given the sender.
-   * @param metadata action requester
-   * @return action result
-   */
+    * Run the action given the sender.
+    * @param metadata action requester
+    * @return action result
+    */
   override def run(metadata: Metadata): Result = {
     if (uid > 0) {
       val user = User(uid)
       val groups = user.groups.toSeq
-      val list = groups.map(x => (x, "", Temporal.notYet))
+      val list = groups.map(x => (x, Group(x).name, Group(x).updated_at))
       UserGroupListRes(list)
     } else {
-      throw new ActionArgumentException("Bad uid")
+      val errorMessage = getClass.getSimpleName
+      throw new ActionArgumentException(s"Bad uid in : $errorMessage")
     }
 
   }
 
 }
 
-/** [[UserGroupList]] result. */
+/**
+  * [[UserGroupList]] result.
+  * @param groups sequence of nid, name and last activity
+  */
 case class UserGroupListRes(groups: Seq[(NID, String, OffsetDateTime)]) extends Result

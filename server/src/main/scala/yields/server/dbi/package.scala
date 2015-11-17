@@ -1,6 +1,6 @@
 package yields.server
 
-import com.redis.RedisClientPool
+import com.redis.{RedisClient, RedisClientPool}
 import yields.server.dbi.exceptions.IllegalValueException
 import yields.server.utils.Config
 
@@ -17,6 +17,14 @@ package object dbi {
     secret = Some(Config.getString("database.pass")),
     database = Config.getInt("database.id")
   )
+
+  /**
+    * Public accessor to database via local redis object
+    * @param query
+    * @tparam T
+    * @return
+    */
+  def redis[T](query: RedisClient => T): T = redis.withClient(query)
 
   /** Terminates database connection. */
   def close(): Unit = {

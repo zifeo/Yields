@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="yields.client.activities.GroupInfoActivity"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="#8080FF"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="-18sp"
+        android:paddingRight="0sp"
+        >
+    </android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageViewGroup"
+            android:contentDescription="@string/groupImage"
+            android:src="@drawable/default_group_image"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textViewGroupName"
+            android:textSize="30sp"
+            android:layout_marginStart="15dp"
+            android:layout_alignTop="@+id/imageViewGroup"
+            android:layout_toEndOf="@+id/imageViewGroup" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginTop="30dp"
+        android:text="Tags : "
+        android:id="@+id/textViewTags"
+        android:layout_gravity="center_horizontal"
+        android:maxWidth="300dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:text="@string/users"
+        android:id="@+id/button2"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/joinGroup"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal" />
+
+
+
+</LinearLayout>
