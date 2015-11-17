@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
@@ -229,15 +230,12 @@ public class ServerRequestsTests {
     @Test
     public void testGroupUpdateImageRequest() {
         try {
-            //TODO : IMAGE SERIALIZATION EXPLANATION @Trofleb
             Id groupId = new Id(12);
             Id senderId = new Id(11);
 
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
-            int size = newImage.getRowBytes() * newImage.getHeight();
-            ByteBuffer b = ByteBuffer.allocate(size);
-            newImage.copyPixelsToBuffer(b);
-            byte[] byteImage = b.array();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateImageRequest(senderId, groupId,
                     newImage);
@@ -248,7 +246,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
-                    Base64.encodeToString(byteImage, Base64.DEFAULT));
+                    stream.toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.GID.getValue()),
                     groupId.getId());
         } catch (JSONException e) {
@@ -325,6 +323,9 @@ public class ServerRequestsTests {
             String text = "Apple pie is best pie !";
             Content textContent = new TextContent(text);
             Content imageContent = new ImageContent(YieldsApplication.getDefaultGroupImage(), text);
+            Bitmap newImage = YieldsApplication.getDefaultGroupImage();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
 
             ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     textContent);
@@ -355,7 +356,8 @@ public class ServerRequestsTests {
                     imageContent.getType().getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
-            //TODO : CHECK IMAGE
+            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
+                    stream.toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -402,8 +404,10 @@ public class ServerRequestsTests {
             Id groupId = new Id(12);
             Id senderId = new Id(11);
             String text = "Apple pie is best pie !";
-            Bitmap image = YieldsApplication.getDefaultGroupImage();
-            ImageContent imageContent = new ImageContent(image, text);
+            Bitmap newImage = YieldsApplication.getDefaultGroupImage();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            ImageContent imageContent = new ImageContent(newImage, text);
 
             ServerRequest serverRequest = RequestBuilder.groupImageMessageRequest(senderId, groupId,
                     imageContent);
@@ -419,7 +423,8 @@ public class ServerRequestsTests {
                     imageContent.getType().getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
-            //TODO : CHECK IMAGE
+            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
+                    stream.toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
