@@ -43,8 +43,6 @@ public class LoggingInActivity extends AppCompatActivity {
                 .putExtra("bindGroupActivity", true);
 
         bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
-
-        goToGroupActivity();
     }
 
     /**
@@ -69,6 +67,7 @@ public class LoggingInActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             YieldsApplication.setBinder((YieldServiceBinder) service);
+            goToGroupActivity();
         }
 
         @Override

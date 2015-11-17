@@ -32,6 +32,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -542,18 +543,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     cursor.getColumnIndex(KEY_GROUP_NAME));
             Bitmap groupImage = deserializeBitmap(
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
-            Group.GroupVisibility groupVisibility;
-            switch (cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY))){
-                case "Public":
-                    groupVisibility = Group.GroupVisibility.PUBLIC;
-                    break;
-                case "Private":
-                    groupVisibility = Group.GroupVisibility.PRIVATE;
-                    break;
-                default:
-                    throw new CacheDatabaseException("Couldn't retrieve Group visibility from " +
-                            "Cache, Group Id was : " + groupId.getId());
-            }
+            Group.GroupVisibility groupVisibility = Group.GroupVisibility.valueOf(
+                    cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
@@ -666,8 +657,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                             cursor.getColumnIndex(KEY_MESSAGE_TYPE));
                     Content content = deserializeContent(contentAsBytes, contentType);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                    Date date = dateFormat.parse(dateAsString);
+                    Date date = DateSerialization.toDateForCache(dateAsString);
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
@@ -702,8 +692,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         while(!done) {
             try {
                 String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                Date date = dateFormat.parse(dateAsString);
+                Date date = DateSerialization.toDateForCache(dateAsString);
                 if(date.compareTo(furthestDate) <= 0){
                     done = true;
                     retValue =  true;
@@ -941,8 +930,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
         values.put(KEY_MESSAGE_TYPE, message.getContent().getType().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
+        values.put(KEY_MESSAGE_DATE, DateSerialization.toStringForCache(message.getDate()));
         return values;
     }
 

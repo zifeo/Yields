@@ -26,12 +26,20 @@ case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends 
       val content = group.getMessagesInRange(datetime, count)
       GroupHistoryRes(nid, content)
     } else {
-      throw new ActionArgumentException("Bad arguments value")
+      val errorMessage = getClass.getSimpleName
+      throw new ActionArgumentException(s"Bad nid and/or lastTid and/or count value in : $errorMessage")
     }
   }
 
 }
 
+<<<<<<< HEAD
 /** [[GroupHistory]] result. */
 case class GroupHistoryRes(nid: NID, nodes: Seq[FeedContent]) extends Result
+=======
+/** [[GroupHistory]] result.
+  * @param nodes a sequence of messages
+  */
+case class GroupHistoryRes(nodes: Seq[FeedContent]) extends Result
+>>>>>>> master
 

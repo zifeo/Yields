@@ -29,11 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import yields.client.R;
-import yields.client.exceptions.NodeException;
+
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -44,8 +43,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.service.YieldService;
-import yields.client.service.YieldServiceBinder;
+
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -181,14 +179,13 @@ public class MessageActivity extends AppCompatActivity
         if (mType == ContentType.GROUP_MESSAGES){
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
-            // TODO : uncomment this to allow communication with the app Service.
             YieldsApplication.getBinder().sendMessage(mGroup, message);
         }
         else{
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
             // TODO : implement method to send comments in the message binder.
-            // mMessageBinder.sendComment(...);
+            // mYieldsServiceBinder.sendComment(...);
         }
     }
 

@@ -21,7 +21,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class Group extends Node {
 
     public enum GroupVisibility {
-        PRIVATE("Private"), PUBLIC("Public");
+        PRIVATE("PRIVATE"), PUBLIC("PUBLIC");
 
         private final String mName;
 

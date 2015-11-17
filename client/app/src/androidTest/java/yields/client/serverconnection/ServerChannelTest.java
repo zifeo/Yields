@@ -50,7 +50,11 @@ public class ServerChannelTest {
 
 
         try {
+<<<<<<< HEAD
             channel.sendRequest(simpleServerRequest);
+=======
+            Response response = channel.sendRequest(simpleServerRequest);
+>>>>>>> master
             Assert.assertEquals(sSimpleRequest
                     .replace("TIME", DateSerialization.toString(new Date())),
                     output.toString());

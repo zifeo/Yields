@@ -56,7 +56,15 @@ public class YieldServiceBinder extends Binder {
         for (User u : members){
             memberIDs.add(u.getId());
         }
+<<<<<<< HEAD
         //TODO : Implement Service Request
+=======
+        ServerRequest groupAddServerRequest = RequestBuilder
+                .groupCreateRequest(group.getUsers().get(0).getId(), group.getName(),
+                        group.getVisibility(), memberIDs);
+        Log.d("REQUEST", "Add new group");
+        mService.sendRequest(groupAddServerRequest);
+>>>>>>> master
     }
 
     /**
@@ -76,9 +84,13 @@ public class YieldServiceBinder extends Binder {
     public void sendMessage(Group group, Message message) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
+<<<<<<< HEAD
 
         //TODO: Finish request
         mService.sendRequest(new GroupMessageRequest(message, group));
+=======
+        //mService.sendRequest();
+>>>>>>> master
     }
 
     /**
@@ -91,8 +103,16 @@ public class YieldServiceBinder extends Binder {
                                      Date lastDate) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(lastDate);
+<<<<<<< HEAD
 
         //TODO: Finish request
         mService.sendRequest(new GroupHistoryRequest(group, lastDate));
+=======
+        /*ServerRequest groupHistoryServerRequest = RequestBuilder
+                .GroupHistoryRequest(group.getId(), lastDate, messageCount);*/
+        //TODO : stuff
+        //mService.sendRequest(groupHistoryServerRequest);
+        //Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
+>>>>>>> master
     }
 }

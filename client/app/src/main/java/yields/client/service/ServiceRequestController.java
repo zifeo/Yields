@@ -59,51 +59,55 @@ public class ServiceRequestController {
         mService.receiveError("problem connecting to server : " + e.getMessage());
     }
 
+    /**
+     * Handles any given ServiceRequest.
+     * @param serviceRequest
+     */
     public void handleServiceRequest(ServiceRequest serviceRequest) {
         switch (serviceRequest.getType()) {
             case PING:
                 handlePingRequest();
                 break;
-            case USERCONNECT:
+            case USER_CONNECT:
                 handleUserConnectRequest();
                 break;
-            case USERUPDATE:
+            case USER_UPDATE:
                 handleUserUpdateRequest();
                 break;
-            case USERGROUPLIST:
+            case USER_GROUP_LIST:
                 handleUserGroupListRequest();
                 break;
-            case USERENTOURAGEADD:
+            case USER_ENTOURAGE_ADD:
                 handleUserEntourageAddRequest();
                 break;
-            case USERENTOURAGEREMOVE:
+            case USER_ENTOURAGE_REMOVE:
                 handleUserEntourageRemoveRequest();
                 break;
-            case USERSTATUS:
+            case USER_STATUS:
                 handleUserStatusRequest();
                 break;
-            case GROUPCREATE:
+            case GROUP_CREATE:
                 handleGroupCreateRequest();
                 break;
-            case GROUPUPDATENAME:
+            case GROUP_UPDATE_NAME:
                 handleGroupUpdateNameRequest();
                 break;
-            case GROUPUPDATEVISIBILITY:
+            case GROUP_UPDATE_VISIBILITY:
                 handleGroupUpdateVisibilityRequest();
                 break;
-            case GROUPUPDATEIMAGE:
+            case GROUP_UPDATE_IMAGE:
                 handleGroupUpdateImageRequest();
                 break;
-            case GROUPADD:
+            case GROUP_ADD:
                 handleGroupAddRequest();
                 break;
-            case GROUPREMOVE:
+            case GROUP_REMOVE:
                 handleGroupRemoveRequest();
                 break;
-            case GROUPMESSAGE:
+            case GROUP_MESSAGE:
                 handleGroupMessageRequest((GroupMessageRequest) serviceRequest);
                 break;
-            case GROUPHISTORY:
+            case GROUP_HISTORY:
                 handleGroupHistoryRequest((GroupHistoryRequest) serviceRequest);
                 break;
             default:
@@ -138,57 +142,100 @@ public class ServiceRequestController {
         }
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserGroupListRequest() {
         //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserEntourageRemoveRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserStatusRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupCreateRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserEntourageAddRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupUpdateVisibilityRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupUpdateImageRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupUpdateNameRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupAddRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupRemoveRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserUpdateRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleUserConnectRequest() {
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handlePingRequest() {
-
+        //TODO
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupMessageRequest(GroupMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
@@ -204,6 +251,9 @@ public class ServiceRequestController {
         }
     }
 
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
     private void handleGroupHistoryRequest(GroupHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {

@@ -36,7 +36,11 @@ public class ServerChannel implements CommunicationChannel {
      * @throws IOException If we have trouble sending the serverRequest
      */
     @Override
+<<<<<<< HEAD
     public void sendRequest(ServerRequest serverRequest)
+=======
+    public Response sendRequest(ServerRequest serverRequest)
+>>>>>>> master
             throws IOException {
 
         Objects.requireNonNull(serverRequest);
@@ -45,8 +49,11 @@ public class ServerChannel implements CommunicationChannel {
             throw new IOException("Not connected to server");
         }
 
+<<<<<<< HEAD
         Log.d("DEBUG", "sending : " + serverRequest.message());
 
+=======
+>>>>>>> master
         mSender.write(serverRequest.message());
         mSender.newLine();
         mSender.flush();

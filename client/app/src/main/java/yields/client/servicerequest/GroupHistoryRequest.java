@@ -3,12 +3,12 @@ package yields.client.servicerequest;
 import android.app.Service;
 
 import java.util.Date;
+import java.util.Objects;
 
-import yields.client.id.Id;
 import yields.client.node.Group;
-import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -29,18 +29,22 @@ public class GroupHistoryRequest extends ServiceRequest {
      */
     public GroupHistoryRequest(Group group, Date furthestDate) {
         super();
+
+        Objects.requireNonNull(group);
+        Objects.requireNonNull(furthestDate);
+
         mFurthestDate = new Date(furthestDate.getTime());
         mGroup = group;
     }
 
     /**
-     * Returns the type of this ServiceRequest as a String.
+     * Returns the type of this ServiceRequest.
      *
-     * @return The type of this ServiceRequest as a String.
+     * @return The type of this ServiceRequest.
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPHISTORY;
+        return RequestKind.GROUP_HISTORY;
     }
 
     /**
@@ -52,11 +56,6 @@ public class GroupHistoryRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.groupHistoryRequest(YieldsApplication.getUser().getId(),
                 getGroup().getId(), getDate(), MESSAGE_COUNT);
-    }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
     }
 
     /**

@@ -10,6 +10,7 @@ import com.redis.RedisClient.DESC
 import yields.server.dbi.models._
 
 /**
+<<<<<<< HEAD
  * Model of a node with link to the database
  *
  * Node is abstract superclass of every possible kind of nodes like Group, Image etc
@@ -21,6 +22,20 @@ import yields.server.dbi.models._
  * nodes:[nid]:nodes Zset[NID] with score datetime
  * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
  */
+=======
+  * Model of a node with link to the database
+  *
+  * Node is abstract superclass of every possible kind of nodes like Group, Image etc
+  *
+  * Database structure :
+  * nodes:nid Long - last node id created
+  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
+  * nodes:[nid]:users Zset[UID] with score datetime
+  * nodes:[nid]:nodes Zset[NID] with score datetime
+  * nodes:[nid]:tid Long - last time id created
+  * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
+  */
+>>>>>>> master
 abstract class Node {
 
   object NodeKey {
@@ -125,6 +140,15 @@ abstract class Node {
   def addMessage(content: FeedContent): Boolean = {
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, content._1.toEpochSecond, content)))
   }
+
+  /** Add multiple users to the group */
+  def addMultipleUser(users: Seq[UID]): Unit =
+    users.foreach(addUser)
+
+  /** Add multiple nodes to the group */
+  def addMultipleNodes(nodes: Seq[NID]): Unit =
+    nodes.foreach(addNode)
+
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {

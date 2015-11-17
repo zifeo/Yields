@@ -15,7 +15,8 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     for {
       name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
-    } yield GroupCreate(name, nodes)
+      users <- arbitrary[List[UID]]
+    } yield GroupCreate(name, nodes, users)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {

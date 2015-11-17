@@ -6,12 +6,12 @@ import java.util.Objects;
 
 import yields.client.messages.Message;
 import yields.client.node.Group;
-import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
+import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServerRequest asking the Service to add a Message to a Group.
+ * ServiceRequest asking the Service to add a Message to a Group.
  */
 public class GroupMessageRequest extends ServiceRequest {
 
@@ -25,19 +25,22 @@ public class GroupMessageRequest extends ServiceRequest {
      * @param receivingGroup The Group to which the Message should be added.
      */
     public GroupMessageRequest(Message message, Group receivingGroup) {
+        super();
         Objects.requireNonNull(message);
         Objects.requireNonNull(receivingGroup);
+
         mMessage = message;
         mReceivingGroup = receivingGroup;
     }
+
     /**
-     * Returns the type of this ServiceRequest as a String.
+     * Returns the type of this ServiceRequest.
      *
-     * @return The type of this ServiceRequest as a String.
+     * @return The type of this ServiceRequest.
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUPMESSAGE;
+        return RequestKind.GROUP_MESSAGE;
     }
 
     /**
@@ -49,15 +52,9 @@ public class GroupMessageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         Group group = getReceivingGroup();
         Message message = getMessage();
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(message);
+
         return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
                 message.getContent());
-    }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
     }
 
     /**
