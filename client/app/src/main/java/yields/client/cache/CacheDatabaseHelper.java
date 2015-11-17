@@ -31,6 +31,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -647,8 +648,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                             cursor.getColumnIndex(KEY_MESSAGE_TYPE));
                     Content content = deserializeContent(contentAsBytes, contentType);
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                    Date date = dateFormat.parse(dateAsString);
+                    Date date = DateSerialization.toDateForCache(dateAsString);
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
@@ -683,8 +683,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         while(!done) {
             try {
                 String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                Date date = dateFormat.parse(dateAsString);
+                Date date = DateSerialization.toDateForCache(dateAsString);
                 if(date.compareTo(furthestDate) <= 0){
                     done = true;
                     retValue =  true;
@@ -922,8 +921,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_GROUPID, groupId.getId());
         values.put(KEY_MESSAGE_TYPE, message.getContent().getType().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        values.put(KEY_MESSAGE_DATE, dateFormat.format(message.getDate()));
+        values.put(KEY_MESSAGE_DATE, DateSerialization.toStringForCache(message.getDate()));
         return values;
     }
 
