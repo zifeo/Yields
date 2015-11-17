@@ -7,11 +7,11 @@ import yields.server.dbi.models.{Node, Group, UID, User}
 import yields.server.mpi.Metadata
 import yields.server.utils.{Config, Temporal}
 import yields.server.dbi._
+import yields.server.actions.groups._
 
 
 /**
   * Test if GroupCreate action performed well
-  * TODO flush database before and after
   * TODO test GroupCreate without users
   */
 class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
