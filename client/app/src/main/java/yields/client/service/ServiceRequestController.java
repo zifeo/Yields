@@ -125,12 +125,14 @@ public class ServiceRequestController {
     private void handleAddMessagesToGroup(Response response) {
         try {
             JSONArray array = response.getMessage().getJSONArray("nodes");
-            ArrayList<Message> list = new ArrayList<>();
-            for (int i = 0; i < array.length(); i++) {
-                list.add(new Message(array.getJSONArray(i)));
-            }
+            if (array.length() > 0) {
+                ArrayList<Message> list = new ArrayList<>();
+                for (int i = 0; i < array.length(); i++) {
+                    list.add(new Message(array.getJSONArray(i)));
+                }
 
-            mService.receiveMessages(new Id(response.getMessage().getLong("nid")), list);
+                mService.receiveMessages(new Id(response.getMessage().getLong("nid")), list);
+            }
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }

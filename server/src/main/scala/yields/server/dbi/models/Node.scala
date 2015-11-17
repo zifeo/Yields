@@ -6,6 +6,7 @@ import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
+import com.redis.RedisClient.DESC
 import yields.server.dbi.models._
 
 /**
@@ -111,10 +112,12 @@ abstract class Node {
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
     _feed = redis.withClient(_.zrangebyscore[FeedContent](
       NodeKey.feed,
-      min = datetime.toEpochSecond,
-      max = Temporal.current.toEpochSecond,
-      limit = Some((0, count))
+      min = Temporal.notYet.toEpochSecond,
+      max = datetime.toEpochSecond,
+      limit = Some((0, count)),
+      sortAs = DESC
     ))
+    //TODO: Fix key
     valueOrException(_feed)
   }
 

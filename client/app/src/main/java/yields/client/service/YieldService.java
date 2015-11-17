@@ -159,6 +159,7 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity != null &&
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
+
             mCurrentNotifiableActivity.notifyChange();
         }
     }
