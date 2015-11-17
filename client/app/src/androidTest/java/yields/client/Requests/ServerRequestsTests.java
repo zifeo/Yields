@@ -123,9 +123,10 @@ public class ServerRequestsTests {
      * Tests if a GroupCreateRequest is correctly built.
      * (Test for groupCreateRequest(Id sender, String name, List<Id> nodes))
      */
-    /*
     @Test
     public void testGroupCreateRequest(){
+        //TODO : Need confirmation of how GroupCreateRequests are handled on server side.
+        /*
         try {
             Id senderId = new Id(11);
             String groupName = "Dank AF";
@@ -149,9 +150,9 @@ public class ServerRequestsTests {
                     new JSONArray(nodeIds));
         } catch (JSONException e) {
             fail("Request was not built correctly !");
-        }
+        }*/
     }
-    */
+
 
     /**
      * Tests if a GroupUpdateNameRequest is correctly built.
