@@ -533,18 +533,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     cursor.getColumnIndex(KEY_GROUP_NAME));
             Bitmap groupImage = deserializeBitmap(
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
-            Group.GroupVisibility groupVisibility;
-            switch (cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY))){
-                case "Public":
-                    groupVisibility = Group.GroupVisibility.PUBLIC;
-                    break;
-                case "Private":
-                    groupVisibility = Group.GroupVisibility.PRIVATE;
-                    break;
-                default:
-                    throw new CacheDatabaseException("Couldn't retrieve Group visibility from " +
-                            "Cache, Group Id was : " + groupId.getId());
-            }
+            Group.GroupVisibility groupVisibility = Group.GroupVisibility.valueOf(
+                    cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
