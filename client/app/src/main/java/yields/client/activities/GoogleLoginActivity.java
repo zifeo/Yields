@@ -25,7 +25,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
 
-    /* Request code used to invoke sign in user interactions. */
+    /* ServerRequest code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
 
     /* String used for debug log */

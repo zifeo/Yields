@@ -29,11 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import yields.client.R;
-import yields.client.exceptions.NodeException;
+
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -44,9 +43,9 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.service.MessageBinder;
+
 import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -62,7 +61,7 @@ public class MessageActivity extends AppCompatActivity
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
-    private static MessageBinder mMessageBinder;
+    private static YieldServiceBinder mYieldsServiceBinder;
     private static ActionBar mActionBar;
     private ImageButton mSendButton;
 
@@ -187,13 +186,13 @@ public class MessageActivity extends AppCompatActivity
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             // TODO : uncomment this to allow communication with the app Service.
-            //mMessageBinder.sendMessage(mGroup, message);
+            //mYieldsServiceBinder.sendMessage(mGroup, message);
         }
         else{
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
             // TODO : implement method to send comments in the message binder.
-            // mMessageBinder.sendComment(...);
+            // mYieldsServiceBinder.sendComment(...);
         }
     }
 
@@ -412,16 +411,16 @@ public class MessageActivity extends AppCompatActivity
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             // TODO : use message Binder
-            /*mMessageBinder = (MessageBinder) service;
-            mMessageBinder.attachActivity(MessageActivity.this);*/
+            /*mYieldsServiceBinder = (MessageBinder) service;
+            mYieldsServiceBinder.attachActivity(MessageActivity.this);*/
             mSendButton.setEnabled(true);
-            /*mMessageBinder.addMoreGroupMessages(mGroup, new java.util.Date()
+            /*mYieldsServiceBinder.addMoreGroupMessages(mGroup, new java.util.Date()
                     , 20);*/
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mMessageBinder = null;
+            mYieldsServiceBinder = null;
             mSendButton.setEnabled(false);
         }
     };

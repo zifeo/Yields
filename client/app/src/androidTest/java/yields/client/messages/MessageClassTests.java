@@ -54,7 +54,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
      */
     @Test
     public void testTextContentHasCorrectType(){
-        assertEquals("text", MOCK_TEXT_CONTENT_1.getType());
+        assertEquals(Content.ContentType.TEXT, MOCK_TEXT_CONTENT_1.getType());
     }
 
     /**
@@ -64,7 +64,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testImageContentHasCorrectType(){
         Bitmap bitmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.send_icon);
         ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
-        assertEquals("image", imageContent.getType());
+        assertEquals(Content.ContentType.IMAGE, imageContent.getType());
     }
 
     /**

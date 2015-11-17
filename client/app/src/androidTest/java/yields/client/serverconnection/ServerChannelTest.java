@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 
+import yields.client.id.Id;
+
 public class ServerChannelTest {
     private final static String FAKE_RESPONSE = "{" +
             "\"type\":\"test\"," +
@@ -32,12 +34,12 @@ public class ServerChannelTest {
             "\"datetime\":\"TIME\"}," +
             "\"kind\":\"PING\"," +
             "\"message\":" +
-            "{\"content\":\"test\"}" +
+            "{\"text\":\"test\"}" +
             "}\n";
 
     @Test
-    public void testWorkingSendRequestAndReadResponse() throws JSONException{
-        Request simpleRequest = RequestBuilder.pingRequest("test");
+    public void testWorkingSendRequestAndReadResponse() {
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -49,7 +51,7 @@ public class ServerChannelTest {
 
 
         try {
-            Response response = channel.sendRequest(simpleRequest);
+            Response response = channel.sendRequest(simpleServerRequest);
             Assert.assertEquals(sSimpleRequest
                     .replace("TIME", DateSerialization.toString(new Date())),
                     output.toString());
@@ -59,8 +61,8 @@ public class ServerChannelTest {
     }
 
     @Test
-    public void testNonWorkingConnection() throws IOException{
-        Request simpleRequest = RequestBuilder.pingRequest("test");
+    public void testNonWorkingConnection() {
+        ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
 
         ByteArrayInputStream input = new ByteArrayInputStream(
                 FAKE_RESPONSE.getBytes());
@@ -70,9 +72,10 @@ public class ServerChannelTest {
                 toReade(input), simpleStatus(false));
 
         try {
-            channel.sendRequest(simpleRequest);
+            channel.sendRequest(simpleServerRequest);
             Assert.fail("");
         } catch (IOException e) {
+            //Assert.fail(e.getMessage());
         }
 
         Assert.assertEquals("", output.toString());

@@ -9,16 +9,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import yields.client.activities.GroupActivity;
-import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
 import yields.client.id.Id;
-import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
-import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.node.User;
-import yields.client.serverconnection.Request;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
 
 public class YieldServiceBinder extends Binder {
@@ -58,10 +54,11 @@ public class YieldServiceBinder extends Binder {
         for (User u : members){
             memberIDs.add(u.getId());
         }
-        Request groupAddRequest = RequestBuilder
-                .GroupCreateRequest(group.getUsers().get(0).getId(), group.getName(), memberIDs);
+        ServerRequest groupAddServerRequest = RequestBuilder
+                .groupCreateRequest(group.getUsers().get(0).getId(), group.getName(),
+                        group.getVisibility(), memberIDs);
         Log.d("REQUEST", "Add new group");
-        mService.sendRequest(groupAddRequest);
+        mService.sendRequest(groupAddServerRequest);
     }
 
     /**
@@ -81,9 +78,7 @@ public class YieldServiceBinder extends Binder {
     public void sendMessage(Group group, Message message){
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        Request groupMessageReq = createRequestForMessageToSend(group, message);
-        Log.d("REQUEST", "sendMessage = " + groupMessageReq.message());
-        mService.sendRequest(groupMessageReq);
+        //mService.sendRequest();
     }
 
     /**
@@ -97,36 +92,10 @@ public class YieldServiceBinder extends Binder {
                                      Date lastDate, int messageCount) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(lastDate);
-        Request groupHistoryRequest = RequestBuilder
-                .GroupHistoryRequest(group.getId(), lastDate, messageCount);
-        mService.sendRequest(groupHistoryRequest);
-        Log.d("REQUEST", "getGroupMessages " + groupHistoryRequest.message());
-    }
-
-    /**
-     * Build a request for sending a message to a group.
-     * @param group The group receiving the message.
-     * @param message The message to be sent to the group.
-     * @return The request.
-     */
-    private static Request createRequestForMessageToSend(Group group, Message message){
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(message);
-        Request req;
-        switch (message.getContent().getType()) {
-            case "image":
-                req = RequestBuilder
-                        .GroupImageMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", (ImageContent) message.getContent());
-                break;
-            case "text":
-                req = RequestBuilder
-                        .GroupTextMessageRequest(message.getSender().getId(), group.getId(),
-                                "text", ((TextContent) message
-                                        .getContent()).getText());
-                break;
-            default : throw new IllegalArgumentException("type unknown");
-        }
-        return req;
+        /*ServerRequest groupHistoryServerRequest = RequestBuilder
+                .GroupHistoryRequest(group.getId(), lastDate, messageCount);*/
+        //TODO : stuff
+        //mService.sendRequest(groupHistoryServerRequest);
+        //Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
     }
 }
