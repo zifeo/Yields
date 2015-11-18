@@ -29,7 +29,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class Message extends Node {
 
     public enum MessageStatus {
-        SENT("SENT"), SEEN("SEEN"), NOT_SENT("NOT_SENT");
+        RECEIVED("RECEIVED"), SEEN("SEEN"), NOT_SENT("NOT_SENT");
 
         private String mValue;
 
@@ -109,7 +109,7 @@ public class Message extends Node {
             throw new JSONException(e.getMessage());
         }
 
-        mStatus = MessageStatus.SENT;
+        mStatus = MessageStatus.NOT_SENT;
     }
 
     /**
