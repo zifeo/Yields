@@ -43,11 +43,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(getInstrumentation().getContext().getResources());
-<<<<<<< 36e0fa42ddf3bbf4b02a224522f2ee2b2ba3c306
         MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
-=======
-        MOCK_TEXT_CONTENT_1 = MockFactory.generateFakeTextContent("Mock text.");
->>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
     }
 
     /**
@@ -96,13 +92,8 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         assertEquals(Message.MessageStatus.NOT_SENT, message.getStatus());
 
         message = new Message("message", new Id(-4), user, content, new Date(),
-<<<<<<< 36e0fa42ddf3bbf4b02a224522f2ee2b2ba3c306
-                Message.MessageStatus.SENT);
-        assertEquals(Message.MessageStatus.SENT, message.getStatus());
-=======
                 Message.MessageStatus.RECEIVED);
         assertEquals(Message.MessageStatus.RECEIVED, message.getStatus());
->>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
 
         message = new Message("message", new Id(-4), user, content, new Date(),
                 Message.MessageStatus.SEEN);
@@ -123,11 +114,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentHasCorrectType() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-<<<<<<< 36e0fa42ddf3bbf4b02a224522f2ee2b2ba3c306
         ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
-=======
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
->>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
         assertEquals(Content.ContentType.IMAGE, imageContent.getType());
     }
 
@@ -145,11 +132,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectCaption() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-<<<<<<< 36e0fa42ddf3bbf4b02a224522f2ee2b2ba3c306
         ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
-=======
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
->>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
         assertEquals("Mock caption", imageContent.getCaption());
     }
 
@@ -159,11 +142,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectImage() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-<<<<<<< 36e0fa42ddf3bbf4b02a224522f2ee2b2ba3c306
         ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
-=======
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
->>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
         assertTrue(imageContent.getImage().sameAs(bitmap));
     }
 
@@ -183,11 +162,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectLayout() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-<<<<<<< 36e0fa42ddf3bbf4b02a224522f2ee2b2ba3c306
         ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
-=======
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
->>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
         LinearLayout view = null;
         try {
             view = (LinearLayout) imageContent.getView();
