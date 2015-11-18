@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -171,10 +170,14 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
             e.printStackTrace();
         }
         //Caption from TextView
-        TextView caption = (TextView) view.getChildAt(0);
+        TextView caption = null;
+        if (view != null) {
+            caption = (TextView) view.getChildAt(0);
+        } else{
+            fail("View was incorrect !");
+        }
         assertEquals("Mock caption", caption.getText());
         //Image from ImageView
-        ImageView image = (ImageView) view.getChildAt(1);
         //TODO : find a way to check that layout image is correct
     }
 
