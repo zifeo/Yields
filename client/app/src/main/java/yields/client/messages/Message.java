@@ -87,9 +87,15 @@ public class Message extends Node {
      * @param object The JSON representing the message.
      * @throws JSONException if the json is invalid.
      */
+<<<<<<< HEAD
     public Message(JSONArray object ) throws JSONException, ParseException{
         super(object.getString(0),
                 new Id(DateSerialization.toDate(object.getString(0)).getTime()));
+=======
+    public Message(JSONObject object) throws JSONException {
+        super(object.getString("datetime") + object.getString("user"),
+                new Id(object.getString("id")));
+>>>>>>> Add MessageStatus enum to Message, and use it as field, tests for this are also added.
 
         Id idUser = new Id(object.getString(1));
         /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
