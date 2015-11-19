@@ -53,7 +53,8 @@ public class Group extends Node {
      * @param validated  If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
+    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility,
+                 boolean validated) {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
@@ -103,7 +104,19 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<User> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE, false);
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+                false);
+    }
+
+    /**
+     * Create a wrapper for the comment message in order to be able to send and retreive comment
+     * for this message.
+     * @param messageComment The message commented.
+     * @param group The parent group containing the message.
+     * @return The group wrapper for this message.
+     */
+    public static Group createGroupForMessageComment(Message messageComment, Group group) {
+        return new Group("message comment", messageComment.getId(), group.getUsers());
     }
 
     /**
@@ -185,26 +198,29 @@ public class Group extends Node {
 
     /**
      * Add a tag to the group
+     *
      * @param tag The tag we want to add, without spaces, in lowercase
      */
-    public void addTag(Tag tag){
+    public void addTag(Tag tag) {
         mTags.add(Objects.requireNonNull(tag));
     }
 
     /**
      * Indicate whether the group can be matched with a given tag
+     *
      * @param tag The tag we want to test
      * @return true iff the group contains the given tag
      */
-    public boolean matchToTag(Tag tag){
+    public boolean matchToTag(Tag tag) {
         return mTags.contains(tag);
     }
 
     /**
      * Returns a list containing all the tags of the group
+     *
      * @return A list containing all the tags of the group, in a random order
      */
-    public List<Tag> getTagList(){
+    public List<Tag> getTagList() {
         return new ArrayList<>(mTags);
     }
 
@@ -272,20 +288,21 @@ public class Group extends Node {
 
         /**
          * Default constructor for tags
+         *
          * @param text The text of the tag
          */
-        public Tag(String text){
-            if (text.contains(" ")){
+        public Tag(String text) {
+            if (text.contains(" ")) {
                 throw new IllegalArgumentException("Tag cannot contain spaces");
             }
-            if (!text.toLowerCase().equals(text)){
+            if (!text.toLowerCase().equals(text)) {
                 throw new IllegalArgumentException("Tag must be in lowercase");
             }
-            if (text.length() < MIN_TAG_LENGTH){
+            if (text.length() < MIN_TAG_LENGTH) {
                 throw new IllegalArgumentException(
                         "Length of a Tag must be at least " + MIN_TAG_LENGTH + " characters");
             }
-            if (text.length() > MAX_TAG_LENGTH){
+            if (text.length() > MAX_TAG_LENGTH) {
                 throw new IllegalArgumentException(
                         "Length of a Tag cannot be more than " + MAX_TAG_LENGTH + " characters");
             }
@@ -295,12 +312,13 @@ public class Group extends Node {
 
         /**
          * Compares a tag and another object
+         *
          * @param o The object we want to test
          * @return true iff the two objects are equals
          */
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Tag){
+            if (o instanceof Tag) {
                 return ((Tag) o).mText.equals(this.mText);
             }
             return super.equals(o);
@@ -308,6 +326,7 @@ public class Group extends Node {
 
         /**
          * Gives the hashcode of a tag
+         *
          * @return The hash of this tag
          */
         @Override
@@ -317,9 +336,10 @@ public class Group extends Node {
 
         /**
          * Returns the text of the tag
+         *
          * @return The text of the tag
          */
-        public String getText(){
+        public String getText() {
             return mText;
         }
     }
