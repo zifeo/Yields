@@ -81,7 +81,7 @@ abstract class Node {
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
     _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.refreshed_at))
-    valueOrDefault(_refreshed_at, Temporal.notYet)
+    valueOrDefault(_refreshed_at, Temporal.minimum)
   }
 
   /** Users getter */
@@ -112,7 +112,7 @@ abstract class Node {
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
     _feed = redis.withClient(_.zrangebyscore[FeedContent](
       NodeKey.feed,
-      min = Temporal.notYet.toEpochSecond,
+      min = Temporal.minimum.toEpochSecond,
       max = datetime.toEpochSecond,
       limit = Some((0, count)),
       sortAs = DESC
