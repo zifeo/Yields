@@ -1,8 +1,11 @@
 package yields.client.activities;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -39,7 +42,7 @@ public class UserListActivity extends AppCompatActivity {
 
         Group group = Objects.requireNonNull(YieldsApplication.getGroup(),
                 "The group in YieldsApplication cannot be null when UserListActivity is created");
-        List<User> userList = Objects.requireNonNull(YieldsApplication.getUserList(),
+        final List<User> userList = Objects.requireNonNull(YieldsApplication.getUserList(),
                 "The user list in YieldsApplication cannot be null when UserListActivity is created");
 
         String title = "Users of " + group.getName();
@@ -51,7 +54,15 @@ public class UserListActivity extends AppCompatActivity {
                 R.layout.user_layout, userList);
 
         listView.setAdapter(arrayAdapter);
-        //listView.setOnItemClickListener(new CustomListener());
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                YieldsApplication.setUserSearched(userList.get(position));
+
+                Intent intent = new Intent(UserListActivity.this, UserInfoActivity.class);
+                startActivity(intent);
+            }
+        });
         listView.setItemsCanFocus(true);
     }
 }
