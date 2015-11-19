@@ -44,7 +44,7 @@ abstract class Node {
   private var _refreshed_at: Option[OffsetDateTime] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
-  private var _feed: Option[List[FeedContent]] = None
+  private var _feed: Option[List[IncomingFeedContent]] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -109,8 +109,8 @@ abstract class Node {
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
   /** Get n messages starting from some point */
-  def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
-    _feed = redis.withClient(_.zrangebyscore[FeedContent](
+  def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
+    _feed = redis.withClient(_.zrangebyscore[IncomingFeedContent](
       NodeKey.feed,
       min = Temporal.minimum.toEpochSecond,
       max = datetime.toEpochSecond,
@@ -122,7 +122,7 @@ abstract class Node {
   }
 
   /** Add message */
-  def addMessage(content: FeedContent): Boolean = {
+  def addMessage(content: IncomingFeedContent): Boolean = {
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, content._1.toEpochSecond, content)))
   }
 

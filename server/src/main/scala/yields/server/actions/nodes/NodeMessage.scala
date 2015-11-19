@@ -32,10 +32,10 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
         group.addMessage((Temporal.current, metadata.sender, None, text.getOrElse("")))
       }
     }
-    NodeMessageRes(true)
+    NodeMessageRes()
   }
 
 }
 
 /** [[NodeMessage]] result. */
-case class NodeMessageRes(b: Boolean) extends Result
+case class NodeMessageRes() extends Result

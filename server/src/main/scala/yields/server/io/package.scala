@@ -5,7 +5,7 @@ import yields.server.actions.groups._
 import yields.server.actions.nodes._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
-import yields.server.io.models.{ImageJsonFormat, GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
+import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
 import yields.server.io.mpi.{RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -21,7 +21,6 @@ package object io {
   implicit lazy val nodeJF = NodeJsonFormat
   implicit lazy val groupJF = GroupJsonFormat
   implicit lazy val userJF = UserJsonFormat
-  implicit lazy val imageJF = ImageJsonFormat
 
   /** *** Actions  *****/
 
@@ -37,7 +36,7 @@ package object io {
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
 
   implicit lazy val nodeMessageJF = jsonFormat4(NodeMessage)
-  implicit lazy val nodeMessageResJF = jsonFormat1(NodeMessageRes)
+  implicit lazy val nodeMessageResJF = jsonFormat0(NodeMessageRes)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
   implicit lazy val nodeHistoryResJF = jsonFormat2(NodeHistoryRes)

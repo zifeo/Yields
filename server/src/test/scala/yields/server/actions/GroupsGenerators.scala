@@ -58,12 +58,12 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
   implicit lazy val groupHistoryResArb: Arbitrary[NodeHistoryRes] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      nodes <- arbitrary[List[FeedContent]]
+      nodes <- arbitrary[List[ResponseFeedContent]]
     } yield NodeHistoryRes(nid, nodes)
   }
 
   implicit lazy val groupMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
-    NodeMessageRes(true)
+    NodeMessageRes()
   }
 
 }

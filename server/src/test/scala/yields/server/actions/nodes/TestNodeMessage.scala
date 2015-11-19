@@ -26,7 +26,7 @@ class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
   lazy val users: List[User] = List(User.create("e1"), User.create("e2"), User.create("e3"), User.create("e4"))
   lazy val nodes: List[Node] = List(Group.createGroup("g1"), Group.createGroup("g2"), Group.createGroup("g3"))
 
-  "running groupCreate action with all parameters set" should "create a group" in {
+  "running nodeMessage action on a group" should "add new entry to feed" in {
     val create = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid))
     val res = create.run(m)
 
@@ -40,7 +40,22 @@ class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
         msg.head._4 should be("A message")
         msg.head._2 should be(m.sender)
     }
-
   }
+
+  "receiving a media in a messgae" should "create the media on disk" in {
+    val group = Group.createGroup("name")
+    val action = new NodeMessage(group.nid, Some("Some text"), Some("image"), Some("Some content"))
+    action.run(m)
+    val feed = group.getMessagesInRange(Temporal.current, 5)
+
+    feed.head._3.isDefined should be(true)
+    feed.head._4 should be("Some text")
+
+    val media = Media(feed.head._3.get)
+    Media.checkFileExist(media.hash) should be(true)
+    media.contentType should be("image")
+    media.content should be("Some content")
+  }
+
 
 }

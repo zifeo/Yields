@@ -27,13 +27,13 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
     redis(_.select(Config.getInt("database.id")))
   }
 
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
   def add10Msgs(nid: NID) = {
     val g = Group(nid)
     for {
       i <- 1 until 10
-      msg <- arbitrary[FeedContent].sample
+      msg <- arbitrary[IncomingFeedContent].sample
     } yield g.addMessage(msg)
   }
 
@@ -47,6 +47,40 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
       case NodeHistoryRes(nid, messages) =>
         messages.length should be(n)
         nid should be(group.nid)
+    }
+  }
+
+  "getting message containing media" should "give the media back" in {
+    val group = Group.createGroup("name")
+    val addMsg1 = new NodeMessage(group.nid, Some("this entry has some text"), None, None)
+    addMsg1.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+
+    val addMsg2 = new NodeMessage(group.nid, None, Some("image"), Some("Some content"))
+    addMsg2.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+
+    val addMsg3 = new NodeMessage(group.nid, Some("text"), Some("image"), Some("other content"))
+    addMsg3.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+
+    val addMsg4 = new NodeMessage(group.nid, Some("some text again"), None, None)
+    addMsg4.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+
+    val history = new NodeHistory(group.nid, Temporal.current, 4)
+    val res = history.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+    res match {
+      case NodeHistoryRes(nid, messages) =>
+        messages.head._4 should be("this entry has some text")
+        messages.head._3.isDefined should be(false)
+
+        messages(1)._3.isDefined should be(true)
+        messages(1)._3.get should be("Some content")
+        messages(1)._4 should be("")
+
+        messages(2)._3.isDefined should be(true)
+        messages(2)._3.get should be("other content")
+        messages(2)._4 should be("text")
+
+        messages(3)._3.isDefined should be(false)
+        messages(3)._4 should be("some text again")
     }
   }
 

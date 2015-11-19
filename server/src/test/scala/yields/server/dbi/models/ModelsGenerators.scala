@@ -21,13 +21,12 @@ trait ModelsGenerators extends DefaultsGenerators {
     } yield User(uid)
   }
 
-  implicit lazy val feedContentArb: Arbitrary[FeedContent] = Arbitrary {
+  implicit lazy val feedContentArb: Arbitrary[IncomingFeedContent] = Arbitrary {
     for {
       datetime <- arbitrary[OffsetDateTime]
       uid <- arbitrary[UID]
-      nid <- arbitrary[Option[NID]]
       text <- arbitrary[String]
-    } yield (datetime, uid, nid, text)
+    } yield (datetime, uid, None, text)
   }
 
 }

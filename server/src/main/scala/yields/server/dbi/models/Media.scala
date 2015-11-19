@@ -33,7 +33,7 @@ class Media private(override val nid: NID) extends Node {
   private var _path: Option[String] = None
 
   /** Media content getter */
-  def content: String = {
+  def content: Blob = {
     import scala.io._
     if (_path.isDefined && _hash.isDefined) {
       if (checkFileExist(_hash.get)) {
@@ -50,7 +50,7 @@ class Media private(override val nid: NID) extends Node {
   }
 
   /** Media content setter on disk */
-  def content_=(content: String) = {
+  def content_=(content: Blob) = {
     if (_path.isDefined) {
       val p = _path.get
       val file = new File(p)
@@ -111,7 +111,7 @@ object Media {
     * @param content base64 media
     * @return media
     */
-  def createMedia(contentType: String, content: String): Media = {
+  def createMedia(contentType: String, content: Blob): Media = {
     // Create hash
     val hash = createHash(content)
     val img = Media(Node.newNID())
@@ -131,7 +131,7 @@ object Media {
 
   }
 
-  def createHash(content: String): String = {
+  def createHash(content: Blob): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
     val ha = new sun.misc.BASE64Encoder().encode(md.digest(content.getBytes))
     ha.filter(_ != '/')
@@ -142,7 +142,7 @@ object Media {
   }
 
   def buildPathFromName(name: String): String = {
-    Config.getString("ressource.media.folder") + name + Config.getString("ressource.image.extOnDisk")
+    Config.getString("ressource.media.folder") + name + Config.getString("ressource.media.extension")
   }
 
 }
