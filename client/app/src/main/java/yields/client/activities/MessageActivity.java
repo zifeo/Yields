@@ -257,7 +257,7 @@ public class MessageActivity extends AppCompatActivity
                     retrieveGroupMessages();
                 }
                 else{
-                    retreiveCommentMessages();
+                    retrieveCommentMessages();
                 }
             }
         });
@@ -320,6 +320,16 @@ public class MessageActivity extends AppCompatActivity
         Log.d("MessageActivity", "Fragment created");
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
+        loadComments();
+    }
+
+    /**
+     * Make request to load comments for a message and sends it to the server using the
+     * ServiceBinder.
+     */
+    private void loadComments(){
+        GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
+        YieldsApplication.getBinder().sendRequest(request);
     }
 
     /**
@@ -389,7 +399,7 @@ public class MessageActivity extends AppCompatActivity
     /**
      * Retrieve comments for a message an puts them in the comments adapter.
      */
-    private void retreiveCommentMessages() {
+    private void retrieveCommentMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
