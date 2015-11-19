@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -282,7 +283,57 @@ public class GroupSettingsActivity extends AppCompatActivity {
          * Listener for the "Add tag" item.
          */
         private void changeTagListener() {
+            final EditText editTextTag = new EditText(GroupSettingsActivity.this);
+            editTextTag.setId(R.id.editText);
 
+            final AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
+                    .setTitle("Add new tag")
+                    .setMessage("The new tag must be between 2 and 20 characters" +
+                            ", in lowercase, with no spaces.")
+                    .setView(editTextTag)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String text = editTextTag.getText().toString();
+
+                    if (text.length() < Group.Tag.MIN_TAG_LENGTH) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The tag is too short");
+                    } else if (text.length() > Group.Tag.MAX_TAG_LENGTH) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The tag is too long");
+                    } else if (!text.toLowerCase().equals(text)) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The tag is not in lowercase");
+                    } else if (text.contains(" ")) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The tag contains spaces");
+                    } else {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "Tag \"" + text + "\" added");
+
+                        Group.Tag tag = new Group.Tag(text);
+
+                        mGroup.addTag(tag);
+
+                        // TODO Send request to server to add tag in database
+
+                        dialog.dismiss();
+                    }
+                }
+            });
         }
     }
 
