@@ -14,8 +14,8 @@ import java.net.UnknownHostException;
  *
  */
 public class YieldsSocketProvider implements SocketProvider {
-    private final static int DST_PORT = 7777;
-    private final static String LOCAL_ADDRESS = "10.0.2.2";
+    private final static int DST_PORT = 27777;
+    private final static String LOCAL_ADDRESS = "avalan.ch";
     private final InetAddress mDstAddress;
 
     /**
