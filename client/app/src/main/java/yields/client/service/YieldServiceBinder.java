@@ -1,23 +1,16 @@
 package yields.client.service;
 
 import android.os.Binder;
-import android.util.Log;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import yields.client.activities.NotifiableActivity;
-import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.serverconnection.ServerRequest;
-import yields.client.serverconnection.RequestBuilder;
 import yields.client.servicerequest.GroupHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
+import yields.client.servicerequest.NodeMessageRequest;
 
 public class YieldServiceBinder extends Binder {
     private final YieldService mService;
@@ -82,7 +75,7 @@ public class YieldServiceBinder extends Binder {
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
 
-        mService.sendRequest(new GroupMessageRequest(message, group));
+        mService.sendRequest(new NodeMessageRequest(message, group));
     }
 
     /**
