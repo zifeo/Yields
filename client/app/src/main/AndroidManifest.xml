@@ -78,15 +78,16 @@
             android:name=".activities.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity
+            android:name=".activities.UserInfoActivity"
+            android:parentActivityName=".activities.UserListActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
 
         <service
             android:name=".service.YieldService"
             android:enabled="true"
             android:exported="true" >
         </service>
-
-        <activity android:name=".activities.UserInfoActivity" >
-        </activity>
     </application>
-
 </manifest>

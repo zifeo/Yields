@@ -43,7 +43,7 @@ public class GroupInfoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         mGroup = Objects.requireNonNull(YieldsApplication.getGroup(),
-                "The group in YieldsApplication cannot be null when this activity is created");
+                "The group in YieldsApplication cannot be null when GroupInfoActivity is created");
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewGroup);
         imageView.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(mGroup.getImage(),

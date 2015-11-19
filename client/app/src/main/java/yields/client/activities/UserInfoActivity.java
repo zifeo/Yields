@@ -36,7 +36,7 @@ public class UserInfoActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Group Information");
+        getSupportActionBar().setTitle("User Information");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         User user = Objects.requireNonNull(YieldsApplication.getUserSearched(),
