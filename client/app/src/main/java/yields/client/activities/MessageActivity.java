@@ -193,15 +193,16 @@ public class MessageActivity extends AppCompatActivity
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(0), mUser, content,
-                new Date());
+        Message message = new Message("message", new Id(0), mUser, content, new Date());
         if (mType == ContentType.GROUP_MESSAGES){
+            Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
             YieldsApplication.getBinder().sendRequest(request);
         }
         else{
+            Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
             NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
@@ -326,6 +327,7 @@ public class MessageActivity extends AppCompatActivity
      * MessageActivity (id fragmentPlaceHolder).
      */
     private void createCommentFragment(){
+        Log.d("MessageActivity", "createCommentFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -336,7 +338,6 @@ public class MessageActivity extends AppCompatActivity
         mCommentAdapter.clear();
         ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
         ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
-        Log.d("MessageActivity", "Fragment created");
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
         loadComments();
@@ -347,6 +348,7 @@ public class MessageActivity extends AppCompatActivity
      * ServiceBinder.
      */
     private void loadComments(){
+        Log.d("MessageActivity", "loadComments");
         GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
@@ -356,6 +358,7 @@ public class MessageActivity extends AppCompatActivity
      * the MessageActivity (id fragmentPlaceHolder).
      */
     private void createGroupMessageFragment(){
+        Log.d("MessageActivity", "createGroupMessageFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -379,7 +382,6 @@ public class MessageActivity extends AppCompatActivity
                         createCommentFragment();
                     }
                 });
-        Log.d("MessageActivity", "Fragment created");
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
     }
@@ -409,6 +411,7 @@ public class MessageActivity extends AppCompatActivity
      * Retrieve message from the server and puts them in the group message adapter.
      */
     private void retrieveGroupMessages() {
+        Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
@@ -421,6 +424,7 @@ public class MessageActivity extends AppCompatActivity
      * Retrieve comments for a message an puts them in the comments adapter.
      */
     private void retrieveCommentMessages() {
+        Log.d("MessageActivity", "retrieveCommentMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
@@ -467,7 +471,7 @@ public class MessageActivity extends AppCompatActivity
 
         public void sendRequest(ServiceRequest request) {
             Objects.requireNonNull(request);
-            Log.d("MessageActivity", "Send request : " + request.toString());
+            Log.d("MessageActivity", "Send request : " + request.getType().toString());
         }
     }
 
