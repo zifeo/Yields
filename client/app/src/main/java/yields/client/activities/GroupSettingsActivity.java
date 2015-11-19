@@ -36,7 +36,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * where the admin can change its name, image, users...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, TYPE, IMAGE, USERS}
+    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
@@ -68,6 +68,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
+        itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
@@ -171,6 +172,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     changeImageListener();
                     break;
 
+                case ADD_TAG:
+                    changeTagListener();
+                    break;
+
                 default:
                     addUsersListener();
                     break;
@@ -248,7 +253,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Change group image" item.
          */
-        void changeImageListener(){
+        private void changeImageListener(){
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -258,7 +263,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Add users" item.
          */
-        void addUsersListener(){
+        private void addUsersListener(){
             ArrayList<String> emailList = new ArrayList<>();
             List<User> currentUsers = mGroup.getUsers();
 
@@ -271,6 +276,13 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     EMAIL_LIST_INPUT_KEY, emailList);
 
             startActivityForResult(intentSelectUsers, REQUEST_ADD_USERS);
+        }
+
+        /**
+         * Listener for the "Add tag" item.
+         */
+        private void changeTagListener() {
+
         }
     }
 
