@@ -46,7 +46,7 @@ public class GroupMessageRequest extends ServiceRequest {
     /**
      * Build a ServerRequest for sending a message to a group.
      *
-     * @return The ServerRequest corresponding to this ServiceRequest.
+     * @return The ServerRequest corresponding to this ServiceRequest.<<
      */
     @Override
     public ServerRequest parseRequestForServer() {
