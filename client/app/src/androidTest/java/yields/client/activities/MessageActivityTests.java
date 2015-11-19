@@ -35,7 +35,6 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
-import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 /**
