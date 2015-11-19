@@ -3,14 +3,10 @@ package yields.client.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +24,6 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.SortedMap;
 
 import yields.client.R;
@@ -45,7 +40,7 @@ import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
 import yields.client.servicerequest.GroupHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
+import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -182,7 +177,7 @@ public class MessageActivity extends AppCompatActivity
         if (mType == ContentType.GROUP_MESSAGES){
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
-            GroupMessageRequest request = new GroupMessageRequest(message, mGroup);
+            NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
             YieldsApplication.getBinder().sendRequest(request);
         }
         else{
