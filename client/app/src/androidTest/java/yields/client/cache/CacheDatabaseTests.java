@@ -653,15 +653,13 @@ public class CacheDatabaseTests {
      * @return True if the Messages are the same, false otherwise.
      */
     private boolean compareMessages(Message originalMessage, Message messageFromCache) {
-        boolean equal = true;
-        equal = equal && originalMessage.getSender().getId().getId().equals(
+        boolean equal = originalMessage.getSender().getId().getId().equals(
                 messageFromCache.getSender().getId().getId());
         equal = equal && originalMessage.getSender().getEmail().equals(
                 messageFromCache.getSender().getEmail());
         equal = equal && originalMessage.getSender().getName().equals(
                 messageFromCache.getSender().getName());
 
-        equal = equal && originalMessage.getName().equals(messageFromCache.getName());
         equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
         equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);
         equal = equal && originalMessage.getPreview().equals(messageFromCache.getPreview());
@@ -674,11 +672,12 @@ public class CacheDatabaseTests {
         switch (originalMessage.getContent().getType()) {
             case TEXT:
                 contentEqual = ((TextContent) originalMessage.getContent()).getText().equals(
-                        ((TextContent) messageFromCache.getContent()));
+                        ((TextContent) messageFromCache.getContent()).getText());
                 break;
             case IMAGE:
                 contentEqual = compareImages(((ImageContent) originalMessage.getContent()).getImage(),
                         ((ImageContent) messageFromCache.getContent()).getImage());
+                break;
             default:
                 contentEqual = false;
                 fail("Impossible content type !");
