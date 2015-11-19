@@ -51,6 +51,16 @@ public final class ServerChannel implements CommunicationChannel {
         mSender.flush();
     }
 
+    @Override
+    public void destroy(){
+        try {
+            mSender.close();
+        } catch (IOException e) {
+            Log.d("Y:" + this.getClass().getName(),
+                    "problem closing BufferedReader : " + e.getMessage());
+        }
+    }
+
     /**
      * Test the validity of the response.
      * @param response The response to test.
