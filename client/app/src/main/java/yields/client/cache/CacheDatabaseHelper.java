@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ContentException;
@@ -336,6 +335,29 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             do {
                 Id userId = new Id(cursor.getLong(
                         cursor.getColumnIndex(KEY_USER_NODE_ID)));
+                users.add(getUser(userId));
+            } while (cursor.moveToNext());
+            cursor.close();
+            return users;
+        }
+    }
+
+    /**
+     * Returns all Users that are in the ClientUser's entourage in the database.
+     *
+     * @return An exhaustive List of all Users in the database that are in the ClientUser's entourage.
+     */
+    public List<User> getClientUserEntourage() {
+        String selectAllUsersQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_ENTOURAGE + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectAllUsersQuery, new String[]{"1"});
+        List<User> users = new ArrayList<>();
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return users;
+        } else {
+            do {
+                Id userId = new Id(cursor.getLong(
+                        cursor.getColumnIndex(KEY_USER_NODEID)));
                 users.add(getUser(userId));
             } while (cursor.moveToNext());
             cursor.close();

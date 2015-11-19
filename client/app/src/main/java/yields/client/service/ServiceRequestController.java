@@ -8,6 +8,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import yields.client.cache.CacheDatabaseHelper;
@@ -25,11 +26,11 @@ import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateVisibilityRequest;
+import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -60,7 +61,7 @@ public class ServiceRequestController {
      *
      * @param e the exception that was triggered the connection error
      */
-    synchronized public void handleConnectionError(final IOException e){
+    synchronized public void handleConnectionError(final IOException e) {
         if (!isConnecting.get()) {
             mService.onServerDisconnected();
             mService.receiveError("Problem connecting to server : " + e.getMessage());
@@ -84,6 +85,7 @@ public class ServiceRequestController {
 
     /**
      * Test if the server is connected
+     *
      * @return
      */
     synchronized public boolean isConnected() {
@@ -185,11 +187,7 @@ public class ServiceRequestController {
         }
     }
 
-    private void handleGroupMessageResponse(Response serverResponse) {
-
-    }
-
-    private void handleGroupHistoryResponse(Response response) {
+    private void handleAddMessagesToGroupResponse(Response response) {
         try {
             JSONArray array = response.getMessage().getJSONArray("nodes");
             if (array.length() > 0) {
@@ -201,6 +199,7 @@ public class ServiceRequestController {
                     list.add(message);
                     mCacheHelper.addMessage(message, groupId);
                 }
+
                 mService.receiveMessages(groupId, list);
             }
         } catch (JSONException | ParseException e) {
