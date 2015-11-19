@@ -64,4 +64,14 @@ public class TextContent extends Content {
     public String getPreview() {
         return mText;
     }
+
+    /**
+     * Returns the text of the Content, this should exclusively be used for requests.
+     *
+     * @return The text associated to this Content (for a request).
+     */
+    @Override
+    public String getTextForRequest() {
+        return mText;
+    }
 }
