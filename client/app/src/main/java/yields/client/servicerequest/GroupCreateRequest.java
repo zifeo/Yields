@@ -1,7 +1,5 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,7 +8,6 @@ import yields.client.id.Id;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -60,6 +57,15 @@ public class GroupCreateRequest extends ServiceRequest {
         }
         return RequestBuilder.groupCreateRequest(mCreator.getId(), mGroup.getName(), mGroup
                 .getVisibility(), userIds);
+    }
+
+    /**
+     * Returns the Group that will be created.
+     *
+     * @return The Group that will be created.
+     */
+    public Group getGroup() {
+        return mGroup;
     }
 
 }

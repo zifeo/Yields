@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ContentException;
@@ -54,6 +53,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_IMAGE = "userImage";
+    private static final String KEY_USER_ENTOURAGE = "userEntourage";
 
     private static final String KEY_GROUP_NODEID = "nodeID";
     private static final String KEY_GROUP_NAME = "groupName";
@@ -73,7 +73,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODEID + " TEXT,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
-            + " BLOB" + ")";
+            + " BLOB, " + KEY_USER_ENTOURAGE + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " TEXT,"
@@ -104,7 +104,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public CacheDatabaseHelper() {
         this(YieldsApplication.getApplicationContext());
     }
-
 
 
     /**
@@ -147,7 +146,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(messageId);
 
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODEID + " = ? AND " + KEY_MESSAGE_GROUPID
-                        + " = ?", new String[]{String.valueOf(messageId.getId()), groupId.getId()});
+                + " = ?", new String[]{String.valueOf(messageId.getId()), groupId.getId()});
     }
 
     /**
@@ -158,8 +157,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @throws CacheDatabaseException If the message could not be added to the
      *                                database.
      */
-    public void addMessage(Message message, Id groupId)
-            throws CacheDatabaseException {
+    public void addMessage(Message message, Id groupId) throws CacheDatabaseException {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
@@ -197,7 +195,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Adds the User from the database.
+     * Adds the User to the database.
      *
      * @param user The User to be added.
      * @throws CacheDatabaseException If the User could not be inserted into the
@@ -308,17 +306,40 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Returns all Users that are in the ClientUser's entourage in the database.
+     *
+     * @return An exhaustive List of all Users in the database that are in the ClientUser's entourage.
+     */
+    public List<User> getClientUserEntourage() {
+        String selectAllUsersQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_ENTOURAGE + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectAllUsersQuery, new String[]{"1"});
+        List<User> users = new ArrayList<>();
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return users;
+        } else {
+            do {
+                Id userId = new Id(cursor.getLong(
+                        cursor.getColumnIndex(KEY_USER_NODEID)));
+                users.add(getUser(userId));
+            } while (cursor.moveToNext());
+            cursor.close();
+            return users;
+        }
+    }
+
+    /**
      * Deletes the Group and all it's Messages from the database.
      *
-     * @param group The Group to be deleted.
+     * @param groupId The Id of the Group to be deleted.
      */
-    public void deleteGroup(Group group) {
-        Objects.requireNonNull(group);
+    public void deleteGroup(Id groupId) {
+        Objects.requireNonNull(groupId);
 
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_GROUPID + " = ?",
-                new String[]{group.getId().getId()});
+                new String[]{groupId.getId()});
         mDatabase.delete(TABLE_GROUPS, KEY_GROUP_NODEID + " = ?",
-                new String[]{group.getId().getId()});
+                new String[]{groupId.getId()});
     }
 
     /**
@@ -341,7 +362,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
             updateGroup(group);
         } else if (cursor.getCount() > 1) { //There should not be several Groups with the same Id.
-            deleteGroup(group);
+            deleteGroup(group.getId());
         }
 
         if (cursor.getCount() > 1 || cursor.getCount() == 0) {
@@ -449,6 +470,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void removeUserFromGroup(Id groupId, Id userId) {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(userId);
+
+        if (YieldsApplication.getUser().getId().getId().equals(userId.getId())) {
+            deleteGroup(groupId);
+            return;
+        }
 
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
@@ -919,6 +945,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_NAME, user.getName());
         values.put(KEY_USER_EMAIL, user.getEmail());
         values.put(KEY_USER_IMAGE, serializeBitmap(user.getImg()));
+
+        List<User> entourage = YieldsApplication.getUser().getEntourage();
+        List<String> entourageIds = new ArrayList<>();
+        for (User entourageUser : entourage) {
+            entourageIds.add(entourageUser.getId().getId());
+        }
+        int inEntourage = entourageIds.contains(user.getId().getId()) ? 1 : 0;
+        values.put(KEY_USER_ENTOURAGE, inEntourage);
         return values;
     }
 

@@ -36,7 +36,6 @@ public class Group extends Node {
 
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
-    private boolean mConsumed;
     private List<User> mUsers;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
@@ -57,7 +56,6 @@ public class Group extends Node {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
-        mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
         mValidated = validated;

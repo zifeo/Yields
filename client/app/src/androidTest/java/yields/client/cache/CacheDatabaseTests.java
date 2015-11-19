@@ -9,8 +9,6 @@ import android.support.test.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -200,7 +198,7 @@ public class CacheDatabaseTests {
 
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM users;", null);
             assertEquals(6, cursor.getCount());
-            assertEquals(5, cursor.getColumnCount());
+            assertEquals(6, cursor.getColumnCount());
             cursor.moveToFirst();
 
             for (int i = 0; i < 6; i++) {
@@ -278,7 +276,7 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addGroup(group);
             }
             for (Group group : groups) {
-                mDatabaseHelper.deleteGroup(group);
+                mDatabaseHelper.deleteGroup(group.getId());
             }
 
             String selectQuery = "SELECT * FROM groups;";
