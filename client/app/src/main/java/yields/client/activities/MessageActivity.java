@@ -61,6 +61,7 @@ public class MessageActivity extends AppCompatActivity
 
     private static ContentType mType;
     private static Message mCommentMessage;
+    private static Group mLastApplicationGroup;
     private static FragmentManager mFragmentManager;
     private static Fragment mCurrentFragment;
 
@@ -333,8 +334,13 @@ public class MessageActivity extends AppCompatActivity
                     @Override
                     public void onItemClick(AdapterView<?> parent,
                                             View view, int position, long id) {
-                        mCommentMessage = mGroupMessageAdapter.
-                                getItem(position);
+                        // First keep a reference to the message that has been clicked on.
+                        mCommentMessage = mGroupMessageAdapter.getItem(position);
+                        // We save the reference of the last group in the YieldsApplication class.
+                        mLastApplicationGroup  = mGroup;
+                        // Then we update the group currently displayed as it is the commented
+                        // message
+                        mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
                         mType = ContentType.MESSAGE_COMMENTS;
                         createCommentFragment();
                     }
@@ -373,6 +379,10 @@ public class MessageActivity extends AppCompatActivity
             mGroupMessageAdapter.add(message);
         }
         mGroupMessageAdapter.notifyDataSetChanged();
+    }
+
+    private void retreiveCommentMessages() {
+        // TODO : retrieve messages from mGroup representing the commented message.
     }
 
     /**
