@@ -44,6 +44,8 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
+import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -119,7 +121,8 @@ public class MessageActivity extends AppCompatActivity
         mFragmentManager =  getFragmentManager();
         createGroupMessageFragment();
 
-        YieldsApplication.getBinder().addMoreGroupMessages(mGroup, new Date());
+        GroupHistoryRequest historyRequest = new GroupHistoryRequest(mGroup, new Date());
+        YieldsApplication.getBinder().sendRequest(historyRequest);
     }
 
     /**
@@ -179,7 +182,8 @@ public class MessageActivity extends AppCompatActivity
         if (mType == ContentType.GROUP_MESSAGES){
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
-            YieldsApplication.getBinder().sendMessage(mGroup, message);
+            GroupMessageRequest request = new GroupMessageRequest(message, mGroup);
+            YieldsApplication.getBinder().sendRequest(request);
         }
         else{
             mCommentAdapter.add(message);
