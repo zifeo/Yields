@@ -183,8 +183,8 @@ public class MessageActivity extends AppCompatActivity
         else{
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
-            // TODO : implement method to send comments in the message binder.
-            // mYieldsServiceBinder.sendComment(...);
+            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
+            YieldsApplication.getBinder().sendRequest(request);
         }
     }
 
