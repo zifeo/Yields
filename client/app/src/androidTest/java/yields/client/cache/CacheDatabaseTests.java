@@ -198,7 +198,7 @@ public class CacheDatabaseTests {
 
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM users;", null);
             assertEquals(6, cursor.getCount());
-            assertEquals(5, cursor.getColumnCount());
+            assertEquals(6, cursor.getColumnCount());
             cursor.moveToFirst();
 
             for (int i = 0; i < 6; i++) {
@@ -276,7 +276,7 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addGroup(group);
             }
             for (Group group : groups) {
-                mDatabaseHelper.deleteGroup(group);
+                mDatabaseHelper.deleteGroup(group.getId());
             }
 
             String selectQuery = "SELECT * FROM groups;";

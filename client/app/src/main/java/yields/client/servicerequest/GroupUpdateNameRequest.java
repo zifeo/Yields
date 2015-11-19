@@ -1,13 +1,10 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
-import yields.client.node.Group;
+import yields.client.id.Id;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -16,24 +13,24 @@ import yields.client.serverconnection.ServerRequest;
 public class GroupUpdateNameRequest extends ServiceRequest {
 
     private final User mSender;
-    private final Group mGroup;
+    private final Id mGroupId;
     private final String mName;
 
     /**
      * Main constructor for this type of ServiceRequest (renaming a Group).
      *
-     * @param sender The User that created this request.
-     * @param group  The Group that should be renamed.
-     * @param name   The new name of the Group.
+     * @param sender  The User that created this request.
+     * @param groupId The Id of the Group that should be renamed.
+     * @param name    The new name of the Group.
      */
-    public GroupUpdateNameRequest(User sender, Group group, String name) {
+    public GroupUpdateNameRequest(User sender, Id groupId, String name) {
         super();
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(name);
 
         mSender = sender;
-        mGroup = group;
+        mGroupId = groupId;
         mName = name;
     }
 
@@ -54,6 +51,24 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroup.getId(), mName);
+        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroupId, mName);
+    }
+
+    /**
+     * Returns the Id of the Group that will be renamed.
+     *
+     * @return The Id of the Group that will be renamed.
+     */
+    public Id getGroupId() {
+        return mGroupId;
+    }
+
+    /**
+     * Returns the new name of the Group.
+     *
+     * @return The new name of the Group.
+     */
+    public String getNewGroupName() {
+        return mName;
     }
 }

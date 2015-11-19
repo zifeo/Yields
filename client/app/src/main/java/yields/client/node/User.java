@@ -7,21 +7,22 @@ import java.util.Objects;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 
-public class User extends Node{
+public class User extends Node {
 
     private String mEmail;
     private Bitmap mImg;
 
     /**
      * Constructor for the User class.
-     * @param name Name of the user.
-     * @param id Id of the user.
+     *
+     * @param name  Name of the user.
+     * @param id    Id of the user.
      * @param email Email of the user.
-     * @param img Image of the user.
+     * @param img   Image of the user.
      * @throws NodeException If any of those parameters are invalid.
      */
     public User(String name, Id id,
-                 String email, Bitmap img) throws NodeException {
+                String email, Bitmap img) throws NodeException {
         super(name, id);
         this.mEmail = Objects.requireNonNull(email);
         this.mImg = Objects.requireNonNull(img);
@@ -29,14 +30,16 @@ public class User extends Node{
 
     /**
      * Getter for  the image of the user.
+     *
      * @return The image of the user.
      */
-    public Bitmap getImg(){
+    public Bitmap getImg() {
         return mImg;
     }
 
     /**
      * Getter for the email of the user.
+     *
      * @return The email of the user.
      */
     public String getEmail() {

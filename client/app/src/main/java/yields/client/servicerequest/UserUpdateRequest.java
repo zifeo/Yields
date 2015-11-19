@@ -1,12 +1,9 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -45,6 +42,15 @@ public class UserUpdateRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userUpdateRequest(mUser.getId());
+        return RequestBuilder.userUpdateRequest(mUser.getId(), mUser.getName(), mUser.getEmail(), mUser.getImg());
+    }
+
+    /**
+     * Returns the User that should be updated through this request.
+     *
+     * @return The User that should be updated through this request.
+     */
+    public User getUser(){
+        return mUser;
     }
 }

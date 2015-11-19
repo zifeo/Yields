@@ -1,13 +1,10 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
-import yields.client.node.Group;
+import yields.client.id.Id;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -16,24 +13,24 @@ import yields.client.serverconnection.ServerRequest;
 public class GroupAddRequest extends ServiceRequest {
 
     private final User mSender;
-    private final Group mGroup;
+    private final Id mGroupId;
     private final User mUser;
 
     /**
      * Main constructor for this type of ServiceRequest (adding a User to a Group).
      *
      * @param sender  The User that created this request.
-     * @param group   The Group that should have a User added to it.
+     * @param groupId The Group that should have a User added to it.
      * @param newUser The User that should be added to the Group.
      */
-    public GroupAddRequest(User sender, Group group, User newUser) {
+    public GroupAddRequest(User sender, Id groupId, User newUser) {
         super();
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(newUser);
 
         mSender = sender;
-        mGroup = group;
+        mGroupId = groupId;
         mUser = newUser;
     }
 
@@ -54,6 +51,24 @@ public class GroupAddRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupAddRequest(mSender.getId(), mGroup.getId(), mUser.getId());
+        return RequestBuilder.groupAddRequest(mSender.getId(), mGroupId, mUser.getId());
+    }
+
+    /**
+     * Returns the Id of the Group to which the User will be added.
+     *
+     * @return The Id of the Group to which the User will be added.
+     */
+    public Id getGroupId() {
+        return mGroupId;
+    }
+
+    /**
+     * Returns the User that will be added to the Group.
+     *
+     * @return The User that will be added to the Group.
+     */
+    public User getUser() {
+        return mUser;
     }
 }

@@ -54,28 +54,24 @@ public class RequestBuilder {
     /**
      * ServerRequest for updating user properties.
      *
-     * @param sender The sender of the request.
-     * @param args   The properties to be changed organized in a form
-     *               property -> new value
-     * @return The request.
+     * @param sender The sender of the request, which wants to be updated.
+     * @param name   The name of the updated User.
+     * @param email  The email ot the updated User.
+     * @param image  The image of the updated User.
+     * @return The appropriate ServerRequest.
      */
-    public static ServerRequest userUpdateRequest(Id sender,
-                                                  Map<Fields, String> args) {
+    public static ServerRequest userUpdateRequest(Id sender, String name, String email, Bitmap image) {
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(args);
-        RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USER_UPDATE, sender);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(email);
+        Objects.requireNonNull(image);
 
-        if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }
-        if (args.containsKey(Fields.NAME)) {
-            builder.addField(Fields.NAME, args.get(Fields.NAME));
-        }
-        /* PIC if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }*/
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
 
+        builder.addField(Fields.NAME, name);
+        builder.addField(Fields.EMAIL, email);
+        builder.addField(Fields.IMAGE, image);
+        
         return builder.request();
     }
 
@@ -148,27 +144,29 @@ public class RequestBuilder {
     }
 
     /**
-     * Update the user info on server
+     * Created a User information request.
      *
-     * @param sender The sender of the request.
+     * @param sender   The Id of the sender of the request.
+     * @param userInfo The Id of the User from which information shall be retrieved.
      * @return The request.
      */
-    public static ServerRequest userUpdateRequest(Id sender) {
+    public static ServerRequest userInfoRequest(Id sender, Id userInfo) {
         Objects.requireNonNull(sender);
-        RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USER_STATUS, sender);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_INFO, sender);
+        builder.addField(Fields.NID, userInfo);
 
         return builder.request();
     }
 
     /**
-     * Creates a Group create request
+     * Creates a Group create request.
      *
-     * @param sender     The id of the sender
-     * @param name       The new name of the group
+     * @param sender     The id of the sender.
+     * @param name       The new name of the group.
      * @param visibility The visibility of the group.
-     * @param nodes      The nodes attached to the group
-     * @return The request itself
+     * @param nodes      The nodes attached to the group.
+     * @return The request itself.
      */
     public static ServerRequest groupCreateRequest(Id sender, String name,
                                                    Group.GroupVisibility visibility,

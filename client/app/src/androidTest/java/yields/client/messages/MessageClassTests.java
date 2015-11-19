@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -174,7 +173,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         TextView caption = null;
         if (view != null) {
             caption = (TextView) view.getChildAt(0);
-        } else{
+        } else {
             fail("View was incorrect !");
         }
         assertEquals("Mock caption", caption.getText());

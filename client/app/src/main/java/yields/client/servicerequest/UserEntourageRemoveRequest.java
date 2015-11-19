@@ -52,4 +52,13 @@ public class UserEntourageRemoveRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userEntourageRemoveRequest(mUser.getId(), mUserToRemove.getEmail());
     }
+
+    /**
+     * Returns the User that should be removed from the entourage.
+     *
+     * @return The User that should be removed from the entourage.
+     */
+    public User getUserToRemove() {
+        return mUserToRemove;
+    }
 }
