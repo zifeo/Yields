@@ -1,7 +1,6 @@
 package yields.client.nodes;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -11,18 +10,13 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import yields.client.R;
-import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.MockFactory;
-import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
@@ -32,7 +26,6 @@ import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
-import static yields.client.node.Group.*;
 
 public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>{
 
@@ -70,7 +63,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         }
 
         for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
-            Assert.assertEquals("Mock message " + i, ((TextContent) messages.get(i).getContent()).getText());
+            Assert.assertEquals("Mock message #" + i, ((TextContent) messages.get(i).getContent()).getText());
         }
     }
 
@@ -83,7 +76,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         synchronized public SortedMap<Date, Message> getLastMessages() {
             SortedMap<Date, Message> map = new TreeMap<>();
             for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
-                TextContent mockContent = MockFactory.generateFakeTextContent("Mock message " + i);
+                TextContent mockContent = MockFactory.generateFakeTextContent(i);
                 List<User> usersInGroup = new ArrayList<User>();
                 Message m = MockFactory.generateMockMessage("node name", new
                                 Id(i), MockFactory.generateFakeUser("topkek",

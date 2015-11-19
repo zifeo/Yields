@@ -43,7 +43,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(getInstrumentation().getContext().getResources());
-        MOCK_TEXT_CONTENT_1 = MockFactory.generateFakeTextContent("Mock text.");
+        MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
     }
 
     /**
@@ -114,7 +114,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentHasCorrectType() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
+        ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
         assertEquals(Content.ContentType.IMAGE, imageContent.getType());
     }
 
@@ -132,7 +132,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectCaption() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
+        ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
         assertEquals("Mock caption", imageContent.getCaption());
     }
 
@@ -142,7 +142,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectImage() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
+        ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
         assertTrue(imageContent.getImage().sameAs(bitmap));
     }
 
@@ -162,7 +162,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testImageContentReturnsCorrectLayout() {
         Bitmap bitmap = YieldsApplication.getDefaultGroupImage();
-        ImageContent imageContent = MockFactory.generateFakeImageContent(bitmap, "Mock caption");
+        ImageContent imageContent = new ImageContent(bitmap, "Mock caption");
         LinearLayout view = null;
         try {
             view = (LinearLayout) imageContent.getView();
