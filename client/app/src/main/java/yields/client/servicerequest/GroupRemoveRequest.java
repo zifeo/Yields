@@ -1,13 +1,10 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
-import yields.client.node.Group;
+import yields.client.id.Id;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -16,25 +13,25 @@ import yields.client.serverconnection.ServerRequest;
 public class GroupRemoveRequest extends ServiceRequest {
 
     private final User mSender;
-    private final Group mGroup;
-    private final User mUser;
+    private final Id mGroupId;
+    private final Id mUserId;
 
     /**
      * Main constructor for this type of ServiceRequest (removing a User from a Group).
      *
-     * @param sender  The User that created this request.
-     * @param group   The Group that should a User removed from it.
-     * @param userToRemove The User that should be removed from the Group.
+     * @param sender         The User that created this request.
+     * @param groupId        The Group that should a User removed from it.
+     * @param userToRemoveId The User that should be removed from the Group.
      */
-    public GroupRemoveRequest(User sender, Group group, User userToRemove) {
+    public GroupRemoveRequest(User sender, Id groupId, Id userToRemoveId) {
         super();
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(userToRemove);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(userToRemoveId);
 
         mSender = sender;
-        mGroup = group;
-        mUser = userToRemove;
+        mGroupId = groupId;
+        mUserId = userToRemoveId;
     }
 
     /**
@@ -54,7 +51,24 @@ public class GroupRemoveRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupRemoveRequest(mSender.getId(), mGroup.getId(), mUser.getId());
+        return RequestBuilder.groupRemoveRequest(mSender.getId(), mGroupId, mUserId);
     }
 
+    /**
+     * Returns the Id of the Group from which the User shall be removed.
+     *
+     * @return The Id of the Group from which the User shall be removed.
+     */
+    public Id getGroupId() {
+        return mGroupId;
+    }
+
+    /**
+     * Returns the Id of the User that will be removed from the Group.
+     *
+     * @return The Id of the User that will be removed from the Group.
+     */
+    public Id getUserToRemoveId() {
+        return mUserId;
+    }
 }

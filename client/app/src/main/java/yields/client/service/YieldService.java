@@ -234,7 +234,7 @@ public class YieldService extends Service {
 
 
     /**
-     * AsncTask sending th requests.
+     * AsyncTask sending th requests.
      */
     private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override

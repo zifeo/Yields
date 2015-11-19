@@ -1,13 +1,11 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
+import yields.client.id.Id;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -16,24 +14,24 @@ import yields.client.serverconnection.ServerRequest;
 public class GroupUpdateVisibilityRequest extends ServiceRequest {
 
     private final User mSender;
-    private final Group mGroup;
+    private final Id mGroupId;
     private final Group.GroupVisibility mVisibility;
 
     /**
      * Main constructor for this type of ServiceRequest (updating a Group's visibility).
      *
      * @param sender     The User that created this request.
-     * @param group      The Group that should have it's visibility changed.
+     * @param groupId    The Id of the Group that should have it's visibility changed.
      * @param visibility The new visibility of the Group
      */
-    public GroupUpdateVisibilityRequest(User sender, Group group, Group.GroupVisibility visibility) {
+    public GroupUpdateVisibilityRequest(User sender, Id groupId, Group.GroupVisibility visibility) {
         super();
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(visibility);
 
         mSender = sender;
-        mGroup = group;
+        mGroupId = groupId;
         mVisibility = visibility;
     }
 
@@ -54,7 +52,25 @@ public class GroupUpdateVisibilityRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupUpdateVisibilityRequest(mSender.getId(), mGroup.getId(),
+        return RequestBuilder.groupUpdateVisibilityRequest(mSender.getId(), mGroupId,
                 mVisibility);
+    }
+
+    /**
+     * Returns the new Group.GroupVisibility of the Group.
+     *
+     * @return The new Group.GroupVisibility of the Group.
+     */
+    public Group.GroupVisibility getNewGroupVisibility() {
+        return mVisibility;
+    }
+
+    /**
+     * Returns the Id of the Group that will have it's Group.GroupVisibility updated.
+     *
+     * @return The Id of the Group that will have it's Group.GroupVisibility updated.
+     */
+    public Id getGroupId() {
+        return mGroupId;
     }
 }
