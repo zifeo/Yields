@@ -186,6 +186,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
      * Tests Message's constructor that takes a String (JSON format).
      */
     @Test
+<<<<<<< HEAD
     public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException, ParseException {
         Message m = new Message(new JSONArray(JSON_MESSAGE));
         User u = m.getSender();
@@ -202,6 +203,23 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     @Test
     public void testMessagesFromJSONAreCorrectlyParserForContent() throws JSONException, ParseException {
         Message m = new Message(new JSONArray(JSON_MESSAGE));
+=======
+    public void testMessagesFromJSONAreCorrectlyParseD() {
+        Message m = null;
+        try {
+            m = new Message(new JSONObject(JSON_MESSAGE));
+        } catch (JSONException e) {
+            fail("Couldn't parse JSON into Message");
+        }
+        User u = m.getSender();
+        assertEquals((new Id("117")).getId(), u.getId().getId());
+        Date date = m.getDate();
+        try {
+            assertEquals(DateSerialization.toDate("2011-12-03T10:15:30+01:00").toString(), date.toString());
+        } catch (ParseException e) {
+            fail("Couldn't deserialize Message's Date");
+        }
+>>>>>>> 6c06ba08733ac9ce93dba60966297696532475ae
         TextContent content = (TextContent) m.getContent();
         assertEquals("MESSAGE_TEXT", content.getText());
     }

@@ -9,6 +9,8 @@ import android.support.test.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

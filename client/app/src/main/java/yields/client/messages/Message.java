@@ -5,9 +5,7 @@ import android.graphics.BitmapFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
@@ -16,7 +14,6 @@ import yields.client.R;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-import yields.client.node.Group;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
@@ -87,7 +84,7 @@ public class Message extends Node {
      * @param object The JSON representing the message.
      * @throws JSONException if the json is invalid.
      */
-    public Message(JSONArray object ) throws JSONException, ParseException{
+    public Message(JSONArray object) throws JSONException, ParseException {
         super(object.getString(0),
                 new Id(DateSerialization.toDate(object.getString(0)).getTime()));
 
