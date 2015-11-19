@@ -3,6 +3,7 @@ package yields.server.actions.groups
 import org.scalacheck.Prop._
 import org.scalacheck.{Arbitrary, Gen, Properties}
 import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
+import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory}
 import yields.server.dbi._
 import yields.server.dbi.models.ModelsGenerators
 import yields.server.dbi.models._
@@ -43,12 +44,20 @@ class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with
     val group = Group.createGroup("name")
     add10Msgs(group.nid)
     val n = 5
+<<<<<<< HEAD
     val action = new GroupHistory(group.nid, Temporal.current, n)
     val res = action.run(m)
     res match {
       case GroupHistoryRes(nid, messages) =>
         messages.length should be(n)
         nid should be (group.nid)
+=======
+    val action = new NodeHistory(group.nid, 1, n)
+    val res = action.run(m)
+    res match {
+      case NodeHistoryRes(x) =>
+        x.length should be(n)
+>>>>>>> massive refactor, image -> media
     }
   }
 

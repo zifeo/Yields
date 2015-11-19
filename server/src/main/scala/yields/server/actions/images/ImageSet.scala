@@ -2,7 +2,7 @@ package yields.server.actions.images
 
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{Image, NID}
+import yields.server.dbi.models.{Media, NID}
 import yields.server.mpi.Metadata
 
 /**
@@ -17,7 +17,7 @@ case class ImageSet(content: String) extends Action {
     */
   override def run(metadata: Metadata): Result = {
     if (content.nonEmpty) {
-      val img = Image.createImage(content)
+      val img = Media.createImage(content)
       ImageSetRes(img.nid)
     } else {
       val errorMessage = this.getClass.getSimpleName

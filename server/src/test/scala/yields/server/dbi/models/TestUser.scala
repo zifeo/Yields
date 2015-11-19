@@ -110,4 +110,8 @@ class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
     u4.entourage should not contain u2.uid
   }
 
+  "Trying to get a non-existent user" should "throw an exception" in {
+    val user = User(1234567)
+  }
+
 }

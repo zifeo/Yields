@@ -1,4 +1,4 @@
-package yields.server.actions.groups
+package yields.server.actions.nodes
 
 import java.time.OffsetDateTime
 
@@ -13,6 +13,7 @@ import yields.server.mpi.Metadata
  * @param datetime last time related to the given node
  * @param count number of node wanted
  */
+
 case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends Action {
 
   /**
@@ -35,4 +36,3 @@ case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends 
 
 /** [[GroupHistory]] result. */
 case class GroupHistoryRes(nid: NID, nodes: Seq[FeedContent]) extends Result
-

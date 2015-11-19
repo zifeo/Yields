@@ -1,7 +1,7 @@
 package yields.server.actions.images
 
 import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{Image, NID}
+import yields.server.dbi.models.{Media, NID}
 import yields.server.mpi.Metadata
 
 /**
@@ -14,7 +14,7 @@ case class ImageGet(nid: NID) extends Action {
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    val img = Image(nid)
+    val img = Media(nid)
     ImageGetRes(img.content)
   }
 }

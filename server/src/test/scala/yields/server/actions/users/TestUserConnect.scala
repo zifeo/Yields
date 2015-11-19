@@ -27,7 +27,7 @@ class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
     redis(_.select(Config.getInt("database.id")))
   }
 
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
   "connecting an existing user" should "return the user" in {
     val email = "emai12763l@email.com"
@@ -43,10 +43,16 @@ class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
     }
   }
 
-  "connecting an non-existing user" should "throw an exception" in {
+  "connecting an non-existing user" should "create the user" in {
     val nonRegisteredEmail = "91b9cc47d30be9fb2e543201d78fb8f6@email.com"
     val action = new UserConnect(nonRegisteredEmail)
-    an[UnauthorizeActionException] should be thrownBy action.run(m)
+    val res = action.run(m)
+    res match {
+      case UserConnectRes(x) =>
+        val user = User(x)
+        user.email should be(nonRegisteredEmail)
+        user.uid should be(x)
+    }
   }
 
 }

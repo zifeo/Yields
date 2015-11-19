@@ -18,7 +18,7 @@ import yields.server.utils.Temporal
   *
   * Database structure:
   * users:uid Long - last user id created
-  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at
+  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at / connected_at
   * users:[uid]:groups Zset[NID] with score datetime
   * users:[uid]:entourage Zset[UID] with score datetime
   * users:indexes:email Map[Email, UID] - email
@@ -39,6 +39,7 @@ final class User private(val uid: UID) {
     val picture = "picture"
     val created_at = "created_at"
     val updated_at = "updated_at"
+    val connected_at = "connected_at"
     val groups = s"$user:groups"
     val entourage = s"$user:entourage"
   }
@@ -49,6 +50,7 @@ final class User private(val uid: UID) {
 
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
+  private var _connected_at: Option[OffsetDateTime] = None
 
   private var _groups: Option[List[NID]] = None
   private var _entourage: Option[List[UID]] = None
@@ -94,6 +96,16 @@ final class User private(val uid: UID) {
     _updated_at = redis.withClient(_.hget[OffsetDateTime](Key.user, Key.updated_at))
     valueOrException(_updated_at)
   }
+
+  /** Connected datetime getter. */
+  def connected_at: OffsetDateTime = _connected_at.getOrElse {
+    _connected_at = redis.withClient(_.hget[OffsetDateTime](Key.user, Key.connected_at))
+    valueOrException(_connected_at)
+  }
+
+  /** Connected datetime getter. */
+  def connected_at_=(offsetDateTime: OffsetDateTime): Unit =
+    _connected_at = update(Key.connected_at, offsetDateTime)
 
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {

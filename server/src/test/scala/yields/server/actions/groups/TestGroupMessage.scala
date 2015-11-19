@@ -2,6 +2,7 @@ package yields.server.actions.groups
 
 import org.scalacheck.Arbitrary._
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import yields.server.actions.nodes.NodeMessage
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
@@ -31,7 +32,7 @@ class TestGroupMessage extends FlatSpec with Matchers with BeforeAndAfter {
 
     res match {
       case GroupCreateRes(nid) =>
-        val action = new GroupMessage(nid, "A message")
+        val action = new NodeMessage(nid, "A message", None, None)
         action.run(m)
         val g = Group(nid)
         val msg = g.getMessagesInRange(Temporal.current, 100)

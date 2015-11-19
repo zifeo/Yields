@@ -3,8 +3,9 @@ package yields.server.io.actions
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
-import yields.server.actions.groups.{GroupCreate, GroupHistory, GroupMessage, GroupUpdate}
+import yields.server.actions.groups.{GroupCreate, GroupUpdate}
 import yields.server.actions.images.{ImageGet, ImageSet}
+import yields.server.actions.nodes.{NodeHistory, NodeMessage}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -28,13 +29,12 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   override def write(obj: Action): JsValue = obj match {
     case x: GroupCreate => packWithKind(x)
     case x: GroupUpdate => packWithKind(x)
-    case x: GroupMessage => packWithKind(x)
-    case x: GroupHistory => packWithKind(x)
+    case x: NodeMessage => packWithKind(x)
+    case x: NodeHistory => packWithKind(x)
 
     case x: UserConnect => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
     case x: UserGroupList => packWithKind(x)
-    case x: UserCreate => packWithKind(x)
     case x: UserInfo => packWithKind(x)
 
     case x: ImageSet => packWithKind(x)
@@ -51,13 +51,12 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
         kind match {
           case "GroupCreate" => message.convertTo[GroupCreate]
           case "GroupUpdate" => message.convertTo[GroupUpdate]
-          case "GroupMessage" => message.convertTo[GroupMessage]
-          case "GroupHistory" => message.convertTo[GroupHistory]
+          case "NodeMessage" => message.convertTo[NodeMessage]
+          case "NodeHistory" => message.convertTo[NodeHistory]
 
           case "UserConnect" => message.convertTo[UserConnect]
           case "UserUpdate" => message.convertTo[UserUpdate]
           case "UserGroupList" => message.convertTo[UserGroupList]
-          case "UserCreate" => message.convertTo[UserCreate]
           case "UserInfo" => message.convertTo[UserInfo]
 
           case "ImageSet" => message.convertTo[ImageSet]

@@ -1,30 +1,40 @@
 package yields.server.actions.users
 
-import yields.server.actions.exceptions.UnauthorizeActionException
+import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizeActionException}
 import yields.server.dbi.models.{User, UID, Email}
 import yields.server.actions.{Result, Action}
 import yields.server.mpi.Metadata
+import yields.server.utils.Temporal
+import yields.server.actions._
 
 /**
- * Connects an user to the server.
- * @param email user mail
- */
+  * Connects an user to the server.
+  * @param email user mail
+  *
+  *              TODO Update timestamp
+  */
 case class UserConnect(email: Email) extends Action {
 
   /**
-   * Run the action given the sender.
-   * @param metadata action requester
-   * @return action result
-   */
+    * Run the action given the sender.
+    * @param metadata action requester
+    * @return action result
+    */
   override def run(metadata: Metadata): Result = {
-
-    User.fromEmail(email) match {
-      case Some(user) => UserConnectRes(user.uid)
-      case _ =>
-        val errorMessage = getClass.getSimpleName
-        throw new UnauthorizeActionException(s"Invalid email in : $errorMessage")
+    if (checkValidEmail(email)) {
+      User.fromEmail(email) match {
+        case Some(user) =>
+          user.connected_at = Temporal.current
+          UserConnectRes(user.uid)
+        case _ =>
+          val newUser = User.create(email)
+          newUser.connected_at = Temporal.current
+          UserConnectRes(newUser.uid)
+      }
+    } else {
+      val errorMessage = this.getClass.getSimpleName
+      throw new ActionArgumentException(s"invalid email in : $errorMessage")
     }
-
   }
 
 }

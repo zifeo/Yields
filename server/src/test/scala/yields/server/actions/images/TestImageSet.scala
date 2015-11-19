@@ -22,7 +22,7 @@ class TestImageSet extends FlatSpec with Matchers with BeforeAndAfter {
     val res = action.run(m)
     res match {
       case ImageSetRes(x) =>
-        val img = Image(x)
+        val img = Media(x)
         img.nid should be(x)
         img.content should be(contentTest)
     }

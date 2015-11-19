@@ -3,6 +3,7 @@ package yields.server
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
 import yields.server.actions.images._
+import yields.server.actions.nodes._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
 import yields.server.io.models.{ImageJsonFormat, GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
@@ -55,9 +56,6 @@ package object io {
 
   implicit lazy val userUpdateJF = jsonFormat4(UserUpdate)
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
-
-  implicit lazy val userCreateJF = jsonFormat2(UserCreate)
-  implicit lazy val userCreateResJF = jsonFormat1(UserCreateRes)
 
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
   implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
