@@ -314,7 +314,6 @@ public class MessageActivity extends AppCompatActivity
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
-        // TODO : Retrieve comments from the server using the message binder.
         ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
         ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
         Log.d("MessageActivity", "Fragment created");
@@ -380,6 +379,8 @@ public class MessageActivity extends AppCompatActivity
         else{
             Log.d("MessageActivity", "Back to group message fragment");
             mType = ContentType.GROUP_MESSAGES;
+            // We need to go back to the last reference of mGroup.
+            mGroup = mLastApplicationGroup;
             createGroupMessageFragment();
         }
     }
