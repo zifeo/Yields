@@ -56,9 +56,4 @@ public class GroupAddRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.groupAddRequest(mSender.getId(), mGroup.getId(), mUser.getId());
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
 }

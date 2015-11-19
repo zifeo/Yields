@@ -60,7 +60,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
     g1.addMessage(m2)
     g1.addMessage(m3)
     val g2 = Group(g1.nid)
-    val feed = g2.getMessagesInRange(0, 3)
+    val feed = g2.getMessagesInRange(Temporal.current, 3)
 
     feed.length should be(3)
     feed should contain(m1)

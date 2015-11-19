@@ -30,11 +30,11 @@ public class ServerChannelTest {
 
     private static String sSimpleRequest = "{" +
             "\"metadata\":{" +
-            "\"sender\":\"0\"," +
+            "\"sender\":0," +
             "\"datetime\":\"TIME\"}," +
             "\"kind\":\"PING\"," +
             "\"message\":" +
-            "{\"text\":\"test\"}" +
+            "{\"content\":\"test\"}" +
             "}\n";
 
     @Test
@@ -46,12 +46,11 @@ public class ServerChannelTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 
-        ServerChannel channel = new ServerChannel(toWriter(output),
-                toReade(input), simpleStatus(true));
+        ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(true));
 
 
         try {
-            Response response = channel.sendRequest(simpleServerRequest);
+            channel.sendRequest(simpleServerRequest);
             Assert.assertEquals(sSimpleRequest
                     .replace("TIME", DateSerialization.toString(new Date())),
                     output.toString());
@@ -68,8 +67,7 @@ public class ServerChannelTest {
                 FAKE_RESPONSE.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        ServerChannel channel = new ServerChannel(toWriter(output),
-                toReade(input), simpleStatus(false));
+        ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(false));
 
         try {
             channel.sendRequest(simpleServerRequest);

@@ -11,7 +11,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -19,19 +18,20 @@ import yields.client.R;
 import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
+import yields.client.cache.CacheDatabaseHelper;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.Group;
-import yields.client.serverconnection.ServerRequest;
-import yields.client.serverconnection.RequestBuilder;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
     private Binder mBinder;
     private NotifiableActivity mCurrentNotifiableActivity;
     private Group mCurrentGroup;
-    private List<Group> mWaitingUpdateGroup;
     private int mIdLastNotification;
+    private ServiceRequestController mServiceRequestController;
+    private ConnectControllerTask mConnectControllerTask;
 
     /**
      * Connects the service to the server when it is created and
@@ -41,8 +41,9 @@ public class YieldService extends Service {
     public void onCreate() {
         mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
-        Log.d("DEBUG", "create Yield Service");
-        //TODO connect to server
+        Log.d("Y:" + this.getClass().getName(), "create Yield Service");
+        mConnectControllerTask = new ConnectControllerTask();
+        mConnectControllerTask.execute();
     }
 
     /**
@@ -54,13 +55,14 @@ public class YieldService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.getBooleanExtra("newUser", false)) {
+        //TODO : to be defined what to do when starting a connection
+        /*if (intent != null && intent.getBooleanExtra("newUser", false)) {
             String email = intent.getStringExtra("email");
             ServerRequest connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
             sendRequest(connectReq);
-        }
+        }*/
 
-        Log.d("DEBUG", "Starting yield service");
+        Log.d("Y:" + this.getClass().getName(), "Starting yield service");
 
         return START_STICKY;
     }
@@ -73,7 +75,7 @@ public class YieldService extends Service {
      */
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d("DEBUG", "Service binds to an activity");
+        Log.d("Y:" + this.getClass().getName(), "Service binds to an activity");
         // A client is binding to the service with bindService()
         return mBinder;
     }
@@ -86,7 +88,7 @@ public class YieldService extends Service {
      */
     @Override
     public boolean onUnbind(Intent intent){
-        Log.d("DEBUG", "unbind : " +
+        Log.d("Y:" + this.getClass().getName(), "unbind : " +
                 (intent.getBooleanExtra("bindMessageActivity", false) ?
                         "messageActivity" : "groupActivity"));
         return true;
@@ -95,10 +97,10 @@ public class YieldService extends Service {
     /**
      * Sends serverRequest to server
      *
-     * @param serverRequest The serverRequest to send
+     * @param serviceRequest The serviceRequest to send
      */
-    public void sendRequest(ServerRequest serverRequest) {
-        new SendRequestTask().execute(serverRequest);
+    public void sendRequest(ServiceRequest serviceRequest) {
+        new SendRequestTask().execute(serviceRequest);
     }
 
     /**
@@ -106,7 +108,7 @@ public class YieldService extends Service {
      */
     @Override
     public void onDestroy() {
-        Log.d("DEBUG", "Yield service has been disconnected");
+        Log.d("Y:" + this.getClass().getName(), "Yield service has been disconnected");
         receiveError("Yield service has been disconnected");
         //TODO : disconnect from server
     }
@@ -117,7 +119,7 @@ public class YieldService extends Service {
      * @param notifiableActivity The concerned messageActivity
      */
     synchronized public void setNotifiableActivity(NotifiableActivity notifiableActivity) {
-        Log.d("DEBUG","add activity");
+        Log.d("Y:" + this.getClass().getName(),"add activity");
         mCurrentNotifiableActivity = notifiableActivity;
         mCurrentGroup = YieldsApplication.getGroup();
     }
@@ -126,7 +128,7 @@ public class YieldService extends Service {
      * Unset the current messageActivity
      */
     synchronized public void unsetMessageActivity() {
-        Log.d("DEBUG","remove activity");
+        Log.d("Y:" + this.getClass().getName(),"remove activity");
         mCurrentNotifiableActivity = null;
     }
 
@@ -153,10 +155,11 @@ public class YieldService extends Service {
      * @param messages The message in question
      */
     synchronized public void receiveMessages(Id groupId, List<Message> messages) {
+        //TODO: To be refactor !
         if (mCurrentNotifiableActivity != null &&
-                mCurrentGroup.getId() == groupId) {
-
+                mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
+
             mCurrentNotifiableActivity.notifyChange();
         }
     }
@@ -167,7 +170,7 @@ public class YieldService extends Service {
      * @param errorMsg The content of the error
      */
     public void receiveError(String errorMsg) {
-        YieldsApplication.showToast(this, errorMsg);
+        //YieldsApplication.showToast(this, errorMsg);
     }
 
     // TODO : receive a response from server (an error message)
@@ -210,13 +213,48 @@ public class YieldService extends Service {
     }
 
 
+
+
     /**
      * AsncTask sending th requests.
      */
-    private static class SendRequestTask extends AsyncTask<ServerRequest, Void, Void> {
+    private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override
-        protected Void doInBackground(ServerRequest... params) {
-            //TODO : send ServerRequest to Server
+        protected Void doInBackground(ServiceRequest... params) {
+            synchronized (this) {
+                while (mServiceRequestController == null) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        Log.d("Y:" + this.getClass().getName(),e.getMessage());
+                    }
+                }
+            }
+
+            if (params.length > 0 && params[0] != null) {
+                mServiceRequestController.handleServiceRequest(params[0]);
+            } else {
+                throw new IllegalArgumentException();
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     * Connects to server // TODO: If not try again later
+     */
+    private class ConnectControllerTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            synchronized (this) {
+                mServiceRequestController = new ServiceRequestController(
+                        new CacheDatabaseHelper(getApplicationContext()),
+                        YieldService.this);
+            }
+
             return null;
         }
     }

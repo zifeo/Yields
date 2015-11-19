@@ -34,7 +34,7 @@ class TestGroupMessage extends FlatSpec with Matchers with BeforeAndAfter {
         val action = new GroupMessage(nid, "A message")
         action.run(m)
         val g = Group(nid)
-        val msg = g.getMessagesInRange(0, 100)
+        val msg = g.getMessagesInRange(Temporal.current, 100)
         msg.length should be(1)
         msg.head._4 should be("A message")
         msg.head._2 should be(m.sender)

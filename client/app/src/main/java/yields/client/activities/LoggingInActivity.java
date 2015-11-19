@@ -32,6 +32,8 @@ public class LoggingInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logging_in);
 
+        YieldsApplication.setApplicationContext(getApplicationContext());
+
         Intent serviceIntent = new Intent(this, YieldService.class)
                 .putExtra("email", Plus.AccountApi
                         .getAccountName(YieldsApplication.getGoogleApiClient()));
@@ -41,8 +43,6 @@ public class LoggingInActivity extends AppCompatActivity {
                 .putExtra("bindGroupActivity", true);
 
         bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
-
-        goToGroupActivity();
     }
 
     /**
@@ -67,6 +67,7 @@ public class LoggingInActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             YieldsApplication.setBinder((YieldServiceBinder) service);
+            goToGroupActivity();
         }
 
         @Override

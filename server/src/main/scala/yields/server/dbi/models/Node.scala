@@ -6,21 +6,21 @@ import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
+import com.redis.RedisClient.DESC
 import yields.server.dbi.models._
 
 /**
-  * Model of a node with link to the database
-  *
-  * Node is abstract superclass of every possible kind of nodes like Group, Image etc
-  *
-  * Database structure :
-  * nodes:nid Long - last node id created
-  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
-  * nodes:[nid]:users Zset[UID] with score datetime
-  * nodes:[nid]:nodes Zset[NID] with score datetime
-  * nodes:[nid]:tid Long - last time id created
-  * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
-  */
+ * Model of a node with link to the database
+ *
+ * Node is abstract superclass of every possible kind of nodes like Group, Image etc
+ *
+ * Database structure :
+ * nodes:nid Long - last node id created
+ * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
+ * nodes:[nid]:users Zset[UID] with score datetime
+ * nodes:[nid]:nodes Zset[NID] with score datetime
+ * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
+ */
 abstract class Node {
 
   object NodeKey {
@@ -33,7 +33,6 @@ abstract class Node {
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
-    val tid = s"$node:tid"
   }
 
   val nid: NID
@@ -82,7 +81,7 @@ abstract class Node {
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
     _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.refreshed_at))
-    valueOrDefault(_refreshed_at, Temporal.notYet)
+    valueOrDefault(_refreshed_at, Temporal.minimum)
   }
 
   /** Users getter */
@@ -110,17 +109,21 @@ abstract class Node {
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
   /** Get n messages starting from some point */
-  // TODO: Check that TID (expanding Long) is a valid int
-  def getMessagesInRange(start: TID, n: Int): List[FeedContent] = {
-    _feed = redis.withClient(_.zrange[FeedContent](NodeKey.feed, start.toInt, n))
+  def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
+    _feed = redis.withClient(_.zrangebyscore[FeedContent](
+      NodeKey.feed,
+      min = Temporal.minimum.toEpochSecond,
+      max = datetime.toEpochSecond,
+      limit = Some((0, count)),
+      sortAs = DESC
+    ))
+    //TODO: Fix key
     valueOrException(_feed)
   }
 
   /** Add message */
   def addMessage(content: FeedContent): Boolean = {
-    val tid = redis.withClient(_.incr(NodeKey.tid)
-      .getOrElse(throw new UnincrementableIdentifierException(s"time identifier (tid) from node $nid fails")))
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, tid, content)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, content._1.toEpochSecond, content)))
   }
 
   /** Add multiple users to the group */

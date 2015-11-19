@@ -1,9 +1,5 @@
 package yields.client.servicerequest;
 
-
-import android.app.Service;
-
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -12,7 +8,7 @@ import yields.client.serverconnection.ServerRequest;
 public abstract class ServiceRequest {
 
     /**
-     * The Kind of messages possible
+     * The Kind of request possible
      */
     public enum RequestKind {
         PING("PING"), USER_CONNECT("UserConnect"), USER_UPDATE("UserUpdateRequest"),
@@ -26,10 +22,18 @@ public abstract class ServiceRequest {
 
         private final String mName;
 
+        /**
+         * Enumeration constructor
+         * @param name The String representation of the request type
+         */
         RequestKind(String name) {
             mName = name;
         }
 
+        /**
+         * Get's the String representation of the request
+         * @return The String representation of the request
+         */
         public String getValue() {
             return mName;
         }
@@ -62,8 +66,6 @@ public abstract class ServiceRequest {
      * @return The ServerRequest corresponding to this ServiceRequest.
      */
     abstract public ServerRequest parseRequestForServer();
-
-    abstract public void serviceActionOnResponse(Service service, Response response);
 }
 
 

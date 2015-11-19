@@ -19,7 +19,7 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
 
   /** Outgoing log with given channel. */
   override val outgoing = { result: Response =>
-    val json = result.toJson
+    val json = result.toJson + "\n"
     ByteString(json.toString())
   }
 

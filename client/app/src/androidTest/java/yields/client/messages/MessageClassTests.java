@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -32,7 +33,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
     private static TextContent MOCK_TEXT_CONTENT_1;
-    private static final String JSON_MESSAGE = "{\"datetime\": \"2011-12-03T10:15:30+01:00\", \"node\":\"null\", \"text\":\"MESSAGE_TEXT\", \"user\":\"117\", \"id\":\"2\"}";
+    private static final String JSON_MESSAGE = "[\"2015-11-17T00:30:16.276+01:00\", \"117\", \"null\", \"MESSAGE_TEXT\" ]";
 
     public MessageClassTests() {
         super(MessageActivity.class);
@@ -127,22 +128,22 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     }
 
     @Test
-    public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException {
-        Message m = new Message(new JSONObject(JSON_MESSAGE));
+    public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException, ParseException {
+        Message m = new Message(new JSONArray(JSON_MESSAGE));
         User u = m.getSender();
         assertEquals((new Id("117")).getId(), u.getId().getId());
     }
 
     @Test
     public void testMessagesFromJSONAreCorrectlyParserForDate() throws JSONException, ParseException {
-        Message m = new Message(new JSONObject(JSON_MESSAGE));
+        Message m = new Message(new JSONArray(JSON_MESSAGE));
         Date date = m.getDate();
-        assertEquals(DateSerialization.toDate("2011-12-03T10:15:30+01:00").toString(), date.toString());
+        assertEquals(DateSerialization.toDate("2015-11-17T00:30:16.276+01:00").toString(), date.toString());
     }
 
     @Test
-    public void testMessagesFromJSONAreCorrectlyParserForContent() throws JSONException {
-        Message m = new Message(new JSONObject(JSON_MESSAGE));
+    public void testMessagesFromJSONAreCorrectlyParserForContent() throws JSONException, ParseException {
+        Message m = new Message(new JSONArray(JSON_MESSAGE));
         TextContent content = (TextContent) m.getContent();
         assertEquals("MESSAGE_TEXT", content.getText());
     }

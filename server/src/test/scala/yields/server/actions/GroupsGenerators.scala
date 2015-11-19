@@ -1,5 +1,7 @@
 package yields.server.actions
 
+import java.time.OffsetDateTime
+
 import org.scalacheck.Arbitrary
 import yields.server._
 import yields.server.actions.groups._
@@ -43,21 +45,24 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
   }
 
   implicit lazy val groupMessageResArb: Arbitrary[GroupMessageRes] = Arbitrary {
-    GroupMessageRes()
+    for {
+      datetime <- arbitrary[OffsetDateTime]
+    } yield GroupMessageRes(datetime)
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      lastTid <- arbitrary[TID]
+      datetime <- arbitrary[OffsetDateTime]
       count <- arbitrary[Int]
-    } yield GroupHistory(nid, lastTid, count)
+    } yield GroupHistory(nid, datetime, count)
   }
 
   implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
     for {
+      nid <- arbitrary[NID]
       nodes <- arbitrary[List[FeedContent]]
-    } yield GroupHistoryRes(nodes)
+    } yield GroupHistoryRes(nid, nodes)
   }
 
 }

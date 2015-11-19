@@ -30,9 +30,9 @@ public class RequestBuilder {
      * The Fields possible for the request
      */
     public enum Fields {
-        EMAIL("email"), TEXT("text"), NAME("name"),
-        NODES("nodes"), GID("gid"), KIND("kind"),
-        LAST("dateLast"), TO("to"), COUNT("count"),
+        EMAIL("email"), TEXT("content"), NAME("name"),
+        NODES("nodes"), KIND("kind"),
+        LAST("datetime"), TO("to"), COUNT("count"),
         IMAGE("image"), NID("nid"), VISIBILITY("visibility"),
         CONTENT_TYPE("contentType");
 
@@ -148,7 +148,7 @@ public class RequestBuilder {
     }
 
     /**
-     * TODO : Nicolas.C explain please.
+     * Update the user info on server
      *
      * @param sender The sender of the request.
      * @return The request.
@@ -209,7 +209,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newName);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, sender);
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
     }
@@ -230,8 +230,9 @@ public class RequestBuilder {
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
                 .GROUP_UPDATE_VISIBILITY, sender);
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
+
         return builder.request();
     }
 
@@ -251,7 +252,7 @@ public class RequestBuilder {
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
                 .GROUP_UPDATE_IMAGE, sender);
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.IMAGE, newImage);
         return builder.request();
     }
@@ -274,7 +275,7 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_ADD, sender);
 
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.NID, newUser);
 
         return builder.request();
@@ -297,7 +298,7 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_REMOVE, sender);
 
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.NID, userToRemove);
 
         return builder.request();
@@ -339,7 +340,7 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
 
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
         builder.addField(Fields.TEXT, content.getText());
 
@@ -363,7 +364,7 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
 
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
         builder.addField(Fields.TEXT, content.getCaption());
         builder.addField(Fields.IMAGE, content.getImage());
@@ -390,7 +391,7 @@ public class RequestBuilder {
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
-        builder.addField(Fields.GID, groupId);
+        builder.addField(Fields.NID, groupId);
 
         return builder.request();
     }
@@ -441,7 +442,7 @@ public class RequestBuilder {
     }
 
     private void addField(Fields fieldType, Id field) {
-        this.mConstructingMap.put(fieldType.getValue(), field.getId());
+        this.mConstructingMap.put(fieldType.getValue(), Long.parseLong(field.getId()));
     }
 
     private void addField(Fields fieldType, int field) {
@@ -473,7 +474,7 @@ public class RequestBuilder {
         request.put(Fields.KIND.getValue(), mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
-        metadata.put("sender", mSender.getId());
+        metadata.put("sender", Long.parseLong(mSender.getId()));
 
         metadata.put("datetime", formatDate(
                 new Date()));

@@ -43,11 +43,12 @@ class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with
     val group = Group.createGroup("name")
     add10Msgs(group.nid)
     val n = 5
-    val action = new GroupHistory(group.nid, 1, n)
+    val action = new GroupHistory(group.nid, Temporal.current, n)
     val res = action.run(m)
     res match {
-      case GroupHistoryRes(x) =>
-        x.length should be(n)
+      case GroupHistoryRes(nid, messages) =>
+        messages.length should be(n)
+        nid should be (group.nid)
     }
   }
 

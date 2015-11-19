@@ -9,7 +9,7 @@ import java.util.TimeZone;
 public class DateSerialization {
 
     private static SimpleDateFormat dateFormatISO6101 =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ");
 
     private static SimpleDateFormat dateFormatForCache =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

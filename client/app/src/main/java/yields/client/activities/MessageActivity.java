@@ -44,8 +44,6 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
-import yields.client.service.YieldService;
-import yields.client.service.YieldServiceBinder;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -61,7 +59,6 @@ public class MessageActivity extends AppCompatActivity
     private Bitmap mImage; // Image taken from the gallery.
     private boolean mSendImage;
     private static EditText mInputField;
-    private static YieldServiceBinder mYieldsServiceBinder;
     private static ActionBar mActionBar;
     private ImageButton mSendButton;
 
@@ -116,12 +113,13 @@ public class MessageActivity extends AppCompatActivity
             setHeaderBar();
         }
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
-        mSendButton.setEnabled(false);
 
         // By default, we show the messages of the group.
         mType = ContentType.GROUP_MESSAGES;
         mFragmentManager =  getFragmentManager();
         createGroupMessageFragment();
+
+        YieldsApplication.getBinder().addMoreGroupMessages(mGroup, new Date());
     }
 
     /**
@@ -131,11 +129,7 @@ public class MessageActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
-
-        Intent serviceIntent = new Intent(this, YieldService.class)
-                .putExtra("bindMessageActivity", true);
-
-        bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+        YieldsApplication.getBinder().attachActivity(this);
     }
 
     /**
@@ -185,8 +179,7 @@ public class MessageActivity extends AppCompatActivity
         if (mType == ContentType.GROUP_MESSAGES){
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
-            // TODO : uncomment this to allow communication with the app Service.
-            //mYieldsServiceBinder.sendMessage(mGroup, message);
+            YieldsApplication.getBinder().sendMessage(mGroup, message);
         }
         else{
             mCommentAdapter.add(message);
@@ -267,7 +260,12 @@ public class MessageActivity extends AppCompatActivity
      */
     @Override
     public void notifyChange() {
-        retrieveGroupMessages();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                retrieveGroupMessages();
+            }
+        });
     }
 
     /**
@@ -406,22 +404,4 @@ public class MessageActivity extends AppCompatActivity
     private void setHeaderBar(){
         mActionBar.setTitle(mGroup.getName());
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // TODO : use message Binder
-            /*mYieldsServiceBinder = (MessageBinder) service;
-            mYieldsServiceBinder.attachActivity(MessageActivity.this);*/
-            mSendButton.setEnabled(true);
-            /*mYieldsServiceBinder.addMoreGroupMessages(mGroup, new java.util.Date()
-                    , 20);*/
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mYieldsServiceBinder = null;
-            mSendButton.setEnabled(false);
-        }
-    };
 }

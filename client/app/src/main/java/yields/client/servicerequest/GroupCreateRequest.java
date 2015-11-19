@@ -62,8 +62,4 @@ public class GroupCreateRequest extends ServiceRequest {
                 .getVisibility(), userIds);
     }
 
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
-    }
 }

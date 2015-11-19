@@ -16,6 +16,8 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.RequestBuilder;
+import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 
 public class YieldServiceBinder extends Binder {
     private final YieldService mService;
@@ -47,7 +49,8 @@ public class YieldServiceBinder extends Binder {
      *
      * @param group the group to create
      */
-    public void createNewGroup(Group group) {
+    // TODO: Note done yet but good base
+    /*public void createNewGroup(Group group) {
         Objects.requireNonNull(group);
         List<Id> memberIDs = new ArrayList<>();
         List<User> members = group.getUsers();
@@ -59,7 +62,7 @@ public class YieldServiceBinder extends Binder {
                         group.getVisibility(), memberIDs);
         Log.d("REQUEST", "Add new group");
         mService.sendRequest(groupAddServerRequest);
-    }
+    }*/
 
     /**
      * Can be used to know if the server is connected to the server
@@ -75,10 +78,11 @@ public class YieldServiceBinder extends Binder {
      * @param message The message itself
      * @throws IOException in case of communication errors
      */
-    public void sendMessage(Group group, Message message){
+    public void sendMessage(Group group, Message message) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(message);
-        //mService.sendRequest();
+
+        mService.sendRequest(new GroupMessageRequest(message, group));
     }
 
     /**
@@ -86,16 +90,12 @@ public class YieldServiceBinder extends Binder {
      *
      * @param group The group we want to retrieve from
      * @param lastDate The last date we have in the history
-     * @param messageCount The max number of message we want
      */
     public void addMoreGroupMessages(Group group,
-                                     Date lastDate, int messageCount) {
+                                     Date lastDate) {
         Objects.requireNonNull(group);
         Objects.requireNonNull(lastDate);
-        /*ServerRequest groupHistoryServerRequest = RequestBuilder
-                .GroupHistoryRequest(group.getId(), lastDate, messageCount);*/
-        //TODO : stuff
-        //mService.sendRequest(groupHistoryServerRequest);
-        //Log.d("REQUEST", "getGroupMessages " + groupHistoryServerRequest.message());
+
+        mService.sendRequest(new GroupHistoryRequest(group, lastDate));
     }
 }

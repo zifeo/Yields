@@ -47,9 +47,4 @@ public class UserConnectRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userConnectRequest(mClientUser.getId(), mClientUser.getEmail());
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
-    }
 }

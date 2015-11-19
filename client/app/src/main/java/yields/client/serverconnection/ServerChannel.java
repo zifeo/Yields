@@ -1,5 +1,7 @@
 package yields.client.serverconnection;
 
+import android.util.Log;
+
 import org.json.JSONException;
 
 import java.io.BufferedReader;
@@ -10,22 +12,19 @@ import java.util.Objects;
 /**
  * The server channel connects to the server and sends message to the server
  */
-public class ServerChannel implements CommunicationChannel {
+public final class ServerChannel implements CommunicationChannel {
     private BufferedWriter mSender;
-    private BufferedReader mReceiver;
     private ConnectionStatus mConnectionStatus;
 
     /**
      * Constructor for the server channel.
      * @param sender The sender.
-     * @param receiver The receiver.
      * @param connectionStatus Status of the connection.
      */
-    protected ServerChannel(BufferedWriter sender, BufferedReader receiver,
+    protected ServerChannel(BufferedWriter sender,
                          ConnectionStatus connectionStatus){
 
         this.mSender = sender;
-        this.mReceiver = receiver;
         this.mConnectionStatus = connectionStatus;
     }
 
@@ -37,7 +36,7 @@ public class ServerChannel implements CommunicationChannel {
      * @throws IOException If we have trouble sending the serverRequest
      */
     @Override
-    public Response sendRequest(ServerRequest serverRequest)
+    public void sendRequest(ServerRequest serverRequest)
             throws IOException {
 
         Objects.requireNonNull(serverRequest);
@@ -46,21 +45,10 @@ public class ServerChannel implements CommunicationChannel {
             throw new IOException("Not connected to server");
         }
 
+        Log.d("Y:" + this.getClass().getName(), "sending : " + serverRequest.message());
         mSender.write(serverRequest.message());
         mSender.newLine();
         mSender.flush();
-
-        Response response = null;
-
-        String rawResponse = ""; //mReceiver.readLine();
-
-        try {
-            response = new Response(rawResponse);
-        } catch (JSONException e){
-            throw new IOException("Invalid response");
-        }
-
-        return response;
     }
 
     /**

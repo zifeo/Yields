@@ -3,9 +3,11 @@ package yields.client.messages;
 
 import android.graphics.BitmapFactory;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
@@ -52,11 +54,11 @@ public class Message extends Node {
      * @param object The JSON representing the message.
      * @throws JSONException if the json is invalid.
      */
-    public Message(JSONObject object ) throws JSONException{
-        super(object.getString("datetime") + object.getString("user"),
-                new Id(object.getString("id")));
+    public Message(JSONArray object ) throws JSONException, ParseException{
+        super(object.getString(0),
+                new Id(DateSerialization.toDate(object.getString(0)).getTime()));
 
-        Id idUser = new Id(object.getString("user"));
+        Id idUser = new Id(object.getString(1));
         /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
         // TODO : The same apply for the profil pic and the email.
         User sender = new User(idUser.getId() , idUser, "",
@@ -65,11 +67,11 @@ public class Message extends Node {
 
         this.mSender = sender;
         // TODO : Implement images !!!
-        this.mContent = new TextContent(object.getString("text"));
+        this.mContent = new TextContent(object.getString(3));
         //TODO : Implement Groups
 
         try {
-            this.mDate = DateSerialization.toDate(object.getString("datetime"));
+            this.mDate = DateSerialization.toDate(object.getString(0));
         } catch (ParseException e) {
             throw new JSONException(e.getMessage());
         }

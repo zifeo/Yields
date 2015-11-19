@@ -8,8 +8,7 @@ public interface CommunicationChannel {
      * sends a serverRequest threw the communication channel
      *
      * @param serverRequest ServerRequest to send
-     * @return the response of the server
      * @throws IOException if there was an error with the retrieval of the message
      */
-    Response sendRequest(ServerRequest serverRequest) throws IOException;
+    void sendRequest(ServerRequest serverRequest) throws IOException;
 }

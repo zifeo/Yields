@@ -52,9 +52,4 @@ public class UserEntourageRemoveRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userEntourageRemoveRequest(mUser.getId(), mUserToRemove.getEmail());
     }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-
-    }
 }

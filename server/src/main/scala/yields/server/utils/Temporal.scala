@@ -18,6 +18,6 @@ object Temporal {
   def current: OffsetDateTime = date2OffsetDateTime(new Date())
 
   /** Returns a date not yet set. */
-  def notYet: OffsetDateTime = OffsetDateTime.MIN
+  def minimum: OffsetDateTime = OffsetDateTime.MIN
 
 }

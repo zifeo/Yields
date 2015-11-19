@@ -29,6 +29,7 @@ public class GroupHistoryRequest extends ServiceRequest {
      */
     public GroupHistoryRequest(Group group, Date furthestDate) {
         super();
+
         Objects.requireNonNull(group);
         Objects.requireNonNull(furthestDate);
 
@@ -55,11 +56,6 @@ public class GroupHistoryRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.groupHistoryRequest(YieldsApplication.getUser().getId(),
                 getGroup().getId(), getDate(), MESSAGE_COUNT);
-    }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
     }
 
     /**

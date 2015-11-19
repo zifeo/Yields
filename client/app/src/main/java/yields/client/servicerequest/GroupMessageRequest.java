@@ -52,13 +52,9 @@ public class GroupMessageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         Group group = getReceivingGroup();
         Message message = getMessage();
+
         return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
                 message.getContent());
-    }
-
-    @Override
-    public void serviceActionOnResponse(Service service, Response response) {
-        //TODO : @Trofleb
     }
 
     /**
@@ -66,16 +62,15 @@ public class GroupMessageRequest extends ServiceRequest {
      *
      * @return The Message of this ServiceRequest.
      */
-    public Message getMessage() {
+    public Message getMessage(){
         return mMessage;
     }
-
     /**
      * Getter method for the receiving Group of this ServiceRequest.
      *
      * @return The receiving Group of this ServiceRequest.
      */
-    public Group getReceivingGroup() {
+    public Group getReceivingGroup(){
         return mReceivingGroup;
     }
 }

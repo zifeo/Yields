@@ -28,6 +28,7 @@ import java.util.Objects;
 
 import yields.client.R;
 import yields.client.fragments.GroupMessageFragment;
+import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
@@ -58,6 +59,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
     public MessageActivityTests() {
         super(MessageActivity.class);
+
+        ServiceTestConnection.connectActivityToService();
     }
 
     /**
