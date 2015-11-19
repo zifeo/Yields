@@ -9,6 +9,8 @@ import android.support.test.InstrumentationRegistry;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.List;
 import yields.client.activities.MockFactory;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.id.Id;
+import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
@@ -72,7 +75,7 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addMessage(message, new Id(666));
             }
             for (Message message : messages) {
-                mDatabaseHelper.deleteMessage(message.getId());
+                mDatabaseHelper.deleteMessage(message.getId(), new Id(666));
             }
 
             String selectQuery = "SELECT * FROM messages;";
@@ -99,8 +102,56 @@ public class CacheDatabaseTests {
             }
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
             assertEquals(3, cursor.getCount());
-            assertEquals(7, cursor.getColumnCount());
+            assertEquals(8, cursor.getColumnCount());
             cursor.close();
+        } catch (CacheDatabaseException e) {
+            e.printStackTrace();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if Text Messages are correctly added to the database.
+     * (Test for addMessage(Message message, Id groupId))
+     */
+    @Test
+    public void testDatabaseAddsTextMessageCorrectly() {
+        try {
+            Message message = MockFactory.generateMockMessages(3).get(0);
+            Group group = MockFactory.generateMockGroups(2).get(0);
+            group.addUser(message.getSender());
+            mDatabaseHelper.addMessage(message, group.getId());
+
+            Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group,
+                    new Date(), 10).get(0);
+
+            assertTrue(compareMessages(message, messageFromCache));
+        } catch (CacheDatabaseException e) {
+            e.printStackTrace();
+        } finally {
+            mDatabaseHelper.clearDatabase();
+        }
+    }
+
+    /**
+     * Tests if Image Messages are correctly added to the database.
+     * (Test for addMessage(Message message, Id groupId))
+     */
+    @Test
+    public void testDatabaseAddsImageMessageCorrectly() {
+        try {
+            ImageContent content = new ImageContent(YieldsApplication.getDefaultGroupImage(), "hello");
+            User user = MockFactory.generateMockUsers(2).get(1);
+            Message message = new Message("Bob", new Id(2), user, content, new Date());
+            Group group = MockFactory.generateMockGroups(2).get(0);
+            group.addUser(message.getSender());
+            mDatabaseHelper.addMessage(message, group.getId());
+
+            Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group,
+                    new Date(), 10).get(0);
+
+            assertTrue(compareMessages(message, messageFromCache));
         } catch (CacheDatabaseException e) {
             e.printStackTrace();
         } finally {
@@ -379,7 +430,7 @@ public class CacheDatabaseTests {
             mDatabaseHelper.addGroup(group);
             User userToAdd = MockFactory.generateMockUsers(15).get(14);
             mDatabaseHelper.addUser(userToAdd);
-            mDatabaseHelper.addUserToGroup(group.getId(), userToAdd.getId());
+            mDatabaseHelper.addUserToGroup(group.getId(), userToAdd);
             Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
             assertEquals(fromDatabase.getName(), group.getName());
             assertEquals(fromDatabase.getId().getId(), group.getId().getId());
@@ -482,7 +533,7 @@ public class CacheDatabaseTests {
             for (int i = 0; i < 10; i++) {
                 Message message = messagesFromDatabase.get(i);
                 assertEquals("2", message.getSender().getId().getId());
-                assertEquals("Mock message #" + (59-i), ((TextContent) message.getContent()).getText());
+                assertEquals("Mock message #" + (59 - i), ((TextContent) message.getContent()).getText());
             }
         } catch (CacheDatabaseException exception) {
             fail(exception.getMessage());
@@ -582,7 +633,7 @@ public class CacheDatabaseTests {
      * Compares two Images (where one of them passed through the cache).
      *
      * @param originalImage  The original image (didn't go through cache).
-     * @param imageFromCache The image that wen through the cache.
+     * @param imageFromCache The image that went through the cache.
      * @return True if the images are the same, false otherwise.
      */
     private boolean compareImages(Bitmap originalImage, Bitmap imageFromCache) {
@@ -592,5 +643,51 @@ public class CacheDatabaseTests {
         Bitmap reconstructedOriginalImage = BitmapFactory.decodeByteArray(bytesOriginalImage, 0,
                 bytesOriginalImage.length);
         return reconstructedOriginalImage.sameAs(imageFromCache);
+    }
+
+    /**
+     * Compare two Messages (where one passed through the cache).
+     *
+     * @param originalMessage  The original message (didn't go through cache).
+     * @param messageFromCache The message that went through the cache.
+     * @return True if the Messages are the same, false otherwise.
+     */
+    private boolean compareMessages(Message originalMessage, Message messageFromCache) {
+        boolean equal = true;
+        equal = equal && originalMessage.getSender().getId().getId().equals(
+                messageFromCache.getSender().getId().getId());
+        equal = equal && originalMessage.getSender().getEmail().equals(
+                messageFromCache.getSender().getEmail());
+        equal = equal && originalMessage.getSender().getName().equals(
+                messageFromCache.getSender().getName());
+
+        equal = equal && originalMessage.getName().equals(messageFromCache.getName());
+        equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
+        equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);
+        equal = equal && originalMessage.getPreview().equals(messageFromCache.getPreview());
+        equal = equal && originalMessage.getStatus().equals(messageFromCache.getStatus());
+
+        equal = equal && originalMessage.getContent().getPreview().equals(
+                messageFromCache.getContent().getPreview());
+
+        boolean contentEqual;
+        switch (originalMessage.getContent().getType()) {
+            case TEXT:
+                contentEqual = ((TextContent) originalMessage.getContent()).getText().equals(
+                        ((TextContent) messageFromCache.getContent()));
+                break;
+            case IMAGE:
+                contentEqual = compareImages(((ImageContent) originalMessage.getContent()).getImage(),
+                        ((ImageContent) messageFromCache.getContent()).getImage());
+            default:
+                contentEqual = false;
+                fail("Impossible content type !");
+        }
+
+        equal = equal && contentEqual;
+        equal = equal && originalMessage.getContent().getTextForRequest().equals(
+                messageFromCache.getContent().getTextForRequest());
+
+        return equal;
     }
 }
