@@ -56,7 +56,7 @@ public class ServiceRequestController {
     }
 
     public void handleConnectionError(IOException e){
-        mService.receiveError("problem connecting to server : " + e.getMessage());
+        mService.receiveError("Problem connecting to server : " + e.getMessage());
     }
 
     /**
@@ -247,7 +247,7 @@ public class ServiceRequestController {
         try {
             mCommunicationChannel.sendRequest(serverRequest);
         } catch (IOException e) {
-            mService.receiveError("no connection available : " + e.getMessage());
+            mService.receiveError("No connection available : " + e.getMessage());
         }
     }
 
@@ -266,7 +266,7 @@ public class ServiceRequestController {
         try {
             mCommunicationChannel.sendRequest(serverRequest);
         } catch (IOException e) {
-            mService.receiveError("no connection available : " + e.getMessage());
+            mService.receiveError("No connection available : " + e.getMessage());
         }
 
         //Once response is received add all Messages to cache.
@@ -275,12 +275,6 @@ public class ServiceRequestController {
             mCacheHelper.add(message, serverRequest.getGroup.getId());
         }
          */
-
-        //ALL NODE ID'S MOST BE UNIQUE, OR ELSE WHEN ADDING TO CACHE ALL PREVIOUS
-        //NODES WITH SAME ID ARE DELETED
-        //THIS CAN BE CHANGED EASILY
-        //BUT I'D APPRECIATE NOT HAVING TO CHANGE MY IMPLEMENTATION EVRY OTHER WEEK
-        //K THX BYE
     }
 
     /**

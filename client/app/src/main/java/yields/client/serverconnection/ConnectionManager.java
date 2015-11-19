@@ -79,10 +79,8 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
                     subscriber.updateOn(response);
                 } catch (IOException e) {
                     subscriber.updateOnConnectionProblem(e);
-                    Log.d("DEBUG", e.getMessage());
                 } catch (JSONException e) {
                     subscriber.updateOnParsingProblem(e);
-                    Log.d("DEBUG", e.getMessage());
                 }
             }
         }

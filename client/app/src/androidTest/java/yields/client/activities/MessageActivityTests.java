@@ -220,7 +220,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
     @Test
     public void testParentMessageIsCorrect() throws InterruptedException {
-        Log.d("DEBUG", "hello");
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock comment";

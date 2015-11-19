@@ -90,6 +90,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Main constructor, creates the database.
+     *
+     * @param context The contex for the database.
      */
     public CacheDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -97,7 +99,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Main constructor, creates the database.
+     * Secondary constructor, creates the database with the Yields application context.
      */
     public CacheDatabaseHelper() {
         this(YieldsApplication.getApplicationContext());

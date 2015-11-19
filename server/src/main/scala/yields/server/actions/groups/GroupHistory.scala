@@ -33,13 +33,6 @@ case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends 
 
 }
 
-<<<<<<< HEAD
 /** [[GroupHistory]] result. */
 case class GroupHistoryRes(nid: NID, nodes: Seq[FeedContent]) extends Result
-=======
-/** [[GroupHistory]] result.
-  * @param nodes a sequence of messages
-  */
-case class GroupHistoryRes(nodes: Seq[FeedContent]) extends Result
->>>>>>> master
 

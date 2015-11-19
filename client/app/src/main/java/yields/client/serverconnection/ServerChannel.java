@@ -12,7 +12,7 @@ import java.util.Objects;
 /**
  * The server channel connects to the server and sends message to the server
  */
-public class ServerChannel implements CommunicationChannel {
+public final class ServerChannel implements CommunicationChannel {
     private BufferedWriter mSender;
     private ConnectionStatus mConnectionStatus;
 
@@ -45,7 +45,7 @@ public class ServerChannel implements CommunicationChannel {
             throw new IOException("Not connected to server");
         }
 
-        Log.d("DEBUG", "sending : " + serverRequest.message());
+        Log.d("Y:" + this.getClass().getName(), "sending : " + serverRequest.message());
         mSender.write(serverRequest.message());
         mSender.newLine();
         mSender.flush();

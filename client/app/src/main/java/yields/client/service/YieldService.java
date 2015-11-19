@@ -41,7 +41,7 @@ public class YieldService extends Service {
     public void onCreate() {
         mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
-        Log.d("DEBUG", "create Yield Service");
+        Log.d("Y:" + this.getClass().getName(), "create Yield Service");
         mConnectControllerTask = new ConnectControllerTask();
         mConnectControllerTask.execute();
     }
@@ -62,7 +62,7 @@ public class YieldService extends Service {
             sendRequest(connectReq);
         }*/
 
-        Log.d("DEBUG", "Starting yield service");
+        Log.d("Y:" + this.getClass().getName(), "Starting yield service");
 
         return START_STICKY;
     }
@@ -75,7 +75,7 @@ public class YieldService extends Service {
      */
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d("DEBUG", "Service binds to an activity");
+        Log.d("Y:" + this.getClass().getName(), "Service binds to an activity");
         // A client is binding to the service with bindService()
         return mBinder;
     }
@@ -88,7 +88,7 @@ public class YieldService extends Service {
      */
     @Override
     public boolean onUnbind(Intent intent){
-        Log.d("DEBUG", "unbind : " +
+        Log.d("Y:" + this.getClass().getName(), "unbind : " +
                 (intent.getBooleanExtra("bindMessageActivity", false) ?
                         "messageActivity" : "groupActivity"));
         return true;
@@ -108,7 +108,7 @@ public class YieldService extends Service {
      */
     @Override
     public void onDestroy() {
-        Log.d("DEBUG", "Yield service has been disconnected");
+        Log.d("Y:" + this.getClass().getName(), "Yield service has been disconnected");
         receiveError("Yield service has been disconnected");
         //TODO : disconnect from server
     }
@@ -119,7 +119,7 @@ public class YieldService extends Service {
      * @param notifiableActivity The concerned messageActivity
      */
     synchronized public void setNotifiableActivity(NotifiableActivity notifiableActivity) {
-        Log.d("DEBUG","add activity");
+        Log.d("Y:" + this.getClass().getName(),"add activity");
         mCurrentNotifiableActivity = notifiableActivity;
         mCurrentGroup = YieldsApplication.getGroup();
     }
@@ -128,7 +128,7 @@ public class YieldService extends Service {
      * Unset the current messageActivity
      */
     synchronized public void unsetMessageActivity() {
-        Log.d("DEBUG","remove activity");
+        Log.d("Y:" + this.getClass().getName(),"remove activity");
         mCurrentNotifiableActivity = null;
     }
 
@@ -226,12 +226,16 @@ public class YieldService extends Service {
                     try {
                         this.wait();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Log.d("Y:" + this.getClass().getName(),e.getMessage());
                     }
                 }
             }
 
-            mServiceRequestController.handleServiceRequest(params[0]);
+            if (params.length > 0 && params[0] != null) {
+                mServiceRequestController.handleServiceRequest(params[0]);
+            } else {
+                throw new IllegalArgumentException();
+            }
 
             return null;
         }
