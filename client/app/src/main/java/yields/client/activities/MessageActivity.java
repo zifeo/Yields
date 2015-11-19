@@ -203,16 +203,6 @@ public class MessageActivity extends AppCompatActivity
     }
 
     /**
-     * Called when new message(s) have been received.
-     * @param newMessages The new message(s) received.
-     */
-    public void receiveNewMessage(List<Message> newMessages){
-        mGroupMessageAdapter.addAll(newMessages);
-        mGroupMessageAdapter.notifyDataSetChanged();
-    }
-
-
-    /**
      * Is called once the image picking is finished. It displays a toast
      * informing the user that he added a message to his message.
      */
