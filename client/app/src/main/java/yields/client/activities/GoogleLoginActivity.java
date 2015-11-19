@@ -2,6 +2,8 @@ package yields.client.activities;
 
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +20,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 
 import yields.client.R;
+import yields.client.gui.GraphicTransforms;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class GoogleLoginActivity extends AppCompatActivity implements
@@ -83,6 +86,19 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         // Cannot use the xml file :
         // https://developers.google.com/android/reference/com/google/android/gms/common/SignInButton
         mGoogleSingInButton.setOnClickListener(this);
+
+        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(),
+                R.drawable.default_group_image);
+
+        Bitmap defaultUserImage = BitmapFactory.decodeResource(getResources(),
+                R.drawable.default_user_image);
+
+        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
+        YieldsApplication.setDefaultGroupImage(
+                GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
+
+        YieldsApplication.setDefaultUserImage(
+                GraphicTransforms.getCroppedCircleBitmap(defaultUserImage, diameter));
     }
 
     /**

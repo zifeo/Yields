@@ -1,8 +1,11 @@
 package yields.client.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -69,5 +72,17 @@ public class GroupInfoActivity extends AppCompatActivity {
             }
             textViewTags.setText(builder.toString());
         }
+
+        Button usersButton = (Button) findViewById(R.id.buttonUsers);
+
+        usersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        YieldsApplication.setUserList(mGroup.getUsers());
     }
 }
