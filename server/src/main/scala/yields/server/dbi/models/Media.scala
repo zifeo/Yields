@@ -25,9 +25,11 @@ class Media private(override val nid: NID) extends Node {
 
   object MediaKey {
     val hash = s"${NodeKey.node}:hash"
+    val contentType = s"${NodeKey.node}:contentType"
   }
 
   private var _hash: Option[String] = None
+  private var _contentType: Option[String] = None
   private var _path: Option[String] = None
 
   /** Media content getter */
@@ -76,6 +78,16 @@ class Media private(override val nid: NID) extends Node {
     _path = Some(buildPathFromName(_hash.get))
   }
 
+  private def contentType_=(contentType: String) = {
+    redis.withClient(_.set(MediaKey.contentType, contentType))
+    _contentType = Some(contentType)
+  }
+
+  def contentType: String = {
+    _contentType = redis.withClient(_.get[String](MediaKey.contentType))
+    valueOrDefault(_contentType, "")
+  }
+
   def hash: String = {
     _hash = redis.withClient(_.get[String](MediaKey.hash))
     valueOrDefault(_hash, "")
@@ -107,6 +119,7 @@ object Media {
     // set values
     img.hash = hash
     img.content = content
+    img.contentType = contentType
 
     img
   }
@@ -129,7 +142,7 @@ object Media {
   }
 
   def buildPathFromName(name: String): String = {
-    Config.getString("ressource.image.folder") + name + Config.getString("ressource.image.extOnDisk")
+    Config.getString("ressource.media.folder") + name + Config.getString("ressource.image.extOnDisk")
   }
 
 }

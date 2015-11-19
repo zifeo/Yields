@@ -2,7 +2,6 @@ package yields.server
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
-import yields.server.actions.images._
 import yields.server.actions.nodes._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
@@ -37,11 +36,11 @@ package object io {
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
 
-  implicit lazy val groupMessageJF = jsonFormat2(GroupMessage)
-  implicit lazy val groupMessageResJF = jsonFormat1(GroupMessageRes)
+  implicit lazy val nodeMessageJF = jsonFormat4(NodeMessage)
+  implicit lazy val nodeMessageResJF = jsonFormat1(NodeMessageRes)
 
-  implicit lazy val groupHistoryJF = jsonFormat3(GroupHistory)
-  implicit lazy val groupHistoryResJF = jsonFormat2(GroupHistoryRes)
+  implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
+  implicit lazy val ndoeHistoryResJF = jsonFormat2(NodeHistoryRes)
 
   implicit lazy val groupSearchJF = jsonFormat1(GroupSearch)
   implicit lazy val groupSearchResJF = jsonFormat1(GroupSearchRes)
@@ -59,15 +58,6 @@ package object io {
 
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
   implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
-
-  // Images
-
-  implicit lazy val imageGetJF = jsonFormat1(ImageGet)
-  implicit lazy val imageGetResJF = jsonFormat1(ImageGetRes)
-
-  implicit lazy val imageSetJF = jsonFormat1(ImageSet)
-  implicit lazy val imageSetResJF = jsonFormat1(ImageSetRes)
-
 
   /** *** Message passing interface *****/
 

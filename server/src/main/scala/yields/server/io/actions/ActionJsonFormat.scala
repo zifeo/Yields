@@ -4,7 +4,6 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups.{GroupCreate, GroupUpdate}
-import yields.server.actions.images.{ImageGet, ImageSet}
 import yields.server.actions.nodes.{NodeHistory, NodeMessage}
 import yields.server.actions.users._
 import yields.server.io._
@@ -37,9 +36,6 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     case x: UserGroupList => packWithKind(x)
     case x: UserInfo => packWithKind(x)
 
-    case x: ImageSet => packWithKind(x)
-    case x: ImageGet => packWithKind(x)
-
     case _ =>
       val kind = obj.getClass.getSimpleName
       serializationError(s"unregistered action kind: $kind")
@@ -58,9 +54,6 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "UserUpdate" => message.convertTo[UserUpdate]
           case "UserGroupList" => message.convertTo[UserGroupList]
           case "UserInfo" => message.convertTo[UserInfo]
-
-          case "ImageSet" => message.convertTo[ImageSet]
-          case "ImageGet" => message.convertTo[ImageGet]
 
           case _ => deserializationError(s"unregistered action kind: $kind")
         }

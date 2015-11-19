@@ -1,22 +1,19 @@
-package yields.server.actions.groups
+package yields.server.actions.nodes
 
-import org.scalacheck.Prop._
-import org.scalacheck.{Arbitrary, Gen, Properties}
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory}
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 import yields.server.dbi._
-import yields.server.dbi.models.ModelsGenerators
-import yields.server.dbi.models._
+import yields.server.dbi.models.{ModelsGenerators, _}
 import yields.server.mpi.Metadata
 import yields.server.utils.{Config, Temporal}
-import Arbitrary.arbitrary
 
 /**
   * Test class for group history action
   * TODO test getting messages with first tid not existing
   * TODO test getting negative number of messages
   */
-class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with BeforeAndAfter {
+class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with BeforeAndAfter {
 
   /** Switch on test database */
   before {
@@ -44,20 +41,12 @@ class TestGroupHistory extends FlatSpec with Matchers with ModelsGenerators with
     val group = Group.createGroup("name")
     add10Msgs(group.nid)
     val n = 5
-<<<<<<< HEAD
-    val action = new GroupHistory(group.nid, Temporal.current, n)
+    val action = new NodeHistory(group.nid, Temporal.current, n)
     val res = action.run(m)
     res match {
-      case GroupHistoryRes(nid, messages) =>
+      case NodeHistoryRes(nid, messages) =>
         messages.length should be(n)
-        nid should be (group.nid)
-=======
-    val action = new NodeHistory(group.nid, 1, n)
-    val res = action.run(m)
-    res match {
-      case NodeHistoryRes(x) =>
-        x.length should be(n)
->>>>>>> massive refactor, image -> media
+        nid should be(group.nid)
     }
   }
 

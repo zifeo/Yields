@@ -8,24 +8,31 @@ import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
- * Fetch each group node starting from a date to a count.
- * @param nid node id
- * @param datetime last time related to the given node
- * @param count number of node wanted
- */
+  * Fetch each group node starting from a date to a count.
+  * @param nid node id
+  * @param datetime last time related to the given node
+  * @param count number of node wanted
+  */
 
-case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends Action {
+case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends Action {
 
   /**
-   * Run the action given the sender.
-   * @param metadata action requester
-   * @return action result
-   */
+    * Run the action given the sender.
+    * @param metadata action requester
+    * @return action result
+    */
   override def run(metadata: Metadata): Result = {
     if (nid > 0 && count > 0) {
       val group = Group(nid)
-      val content = group.getMessagesInRange(datetime, count)
-      GroupHistoryRes(nid, content)
+      val content: List[FeedContent] = group.getMessagesInRange(datetime, count)
+      val resMedia = for {
+        c <- content
+        m: Media <- Media(c._3.get)
+        if c._3.isDefined
+      } yield (c._1, c._2, m.content, c._4)
+
+      NodeHistoryRes(nid, content)
+      
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"Bad nid and/or lastTid and/or count value in : $errorMessage")
@@ -34,5 +41,5 @@ case class GroupHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends 
 
 }
 
-/** [[GroupHistory]] result. */
-case class GroupHistoryRes(nid: NID, nodes: Seq[FeedContent]) extends Result
+/** [[NodeHistory]] result. */
+case class NodeHistoryRes(nid: NID, nodes: Seq[FeedContent]) extends Result
