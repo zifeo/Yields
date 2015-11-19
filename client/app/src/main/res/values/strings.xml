@@ -53,4 +53,5 @@
     <string name="joinGroup">Join Group !</string>
     <string name="noTags">No tags for this group</string>
     <string name="userImage">User image</string>
+    <string name="addTag">Add tag</string>
 </resources>
