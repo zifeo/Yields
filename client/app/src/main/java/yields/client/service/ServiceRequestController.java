@@ -2,12 +2,10 @@ package yields.client.service;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
 
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
@@ -21,7 +19,7 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.servicerequest.GroupHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
+import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 
 /**
@@ -105,7 +103,7 @@ public class ServiceRequestController {
                 handleGroupRemoveRequest();
                 break;
             case GROUP_MESSAGE:
-                handleGroupMessageRequest((GroupMessageRequest) serviceRequest);
+                handleGroupMessageRequest((NodeMessageRequest) serviceRequest);
                 break;
             case GROUP_HISTORY:
                 handleGroupHistoryRequest((GroupHistoryRequest) serviceRequest);
@@ -236,7 +234,7 @@ public class ServiceRequestController {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    private void handleGroupMessageRequest(GroupMessageRequest serviceRequest) {
+    private void handleGroupMessageRequest(NodeMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingGroup().getId());

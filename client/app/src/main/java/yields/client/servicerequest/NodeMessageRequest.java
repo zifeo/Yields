@@ -1,22 +1,19 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
 import yields.client.messages.Message;
-import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
  * ServiceRequest asking the Service to add a Message to a Group.
  */
-public class GroupMessageRequest extends ServiceRequest {
+public class NodeMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
-    private final Group mReceivingGroup;
+    private final Node mReceivingNode;
 
     /**
      * Main constructor for this type of ServiceRequest (sending a Message to a Group).
@@ -24,13 +21,13 @@ public class GroupMessageRequest extends ServiceRequest {
      * @param message        The Message that should be sent.
      * @param receivingGroup The Group to which the Message should be added.
      */
-    public GroupMessageRequest(Message message, Group receivingGroup) {
+    public NodeMessageRequest(Message message, Node receivingGroup) {
         super();
         Objects.requireNonNull(message);
         Objects.requireNonNull(receivingGroup);
 
         mMessage = message;
-        mReceivingGroup = receivingGroup;
+        mReceivingNode = receivingGroup;
     }
 
     /**
@@ -50,7 +47,7 @@ public class GroupMessageRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        Group group = getReceivingGroup();
+        Node group = getReceivingNode();
         Message message = getMessage();
 
         return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
@@ -70,7 +67,7 @@ public class GroupMessageRequest extends ServiceRequest {
      *
      * @return The receiving Group of this ServiceRequest.
      */
-    public Group getReceivingGroup(){
-        return mReceivingGroup;
+    public Node getReceivingNode(){
+        return mReceivingNode;
     }
 }
