@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -84,5 +85,21 @@ public class GroupInfoActivity extends AppCompatActivity {
         });
 
         YieldsApplication.setUserList(mGroup.getUsers());
+    }
+
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
