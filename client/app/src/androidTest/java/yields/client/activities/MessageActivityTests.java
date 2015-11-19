@@ -20,7 +20,6 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 
 import yields.client.R;
-import yields.client.fragments.GroupMessageFragment;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.messages.MessageView;
@@ -36,7 +35,6 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
-import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 
 /**

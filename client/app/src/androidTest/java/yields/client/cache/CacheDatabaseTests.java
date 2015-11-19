@@ -654,6 +654,7 @@ public class CacheDatabaseTests {
      */
     private boolean compareMessages(Message originalMessage, Message messageFromCache) {
         boolean equal = originalMessage.getSender().getId().getId().equals(
+
                 messageFromCache.getSender().getId().getId());
         equal = equal && originalMessage.getSender().getEmail().equals(
                 messageFromCache.getSender().getEmail());
