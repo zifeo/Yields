@@ -253,7 +253,12 @@ public class MessageActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                retrieveGroupMessages();
+                if (mType == ContentType.GROUP_MESSAGES) {
+                    retrieveGroupMessages();
+                }
+                else{
+                    retreiveCommentMessages();
+                }
             }
         });
     }
@@ -337,7 +342,7 @@ public class MessageActivity extends AppCompatActivity
                         // First keep a reference to the message that has been clicked on.
                         mCommentMessage = mGroupMessageAdapter.getItem(position);
                         // We save the reference of the last group in the YieldsApplication class.
-                        mLastApplicationGroup  = mGroup;
+                        mLastApplicationGroup = mGroup;
                         // Then we update the group currently displayed as it is the commented
                         // message
                         mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
@@ -370,7 +375,7 @@ public class MessageActivity extends AppCompatActivity
     }
 
     /**
-     * Retrieve message from the server and puts them in the mMessages attribute.
+     * Retrieve message from the server and puts them in the group message adapter.
      */
     private void retrieveGroupMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
@@ -381,8 +386,16 @@ public class MessageActivity extends AppCompatActivity
         mGroupMessageAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Retrieve comments for a message an puts them in the comments adapter.
+     */
     private void retreiveCommentMessages() {
-        // TODO : retrieve messages from mGroup representing the commented message.
+        SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
+
+        for(Message message : messagesTree.values()){
+            mCommentAdapter.add(message);
+        }
+        mCommentAdapter.notifyDataSetChanged();
     }
 
     /**
