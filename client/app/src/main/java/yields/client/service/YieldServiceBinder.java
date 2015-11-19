@@ -2,15 +2,10 @@ package yields.client.service;
 
 import android.os.Binder;
 
-import java.util.Date;
 import java.util.Objects;
 
 import yields.client.activities.NotifiableActivity;
-import yields.client.messages.Message;
-import yields.client.node.Group;
-import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.ServiceRequest;
-import yields.client.servicerequest.NodeMessageRequest;
 
 public class YieldServiceBinder extends Binder {
     private final YieldService mService;
