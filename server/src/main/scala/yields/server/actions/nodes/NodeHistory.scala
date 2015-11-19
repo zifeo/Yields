@@ -26,13 +26,13 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
       val group = Group(nid)
       val content: List[FeedContent] = group.getMessagesInRange(datetime, count)
       val resMedia = for {
-        c <- content
+        c: FeedContent <- content
         m: Media <- Media(c._3.get)
         if c._3.isDefined
       } yield (c._1, c._2, m.content, c._4)
 
       NodeHistoryRes(nid, content)
-      
+
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"Bad nid and/or lastTid and/or count value in : $errorMessage")
