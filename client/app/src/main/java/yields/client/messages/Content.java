@@ -11,7 +11,7 @@ import yields.client.exceptions.ContentException;
 public abstract class Content {
 
     public enum ContentType {
-        TEXT("text"), IMAGE("image");
+        TEXT("TEXT"), IMAGE("IMAGE");
 
         private final String mType;
 
@@ -22,7 +22,6 @@ public abstract class Content {
         public String getType() {
             return mType;
         }
-
     }
 
     /**
@@ -52,4 +51,11 @@ public abstract class Content {
      * @return a string describing the content
      */
     public abstract String getPreview();
+
+    /**
+     * Returns the text of the Content, this should exclusively be used for requests.
+     *
+     * @return The text associated to this Content (for a request).
+     */
+    public abstract String getTextForRequest();
 }
