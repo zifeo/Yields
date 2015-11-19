@@ -228,11 +228,6 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
             e.printStackTrace();
         }
 
-        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(), R.drawable.default_group_image);
-
-        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
-        YieldsApplication.setDefaultGroupImage(GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
-
         mGroups = new ArrayList<>();
 
         Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
