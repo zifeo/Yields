@@ -62,7 +62,7 @@ public class YieldServiceBinder extends Binder {
 
     /**
      * Send a request to server via the Service.
-     * @param request
+     * @param request The request to be sent.
      */
     public void sendRequest(ServiceRequest request) {
         Objects.requireNonNull(request);
