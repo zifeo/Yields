@@ -24,10 +24,14 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 
 import yields.client.R;
 
+import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -39,8 +43,12 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
+import yields.client.node.User;
+import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -88,8 +96,20 @@ public class MessageActivity extends AppCompatActivity
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+        /*mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();*/
+
+        /** FOR TESTING ONLY ! **/
+        // Set the binder.
+        YieldsApplication.setBinder(new FakeBinder(new YieldService()));
+        // Set the user.
+        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+                .createBitmap(80, 80, Bitmap.Config.RGB_565));
+        // Set the group.
+        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
+                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
+                .GroupVisibility.PUBLIC, true);
+        /** **/
 
         mImage = null;
         mSendImage = false;
@@ -426,5 +446,74 @@ public class MessageActivity extends AppCompatActivity
      */
     private void setHeaderBar(){
         mActionBar.setTitle(mGroup.getName());
+    }
+
+    private class FakeBinder extends YieldServiceBinder{
+        public FakeBinder(YieldService service) {
+            super(service);
+        }
+
+        public void attachActivity(NotifiableActivity activity) {
+            Log.d("MessageActivity", "Attach activity");
+        }
+
+        public void unsetMessageActivity(){
+            Log.d("MessageActivity", "Attach activity");
+        }
+
+        public boolean isServerConnected(){
+            return true;
+        }
+
+        public void sendRequest(ServiceRequest request) {
+            Objects.requireNonNull(request);
+            Log.d("MessageActivity", "Send request : " + request.toString());
+        }
+    }
+
+    private class  FakeUser extends ClientUser{
+
+        public FakeUser(String name, Id id, String email, Bitmap img)
+                throws NodeException {
+            super(name, id, email, img);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message)
+                throws IOException {
+
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group, Date lastDate)
+                throws IOException {
+            return null;
+        }
+
+        @Override
+        public void createNewGroup(Group group) throws IOException {
+
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+
+        }
+
+        @Override
+        public Map<User, String> getHistory(Group group, Date from) {
+            return null;
+        }
+    }
+
+    /**
+     * Private class for quick testing purposes.
+     */
+    private class FakeGroup extends Group{
+
+        public FakeGroup(String name, Id id, List<User> users, Bitmap image,
+                         GroupVisibility visibility, boolean validated) {
+            super(name, id, users, image, visibility, validated);
+        }
     }
 }
