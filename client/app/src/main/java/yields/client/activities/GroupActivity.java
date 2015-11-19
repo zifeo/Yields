@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -169,7 +170,7 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
     @Override
     public void onPause(){
         super.onPause();
-
+        Log.d("TOBEREMOVED", "pause");
         YieldsApplication.getBinder().unsetMessageActivity();
     }
 

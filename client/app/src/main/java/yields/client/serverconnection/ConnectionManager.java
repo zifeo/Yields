@@ -69,20 +69,30 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
                     new InputStreamReader(mSocket.getInputStream()));
         } catch (IOException e) {
             subscriber.updateOnConnectionProblem(e);
+            return;
         }
 
-        if(receiver != null) {
-            while (!mSocket.isInputShutdown()) {
-                try {
-                    String pushMessage = receiver.readLine();
+        String pushMessage = null;
+        do {
+            try {
+                pushMessage = receiver.readLine();
+                if(pushMessage != null) {
                     Response response = new Response(pushMessage);
                     subscriber.updateOn(response);
-                } catch (IOException e) {
-                    subscriber.updateOnConnectionProblem(e);
-                } catch (JSONException e) {
-                    subscriber.updateOnParsingProblem(e);
                 }
+            } catch (IOException e) {
+                subscriber.updateOnConnectionProblem(e);
+            } catch (JSONException e) {
+                subscriber.updateOnParsingProblem(e);
             }
+        } while (pushMessage != null);
+
+        try {
+            this.close();
+        } catch (IOException e) {
+            Log.d("Y:" + this.getClass().getName(),"Connection was already closed.");
+        } finally {
+            subscriber.updateOnConnectionProblem(new IOException("Server imput is shutdown"));
         }
     }
 
