@@ -1,23 +1,11 @@
 package yields.client.service;
 
 import android.os.Binder;
-import android.util.Log;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import yields.client.activities.NotifiableActivity;
-import yields.client.id.Id;
-import yields.client.messages.Message;
-import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.serverconnection.ServerRequest;
-import yields.client.serverconnection.RequestBuilder;
-import yields.client.servicerequest.GroupHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
+import yields.client.servicerequest.ServiceRequest;
 
 public class YieldServiceBinder extends Binder {
     private final YieldService mService;
@@ -73,29 +61,11 @@ public class YieldServiceBinder extends Binder {
     }
 
     /**
-     * Sends a message to the server
-     * @param group The group to which is linked the message
-     * @param message The message itself
-     * @throws IOException in case of communication errors
+     * Send a request to server via the Service.
+     * @param request The request to be sent.
      */
-    public void sendMessage(Group group, Message message) {
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(message);
-
-        mService.sendRequest(new GroupMessageRequest(message, group));
-    }
-
-    /**
-     * Add older message to the Message Activity
-     *
-     * @param group The group we want to retrieve from
-     * @param lastDate The last date we have in the history
-     */
-    public void addMoreGroupMessages(Group group,
-                                     Date lastDate) {
-        Objects.requireNonNull(group);
-        Objects.requireNonNull(lastDate);
-
-        mService.sendRequest(new GroupHistoryRequest(group, lastDate));
+    public void sendRequest(ServiceRequest request) {
+        Objects.requireNonNull(request);
+        mService.sendRequest(request);
     }
 }
