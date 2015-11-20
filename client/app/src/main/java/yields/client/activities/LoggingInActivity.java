@@ -66,7 +66,6 @@ public class LoggingInActivity extends AppCompatActivity {
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("TOBEREMOVED", "connected To Service");
             YieldsApplication.setBinder((YieldServiceBinder) service);
             goToGroupActivity();
         }
