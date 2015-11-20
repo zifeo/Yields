@@ -459,7 +459,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
                     .getId());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.LAST.getValue()),
-                    DateSerialization.toString(date));
+                    DateSerialization.dateSerializer.toString(date));
             assertEquals(json.getJSONObject("message").getInt(RequestBuilder.Fields.COUNT.getValue
                     ()), messageCount);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),

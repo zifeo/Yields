@@ -492,6 +492,6 @@ public class RequestBuilder {
      */
     private String formatDate(Date date) {
         Objects.requireNonNull(date);
-        return DateSerialization.toString(date);
+        return DateSerialization.dateSerializer.toString(date);
     }
 }

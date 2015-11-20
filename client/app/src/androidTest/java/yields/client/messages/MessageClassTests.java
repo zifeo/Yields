@@ -195,7 +195,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessagesFromJSONAreCorrectlyParserForDate() throws JSONException, ParseException {
         Message m = new Message(new JSONArray(JSON_MESSAGE));
         Date date = m.getDate();
-        assertEquals(DateSerialization.toDate("2015-11-17T00:30:16.276+01:00").toString(), date.toString());
+        assertEquals(DateSerialization.dateSerializer.toDate("2015-11-17T00:30:16.276+01:00").toString(), date.toString());
     }
 
     @Test

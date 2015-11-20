@@ -52,7 +52,7 @@ public class ServerChannelTest {
         try {
             channel.sendRequest(simpleServerRequest);
             Assert.assertEquals(sSimpleRequest
-                    .replace("TIME", DateSerialization.toString(new Date())),
+                    .replace("TIME", DateSerialization.dateSerializer.toString(new Date())),
                     output.toString());
         } catch (IOException e) {
             Assert.fail(e.getMessage());
