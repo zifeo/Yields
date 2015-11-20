@@ -97,7 +97,8 @@ public class MessageActivity extends AppCompatActivity
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
+        mGroup = YieldsApplication.getGroup();
+        */
 
         /** FOR TESTING ONLY ! **/
         // Set the binder.
