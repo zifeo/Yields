@@ -21,6 +21,7 @@ import yields.client.serverconnection.ConnectionSubscriber;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
+import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -150,7 +151,7 @@ public class ServiceRequestController {
     private void connectToServer() {
         try {
             final ConnectionManager connectionManager = new ConnectionManager(
-                    new YieldEmulatorSocketProvider());
+                    new YieldsSocketProvider());
             mCommunicationChannel = connectionManager.getCommunicationChannel();
 
             new Thread(new ServerListener() {
