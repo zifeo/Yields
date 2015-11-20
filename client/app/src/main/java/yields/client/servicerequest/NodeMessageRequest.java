@@ -8,7 +8,7 @@ import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServiceRequest asking the Service to add a Message to a Group.
+ * ServiceRequest asking the Service to add a Message to a Node.
  */
 public class NodeMessageRequest extends ServiceRequest {
 
@@ -16,18 +16,18 @@ public class NodeMessageRequest extends ServiceRequest {
     private final Node mReceivingNode;
 
     /**
-     * Main constructor for this type of ServiceRequest (sending a Message to a Group).
+     * Main constructor for this type of ServiceRequest (sending a Message to a Node).
      *
      * @param message        The Message that should be sent.
-     * @param receivingGroup The Group to which the Message should be added.
+     * @param receivingNode The Node to which the Message should be added.
      */
-    public NodeMessageRequest(Message message, Node receivingGroup) {
+    public NodeMessageRequest(Message message, Node receivingNode) {
         super();
         Objects.requireNonNull(message);
-        Objects.requireNonNull(receivingGroup);
+        Objects.requireNonNull(receivingNode);
 
         mMessage = message;
-        mReceivingNode = receivingGroup;
+        mReceivingNode = receivingNode;
     }
 
     /**
@@ -41,7 +41,7 @@ public class NodeMessageRequest extends ServiceRequest {
     }
 
     /**
-     * Build a ServerRequest for sending a message to a group.
+     * Build a ServerRequest for sending a message to a node.
      *
      * @return The ServerRequest corresponding to this ServiceRequest.
      */
@@ -63,9 +63,9 @@ public class NodeMessageRequest extends ServiceRequest {
         return mMessage;
     }
     /**
-     * Getter method for the receiving Group of this ServiceRequest.
+     * Getter method for the receiving Node of this ServiceRequest.
      *
-     * @return The receiving Group of this ServiceRequest.
+     * @return The receiving Node of this ServiceRequest.
      */
     public Node getReceivingNode(){
         return mReceivingNode;
