@@ -78,24 +78,6 @@ public class MessageView extends LinearLayout{
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
 
-        /*LinearLayout userNameAndDateLayout = new LinearLayout(applicationContext);
-        userNameAndDateLayout.setOrientation(LinearLayout.HORIZONTAL);
-        RelativeLayout relativeLayout = new RelativeLayout(applicationContext);
-        RelativeLayout.LayoutParams dateLayoutParams = new RelativeLayout.LayoutParams
-                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        RelativeLayout.LayoutParams usernameLayoutParams = new RelativeLayout.LayoutParams
-                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);*/
-        /*if (userIsSender) {
-            dateLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            usernameLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        }
-        else {
-            dateLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-            usernameLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        }*/
-
-        TextView username;
-        TextView date;
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
         String time = dateFormat.format(mMessage.getDate());
 
@@ -111,12 +93,7 @@ public class MessageView extends LinearLayout{
         dateTextView.setAlpha(0.6f);
         dateTextView.setTextColor(Color.GRAY);
 
-        /*LinearLayout usernameDate = (LinearLayout) v.findViewById(R.id.usernamedate);
-        usernameDate.addView(userNameAndDateLayout);*/
-
-
-
-        LinearLayout contentLayout = (LinearLayout) v.findViewById(R.id.contentfield);
+        RelativeLayout contentLayout = (RelativeLayout) v.findViewById(R.id.contentfield);
         try {
             contentLayout.addView(mMessage.getContent().getView());
         } catch (ContentException e) {

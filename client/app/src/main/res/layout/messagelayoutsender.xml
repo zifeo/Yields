@@ -3,58 +3,57 @@
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="6dip" >
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/profilpic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="6dip" />
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/usernamecontent"
             android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            android:layout_toRightOf="@id/profilpicLeft"
-            <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/profilpic">
+            <RelativeLayout
                 android:orientation="horizontal"
                 android:id="@+id/usernamedate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
                 android:textSize="12sp">
-                <TextView
-                    android:id="@+id/nametextview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    />
-
                 <TextView
                     android:id="@+id/datetextview"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"/>
 
-            <LinearLayout
+                <TextView
+                    android:id="@+id/nametextview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"/>
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:orientation="horizontal"
                 android:id="@+id/contentfield"
+                android:layout_below="@id/usernamedate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@id/usernamedate"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentLeft="true"
                 android:layout_alignWithParentIfMissing="true"
                 android:textSize="16sp" />
-        </LinearLayout>
-    </LinearLayout>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/profilpic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="6dip" />
+    </RelativeLayout>
 
 </RelativeLayout>
