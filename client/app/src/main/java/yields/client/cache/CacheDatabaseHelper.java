@@ -60,6 +60,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GROUP_USERS = "groupUsers";
     private static final String KEY_GROUP_IMAGE = "groupImage";
     private static final String KEY_GROUP_VISIBILITY = "groupVisibility";
+    private static final String KEY_GROUP_VALIDATED = "groupValidated";
 
     private static final String KEY_MESSAGE_NODEID = "nodeID";
     private static final String KEY_MESSAGE_GROUPID = "messageGroup";
@@ -68,6 +69,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
     private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
     private static final String KEY_MESSAGE_DATE = "messageDate";
+    private static final String KEY_MESSAGE_TIMEZONE = "messageTimezone";
 
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
@@ -78,7 +80,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " TEXT,"
             + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
-            + " BLOB," + KEY_GROUP_VISIBILITY + " TEXT" + ")";
+            + " BLOB," + KEY_GROUP_VISIBILITY + " TEXT," + KEY_GROUP_VALIDATED + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
@@ -462,6 +464,23 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Updates the validity of a Group in the database.
+     *
+     * @param groupId  The Id field of the Group that will have it's validity changed.
+     * @param validity The new validity of the Group.
+     */
+    public void updateGroupValidity(Id groupId, boolean validity) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(validity);
+
+        ContentValues values = new ContentValues();
+        int validated = validity ? 1 : 0;
+        values.put(KEY_GROUP_VALIDATED, validated);
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+                new String[]{groupId.getId()});
+    }
+
+    /**
      * Removes a User from a Group in the database.
      *
      * @param groupId The Id of the Group form which the User shall be removed.
@@ -572,6 +591,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
             Group.GroupVisibility groupVisibility = Group.GroupVisibility.valueOf(
                     cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+            int validated = cursor.getInt(cursor.getColumnIndex(KEY_GROUP_VALIDATED));
+            boolean groupValidated = (1 == validated);
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
@@ -586,7 +607,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
             }
             cursor.close();
-            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility);
+            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility, groupValidated);
         }
     }
 
@@ -973,6 +994,10 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getImage()));
         values.put(KEY_GROUP_VISIBILITY, group.getVisibility().getValue());
         values.put(KEY_GROUP_NAME, group.getName());
+
+        int validated = group.isValidated() ? 1 : 0;
+        values.put(KEY_GROUP_VALIDATED, validated);
+
         List<User> users = group.getUsers();
         List<Id> userIDs = new ArrayList<>();
         for (User user : users) {
