@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.listadapter.ListAdapterSettings;
 import yields.client.listadapter.ListAdapterUsers;
 import yields.client.node.Group;
@@ -25,6 +26,8 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class UserListActivity extends AppCompatActivity {
     private List<User> mUsers;
+
+    public final static String TITLE_KEY = "TITLE";
 
     /**
      * Method automatically called on the creation of the activity
@@ -41,13 +44,16 @@ public class UserListActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        Group group = Objects.requireNonNull(YieldsApplication.getGroup(),
-                "The group in YieldsApplication cannot be null when UserListActivity is created");
+        Intent intent = getIntent();
+        if (!intent.hasExtra(TITLE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Title extra is missing from intent in UserListActivity");
+        }
+
+        getSupportActionBar().setTitle(intent.getStringExtra(TITLE_KEY));
+
         final List<User> userList = Objects.requireNonNull(YieldsApplication.getUserList(),
                 "The user list in YieldsApplication cannot be null when UserListActivity is created");
-
-        String title = "Users of " + group.getName();
-        getSupportActionBar().setTitle(title);
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
 

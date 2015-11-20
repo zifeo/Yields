@@ -80,11 +80,22 @@ public class GroupInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
+                String title = "Users of " + mGroup.getName();
+                intent.putExtra(UserListActivity.TITLE_KEY, title);
                 startActivity(intent);
             }
         });
 
         YieldsApplication.setUserList(mGroup.getUsers());
+
+        Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
+
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO Send request to server
+            }
+        });
     }
 
     /** Method used to take care of clicks on the tool bar

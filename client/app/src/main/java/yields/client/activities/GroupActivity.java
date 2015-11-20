@@ -105,7 +105,11 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
 
         switch (item.getItemId()) {
             case R.id.actionEntourage:
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, UserListActivity.class);
+                String title = "Entourage";
+                intent.putExtra(UserListActivity.TITLE_KEY, title);
+
+                YieldsApplication.setUserList(YieldsApplication.getUser().getEntourage());
             break;
 
             case R.id.actionDiscover:
