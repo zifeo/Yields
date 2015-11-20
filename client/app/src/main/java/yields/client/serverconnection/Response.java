@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * The response object which represents a response to be send to the server.
  */
-public class Response{
+public class Response {
     /**
      * The Kind of messages possible
      */
@@ -24,11 +24,18 @@ public class Response{
         GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");*/
 
         private final String name;
-        ResKind(String name) { this.name = name; }
-        public String getValue() { return name; }
-        public static ResKind getEnumbyName(String name){
-            for(ResKind e : ResKind.values()){
-                if(name.equals(e.name)) return e;
+
+        ResKind(String name) {
+            this.name = name;
+        }
+
+        public String getValue() {
+            return name;
+        }
+
+        public static ResKind getEnumbyName(String name) {
+            for (ResKind e : ResKind.values()) {
+                if (name.equals(e.name)) return e;
             }
             return null;
         }
@@ -38,7 +45,7 @@ public class Response{
     private ResKind mKind;
 
     /**
-     * Creates a response as a Json Object
+     * Creates a response as a Json Objects
      *
      * @param rawResponse The String of the response
      * @throws JSONException In case of problems parsing the response
@@ -47,7 +54,7 @@ public class Response{
         Objects.requireNonNull(rawResponse);
         this.mResponseObj = new JSONObject(rawResponse);
         mKind = ResKind.getEnumbyName(mResponseObj.getString("kind"));
-        if(mKind == null) {
+        if (mKind == null) {
             throw new JSONException("mKind is not known");
         }
     }
@@ -63,9 +70,10 @@ public class Response{
 
     /**
      * Getter for the response in raw format.
+     *
      * @return The response in raw format.
      */
-    protected String rawResponse(){
+    protected String rawResponse() {
         return mResponseObj.toString();
     }
 
@@ -74,7 +82,7 @@ public class Response{
      *
      * @return The kind
      */
-    public ResKind getKind(){
+    public ResKind getKind() {
         return mKind;
     }
 
@@ -84,7 +92,7 @@ public class Response{
      * @return The message from the server.
      * @throws JSONException In case of Json trouble.
      */
-    public JSONObject getMessage() throws JSONException{
+    public JSONObject getMessage() throws JSONException {
         return mResponseObj.getJSONObject("message");
     }
 
@@ -94,7 +102,7 @@ public class Response{
      * @return The metadata from the server response.
      * @throws JSONException In case of Json trouble.
      */
-    public JSONObject getMetadata() throws JSONException{
+    public JSONObject getMetadata() throws JSONException {
         return mResponseObj.getJSONObject("metadata");
     }
 
