@@ -22,7 +22,7 @@ case class Metadata(client: UID, datetime: OffsetDateTime) {
 object Metadata {
 
   /** Creates new metadata for sending to a UID from the server. */
-  def apply(uid: UID): Metadata =
+  def now(uid: UID): Metadata =
     Metadata(uid, Temporal.current)
 
 }

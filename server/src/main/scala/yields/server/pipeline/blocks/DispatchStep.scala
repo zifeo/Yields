@@ -58,7 +58,7 @@ class DispatchStep(logger: LoggingAdapter) extends StatefulStage[Response, Respo
         val sendList = for {
           receiver <- broadcast.receivers
           if pool.contains(receiver)
-        } yield Response(broadcast, Metadata(receiver))
+        } yield Response(broadcast, Metadata.now(receiver))
         emit(sendList.iterator, ctx)
 
       case _ =>

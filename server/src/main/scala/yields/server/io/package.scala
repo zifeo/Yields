@@ -66,6 +66,6 @@ package object io {
 
   implicit lazy val requestJF = RequestJsonFormat
   implicit lazy val responseJF = ResponseJsonFormat
-  implicit lazy val metadataJF = jsonFormat2(Metadata)
+  implicit lazy val metadataJF = jsonFormat2(Metadata.apply)
 
 }

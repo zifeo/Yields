@@ -39,7 +39,7 @@ class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
         val msg = g.getMessagesInRange(Temporal.current, 100)
         msg.length should be(1)
         msg.head._4 should be("A message")
-        msg.head._2 should be(m.sender)
+        msg.head._2 should be(m.client)
     }
   }
 
