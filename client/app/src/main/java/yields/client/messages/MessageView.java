@@ -56,42 +56,65 @@ public class MessageView extends LinearLayout{
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
+        String senderEmail = mMessage.getSender().getEmail();
+        String currentUserEmail = YieldsApplication.getUser().getEmail();
+        boolean userIsSender = senderEmail.equals(currentUserEmail);
         Context applicationContext = YieldsApplication.getApplicationContext();
-        
+
         LayoutInflater vi;
         vi = LayoutInflater.from(applicationContext);
-        View v = vi.inflate(R.layout.messagelayout, null);
+        View v;
+        if (userIsSender) {
+            v = vi.inflate(R.layout.messagelayoutsender, null);
+        }
+        else{
+            v = vi.inflate(R.layout.messagelayoutnotsender, null);
+        }
 
-        ImageView imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
-        //TODO: Retrieve actual user picture
+        ImageView imageViewProfilPicture;
+            imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
+
         Bitmap image = mMessage.getSender().getImg();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
 
-        LinearLayout userNameAndDateLayout = new LinearLayout(applicationContext);
+        /*LinearLayout userNameAndDateLayout = new LinearLayout(applicationContext);
         userNameAndDateLayout.setOrientation(LinearLayout.HORIZONTAL);
         RelativeLayout relativeLayout = new RelativeLayout(applicationContext);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
+        RelativeLayout.LayoutParams dateLayoutParams = new RelativeLayout.LayoutParams
                 (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        RelativeLayout.LayoutParams usernameLayoutParams = new RelativeLayout.LayoutParams
+                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);*/
+        /*if (userIsSender) {
+            dateLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            usernameLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        }
+        else {
+            dateLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            usernameLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        }*/
 
-        TextView username = new TextView(applicationContext);
-        username.setText(mMessage.getSender().getName());
-        username.setTextSize(10);
-        username.setTextColor(Color.rgb(39, 89, 196));
-        userNameAndDateLayout.addView(username);
-        TextView date = new TextView(applicationContext);
+        TextView username;
+        TextView date;
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
         String time = dateFormat.format(mMessage.getDate());
-        date.setText(time);
-        date.setTextSize(10);
-        date.setAlpha(0.6f);
-        date.setTextColor(Color.GRAY);
-        relativeLayout.addView(date, lp);
 
-        LinearLayout usernameDate = (LinearLayout) v.findViewById(R.id.usernamedate);
-        userNameAndDateLayout.addView(relativeLayout);
-        usernameDate.addView(userNameAndDateLayout);
+        TextView nameTextView = (TextView) v.findViewById(R.id.nametextview);
+        TextView dateTextView = (TextView) v.findViewById(R.id.datetextview);
+
+        nameTextView.setText(mMessage.getSender().getName());
+        nameTextView.setTextSize(10);
+        nameTextView.setTextColor(Color.rgb(39, 89, 196));
+
+        dateTextView.setText(time);
+        dateTextView.setTextSize(10);
+        dateTextView.setAlpha(0.6f);
+        dateTextView.setTextColor(Color.GRAY);
+
+        /*LinearLayout usernameDate = (LinearLayout) v.findViewById(R.id.usernamedate);
+        usernameDate.addView(userNameAndDateLayout);*/
+
+
 
         LinearLayout contentLayout = (LinearLayout) v.findViewById(R.id.contentfield);
         try {

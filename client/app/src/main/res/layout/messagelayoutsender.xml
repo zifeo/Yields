@@ -14,29 +14,45 @@
             android:layout_marginRight="6dip" />
 
         <LinearLayout
+            android:id="@+id/usernamecontent"
             android:orientation="vertical"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+            android:layout_toRightOf="@id/profilpicLeft"
             <LinearLayout
                 android:orientation="horizontal"
                 android:id="@+id/usernamedate"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
-                android:layout_toRightOf="@id/profilpic"
-                android:textSize="12sp" />
+                android:textSize="12sp">
+                <TextView
+                    android:id="@+id/nametextview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:id="@+id/datetextview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:id="@+id/contentfield"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_above="@id/usernamedate"
-                android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
                 android:layout_alignWithParentIfMissing="true"
-                android:layout_toRightOf="@id/profilpic"
                 android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
