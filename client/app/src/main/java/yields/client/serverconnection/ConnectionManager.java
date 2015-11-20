@@ -93,7 +93,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
         } catch (IOException e) {
             Log.d("Y:" + this.getClass().getName(),"Connection was already closed.");
         } finally {
-            subscriber.updateOnConnectionProblem(new IOException("Server imput is shutdown"));
+            subscriber.updateOnConnectionProblem(new IOException("Server input is shutdown"));
         }
     }
 
