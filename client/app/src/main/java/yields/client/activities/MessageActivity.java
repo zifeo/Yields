@@ -254,14 +254,21 @@ public class MessageActivity extends AppCompatActivity
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
+            case android.R.id.home:
+                Log.d("MessageActivity", "Back upper arrow pressed.");
+                onBackPressed();
+                return true;
+
             case R.id.actionSettingsGroup:
+                Log.d("MessageActivity", "actionSettingsGroup.");
                 Intent intent = new Intent(this, GroupSettingsActivity.class);
                 startActivity(intent);
                 return true;
 
+
             default:
+                Log.d("MessageActivity", "default.");
                 return super.onOptionsItemSelected(item);
         }
     }
