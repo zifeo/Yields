@@ -41,7 +41,11 @@ public class Response {
     private final ResKind mKind;
 
     /**
+<<<<<<< 6d5263a38ac91f466cd400f099ea31e604c9cf07
      * Creates a response as a Json Objects.
+=======
+     * Creates a response as a Json Objects
+>>>>>>> Add caching on GroupHistory response
      *
      * @param rawResponse The String of the response.
      * @throws JSONException In case of problems parsing the response.
