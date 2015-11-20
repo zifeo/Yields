@@ -62,7 +62,7 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withText(R.string.changeGroupName)).perform(click());
         onView(withId(R.id.editText)).perform(typeText(" SWENG"), closeSoftKeyboard());
 
-        onView(withId(android.R.id.button1)).check(matches(isDisplayed())).perform(click());
+        onView(withText("Ok")).perform(click());
 
         //onView(withText("Group name changed to \"Group SWENG\"")).inRoot(withDecorView(not(is(getActivity().
                 //getWindow().getDecorView())))).check(matches(isDisplayed()));
