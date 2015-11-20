@@ -74,4 +74,13 @@
         android:id="@+id/buttonJoinGroup"
         android:layout_gravity="center_horizontal" />
 
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/leaveGroup"
+        android:id="@+id/buttonLeaveGroup"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>

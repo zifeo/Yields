@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,13 +17,16 @@ import java.util.Objects;
 import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
+import yields.client.servicerequest.GroupAddRequest;
+import yields.client.servicerequest.GroupRemoveRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the main information of a group are displayed :
  * name, image, tags.
  */
-public class GroupInfoActivity extends AppCompatActivity {
+public class GroupInfoActivity extends AppCompatActivity implements NotifiableActivity{
     private Group mGroup;
 
     private static final int MAX_TAGS = 10;
@@ -86,16 +90,7 @@ public class GroupInfoActivity extends AppCompatActivity {
             }
         });
 
-        YieldsApplication.setUserList(mGroup.getUsers());
-
-        Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
-
-        joinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO Send request to server
-            }
-        });
+        checkButtons();
     }
 
     /** Method used to take care of clicks on the tool bar
@@ -111,6 +106,66 @@ public class GroupInfoActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Notify the activity that a response has been received
+     */
+    @Override
+    public void notifyChange() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                checkButtons();
+
+                if (mGroup.containsUser(YieldsApplication.getUser())){
+                    YieldsApplication.showToast(getApplicationContext(), "Group joined !");
+                }
+                else {
+                    YieldsApplication.showToast(getApplicationContext(), "Group left !");
+                }
+            }
+        });
+    }
+
+    /**
+     * Check if the user is in the group and set the appropriate states to the buttons
+     */
+    private void checkButtons(){
+        YieldsApplication.setUserList(mGroup.getUsers());
+
+        final Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
+
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ServiceRequest request = new GroupAddRequest(YieldsApplication.getUser(),
+                        mGroup, YieldsApplication.getUser());
+                YieldsApplication.getBinder().sendRequest(request);
+
+                joinButton.setEnabled(false);
+            }
+        });
+
+        final Button leaveButton = (Button) findViewById(R.id.buttonLeaveGroup);
+
+        leaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
+                        mGroup, YieldsApplication.getUser());
+                YieldsApplication.getBinder().sendRequest(request);
+
+                leaveButton.setEnabled(false);
+            }
+        });
+
+        if (mGroup.containsUser(YieldsApplication.getUser())){
+            joinButton.setVisibility(View.GONE);
+        }
+        else {
+            leaveButton.setVisibility(View.GONE);
         }
     }
 }
