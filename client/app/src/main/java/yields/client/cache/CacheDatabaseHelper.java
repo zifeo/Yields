@@ -344,29 +344,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Returns all Users that are in the ClientUser's entourage in the database.
-     *
-     * @return An exhaustive List of all Users in the database that are in the ClientUser's entourage.
-     */
-    public List<User> getClientUserEntourage() {
-        String selectAllUsersQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_ENTOURAGE + " = ?";
-        Cursor cursor = mDatabase.rawQuery(selectAllUsersQuery, new String[]{"1"});
-        List<User> users = new ArrayList<>();
-        if (!cursor.moveToFirst()) {
-            cursor.close();
-            return users;
-        } else {
-            do {
-                Id userId = new Id(cursor.getLong(
-                        cursor.getColumnIndex(KEY_USER_NODEID)));
-                users.add(getUser(userId));
-            } while (cursor.moveToNext());
-            cursor.close();
-            return users;
-        }
-    }
-
-    /**
      * Deletes the Group and all it's Messages from the database.
      *
      * @param groupId The Id of the Group to be deleted.
@@ -513,23 +490,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         int validated = validity ? 1 : 0;
         values.put(KEY_GROUP_VALIDATED, validated);
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
-                new String[]{groupId.getId()});
-    }
-
-    /**
-     * Updates the validity of a Group in the database.
-     *
-     * @param groupId  The Id field of the Group that will have it's validity changed.
-     * @param validity The new validity of the Group.
-     */
-    public void updateGroupValidity(Id groupId, boolean validity) {
-        Objects.requireNonNull(groupId);
-        Objects.requireNonNull(validity);
-
-        ContentValues values = new ContentValues();
-        int validated = validity ? 1 : 0;
-        values.put(KEY_GROUP_VALIDATED, validated);
-        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                 new String[]{groupId.getId()});
     }
 

@@ -37,10 +37,9 @@ public class DateSerialization {
      * @return The corresponding Date object.
      * @throws ParseException In case of parsing error.
      */
-    public static Date toDate(String date) throws ParseException{
+    public Date toDate(String date) throws ParseException{
         date = date.replace("Z","+00:00");
-        dateFormatISO6101.setTimeZone(TimeZone.getDefault());
-        return dateFormatISO6101.parse(date);
+        return mDateFormatISO6101.parse(date);
     }
 
     /**
