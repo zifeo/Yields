@@ -30,6 +30,11 @@ import yields.client.listadapter.ListAdapterSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.servicerequest.GroupAddRequest;
+import yields.client.servicerequest.GroupUpdateImageRequest;
+import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateVisibilityRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -109,7 +114,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     String message = "Group image changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
 
-                    //TODO Change group image and send notification to server
+                    ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup, image);
+                    YieldsApplication.getBinder().sendRequest(request);
                 }
                 else {
                     String message = "Could not retrieve image";
@@ -125,23 +131,22 @@ public class GroupSettingsActivity extends AppCompatActivity {
             ArrayList<String> emailList = data.getStringArrayListExtra(
                     AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
-            int count = 0;
-
+            List<User> newUsers = new ArrayList<>();
             List<User> entourage = mUser.getEntourage();
             for (int i = 0; i < emailList.size(); i++){
                 for (int j = 0; j < entourage.size(); j++){
                     if (entourage.get(j).getEmail().equals(emailList.get(i))
                             && !mGroup.containsUser(entourage.get(j))){
 
-                        // TODO Add user to group and send notification to server
-
-                        count++;
+                        newUsers.add(entourage.get(j));
                     }
                 }
             }
 
-            String message = count + " user(s) added to group";
+            String message = newUsers.size() + " user(s) added to group";
             YieldsApplication.showToast(getApplicationContext(), message);
+
+            // TODO Send request to add multiple users to server
         }
     }
 
@@ -197,10 +202,13 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String message = "Group name changed to \"" + editTextName.getText().toString() + "\"";
+                            String newName = editTextName.getText().toString();
+                            String message = "Group name changed to \"" + newName + "\"";
                             YieldsApplication.showToast(getApplicationContext(), message);
 
-                            // TODO Add change in group's name, not just display
+                            ServiceRequest request = new GroupUpdateNameRequest(mUser,
+                                    mGroup, newName);
+                            YieldsApplication.getBinder().sendRequest(request);
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -236,11 +244,16 @@ public class GroupSettingsActivity extends AppCompatActivity {
                         String message = "Group type changed to : " + type;
                         YieldsApplication.showToast(getApplicationContext(), message);
 
-                        if (type.equals("public")) {
-                            mGroup.setVisibility(Group.GroupVisibility.PUBLIC);
-                        } else {
-                            mGroup.setVisibility(Group.GroupVisibility.PRIVATE);
+                        Group.GroupVisibility visibility;
+                        if (itemSelected[0] == 1) {
+                            visibility = Group.GroupVisibility.PRIVATE;
                         }
+                        else {
+                            visibility = Group.GroupVisibility.PUBLIC;
+                        }
+                        ServiceRequest request = new GroupUpdateVisibilityRequest(mUser,
+                                mGroup, visibility);
+                        YieldsApplication.getBinder().sendRequest(request);
                     }
                 })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
