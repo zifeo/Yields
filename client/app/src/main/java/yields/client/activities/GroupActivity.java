@@ -42,7 +42,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Central activity of Yields where the user can discover new nodes, create groups, see its contact
  * list, change its settings and go to chats of different groups
  */
-public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
+public class GroupActivity extends NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
 
@@ -150,6 +150,16 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         });
     }
 
+    @Override
+    void notifyOnServerConnected() {
+
+    }
+
+    @Override
+    void notifyOnServerDisconnected() {
+
+    }
+
     /**
      * Automatically called when the activity is started
      */
@@ -158,20 +168,6 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         super.onStart();
 
         mAdapterGroups.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        YieldsApplication.getBinder().attachActivity(this);
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        Log.d("TOBEREMOVED", "pause");
-        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**

@@ -51,6 +51,7 @@ public class ServiceRequestController {
      */
     synchronized public void handleConnectionError(final IOException e){
         if (!isConnecting.get()) {
+            mService.onServerDisconnected();
             mService.receiveError("Problem connecting to server : " + e.getMessage());
             isConnecting.set(true);
             new Thread(new Runnable() {
@@ -161,6 +162,7 @@ public class ServiceRequestController {
             }).start();
 
             isConnecting.set(false);
+            mService.onServerConnected();
 
         } catch (IOException e) {
             isConnecting.set(false);
