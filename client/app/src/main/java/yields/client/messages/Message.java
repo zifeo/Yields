@@ -89,7 +89,7 @@ public class Message extends Node {
      */
     public Message(JSONArray object ) throws JSONException, ParseException{
         super(object.getString(0),
-                new Id(DateSerialization.toDate(object.getString(0)).getTime()));
+                new Id(DateSerialization.dateSerializer.toDate(object.getString(0)).getTime()));
 
         Id idUser = new Id(object.getString(1));
         /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
@@ -104,7 +104,7 @@ public class Message extends Node {
         //TODO : Implement Groups
 
         try {
-            this.mDate = DateSerialization.toDate(object.getString(0));
+            this.mDate = DateSerialization.dateSerializer.toDate(object.getString(0));
         } catch (ParseException e) {
             throw new JSONException(e.getMessage());
         }
