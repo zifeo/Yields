@@ -77,6 +77,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
             try {
                 pushMessage = receiver.readLine();
                 if(pushMessage != null) {
+                    Log.d("Y:" + this.getClass().getName(), "response : " + pushMessage);
                     Response response = new Response(pushMessage);
                     subscriber.updateOn(response);
                 }

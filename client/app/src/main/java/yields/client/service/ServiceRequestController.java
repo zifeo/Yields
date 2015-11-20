@@ -152,7 +152,7 @@ public class ServiceRequestController {
     private void connectToServer() {
         try {
             final ConnectionManager connectionManager = new ConnectionManager(
-                    new YieldsSocketProvider());
+                    new YieldEmulatorSocketProvider());
             mCommunicationChannel = connectionManager.getCommunicationChannel();
 
             new Thread(new ServerListener() {
