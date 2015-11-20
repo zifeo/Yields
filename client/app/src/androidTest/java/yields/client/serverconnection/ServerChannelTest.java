@@ -38,28 +38,6 @@ public class ServerChannelTest {
             "}\n";
 
     @Test
-    public void testWorkingSendRequestAndReadResponse() {
-        ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
-
-        ByteArrayInputStream input = new ByteArrayInputStream(
-                FAKE_RESPONSE.getBytes());
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-
-        ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(true));
-
-
-        try {
-            channel.sendRequest(simpleServerRequest);
-            Assert.assertEquals(sSimpleRequest
-                    .replace("TIME", DateSerialization.toString(new Date())),
-                    output.toString());
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-        }
-    }
-
-    @Test
     public void testNonWorkingConnection() {
         ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
 
