@@ -69,8 +69,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
     private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
     private static final String KEY_MESSAGE_DATE = "messageDate";
-    private static final String KEY_MESSAGE_TIMEZONE = "messageTimezone";
-
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODEID + " TEXT,"
@@ -93,7 +91,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Main constructor, creates the database.
      *
-     * @param context The contex for the database.
+     * @param context The context for the database.
      */
     public CacheDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -702,7 +700,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     Content content = deserializeContent(cursor,
                             Content.ContentType.valueOf(contentType));
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                    Date date = DateSerialization.toDateForCache(dateAsString);
+                    Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
@@ -736,7 +734,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         while (!done) {
             try {
                 String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                Date date = DateSerialization.toDateForCache(dateAsString);
+                Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
                 if (date.compareTo(furthestDate) <= 0) {
                     done = true;
                     retValue = true;
@@ -944,7 +942,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_TEXT, message.getContent().getTextForRequest());
         values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
-        values.put(KEY_MESSAGE_DATE, DateSerialization.toStringForCache(message.getDate()));
+        values.put(KEY_MESSAGE_DATE, DateSerialization.dateSerializer.toStringForCache(message.getDate()));
 
         return values;
     }
