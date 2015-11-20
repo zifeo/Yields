@@ -70,6 +70,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
     private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
     private static final String KEY_MESSAGE_DATE = "messageDate";
+    private static final String KEY_MESSAGE_TIMEZONE = "messageTimezone";
 
     private static final String KEY_INTERNAL_ID = "interalId";
 
@@ -512,6 +513,23 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         int validated = validity ? 1 : 0;
         values.put(KEY_GROUP_VALIDATED, validated);
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
+                new String[]{groupId.getId()});
+    }
+
+    /**
+     * Updates the validity of a Group in the database.
+     *
+     * @param groupId  The Id field of the Group that will have it's validity changed.
+     * @param validity The new validity of the Group.
+     */
+    public void updateGroupValidity(Id groupId, boolean validity) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(validity);
+
+        ContentValues values = new ContentValues();
+        int validated = validity ? 1 : 0;
+        values.put(KEY_GROUP_VALIDATED, validated);
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
                 new String[]{groupId.getId()});
     }
 
