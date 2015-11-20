@@ -12,19 +12,7 @@ import yields.server.utils.{Config, Temporal}
 /**
   * Test class for User Update
   */
-class TestUserUpdate extends FlatSpec with Matchers with BeforeAndAfter {
-
-  /** Switch on test database */
-  before {
-    redis(_.select(Config.getInt("test.database.id")))
-    redis(_.flushdb)
-  }
-
-  /** Switch back on main database */
-  after {
-    redis(_.flushdb)
-    redis(_.select(Config.getInt("database.id")))
-  }
+class TestUserUpdate extends DBFlatSpec with Matchers {
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 

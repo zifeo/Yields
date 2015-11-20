@@ -1,26 +1,14 @@
 package yields.server.actions.nodes
 
 import org.scalacheck.Arbitrary._
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.Matchers
 import yields.server.actions.groups.{GroupCreate, GroupCreateRes}
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.{Config, Temporal}
+import yields.server.utils.Temporal
 
-class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
-
-  /** Switch on test database */
-  before {
-    redis(_.select(Config.getInt("test.database.id")))
-    redis(_.flushdb)
-  }
-
-  /** Switch back on main database */
-  after {
-    redis(_.flushdb)
-    redis(_.select(Config.getInt("database.id")))
-  }
+class TestNodeMessage extends DBFlatSpec with Matchers {
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
   lazy val users: List[User] = List(User.create("e1"), User.create("e2"), User.create("e3"), User.create("e4"))

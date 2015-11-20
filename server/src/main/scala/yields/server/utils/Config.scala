@@ -5,7 +5,7 @@ import com.typesafe.config.ConfigFactory
 /** Yields configuration adapter accessor. */
 object Config {
 
-  private val config = ConfigFactory.load().getConfig("yields")
+  private lazy val config = ConfigFactory.load().getConfig("yields")
 
   /** Gets a String from the key. */
   def getString(e: String): String = config.getString(e)

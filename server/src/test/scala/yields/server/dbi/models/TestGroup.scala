@@ -1,22 +1,10 @@
 package yields.server.dbi.models
 
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.Matchers
 import yields.server.dbi._
-import yields.server.utils.{Config, Temporal}
+import yields.server.utils.Temporal
 
-class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
-
-  /** Switch on test database */
-  before {
-    redis.withClient(_.select(Config.getInt("test.database.id")))
-    redis.withClient(_.flushdb)
-  }
-
-  /** Switch back on main database */
-  after {
-    redis.withClient(_.flushdb)
-    redis.withClient(_.select(Config.getInt("database.id")))
-  }
+class TestGroup extends DBFlatSpec with Matchers {
 
   val testName = "Group Test"
 
