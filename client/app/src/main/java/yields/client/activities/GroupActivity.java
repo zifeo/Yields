@@ -151,12 +151,12 @@ public class GroupActivity extends NotifiableActivity {
     }
 
     @Override
-    void notifyOnServerConnected() {
+    public void notifyOnServerConnected() {
 
     }
 
     @Override
-    void notifyOnServerDisconnected() {
+    public void notifyOnServerDisconnected() {
 
     }
 
