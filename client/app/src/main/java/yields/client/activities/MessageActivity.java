@@ -371,15 +371,19 @@ public class MessageActivity extends AppCompatActivity
                     @Override
                     public void onItemClick(AdapterView<?> parent,
                                             View view, int position, long id) {
-                        // First keep a reference to the message that has been clicked on.
-                        mCommentMessage = mGroupMessageAdapter.getItem(position);
-                        // We save the reference of the last group in the YieldsApplication class.
-                        mLastApplicationGroup = mGroup;
-                        // Then we update the group currently displayed as it is the commented
-                        // message
-                        mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
-                        mType = ContentType.MESSAGE_COMMENTS;
-                        createCommentFragment();
+                        Message message = mGroupMessageAdapter.getItem(position);
+                        // Only non text messages can be commented.
+                        if (message.getContent().getType() != Content.ContentType.TEXT) {
+                            // First keep a reference to the message that has been clicked on.
+                            mCommentMessage = message;
+                            // We save the reference of the last group in the YieldsApplication class.
+                            mLastApplicationGroup = mGroup;
+                            // Then we update the group currently displayed as it is the commented
+                            // message
+                            mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
+                            mType = ContentType.MESSAGE_COMMENTS;
+                            createCommentFragment();
+                        }
                     }
                 });
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
