@@ -189,13 +189,19 @@ public class ServiceRequestController {
             JSONArray array = response.getMessage().getJSONArray("nodes");
             if (array.length() > 0) {
                 ArrayList<Message> list = new ArrayList<>();
+                Message message;
+                Id groupId = new Id(response.getMessage().getLong("nid"));
                 for (int i = 0; i < array.length(); i++) {
-                    list.add(new Message(array.getJSONArray(i)));
+                    message = new Message(array.getJSONArray(i));
+                    list.add(message);
+                    mCacheHelper.addMessage(message, groupId);
                 }
-                mService.receiveMessages(new Id(response.getMessage().getLong("nid")), list);
+                mService.receiveMessages(groupId, list);
             }
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
+        } catch (CacheDatabaseException e) {
+            //TODO : Decice what happens when cache adding failed.
         }
     }
 
