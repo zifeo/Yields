@@ -49,11 +49,10 @@ public class ServiceRequestController {
      *
      * @param e the exception that was triggered the connection error
      */
-    synchronized public void handleConnectionError(final IOException e){
-        if (!isConnecting.get()) {
+    public void handleConnectionError(final IOException e){
+        if (!isConnecting.getAndSet(true)) {
             mService.onServerDisconnected();
             mService.receiveError("Problem connecting to server : " + e.getMessage());
-            isConnecting.set(true);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -67,7 +66,9 @@ public class ServiceRequestController {
                         connectToServer();
                     }
                 }
-            }).run();
+            }).start();
+        } else {
+            isConnecting.set(false);
         }
     }
 
@@ -75,7 +76,7 @@ public class ServiceRequestController {
      * Test if the server is connected
      * @return
      */
-    synchronized public boolean isConnected(){
+    public boolean isConnected(){
         return !isConnecting.get();
     }
 
@@ -308,10 +309,12 @@ public class ServiceRequestController {
             //TODO : @Nroussel Decide what happens if cache adding failed.
         }
 
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
+        if (isConnected()) {
+            try {
+                mCommunicationChannel.sendRequest(serverRequest);
+            } catch (IOException e) {
+                mService.receiveError("No connection available : " + e.getMessage());
+            }
         }
 
         //Once response is received add all Messages to cache.

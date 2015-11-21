@@ -3,15 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="yields.client.activities.MessageActivity">
 
-    <item android:id="@+id/actionSettingsGroup"
-        android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/groupSettings"
+    <item android:id="@+id/iconConnect"
+        android:icon="@drawable/tick"
+        android:title="@string/connectIcon"
         android:layout_gravity="center"
         app:showAsAction="ifRoom"
         />
 
-    <item android:id="@+id/iconConnect"
-        android:title="@string/connectIcon"
+    <item android:id="@+id/actionSettingsGroup"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/groupSettings"
+        android:layout_gravity="center"
         app:showAsAction="ifRoom"
         />
 </menu>

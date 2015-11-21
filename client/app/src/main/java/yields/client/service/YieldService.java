@@ -11,8 +11,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
@@ -32,6 +34,7 @@ public class YieldService extends Service {
     private int mIdLastNotification;
     private ServiceRequestController mServiceRequestController;
     private ConnectControllerTask mConnectControllerTask;
+    private final Object lock = new Object();
 
     /**
      * Connects the service to the server when it is created and
@@ -65,6 +68,31 @@ public class YieldService extends Service {
         Log.d("Y:" + this.getClass().getName(), "Starting yield service");
 
         return START_STICKY;
+    }
+
+    public void connectionStatusRequest(){
+        Log.d("Y:" + this.getClass().getName(), "asking for connection status");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (lock) {
+                    while (mServiceRequestController == null) {
+                        try {
+                            this.wait();
+                        } catch (InterruptedException e) {
+                            Log.d("Y:" + this.getClass().getName(),"Stopped waiting for request controller" + e.getMessage());
+                        }
+                    }
+                }
+
+                Log.d("Y:" + this.getClass().getName(), "let's call this");
+                if (mServiceRequestController.isConnected()) {
+                    onServerConnected();
+                } else {
+                    onServerDisconnected();
+                }
+            }
+        }).start();
     }
 
     /**
@@ -142,7 +170,7 @@ public class YieldService extends Service {
     }
 
     /**
-     * Called when the server just connected
+     * Called when the server is connected
      */
     synchronized public void onServerConnected() {
         if (mCurrentNotifiableActivity != null) {
@@ -230,21 +258,18 @@ public class YieldService extends Service {
         mNotificationManager.notify(mIdLastNotification, notificationBuilder.build());
     }
 
-
-
-
     /**
      * AsncTask sending th requests.
      */
     private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override
         protected Void doInBackground(ServiceRequest... params) {
-            synchronized (this) {
+            synchronized (lock) {
                 while (mServiceRequestController == null) {
                     try {
                         this.wait();
                     } catch (InterruptedException e) {
-                        Log.d("Y:" + this.getClass().getName(),e.getMessage());
+                        Log.d("Y:" + this.getClass().getName(),"Stopped waiting for request controller" + e.getMessage());
                     }
                 }
             }
@@ -266,12 +291,13 @@ public class YieldService extends Service {
 
         @Override
         protected Void doInBackground(Void... params) {
-
-            synchronized (this) {
+            synchronized (lock) {
                 mServiceRequestController = new ServiceRequestController(
                         new CacheDatabaseHelper(getApplicationContext()),
                         YieldService.this);
             }
+
+            Log.d("D:" + this.getClass().getName(), "done");
 
             return null;
         }
