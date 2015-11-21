@@ -2,6 +2,7 @@ package yields.server.dbi.models
 
 import yields.server.dbi._
 import yields.server.utils.Temporal
+import com.redis.serialization.Parse.Implicits._
 
 /**
   * Representation of a group
@@ -25,9 +26,9 @@ class Group private(override val nid: NID) extends Node {
   def removeAdmin(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(GroupKey.admins, id)))
 
-  /** Nodes getter */
-  def admins: List[NID] = _admins.getOrElse {
-    _admins = redis.withClient(_.zrange[NID](GroupKey.admins, 0, -1))
+  /** admins getter */
+  def admins: List[UID] = _admins.getOrElse {
+    _admins = redis.withClient(_.zrange[UID](GroupKey.admins, 0, -1))
     valueOrDefault(_admins, List.empty)
   }
 }

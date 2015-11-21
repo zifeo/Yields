@@ -23,7 +23,7 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
       val group = Group(nid)
       var media: Option[Media] = None
       if (contentType.isDefined && content.isDefined) {
-        media = Some(Media.createMedia(contentType.get, content.get))
+        media = Some(Media.createMedia(contentType.get, content.get, metadata.sender))
       }
 
       if (media.isDefined) {

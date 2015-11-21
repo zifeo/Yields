@@ -111,7 +111,7 @@ object Media {
     * @param content base64 media
     * @return media
     */
-  def createMedia(contentType: String, content: Blob): Media = {
+  def createMedia(contentType: String, content: Blob, creator: UID): Media = {
     // Create hash
     val hash = createHash(content)
     val img = Media(Node.newNID())
@@ -120,6 +120,7 @@ object Media {
     img.hash = hash
     img.content = content
     img.contentType = contentType
+    img.creator = creator
 
     img
   }

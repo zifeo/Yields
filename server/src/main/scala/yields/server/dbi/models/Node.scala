@@ -88,13 +88,13 @@ abstract class Node {
   }
 
   /** creator getter */
-  private def creator: UID = {
+  def creator: UID = {
     _creator = redis.withClient(_.hget[UID](NodeKey.node, NodeKey.creator))
     valueOrDefault(_creator, 0)
   }
 
   /** creator setter */
-  private def creator_=(uid: UID): Unit = {
+  def creator_=(uid: UID): Unit = {
     _creator = update(NodeKey.creator, uid)
   }
 
