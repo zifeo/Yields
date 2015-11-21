@@ -14,7 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/profilpic">
+            android:layout_toLeftOf="@+id/profilpicandsent">
             <RelativeLayout
                 android:orientation="horizontal"
                 android:id="@+id/usernamedate"
@@ -46,14 +46,27 @@
                 android:layout_alignWithParentIfMissing="true"
                 android:textSize="16sp" />
         </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/profilpic"
+        
+        <RelativeLayout
+            android:id="@+id/profilpicandsent"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
             android:layout_alignParentRight="true"
-            android:layout_marginLeft="6dip" />
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/profilpic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dip" />
+
+            <ImageView
+                android:id="@+id/sentindicator"
+                android:layout_below="@+id/profilpic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="6dip" />
+        </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

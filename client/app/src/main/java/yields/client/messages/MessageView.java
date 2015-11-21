@@ -2,7 +2,9 @@ package yields.client.messages;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -92,6 +94,18 @@ public class MessageView extends LinearLayout{
         dateTextView.setTextSize(10);
         dateTextView.setAlpha(0.6f);
         dateTextView.setTextColor(Color.GRAY);
+
+        ImageView sentIndicator = (ImageView) v.findViewById(R.id.sentindicator);
+        // TODO : Choose the right image. For now placeHolder.
+        Bitmap sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(), R
+                .drawable.ic_query_builder_black_24dp);
+        if (sentImage == null){
+            Log.d("MessageView", "sentImage is null fuck android.");
+        }
+        else{
+            Log.d("MessageView", "sentImage not null, but still fuck android.");
+        }
+        sentIndicator.setImageBitmap(sentImage);
 
         RelativeLayout contentLayout = (RelativeLayout) v.findViewById(R.id.contentfield);
         try {
