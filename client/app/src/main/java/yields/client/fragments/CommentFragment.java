@@ -10,6 +10,7 @@ import android.widget.ListView;
 
 import yields.client.R;
 import yields.client.listadapter.ListAdapterMessages;
+import yields.client.messages.CommentView;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -73,7 +74,8 @@ public class CommentFragment extends Fragment{
         LinearLayout messageContainer = (LinearLayout) mLayout.findViewById(R
                 .id.messageContainer);
         messageContainer.removeAllViews();
-        messageContainer.addView(mMessageView);
+        CommentView commentView = new CommentView(YieldsApplication.getApplicationContext(), mMessage);
+        messageContainer.addView(commentView);
         ListView listView = (ListView) mLayout.findViewById(R.id.commentList);
         listView.setAdapter(mAdapter);
         return mLayout;

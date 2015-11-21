@@ -3,16 +3,15 @@ package yields.client.messages;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.media.Image;
-import android.util.Log;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,9 +19,7 @@ import java.util.Objects;
 
 import yields.client.R;
 import yields.client.exceptions.CommentViewException;
-import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
-import yields.client.gui.GraphicTransforms;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -66,18 +63,33 @@ public class CommentView extends LinearLayout {
 
         LayoutInflater vi;
         vi = LayoutInflater.from(applicationContext);
-        View v = vi.inflate(R.layout.commentlayout, null);
-
-        RelativeLayout rawcontent = (RelativeLayout) v.findViewById(R.id.rawcontent);
-        TextView caption = (TextView) v.findViewById(R.id.caption);
-        TextView messageInfos = (TextView) v.findViewById(R.id.messageinfos);
-
+        View v;
         switch (mMessage.getContent().getType()){
             case IMAGE:
+                v = vi.inflate(R.layout.imagecommentlayout, null);
+
+                ImageView imageView = (ImageView) v.findViewById(R.id.imageContent);
+                TextView caption = (TextView) v.findViewById(R.id.caption);
+                TextView messageInfos = (TextView) v.findViewById(R.id.messageinfos);
+
                 ImageContent content = (ImageContent) mMessage.getContent();
-                ImageView image = new ImageView(YieldsApplication.getApplicationContext());
-                image.setImageBitmap(content.getImage());
-                rawcontent.addView(image);
+
+                Bitmap image = content.getImage();
+                WindowManager wm = (WindowManager) YieldsApplication.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+                Display display = wm.getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int screenWidth = size.x;
+                float scalefactor = ((float) (screenWidth)) / image.getWidth();
+                Bitmap resizedImage = Bitmap.createScaledBitmap(image, screenWidth, (int)
+                    (scalefactor * image.getHeight()), false);
+
+                int maxHeight = (int) ((1.f/4) * size.y);
+                resizedImage = Bitmap.createBitmap(resizedImage, 0, 0, resizedImage.getWidth(),
+                        maxHeight);
+
+                imageView.setImageBitmap(resizedImage);
+
 
                 caption.setTextSize((float) 12.0);
                 caption.setText(content.getCaption());
@@ -88,7 +100,7 @@ public class CommentView extends LinearLayout {
 
                 messageInfos.setText("Sent by " + mMessage.getSender().getName() + " at " +
                         time);
-                messageInfos.setTextColor(Color.BLACK);
+                messageInfos.setTextColor(Color.BLUE);
                 messageInfos.setTextSize((float) 10.0);
                 break;
 
