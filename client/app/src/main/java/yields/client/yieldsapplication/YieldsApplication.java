@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.service.YieldServiceBinder;
@@ -30,6 +31,8 @@ public class YieldsApplication {
     private static Toast mToast = null;
 
     private static YieldServiceBinder mBinder = null;
+
+    private static Long internalNodeId = 0l;
 
     /**
      * Getter for the user of the application.
@@ -213,6 +216,20 @@ public class YieldsApplication {
     public static void cancelToast() {
         if (mToast != null) {
             mToast.cancel();
+        }
+    }
+
+    /**
+     * Returns a new unique Id which was created by the ClientUser.
+     *
+     * @return A new unique Id which was created by the ClientUser.
+     */
+    public static synchronized Id getId() {
+        if (internalNodeId != 0) {
+            internalNodeId--;
+            return new Id(internalNodeId);
+        } else {
+            return null;
         }
     }
 }
