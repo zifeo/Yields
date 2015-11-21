@@ -49,6 +49,11 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         YieldsApplication.setGroup(new Group("Group", new Id(124), new ArrayList<User>()));
     }
 
+    @Override
+    public void tearDown(){
+        YieldsApplication.cancelToast();
+    }
+
     /**
      * Test that tries to change the name of the group
      * @throws InterruptedException

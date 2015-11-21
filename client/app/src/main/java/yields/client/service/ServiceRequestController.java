@@ -20,6 +20,7 @@ import yields.client.node.Group;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
+import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
@@ -188,16 +189,33 @@ public class ServiceRequestController {
     }
 
     private void handleGroupMessageResponse(Response serverResponse) {
-
-    }
-
-    private void handleGroupHistoryResponse(Response response) {
         try {
-            JSONArray array = response.getMessage().getJSONArray("nodes");
+            JSONArray array = serverResponse.getMessage().getJSONArray(RequestBuilder.Fields.NODES.getValue());
             if (array.length() > 0) {
                 ArrayList<Message> list = new ArrayList<>();
                 Message message;
-                Id groupId = new Id(response.getMessage().getLong("nid"));
+                Id groupId = new Id(serverResponse.getMessage().getLong(RequestBuilder.Fields.NID.getValue()));
+                for (int i = 0; i < array.length(); i++) {
+                    message = new Message(array.getJSONArray(i));
+                    list.add(message);
+                    mCacheHelper.addMessage(message, groupId);
+                }
+                mService.receiveMessages(groupId, list);
+            }
+        } catch (JSONException | ParseException e) {
+            e.printStackTrace();
+        } catch (CacheDatabaseException e) {
+            //TODO : Decice what happens when cache adding failed.
+        }
+    }
+
+    private void handleGroupHistoryResponse(Response serverResponse) {
+        try {
+            JSONArray array = serverResponse.getMessage().getJSONArray("nodes");
+            if (array.length() > 0) {
+                ArrayList<Message> list = new ArrayList<>();
+                Message message;
+                Id groupId = new Id(serverResponse.getMessage().getLong("nid"));
                 for (int i = 0; i < array.length(); i++) {
                     message = new Message(array.getJSONArray(i));
                     list.add(message);
