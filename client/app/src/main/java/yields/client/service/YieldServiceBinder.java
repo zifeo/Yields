@@ -57,7 +57,6 @@ public class YieldServiceBinder extends Binder {
      * Can be used to know if the server is connected to the server
      */
     public void connectionStatus(){
-        Log.d("Y:" + this.getClass().getName(), "asking for connection status");
         mService.connectionStatusRequest();
     }
 

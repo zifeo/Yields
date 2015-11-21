@@ -244,7 +244,6 @@ public class MessageActivity extends NotifiableActivity {
 
     @Override
     public void notifyOnServerConnected() {
-        Log.d("Y:" + this.getClass().getName(), "serverDisconnected");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -257,7 +256,6 @@ public class MessageActivity extends NotifiableActivity {
 
     @Override
     public void notifyOnServerDisconnected() {
-        Log.d("Y:" + this.getClass().getName(), "serverDisconnected");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

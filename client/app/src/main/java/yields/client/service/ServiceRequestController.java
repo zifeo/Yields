@@ -67,8 +67,6 @@ public class ServiceRequestController {
                     }
                 }
             }).start();
-        } else {
-            isConnecting.set(false);
         }
     }
 

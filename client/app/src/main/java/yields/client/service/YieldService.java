@@ -71,7 +71,6 @@ public class YieldService extends Service {
     }
 
     public void connectionStatusRequest(){
-        Log.d("Y:" + this.getClass().getName(), "asking for connection status");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -80,15 +79,15 @@ public class YieldService extends Service {
                         try {
                             this.wait();
                         } catch (InterruptedException e) {
-                            Log.d("Y:" + this.getClass().getName(),"Stopped waiting for request controller" + e.getMessage());
                         }
                     }
                 }
 
-                Log.d("Y:" + this.getClass().getName(), "let's call this");
                 if (mServiceRequestController.isConnected()) {
+                    Log.d("Y:" + this.getClass().getName(), "Is connected");
                     onServerConnected();
                 } else {
+                    Log.d("Y:" + this.getClass().getName(), "Is not connected");
                     onServerDisconnected();
                 }
             }
