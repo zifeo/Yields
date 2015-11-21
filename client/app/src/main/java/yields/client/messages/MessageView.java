@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 import yields.client.R;
 import yields.client.exceptions.ContentException;
@@ -35,9 +36,7 @@ public class MessageView extends LinearLayout{
      */
     public MessageView(Context context, Message message) throws MessageViewException {
         super(context);
-        if (message == null){
-            throw new MessageViewException("Error, null message in MessageView constructor");
-        }
+        Objects.requireNonNull(message);
         this.mMessage = message;
         this.addView(createMessageView());
     }
