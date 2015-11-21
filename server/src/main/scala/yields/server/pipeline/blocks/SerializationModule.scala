@@ -1,6 +1,7 @@
 package yields.server.pipeline.blocks
 
 import akka.event.LoggingAdapter
+import akka.stream.scaladsl.BidiFlow
 import akka.util.ByteString
 import spray.json._
 import yields.server.io._
@@ -17,7 +18,7 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
     json.convertTo[Request]
   }
 
-  /** Outgoing log with given channel. */
+  /** Outgoing log with given channel. '\n' is needed by client to detect end of response. */
   override val outgoing = { result: Response =>
     val json = result.toJson.toString()
     ByteString(s"$json\n")
@@ -29,6 +30,7 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
 object SerializationModule {
 
   /** Shortcut for creating a new logging module. */
-  def apply()(implicit logger: LoggingAdapter) = new SerializationModule(logger).create
+  def apply()(implicit logger: LoggingAdapter): BidiFlow[ByteString, Request, Response, ByteString, Unit] =
+    new SerializationModule(logger).create
 
 }

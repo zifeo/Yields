@@ -1,6 +1,7 @@
 package yields.server.pipeline.blocks
 
 import akka.event.LoggingAdapter
+import akka.stream.scaladsl.BidiFlow
 import akka.util.ByteString
 
 /**
@@ -45,6 +46,7 @@ class LoggerModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
 object LoggerModule {
 
   /** Shortcut for creating a new logging module. */
-  def apply[C, G]()(implicit logger: LoggingAdapter) = new LoggerModule[C, G](logger).create
+  def apply[C, G]()(implicit logger: LoggingAdapter): BidiFlow[C, C, G, G, Unit] =
+    new LoggerModule[C, G](logger).create
 
 }
