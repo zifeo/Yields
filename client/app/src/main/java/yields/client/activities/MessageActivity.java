@@ -46,8 +46,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends AppCompatActivity
-        implements NotifiableActivity {
+public class MessageActivity extends NotifiableActivity {
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
     private static ClientUser mUser;
@@ -118,25 +117,6 @@ public class MessageActivity extends AppCompatActivity
 
         GroupHistoryRequest historyRequest = new GroupHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
-    }
-
-    /**
-     * Automatically called when the activity is resumed after another
-     * activity  was displayed
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        YieldsApplication.getBinder().attachActivity(this);
-    }
-
-    /**
-     * Called to pause the activity
-     */
-    @Override
-    public void onPause(){
-        super.onPause();
-        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**
@@ -255,6 +235,16 @@ public class MessageActivity extends AppCompatActivity
                 retrieveGroupMessages();
             }
         });
+    }
+
+    @Override
+    public void notifyOnServerConnected() {
+
+    }
+
+    @Override
+    public void notifyOnServerDisconnected() {
+
     }
 
     /**

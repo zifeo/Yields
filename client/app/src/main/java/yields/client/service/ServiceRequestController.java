@@ -1,11 +1,14 @@
 package yields.client.service;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
@@ -18,6 +21,7 @@ import yields.client.serverconnection.ConnectionSubscriber;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
+import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -29,32 +33,50 @@ public class ServiceRequestController {
 
     private final CacheDatabaseHelper mCacheHelper;
     private final YieldService mService;
+    private final AtomicBoolean isConnecting;
     // Not final because we may have to recreate it in case of connection error
     private CommunicationChannel mCommunicationChannel;
 
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
         mService = service;
-
-        try {
-            final ConnectionManager connectionManager = new ConnectionManager(
-                    new YieldEmulatorSocketProvider());
-            mCommunicationChannel = connectionManager.getCommunicationChannel();
-
-            new Thread(new ServerListener() {
-                public void run() {
-                    connectionManager.subscribeToConnection(this);
-                }
-            }).start();
-
-        } catch (IOException e) {
-            handleConnectionError(e);
-        }
-
+        isConnecting = new AtomicBoolean(true);
+        connectToServer();
     }
 
-    public void handleConnectionError(IOException e){
-        mService.receiveError("Problem connecting to server : " + e.getMessage());
+    /**
+     * Handles any error while connecting to the server
+     *
+     * @param e the exception that was triggered the connection error
+     */
+    synchronized public void handleConnectionError(final IOException e){
+        if (!isConnecting.get()) {
+            mService.onServerDisconnected();
+            mService.receiveError("Problem connecting to server : " + e.getMessage());
+            isConnecting.set(true);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Log.d("Y:" + this.getClass().getName(), "waiting for connection");
+                        Thread.sleep(60000);
+                    } catch (InterruptedException e) {
+                        Log.d("Y:" + this.getClass().getName(),
+                                "Interrupted while waiting we therefore try to connect again now.");
+                    } finally {
+                        connectToServer();
+                    }
+                }
+            }).run();
+        }
+    }
+
+    /**
+     * Test if the server is connected
+     * @return
+     */
+    synchronized public boolean isConnected(){
+        return !isConnecting.get();
     }
 
     /**
@@ -121,6 +143,30 @@ public class ServiceRequestController {
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
                 //TODO: In need of another exception ?
+        }
+    }
+
+    /**
+     * Connects to the server
+     */
+    private void connectToServer() {
+        try {
+            final ConnectionManager connectionManager = new ConnectionManager(
+                    new YieldsSocketProvider());
+            mCommunicationChannel = connectionManager.getCommunicationChannel();
+
+            new Thread(new ServerListener() {
+                public void run() {
+                    connectionManager.subscribeToConnection(this);
+                }
+            }).start();
+
+            isConnecting.set(false);
+            mService.onServerConnected();
+
+        } catch (IOException e) {
+            isConnecting.set(false);
+            handleConnectionError(e);
         }
     }
 

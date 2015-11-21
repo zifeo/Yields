@@ -33,7 +33,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the user can search for new groups, based
  * on their name or tags.
  */
-public class SearchGroupActivity extends AppCompatActivity implements NotifiableActivity{
+public class SearchGroupActivity extends NotifiableActivity{
     private MenuItem mMenuSearch;
     private MenuItem mMenuClose;
     private EditText mEditTextSearch;
@@ -321,6 +321,16 @@ public class SearchGroupActivity extends AppCompatActivity implements Notifiable
                 }
             }
         });
+    }
+
+    @Override
+    public void notifyOnServerConnected() {
+
+    }
+
+    @Override
+    public void notifyOnServerDisconnected() {
+
     }
 
     /**

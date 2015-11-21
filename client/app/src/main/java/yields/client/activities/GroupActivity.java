@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +42,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Central activity of Yields where the user can discover new nodes, create groups, see its contact
  * list, change its settings and go to chats of different groups
  */
-public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
+public class GroupActivity extends NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
 
@@ -153,6 +154,16 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         });
     }
 
+    @Override
+    public void notifyOnServerConnected() {
+
+    }
+
+    @Override
+    public void notifyOnServerDisconnected() {
+
+    }
+
     /**
      * Automatically called when the activity is started
      */
@@ -161,20 +172,6 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         super.onStart();
 
         mAdapterGroups.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        YieldsApplication.getBinder().attachActivity(this);
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-
-        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**
