@@ -24,6 +24,7 @@ import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldEmulatorSocketProvider;
+import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupHistoryRequest;
@@ -439,7 +440,7 @@ public class ServiceRequestController {
     private void handleGroupMessageRequest(NodeMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
-            mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingGroup().getId());
+            mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
             //TODO : @Nroussel Decide what happens if cache adding failed.

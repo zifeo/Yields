@@ -74,8 +74,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String KEY_INTERNAL_ID = "interalId";
 
-    private static final String KEY_INTERNAL_ID = "interalId";
-
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODE_ID + " TEXT,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
