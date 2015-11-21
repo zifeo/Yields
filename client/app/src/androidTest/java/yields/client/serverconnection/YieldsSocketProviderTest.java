@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.Socket;
 
-public class YieldEmulatorSocketProviderTest {
+public class YieldsSocketProviderTest {
 
     /**
      * needs the server running
@@ -17,7 +17,7 @@ public class YieldEmulatorSocketProviderTest {
         SocketProvider socketProvider;
 
         try {
-            socketProvider = new YieldEmulatorSocketProvider();
+            socketProvider = new YieldsSocketProvider();
             Socket socket;
             socket = socketProvider.getConnection();
             Assert.assertTrue(socket.isConnected());
