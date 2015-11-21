@@ -16,8 +16,11 @@ package object models {
   /** Represents a node identifier. */
   type NID = Long
 
-  /** Represent a time identifier (used for indexing an item in a group content). */
+  /** Represent a tag identifier */
   type TID = Long
+
+  /** Represent a tag content */
+  type TagContent = String
 
   /** Represents an email address. */
   type Email = String

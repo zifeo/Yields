@@ -15,7 +15,7 @@ class Group private(override val nid: NID) extends Node {
 
   object GroupKey {
     val admins = s"${NodeKey.node}:admins"
-    val visibility = "visibility"
+    val visibility = "visibility"           // can only be "private" or "public"
   }
 
   private var _admins: Option[List[UID]] = None
