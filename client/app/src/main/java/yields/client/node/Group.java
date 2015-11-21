@@ -183,26 +183,29 @@ public class Group extends Node {
 
     /**
      * Add a tag to the group
+     *
      * @param tag The tag we want to add, without spaces, in lowercase
      */
-    public void addTag(Tag tag){
+    public void addTag(Tag tag) {
         mTags.add(Objects.requireNonNull(tag));
     }
 
     /**
      * Indicate whether the group can be matched with a given tag
+     *
      * @param tag The tag we want to test
      * @return true iff the group contains the given tag
      */
-    public boolean matchToTag(Tag tag){
+    public boolean matchToTag(Tag tag) {
         return mTags.contains(tag);
     }
 
     /**
      * Returns a list containing all the tags of the group
+     *
      * @return A list containing all the tags of the group, in a random order
      */
-    public List<Tag> getTagList(){
+    public List<Tag> getTagList() {
         return new ArrayList<>(mTags);
     }
 
@@ -264,26 +267,28 @@ public class Group extends Node {
      * Class used to represent a tag, which defines the subjects of the group
      */
     public static class Tag {
+
         private String mText;
         public static final int MIN_TAG_LENGTH = 2;
         public static final int MAX_TAG_LENGTH = 20;
 
         /**
          * Default constructor for tags
+         *
          * @param text The text of the tag
          */
-        public Tag(String text){
-            if (text.contains(" ")){
+        public Tag(String text) {
+            if (text.contains(" ")) {
                 throw new IllegalArgumentException("Tag cannot contain spaces");
             }
-            if (!text.toLowerCase().equals(text)){
+            if (!text.toLowerCase().equals(text)) {
                 throw new IllegalArgumentException("Tag must be in lowercase");
             }
-            if (text.length() < MIN_TAG_LENGTH){
+            if (text.length() < MIN_TAG_LENGTH) {
                 throw new IllegalArgumentException(
                         "Length of a Tag must be at least " + MIN_TAG_LENGTH + " characters");
             }
-            if (text.length() > MAX_TAG_LENGTH){
+            if (text.length() > MAX_TAG_LENGTH) {
                 throw new IllegalArgumentException(
                         "Length of a Tag cannot be more than " + MAX_TAG_LENGTH + " characters");
             }
@@ -293,12 +298,13 @@ public class Group extends Node {
 
         /**
          * Compares a tag and another object
+         *
          * @param o The object we want to test
          * @return true iff the two objects are equals
          */
         @Override
         public boolean equals(Object o) {
-            if (o instanceof Tag){
+            if (o instanceof Tag) {
                 return ((Tag) o).mText.equals(this.mText);
             }
             return super.equals(o);
@@ -306,6 +312,7 @@ public class Group extends Node {
 
         /**
          * Gives the hashcode of a tag
+         *
          * @return The hash of this tag
          */
         @Override
@@ -315,9 +322,10 @@ public class Group extends Node {
 
         /**
          * Returns the text of the tag
+         *
          * @return The text of the tag
          */
-        public String getText(){
+        public String getText() {
             return mText;
         }
     }
