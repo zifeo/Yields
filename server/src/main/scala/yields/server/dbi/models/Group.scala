@@ -14,6 +14,7 @@ class Group private(override val nid: NID) extends Node {
 
   object GroupKey {
     val admins = s"${NodeKey.node}:admins"
+    val visibility = "visibility"
   }
 
   private var _admins: Option[List[UID]] = None
@@ -55,6 +56,7 @@ object Group {
       )
       r.hmset(group.NodeKey.node, infos)
     }
+    group.addAdmin(creator)
     group
   }
 
