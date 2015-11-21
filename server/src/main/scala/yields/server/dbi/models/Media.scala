@@ -114,22 +114,21 @@ object Media {
   def createMedia(contentType: String, content: Blob, creator: UID): Media = {
     // Create hash
     val hash = createHash(content)
-    val img = Media(Node.newNID())
+    val media = Media(Node.newNID())
 
     // set values
-    img.hash = hash
-    img.content = content
-    img.contentType = contentType
-    img.creator = creator
+    media.hash = hash
+    media.content = content
+    media.contentType = contentType
+    media.creator = creator
 
-    img
+    media
   }
 
   def apply(n: NID): Media = {
-    val i = new Media(n)
-    i.path = i.hash
-    i
-
+    val media = new Media(n)
+    media.path = media.hash
+    media
   }
 
   def createHash(content: Blob): String = {

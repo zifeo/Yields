@@ -33,7 +33,7 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
   "running groupCreate action with all parameters set" should "create a group" in {
     val users: List[User] = List(User.create("e1@epfl.ch"), User.create("e2@epfl.ch"), User.create("e3@epfl.ch"), User.create("e4@epfl.ch"))
     val nodes: List[Node] = List(Group.createGroup("g1", m.sender), Group.createGroup("g2", m.sender), Group.createGroup("g3", m.sender))
-    val action = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid))
+    val action = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), "private")
     val res = action.run(m)
     res match {
       case GroupCreateRes(nid) =>
@@ -47,7 +47,7 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
   "running groupCreate without name" should "throw an exception" in {
     val users: List[User] = List(User.create("e12@email.com"), User.create("e22@email.com"), User.create("e32@email.com"), User.create("e42@email.com"))
     val nodes: List[Node] = List(Group.createGroup("g1", m.sender), Group.createGroup("g2", m.sender), Group.createGroup("g3", m.sender))
-    val action = new GroupCreate("", nodes.map(_.nid), users.map(_.uid))
+    val action = new GroupCreate("", nodes.map(_.nid), users.map(_.uid), "private")
     an[ActionArgumentException] should be thrownBy action.run(m)
   }
 

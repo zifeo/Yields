@@ -29,7 +29,7 @@ package object io {
 
   // Groups
 
-  implicit lazy val groupCreateJF = jsonFormat3(GroupCreate)
+  implicit lazy val groupCreateJF = jsonFormat4(GroupCreate)
   implicit lazy val groupCreateResJF = jsonFormat1(GroupCreateRes)
 
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)

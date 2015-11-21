@@ -12,12 +12,14 @@ import com.redis.serialization.Parse.Implicits._
   */
 class Group private(override val nid: NID) extends Node {
 
+
   object GroupKey {
     val admins = s"${NodeKey.node}:admins"
     val visibility = "visibility"
   }
 
   private var _admins: Option[List[UID]] = None
+  private var _visibility: Option[String] = None
 
   /** add admin */
   def addAdmin(id: UID): Boolean =
@@ -31,6 +33,18 @@ class Group private(override val nid: NID) extends Node {
   def admins: List[UID] = _admins.getOrElse {
     _admins = redis.withClient(_.zrange[UID](GroupKey.admins, 0, -1))
     valueOrDefault(_admins, List.empty)
+  }
+
+  /** set visibility */
+  def visibility_=(visibility: String): Unit = {
+    redis.withClient(_.hset(NodeKey.node, GroupKey.visibility, visibility))
+    _visibility = Some(visibility)
+  }
+
+  /** get visibility */
+  def visibility: String = {
+    _visibility = redis.withClient(_.hget[String](NodeKey.node, GroupKey.visibility))
+    valueOrDefault(_visibility, "")
   }
 }
 

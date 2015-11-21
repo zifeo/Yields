@@ -2,7 +2,7 @@ package yields.server.actions
 
 import java.time.OffsetDateTime
 
-import org.scalacheck.Arbitrary
+import org.scalacheck._
 import yields.server._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory, NodeMessageRes, NodeMessage}
@@ -17,7 +17,8 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
       name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
       users <- arbitrary[List[UID]]
-    } yield GroupCreate(name, nodes, users)
+      visibility: String <- Gen.oneOf("private", "public")
+    } yield GroupCreate(name, nodes, users, visibility)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
