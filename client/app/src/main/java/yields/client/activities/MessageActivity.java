@@ -106,6 +106,7 @@ public class MessageActivity extends AppCompatActivity
         // Set the user.
         mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
                 .createBitmap(80, 80, Bitmap.Config.RGB_565));
+        YieldsApplication.setUser(mUser);
         // Set the group.
         mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
                 Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
@@ -116,10 +117,10 @@ public class MessageActivity extends AppCompatActivity
         mSendImage = false;
 
         mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
-                .getApplicationContext(), R.layout.messagelayout,
+                .getApplicationContext(), R.layout.messagelayoutsender,
                 new ArrayList<Message>());
         mCommentAdapter = new ListAdapterMessages((YieldsApplication
-                .getApplicationContext()), R.layout.messagelayout, new
+                .getApplicationContext()), R.layout.messagelayoutsender, new
                 ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
