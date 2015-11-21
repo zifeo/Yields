@@ -323,11 +323,17 @@ public class SearchGroupActivity extends NotifiableActivity{
         });
     }
 
+    /**
+     * Method called when the server is connected
+     */
     @Override
     public void notifyOnServerConnected() {
 
     }
 
+    /**
+     * Method called when the server is disconnected
+     */
     @Override
     public void notifyOnServerDisconnected() {
 

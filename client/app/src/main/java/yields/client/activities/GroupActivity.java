@@ -154,11 +154,17 @@ public class GroupActivity extends NotifiableActivity {
         });
     }
 
+    /**
+     * Method called when the server is connected
+     */
     @Override
     public void notifyOnServerConnected() {
 
     }
 
+    /**
+     * Method called when the server is disconnected
+     */
     @Override
     public void notifyOnServerDisconnected() {
 

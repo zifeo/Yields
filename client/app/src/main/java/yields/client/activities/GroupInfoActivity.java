@@ -26,7 +26,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the main information of a group are displayed :
  * name, image, tags.
  */
-public class GroupInfoActivity extends AppCompatActivity implements NotifiableActivity{
+public class GroupInfoActivity extends NotifiableActivity{
     private Group mGroup;
 
     private static final int MAX_TAGS = 10;
@@ -127,6 +127,22 @@ public class GroupInfoActivity extends AppCompatActivity implements NotifiableAc
                 }
             }
         });
+    }
+
+    /**
+     * Method called when the server is connected
+     */
+    @Override
+    public void notifyOnServerConnected() {
+
+    }
+
+    /**
+     * Method called when the server is disconnected
+     */
+    @Override
+    public void notifyOnServerDisconnected() {
+
     }
 
     /**
