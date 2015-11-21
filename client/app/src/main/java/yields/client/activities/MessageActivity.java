@@ -217,7 +217,8 @@ public class MessageActivity extends NotifiableActivity {
                 Intent intent = new Intent(this, GroupSettingsActivity.class);
                 startActivity(intent);
                 return true;
-
+            case R.id.iconConnect:
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -239,12 +240,22 @@ public class MessageActivity extends NotifiableActivity {
 
     @Override
     public void notifyOnServerConnected() {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((MenuItem) findViewById(R.id.iconConnect)).setIcon(R.drawable.tick);
+            }
+        });
     }
 
     @Override
     public void notifyOnServerDisconnected() {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((MenuItem) findViewById(R.id.iconConnect)).setIcon(R.drawable.cross);
+            }
+        });
     }
 
     /**

@@ -9,4 +9,9 @@
         android:layout_gravity="center"
         app:showAsAction="ifRoom"
         />
+
+    <item android:id="@+id/iconConnect"
+        android:title="@string/connectIcon"
+        app:showAsAction="ifRoom"
+        />
 </menu>
