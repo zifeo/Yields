@@ -83,8 +83,11 @@ public class CommentView extends LinearLayout {
                 caption.setText(content.getCaption());
                 caption.setTextColor(Color.BLACK);
 
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                String time = dateFormat.format(mMessage.getDate());
+
                 messageInfos.setText("Sent by " + mMessage.getSender().getName() + " at " +
-                        mMessage.getDate().toString());
+                        time);
                 messageInfos.setTextColor(Color.BLACK);
                 messageInfos.setTextSize((float) 10.0);
                 break;
