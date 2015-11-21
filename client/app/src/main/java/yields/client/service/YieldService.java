@@ -84,10 +84,8 @@ public class YieldService extends Service {
                 }
 
                 if (mServiceRequestController.isConnected()) {
-                    Log.d("Y:" + this.getClass().getName(), "Is connected");
                     onServerConnected();
                 } else {
-                    Log.d("Y:" + this.getClass().getName(), "Is not connected");
                     onServerDisconnected();
                 }
             }
@@ -103,7 +101,6 @@ public class YieldService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d("Y:" + this.getClass().getName(), "Service binds to an activity");
-        // A client is binding to the service with bindService()
         return mBinder;
     }
 
