@@ -11,10 +11,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.List;
-import java.util.Objects;
 
 import yields.client.R;
 import yields.client.activities.GroupActivity;
@@ -28,13 +26,14 @@ import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
+    // This is necessary as mServiceRequestController can't be final.
+    private final Object serviceControllerLock = new Object();
     private Binder mBinder;
     private NotifiableActivity mCurrentNotifiableActivity;
     private Group mCurrentGroup;
     private int mIdLastNotification;
     private ServiceRequestController mServiceRequestController;
     private ConnectControllerTask mConnectControllerTask;
-    private final Object lock = new Object();
 
     /**
      * Connects the service to the server when it is created and
@@ -71,13 +70,13 @@ public class YieldService extends Service {
     }
 
     /**
-     * Responds to a connection status request
+     * Responds to a connection status request.
      */
     public void connectionStatusResponse(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (lock) {
+                synchronized (serviceControllerLock) {
                     while (mServiceRequestController == null) {
                         try {
                             this.wait();
@@ -257,6 +256,9 @@ public class YieldService extends Service {
         mNotificationManager.notify(mIdLastNotification, notificationBuilder.build());
     }
 
+    /**
+     * Tries to reconnect the server.
+     */
     public void reconnectServer() {
         mServiceRequestController.notifyConnector();
     }
@@ -267,7 +269,7 @@ public class YieldService extends Service {
     private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override
         protected Void doInBackground(ServiceRequest... params) {
-            synchronized (lock) {
+            synchronized (serviceControllerLock) {
                 while (mServiceRequestController == null) {
                     try {
                         this.wait();
@@ -294,7 +296,7 @@ public class YieldService extends Service {
 
         @Override
         protected Void doInBackground(Void... params) {
-            synchronized (lock) {
+            synchronized (serviceControllerLock) {
                 mServiceRequestController = new ServiceRequestController(
                         new CacheDatabaseHelper(getApplicationContext()),
                         YieldService.this);

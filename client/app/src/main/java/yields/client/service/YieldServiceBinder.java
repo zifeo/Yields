@@ -59,6 +59,9 @@ public class YieldServiceBinder extends Binder {
         mService.connectionStatusResponse();
     }
 
+    /**
+     * Asks the service to try and reconnect the server
+     */
     public void reconnect(){
         mService.reconnectServer();
     }
