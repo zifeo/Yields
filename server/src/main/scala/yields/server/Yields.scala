@@ -48,6 +48,7 @@ object Yields {
     StdIn.readLine() // get rid of remaining input buffer
     StdIn.readLine() // wait on a new line for stopping
     close()
+    dbi.close()
   }
 
   /**
@@ -81,7 +82,6 @@ object Yields {
     */
   private[server] def close(): Unit = {
     system.log.info("Server closing.")
-    dbi.close()
     system.terminate()
   }
 

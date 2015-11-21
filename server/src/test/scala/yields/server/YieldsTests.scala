@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.io._
 import yields.server.mpi.MessagesGenerators
-import yields.server.pipeline._
 import yields.server.utils.Config
 
 class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
