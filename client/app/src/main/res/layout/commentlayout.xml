@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="?android:attr/listPreferredItemHeight"
+                android:padding="6dip" >
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        
+        <RelativeLayout
+            android:id="@+id/rawcontent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="20px"> <!-- Maybe find a better way to do it. -->
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/captionholder"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/messageinfoholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/messageinfos"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+        
+    </RelativeLayout>
+
+</RelativeLayout>
