@@ -32,6 +32,8 @@ public class YieldsApplication {
 
     private static YieldServiceBinder mBinder = null;
 
+    private static Bitmap mShownImage;
+
     /**
      * Getter for the user of the application.
      * @return The client user.
@@ -198,5 +200,13 @@ public class YieldsApplication {
         if (mToast != null){
             mToast.cancel();
         }
+    }
+
+    public static void setShownImage(Bitmap image){
+        mShownImage = image;
+    }
+
+    public static Bitmap getShowImage(){
+        return mShownImage;
     }
 }
