@@ -133,6 +133,24 @@ public class YieldService extends Service {
     }
 
     /**
+     * Called when the server has been disconnected
+     */
+    synchronized public void onServerDisconnected() {
+        if (mCurrentNotifiableActivity != null) {
+            mCurrentNotifiableActivity.notifyOnServerDisconnected();
+        }
+    }
+
+    /**
+     * Called when the server just connected
+     */
+    synchronized public void onServerConnected() {
+        if (mCurrentNotifiableActivity != null) {
+            mCurrentNotifiableActivity.notifyOnServerConnected();
+        }
+    }
+
+    /**
      * Called when a message is received from the server
      *
      * @param group The group the message s from
