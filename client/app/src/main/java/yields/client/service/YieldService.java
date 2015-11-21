@@ -81,6 +81,8 @@ public class YieldService extends Service {
                         try {
                             this.wait();
                         } catch (InterruptedException e) {
+                            Log.d("Y:" + this.getClass().getName(),
+                                    "Stopped waiting for request controller" + e.getMessage());
                         }
                     }
                 }
