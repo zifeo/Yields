@@ -149,8 +149,11 @@ public class ServiceRequestController {
 
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
-            case GROUPHISTORYRES:
-                handleAddMessagesToGroupResponse(serverResponse);
+            case GROUP_HISTORY_RESPONSE:
+                handleGroupHistoryResponse(serverResponse);
+                break;
+            case GROUP_MESSAGE_RESPONSE:
+                handleGroupMessageResponse(serverResponse);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
@@ -182,7 +185,11 @@ public class ServiceRequestController {
         }
     }
 
-    private void handleAddMessagesToGroupResponse(Response response) {
+    private void handleGroupMessageResponse(Response serverResponse) {
+
+    }
+
+    private void handleGroupHistoryResponse(Response response) {
         try {
             JSONArray array = response.getMessage().getJSONArray("nodes");
             if (array.length() > 0) {
@@ -445,7 +452,7 @@ public class ServiceRequestController {
     }
 
     /**
-     * Listener
+     * Listener for the Server.
      */
     private abstract class ServerListener implements Runnable, ConnectionSubscriber {
 
