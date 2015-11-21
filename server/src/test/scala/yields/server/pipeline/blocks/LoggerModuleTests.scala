@@ -10,14 +10,15 @@ class LoggerModuleTests extends FlatSpec with Matchers with DefaultsGenerators {
 
   val logger = new FakeLogger
   val module = LoggerModule[String, String]()(logger)
+  val cases = 25
 
   "A logger module" should "not change any value" in {
 
-    val (source, generated) = generateSource(stringArb.arbitrary)
+    val (source, generated) = generateSource(stringArb.arbitrary, cases)
     source
       .via(module.join(Flow[String]))
       .runWith(TestSink.probe[String])
-      .request(100)
+      .request(cases)
       .expectNextN(generated)
       .expectComplete()
   }
@@ -25,7 +26,7 @@ class LoggerModuleTests extends FlatSpec with Matchers with DefaultsGenerators {
   it should "log incoming and outgoing values" in {
 
     logger.clear()
-    val (source, generated) = generateSource(stringArb.arbitrary)
+    val (source, generated) = generateSource(stringArb.arbitrary, cases)
 
     await {
       source

@@ -22,7 +22,7 @@ package object pipeline {
     * @tparam T type of element
     * @return pair of a source and a sequence of the same elements
     */
-  def generateSource[T](gen: Gen[T], num: Int = 20): (Source[T, Unit], scala.collection.immutable.Seq[T]) = {
+  def generateSource[T](gen: Gen[T], num: Int): (Source[T, Unit], scala.collection.immutable.Seq[T]) = {
     val generated = (0 until num).flatMap(_ => gen.sample)
     (Source(generated), generated)
   }
