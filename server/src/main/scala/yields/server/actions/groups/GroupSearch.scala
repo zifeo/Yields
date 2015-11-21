@@ -1,9 +1,8 @@
 package yields.server.actions.groups
 
-import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{NID, Node}
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.NID
 import yields.server.mpi.Metadata
-import yields.server.dbi._
 
 
 /**

@@ -3,8 +3,8 @@ package yields.server.pipeline.blocks
 import akka.stream.scaladsl.{Flow, Sink}
 import akka.stream.testkit.scaladsl.TestSink
 import org.scalatest.{FlatSpec, Matchers}
-import yields.server.DefaultsGenerators
-import yields.server.pipeline._
+import yields.server._
+import yields.server.pipeline.FakeLogger
 
 class LoggerModuleTests extends FlatSpec with Matchers with DefaultsGenerators {
 
@@ -36,7 +36,7 @@ class LoggerModuleTests extends FlatSpec with Matchers with DefaultsGenerators {
 
     generated.foreach { element =>
       val occurrences = logger.info.filter(_.contains(element))
-      occurrences should contain inOrder (s"[IN] $element", s"[OUT] $element")
+      occurrences should contain inOrder(s"[IN] $element", s"[OUT] $element")
     }
   }
 

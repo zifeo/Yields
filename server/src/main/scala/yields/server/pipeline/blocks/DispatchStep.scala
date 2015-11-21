@@ -54,7 +54,7 @@ class DispatchStep(logger: LoggingAdapter) extends StatefulStage[Response, Respo
 
     override def onPush(elem: Response, ctx: Context[Response]): SyncDirective = elem match {
 
-      case current @ Response(broadcast: BroadcastResult, metadata) =>
+      case current@Response(broadcast: BroadcastResult, metadata) =>
         val sendList = for {
           receiver <- broadcast.receivers
           if pool.contains(receiver)

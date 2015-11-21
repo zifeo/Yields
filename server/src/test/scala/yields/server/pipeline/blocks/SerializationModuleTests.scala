@@ -5,9 +5,10 @@ import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString
 import org.scalatest.FlatSpec
 import spray.json._
+import yields.server._
 import yields.server.io._
 import yields.server.mpi.{MessagesGenerators, Request}
-import yields.server.pipeline.{FakeLogger, _}
+import yields.server.pipeline.FakeLogger
 
 class SerializationModuleTests extends FlatSpec with MessagesGenerators {
 

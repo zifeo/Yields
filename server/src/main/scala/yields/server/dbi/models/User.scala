@@ -1,12 +1,11 @@
 package yields.server.dbi.models
 
 import java.time.OffsetDateTime
-import java.util.regex.{Matcher, Pattern}
 
 import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.{UnauthorizeActionException, NewUserExistException}
+import yields.server.actions.exceptions.{NewUserExistException, UnauthorizeActionException}
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{KeyNotSetException, IllegalValueException, UnincrementableIdentifierException}
+import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
 
 /**
@@ -47,7 +46,6 @@ final class User private(val uid: UID) {
   private var _name: Option[String] = None
   private var _email: Option[Email] = None
   private var _picture: Option[Blob] = None
-
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
   private var _connected_at: Option[OffsetDateTime] = None
@@ -64,6 +62,13 @@ final class User private(val uid: UID) {
   /** Name setter. */
   def name_=(newName: String): Unit =
     _name = update(Key.name, newName)
+
+  // Updates the field with given value and actualize timestamp.
+  private def update[T](field: String, value: T): Option[T] = {
+    val updates = List((field, value), (Key.updated_at, Temporal.current))
+    redis.withClient(_.hmset(Key.user, updates))
+    Some(value)
+  }
 
   /** Email getter. */
   def email: Email = _email.getOrElse {
@@ -151,11 +156,15 @@ final class User private(val uid: UID) {
     _updated_at = values.get(Key.updated_at).map(OffsetDateTime.parse)
   }
 
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (Key.updated_at, Temporal.current))
-    redis.withClient(_.hmset(Key.user, updates))
-    Some(value)
+  object Key {
+    val user = s"users:$uid"
+    val name = "name"
+    val email = "email"
+    val picture = "picture"
+    val created_at = "created_at"
+    val updated_at = "updated_at"
+    val groups = s"$user:groups"
+    val entourage = s"$user:entourage"
   }
 
 }
@@ -190,12 +199,6 @@ object User {
     } else throw new NewUserExistException("email already registered")
   }
 
-  /** Prepares user model for retrieving data given an user id. */
-  def apply(uid: UID): User = {
-    new User(uid)
-  }
-
-
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): Option[User] = {
 
@@ -204,6 +207,11 @@ object User {
     if (checkValidEmail(email)) {
       redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
     } else throw new UnauthorizeActionException(s"invalid email in fromEmail method")
+  }
+
+  /** Prepares user model for retrieving data given an user id. */
+  def apply(uid: UID): User = {
+    new User(uid)
   }
 
 }

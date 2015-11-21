@@ -1,13 +1,11 @@
 package yields.server.actions.users
 
 import org.scalacheck.Arbitrary._
-import org.scalacheck.Properties
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.actions.ActionsGenerators
+import org.scalatest.Matchers
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.{Config, Temporal}
+import yields.server.utils.Temporal
 
 /**
   * Test class for User Update

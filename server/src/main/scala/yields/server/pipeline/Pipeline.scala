@@ -20,12 +20,14 @@ object Pipeline {
   /**
     * Creates a pipeline including the following steps:
     *
+    * {{{
     *                                         execute
     *          log     serialize     log     +dispatch
     *        +-----+    +-----+    +-----+    +-----+
     *  In ~> |     | ~> |     | ~> |     | ~> |     |
     * Out <~ |     | <~ |     | <~ |     | <~ |     |
     *        +-----+    +-----+    +-----+    +-----+
+    * }}}
     *
     * @param system implicit actor system
     * @return flows pipeline

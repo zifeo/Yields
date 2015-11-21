@@ -3,7 +3,6 @@ package yields.server.dbi
 import java.time.OffsetDateTime
 
 import com.redis.serialization.{Format, Parse}
-import com.redis.serialization.Parse.Implicits._
 
 /**
   * Short models types and some formats.

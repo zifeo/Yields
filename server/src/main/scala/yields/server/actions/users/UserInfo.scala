@@ -1,8 +1,8 @@
 package yields.server.actions.users
 
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{User, UID}
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.{UID, User}
 import yields.server.mpi.Metadata
 
 /**

@@ -1,5 +1,5 @@
+import sbt.Keys._
 import sbt._
-import Keys._
 
 object YieldsServer extends Build {
 
@@ -23,9 +23,22 @@ object YieldsServer extends Build {
       meta ++ akka ++ akkaExp ++ redis ++ tests
     },
 
+    scalacOptions in (Compile, doc) ++= Seq(
+      "-groups",
+      "-implicits",
+      "-no-link-warnings"
+    ),
+    javacOptions in (Compile, doc) ++= Seq(
+      "-notimestamp",
+      "-linksource"
+    ),
+
     cancelable in Global := true,
     fork := true,
-    evictionWarningOptions in update := EvictionWarningOptions.empty
+    autoAPIMappings := true,
+    evictionWarningOptions in update := EvictionWarningOptions.empty,
+
+    target in Compile in doc := baseDirectory.value / "api"
 
   )
 

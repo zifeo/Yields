@@ -15,17 +15,6 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
   private val messageFld = "message"
 
   /**
-    * Format the message with its message type.
-    * @param obj message to pack
-    * @tparam T message type
-    * @return packed message json format
-    */
-  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
-    kindFld -> obj.getClass.getSimpleName.toJson,
-    messageFld -> obj.toJson
-  )
-
-  /**
     * Serializes the result of an action in a json format
     * Format :
     * kind: ...               // Performed action e.g GroupCreateRes, UserConnectRes, etc
@@ -52,6 +41,17 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case _ => serializationError(s"unregistered action kind: $kind")
     }
   }
+
+  /**
+    * Format the message with its message type.
+    * @param obj message to pack
+    * @tparam T message type
+    * @return packed message json format
+    */
+  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
+    kindFld -> obj.getClass.getSimpleName.toJson,
+    messageFld -> obj.toJson
+  )
 
   override def read(json: JsValue): Result =
     json.asJsObject.getFields(kindFld, messageFld) match {

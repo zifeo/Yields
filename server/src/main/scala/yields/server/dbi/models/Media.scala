@@ -1,14 +1,11 @@
 package yields.server.dbi.models
 
 import java.io.{File, PrintWriter}
-import java.nio.file.{Paths, Files}
+import java.nio.file.{Files, Paths}
 
 import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.UnauthorizeActionException
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{UnincrementableIdentifierException, IllegalValueException}
 import yields.server.dbi.models.Media._
-import yields.server.dbi.models.Node._
 import yields.server.utils.Config
 
 /**

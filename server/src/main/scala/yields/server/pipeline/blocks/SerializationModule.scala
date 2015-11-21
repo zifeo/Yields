@@ -8,8 +8,8 @@ import yields.server.io._
 import yields.server.mpi.{Request, Response}
 
 /**
- * Parse every incoming and outgoing items from and to actions.
- */
+  * Parse every incoming and outgoing items from and to actions.
+  */
 class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Request, Response, ByteString] {
 
   /** Incoming log with given channel. */
