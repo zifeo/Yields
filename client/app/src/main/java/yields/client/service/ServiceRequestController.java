@@ -187,7 +187,11 @@ public class ServiceRequestController {
         }
     }
 
-    private void handleAddMessagesToGroupResponse(Response response) {
+    private void handleGroupMessageResponse(Response serverResponse) {
+
+    }
+
+    private void handleGroupHistoryResponse(Response response) {
         try {
             JSONArray array = response.getMessage().getJSONArray("nodes");
             if (array.length() > 0) {
