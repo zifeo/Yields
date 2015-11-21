@@ -284,8 +284,7 @@ public class MessageActivity extends AppCompatActivity
             public void run() {
                 if (mType == ContentType.GROUP_MESSAGES) {
                     retrieveGroupMessages();
-                }
-                else{
+                } else {
                     retrieveCommentMessages();
                 }
             }
@@ -346,6 +345,16 @@ public class MessageActivity extends AppCompatActivity
         mCommentAdapter.clear();
         ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
         ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
+        ((CommentFragment) mCurrentFragment).setCommentViewOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("CommentFragment", "CommentView clicked.");
+                if (mCommentMessage.getContent().getType() == Content.ContentType.IMAGE){
+                    YieldsApplication.setShownImage(((ImageContent)mCommentMessage.getContent()).getImage());
+                    startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                }
+            }
+        });
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
         loadComments();
