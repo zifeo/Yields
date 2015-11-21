@@ -6,22 +6,16 @@ import org.json.JSONObject;
 import java.util.Objects;
 
 /**
- * The response object which represents a response to be send to the server.
+ * The response object which represents a response received from the server.
  */
 public class Response {
+
     /**
-     * The Kind of messages possible
+     * The Kind of possible Responses.
      */
     public enum ResKind {
-        GROUPHISTORYRES("GroupHistoryRes");
-        /*PING("PING"), USERCONNECT("UserConnect"), USERUPDATE("UserUpdate"),
-        USERGROUPLIST("UserGroupList"), USERENTOURAGEADD("UserEntourageAdd"),
-        USERENTOURAGEREMOVE("UserEntourageRemove"), USERSTATUS("UserStatus"),
-        GROUPCREATE("GroupCreate"), GROUPUPDATENAME("GroupUpdateName"),
-        GROUPUPDATEVISIBILITY("GroupUpdateVisibility"), GROUPUPDATEIMAGE
-                ("GroupUpdateImage"),
-        GROUPADD("GroupAdd"), GROUPREMOVE("GroupRemove"),
-        GROUPMESSAGE("GroupMessage"), GROUPHISTORY("GroupHistory");*/
+
+        GROUP_HISTORY_RESPONSE("GroupHistoryRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes");
 
         private final String name;
 
@@ -33,36 +27,38 @@ public class Response {
             return name;
         }
 
-        public static ResKind getEnumbyName(String name) {
+        public static ResKind getEnumByName(String name) {
             for (ResKind e : ResKind.values()) {
-                if (name.equals(e.name)) return e;
+                if (name.equals(e.name)) {
+                    return e;
+                }
             }
             return null;
         }
     }
 
-    private JSONObject mResponseObj;
-    private ResKind mKind;
+    private final JSONObject mResponseObj;
+    private final ResKind mKind;
 
     /**
-     * Creates a response as a Json Objects
+     * Creates a response as a Json Objects.
      *
-     * @param rawResponse The String of the response
-     * @throws JSONException In case of problems parsing the response
+     * @param rawResponse The String of the response.
+     * @throws JSONException In case of problems parsing the response.
      */
     public Response(String rawResponse) throws JSONException {
         Objects.requireNonNull(rawResponse);
         this.mResponseObj = new JSONObject(rawResponse);
-        mKind = ResKind.getEnumbyName(mResponseObj.getString("kind"));
+        mKind = ResKind.getEnumByName(mResponseObj.getString("kind"));
         if (mKind == null) {
             throw new JSONException("mKind is not known");
         }
     }
 
     /**
-     * Gets the Json Object of the response
+     * Gets the Json Object of the response.
      *
-     * @return The Json Object
+     * @return The Json Object.
      */
     public JSONObject object() {
         return mResponseObj;
@@ -78,9 +74,9 @@ public class Response {
     }
 
     /**
-     * Gets the kind of the response
+     * Gets the kind of the response.
      *
-     * @return The kind
+     * @return The kind.
      */
     public ResKind getKind() {
         return mKind;

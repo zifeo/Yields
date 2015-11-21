@@ -92,8 +92,8 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         assertEquals(Message.MessageStatus.NOT_SENT, message.getStatus());
 
         message = new Message("message", new Id(-4), user, content, new Date(),
-                Message.MessageStatus.RECEIVED);
-        assertEquals(Message.MessageStatus.RECEIVED, message.getStatus());
+                Message.MessageStatus.SENT);
+        assertEquals(Message.MessageStatus.SENT, message.getStatus());
 
         message = new Message("message", new Id(-4), user, content, new Date(),
                 Message.MessageStatus.SEEN);
