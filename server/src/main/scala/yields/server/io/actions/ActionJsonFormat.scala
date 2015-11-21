@@ -3,10 +3,9 @@ package yields.server.io.actions
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
-import yields.server.actions.groups.{GroupManage, GroupCreate, GroupUpdate}
+import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeHistory, NodeMessage}
 import yields.server.actions.users._
-import yields.server.io._
 
 /** Json format for [[Action]]. */
 object ActionJsonFormat extends RootJsonFormat[Action] {
@@ -29,6 +28,8 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     case x: GroupCreate => packWithKind(x)
     case x: GroupUpdate => packWithKind(x)
     case x: GroupManage => packWithKind(x)
+    case x: GroupSearch => packWithKind(x)
+
     case x: NodeMessage => packWithKind(x)
     case x: NodeHistory => packWithKind(x)
 
@@ -49,6 +50,8 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "GroupCreate" => message.convertTo[GroupCreate]
           case "GroupUpdate" => message.convertTo[GroupUpdate]
           case "GroupManage" => message.convertTo[GroupManage]
+          case "GroupSearch" => message.convertTo[GroupSearch]
+
           case "NodeMessage" => message.convertTo[NodeMessage]
           case "NodeHistory" => message.convertTo[NodeHistory]
 

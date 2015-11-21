@@ -1,12 +1,9 @@
 package yields.server.actions.groups
 
-import java.time.OffsetDateTime
-
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Group, Blob, NID}
+import yields.server.dbi.models.{Blob, Group, NID}
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Update a group given given specific fields.
@@ -32,7 +29,7 @@ case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extend
         case _ =>
       }
 
-      GroupUpdateRes(Temporal.current)
+      GroupUpdateRes()
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"Bad nid in : $errorMessage")
@@ -42,4 +39,4 @@ case class GroupUpdate(nid: NID, name: Option[String], pic: Option[Blob]) extend
 }
 
 /** [[GroupUpdate]] result. */
-case class GroupUpdateRes(datetime: OffsetDateTime) extends Result
+case class GroupUpdateRes() extends Result

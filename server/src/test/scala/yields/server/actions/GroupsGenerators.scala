@@ -37,9 +37,7 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
   }
 
   implicit lazy val groupUpdateResArb: Arbitrary[GroupUpdateRes] = Arbitrary {
-    for {
-      datetme <- arbitrary[OffsetDateTime]
-    } yield GroupUpdateRes(datetme)
+    GroupUpdateRes()
   }
 
   implicit lazy val groupHistoryArb: Arbitrary[NodeHistory] = Arbitrary {
