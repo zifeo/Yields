@@ -36,6 +36,7 @@ public class ServiceRequestController {
     private final AtomicBoolean isConnecting;
     // Not final because we may have to recreate it in case of connection error
     private CommunicationChannel mCommunicationChannel;
+    private Thread mConnector;
 
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
@@ -53,7 +54,7 @@ public class ServiceRequestController {
         if (!isConnecting.getAndSet(true)) {
             mService.onServerDisconnected();
             mService.receiveError("Problem connecting to server : " + e.getMessage());
-            new Thread(new Runnable() {
+            mConnector = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -66,7 +67,17 @@ public class ServiceRequestController {
                         connectToServer();
                     }
                 }
-            }).start();
+            });
+            mConnector.start();
+        }
+    }
+
+    /**
+     * Notify connector to reconnect faster
+     */
+    public void notifyConnector() {
+        if (mConnector != null && mConnector.isAlive()) {
+            mConnector.interrupt();
         }
     }
 

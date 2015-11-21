@@ -1,7 +1,6 @@
 package yields.client.service;
 
 import android.os.Binder;
-import android.util.Log;
 
 import java.util.Objects;
 
@@ -57,7 +56,11 @@ public class YieldServiceBinder extends Binder {
      * Can be used to know if the server is connected to the server
      */
     public void connectionStatus(){
-        mService.connectionStatusRequest();
+        mService.connectionStatusResponse();
+    }
+
+    public void reconnect(){
+        mService.reconnectServer();
     }
 
     /**

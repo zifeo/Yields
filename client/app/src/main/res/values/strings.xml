@@ -53,4 +53,5 @@
     <string name="joinGroup">Join Group !</string>
     <string name="noTags">No tags for this group</string>
     <string name="connectIcon">Connect Icon</string>
+    <string name="noConnectionText">You aren\'t connected</string>
 </resources>

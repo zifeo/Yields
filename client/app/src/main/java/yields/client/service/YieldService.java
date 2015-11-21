@@ -70,7 +70,10 @@ public class YieldService extends Service {
         return START_STICKY;
     }
 
-    public void connectionStatusRequest(){
+    /**
+     * Responds to a connection status request
+     */
+    public void connectionStatusResponse(){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -252,6 +255,10 @@ public class YieldService extends Service {
         // mId allows you to update the notification later on.
         mIdLastNotification++;
         mNotificationManager.notify(mIdLastNotification, notificationBuilder.build());
+    }
+
+    public void reconnectServer() {
+        mServiceRequestController.notifyConnector();
     }
 
     /**

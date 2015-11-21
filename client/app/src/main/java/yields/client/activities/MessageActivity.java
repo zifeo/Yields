@@ -222,6 +222,7 @@ public class MessageActivity extends NotifiableActivity {
                 startActivity(intent);
                 return true;
             case R.id.iconConnect:
+                YieldsApplication.getBinder().reconnect();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
