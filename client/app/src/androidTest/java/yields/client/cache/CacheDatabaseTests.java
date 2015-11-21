@@ -718,13 +718,10 @@ public class CacheDatabaseTests {
      * @return True if the Messages are the same, false otherwise.
      */
     private boolean compareMessages(Message originalMessage, Message messageFromCache) {
-        boolean equal = originalMessage.getSender().getId().getId().equals(
+        boolean equal = originalMessage.getSender().getId().getId().equals(messageFromCache.getSender().getId().getId());
 
-                messageFromCache.getSender().getId().getId());
-        equal = equal && originalMessage.getSender().getEmail().equals(
-                messageFromCache.getSender().getEmail());
-        equal = equal && originalMessage.getSender().getName().equals(
-                messageFromCache.getSender().getName());
+        equal = equal && originalMessage.getSender().getEmail().equals(messageFromCache.getSender().getEmail());
+        equal = equal && originalMessage.getSender().getName().equals(messageFromCache.getSender().getName());
 
         equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
         equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);

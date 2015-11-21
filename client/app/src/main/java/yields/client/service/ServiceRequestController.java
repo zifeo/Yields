@@ -420,8 +420,8 @@ public class ServiceRequestController {
     private void handleGroupMessageRequest(NodeMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
-            mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode()
-                    .getId());
+            mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
+            //TODO : Notify app
         } catch (CacheDatabaseException e) {
             //TODO : @Nroussel Decide what happens if cache adding failed.
         }
