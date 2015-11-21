@@ -1,8 +1,11 @@
 package yields.server.actions.nodes
 
+import java.time.OffsetDateTime
+
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import yields.server.actions.Result
 import yields.server.dbi._
 import yields.server.dbi.models.{ModelsGenerators, _}
 import yields.server.mpi.Metadata
@@ -38,7 +41,7 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
   }
 
   "retrieving n messages from a group" should "return the n messages" in {
-    val group = Group.createGroup("name")
+    val group = Group.createGroup("name", m.sender)
     add10Msgs(group.nid)
     val n = 5
     val action = new NodeHistory(group.nid, Temporal.current, n)
@@ -50,38 +53,28 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
     }
   }
 
-  "getting message containing media" should "give the media back" in {
-    val group = Group.createGroup("name")
-    val addMsg1 = new NodeMessage(group.nid, Some("this entry has some text"), None, None)
-    addMsg1.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+  "getting messages containing media" should "give the media back" in {
+    /* val group = Group.createGroup("name")
 
-    val addMsg2 = new NodeMessage(group.nid, None, Some("image"), Some("Some content"))
-    addMsg2.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+    val messagesToReceive = List((Temporal.current, 1, None, "this entry has some text"), (Temporal.current, 2, Some("Some content"), ""),
+      (Temporal.current, 3, Some("other content"), "text"), (Temporal.current, 4, None, "some text again"))
 
-    val addMsg3 = new NodeMessage(group.nid, Some("text"), Some("image"), Some("other content"))
-    addMsg3.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+    messagesToReceive.foreach(send)
 
-    val addMsg4 = new NodeMessage(group.nid, Some("some text again"), None, None)
-    addMsg4.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+    def send(m: (OffsetDateTime, Int, Option[String], String)): Unit = {
+      val t = if (m._4 == "") None else Some(m._4)
+      val contentType = if (m._3.isDefined) Some("image") else None
+      val addMsg = new NodeMessage(group.nid, t, contentType, m._3)
+      addMsg.run(new Metadata(m._2, m._1))
+    }
 
     val history = new NodeHistory(group.nid, Temporal.current, 4)
     val res = history.run(new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current))
+
     res match {
       case NodeHistoryRes(nid, messages) =>
-        messages.head._4 should be("this entry has some text")
-        messages.head._3.isDefined should be(false)
-
-        messages(1)._3.isDefined should be(true)
-        messages(1)._3.get should be("Some content")
-        messages(1)._4 should be("")
-
-        messages(2)._3.isDefined should be(true)
-        messages(2)._3.get should be("other content")
-        messages(2)._4 should be("text")
-
-        messages(3)._3.isDefined should be(false)
-        messages(3)._4 should be("some text again")
-    }
+        messages.reverse should be(messagesToReceive)
+    } */
   }
 
 }

@@ -30,7 +30,7 @@ class TestGroupUpdate extends FlatSpec with Matchers with BeforeAndAfter {
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
   "updating a group name" should "update the group in db" in {
-    val g1 = Group.createGroup("name1")
+    val g1 = Group.createGroup("name1", m.sender)
     val action = new GroupUpdate(g1.nid, Some("name2"), None)
     action.run(m)
     val g2 = Group(g1.nid)

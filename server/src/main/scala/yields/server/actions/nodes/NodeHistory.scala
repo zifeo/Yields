@@ -26,17 +26,16 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
     if (nid > 0 && count > 0) {
       val group = Group(nid)
       val content: List[IncomingFeedContent] = group.getMessagesInRange(datetime, count)
-      val split = content.partition(_._3.isDefined)
 
-      // Get media from entries that have some
-      val haveMedia = for {
-        c <- split._1
-        m = Media(c._3.get)
-      } yield (c._1, c._2, Some(m.content), c._4)
+      // Get media
+      val contentWithMedia = content.map {
+        case (d, u, Some(x), t) =>
+          val m = Media(x)
+          (d, u, Some(m.content), t)
+        case (d, u, None, t) => (d, u, None, t)
+      }
 
-      val dontHaveMedia = split._2.map(x => (x._1, x._2, None, x._4))
-
-      NodeHistoryRes(nid, haveMedia ::: dontHaveMedia)
+      NodeHistoryRes(nid, contentWithMedia)
 
     } else {
       val errorMessage = getClass.getSimpleName

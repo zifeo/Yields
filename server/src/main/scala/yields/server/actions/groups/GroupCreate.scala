@@ -19,7 +19,7 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID]) extends A
     */
   override def run(metadata: Metadata): Result = {
     if (!name.isEmpty) {
-      val group = Group.createGroup(name)
+      val group = Group.createGroup(name, metadata.sender)
       group.addMultipleNodes(nodes)
       group.addMultipleUser(users)
       GroupCreateRes(group.nid)

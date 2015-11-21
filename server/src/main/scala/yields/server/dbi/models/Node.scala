@@ -10,17 +10,17 @@ import com.redis.RedisClient.DESC
 import yields.server.dbi.models._
 
 /**
- * Model of a node with link to the database
- *
- * Node is abstract superclass of every possible kind of nodes like Group, Image etc
- *
- * Database structure :
- * nodes:nid Long - last node id created
- * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
- * nodes:[nid]:users Zset[UID] with score datetime
- * nodes:[nid]:nodes Zset[NID] with score datetime
- * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
- */
+  * Model of a node with link to the database
+  *
+  * Node is abstract superclass of every possible kind of nodes like Group, Image etc
+  *
+  * Database structure :
+  * nodes:nid Long - last node id created
+  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
+  * nodes:[nid]:users Zset[UID] with score datetime
+  * nodes:[nid]:nodes Zset[NID] with score datetime
+  * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
+  */
 abstract class Node {
 
   object NodeKey {
@@ -30,6 +30,7 @@ abstract class Node {
     val refreshed_at = "refreshed_at"
     val created_at = "created_at"
     val updated_at = "updated_at"
+    val creator = "creator"
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
@@ -42,6 +43,7 @@ abstract class Node {
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
   private var _refreshed_at: Option[OffsetDateTime] = None
+  private var _creator: Option[UID] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[IncomingFeedContent]] = None
@@ -62,6 +64,7 @@ abstract class Node {
     valueOrException(_kind)
   }
 
+  /** kind setter */
   def kind_=(newKind: String): Unit = {
     _kind = update(NodeKey.kind, newKind)
   }
@@ -82,6 +85,17 @@ abstract class Node {
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
     _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.refreshed_at))
     valueOrDefault(_refreshed_at, Temporal.minimum)
+  }
+
+  /** creator getter */
+  private def creator: UID = {
+    _creator = redis.withClient(_.hget[UID](NodeKey.node, NodeKey.creator))
+    valueOrDefault(_creator, 0)
+  }
+
+  /** creator setter */
+  private def creator_=(uid: UID): Unit = {
+    _creator = update(NodeKey.creator, uid)
   }
 
   /** Users getter */

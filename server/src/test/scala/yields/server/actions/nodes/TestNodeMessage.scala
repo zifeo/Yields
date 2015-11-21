@@ -24,7 +24,7 @@ class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
   lazy val users: List[User] = List(User.create("e1"), User.create("e2"), User.create("e3"), User.create("e4"))
-  lazy val nodes: List[Node] = List(Group.createGroup("g1"), Group.createGroup("g2"), Group.createGroup("g3"))
+  lazy val nodes: List[Node] = List(Group.createGroup("g1", m.sender), Group.createGroup("g2", m.sender), Group.createGroup("g3", m.sender))
 
   "running nodeMessage action on a group" should "add new entry to feed" in {
     val create = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid))
@@ -43,7 +43,7 @@ class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "receiving a media in a messgae" should "create the media on disk" in {
-    val group = Group.createGroup("name")
+    val group = Group.createGroup("name", m.sender)
     val action = new NodeMessage(group.nid, Some("Some text"), Some("image"), Some("Some content"))
     action.run(m)
     val feed = group.getMessagesInRange(Temporal.current, 5)

@@ -42,9 +42,9 @@ class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
 
   "Test with 2 groups in list" should "return the group list" in {
     val u = User.create("an@email.com")
-    val g1 = Group.createGroup("g1")
+    val g1 = Group.createGroup("g1", m.sender)
     g1.name = "n1"
-    val g2 = Group.createGroup("g2")
+    val g2 = Group.createGroup("g2", m.sender)
     g2.name = "n2"
     u.addToGroups(g1.nid)
     u.addToGroups(g2.nid)
