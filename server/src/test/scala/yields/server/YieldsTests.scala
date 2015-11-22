@@ -1,6 +1,10 @@
 package yields.server
 
-import akka.stream.scaladsl.{Source, Tcp}
+import java.io.{OutputStreamWriter, BufferedWriter, BufferedReader, InputStreamReader}
+import java.net.{InetSocketAddress, Socket}
+
+import akka.io.Tcp.SO
+import akka.stream.scaladsl.{Sink, Source, Tcp}
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
@@ -14,7 +18,9 @@ import yields.server.io._
 import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
 import yields.server.utils.{Config, Temporal}
 
+import scala.concurrent.Future
 import scala.language.implicitConversions
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
 
@@ -40,30 +46,28 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     require(acting.nonEmpty, "scenario must contains some acting")
 
     val metadata = Metadata(1, Temporal.current)
-    val (actions, results) = acting.toList.unzip
+    val (actions, expected) = acting.toList.unzip
     val requests = actions.map { action =>
-      val json = Request(action, metadata).toJson
-      ByteString(json.toString())
+      val json = Request(action, metadata).toJson.toString
+      ByteString(s"$json\n")
     }
 
-    val probe =
+    val results = await {
       Source(requests)
-      .via(connection)
-      .map(_.utf8String.parseJson.convertTo[Response].result)
-      .runWith(TestSink.probe[Result])
-      .request(results.size)
+        .via(connection)
+        .map(_.utf8String.parseJson.convertTo[Response].result)
+        .grouped(expected.size)
+        .runWith(Sink.head)
+    }.toList
 
-    results.foreach {
-      case Some(res) => probe.expectNext(res)
-      case None => probe.expectNextN(1)
-    }
-    probe.expectComplete()
+    results should have size expected.size
+    expected.flatten foreach (results should contain (_))
   }
 
   implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
-  "A client" should "be able to connect to the server" in scenario (
-    UserConnect("tests@yields.im") -> Some(UserConnectRes(1))
+  "A client without a socket" should "be able to connect to the server" in scenario (
+    UserConnect("tests@yields.im") -> UserConnectRes(1)
   )
 
   it should "be able to send and retrieve message" in scenario (
@@ -71,5 +75,43 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     GroupMessage(1, "test message") -> None,
     GroupHistory(1, Temporal.current, 1) -> None
   )
+
+  /** Fakes a client connection through a socket. */
+  class FakeClient {
+
+    private val socket = new Socket(Config.getString("addr"), Config.getInt("port"))
+    private val receiver = new BufferedReader(new InputStreamReader(socket.getInputStream))
+    private val sender = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream))
+
+    /** Send a request to the server. */
+    def send(request: Request): Unit = {
+      sender.write(request.toJson.toString())
+      sender.newLine()
+      sender.flush()
+    }
+
+    /** Send an action to the server. */
+    def send(action: Action): Unit = {
+      val metadata = Metadata(1, Temporal.current)
+      send(Request(action, metadata))
+    }
+
+    /** Gets next response from the server. */
+    def receive(): Future[Response] = Future {
+      val message = receiver.readLine()
+      message.parseJson.convertTo[Response]
+    }
+
+    def close(): Unit = {
+      socket.close()
+    }
+
+  }
+
+  "A client with a socket" should "be able to connect to the server" in {
+    val client = new FakeClient
+    client.send(UserConnect("tests@yields.im"))
+    await(client.receive()).result should be (UserConnectRes(1))
+  }
 
 }

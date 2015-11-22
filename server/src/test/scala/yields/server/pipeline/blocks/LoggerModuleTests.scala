@@ -36,7 +36,7 @@ class LoggerModuleTests extends FlatSpec with Matchers with DefaultsGenerators {
 
     generated.foreach { element =>
       val occurrences = logger.info.filter(_.contains(element))
-      occurrences should contain inOrder(s"[IN] $element", s"[OUT] $element")
+      occurrences should contain inOrder (s"[IN] $element", s"[OUT] $element")
     }
   }
 

@@ -2,7 +2,6 @@ package yields.server.actions.users
 
 import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
-import yields.server.actions.exceptions.UnauthorizeActionException
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata

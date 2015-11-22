@@ -1,6 +1,7 @@
 package yields.server.pipeline
 
 import akka.actor.ActorSystem
+import akka.stream.io.Framing
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import yields.server.mpi.{Metadata, Request, Response}
@@ -16,6 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object Pipeline {
 
   val parallelism = Config.getInt("pipeline.parallelism")
+  val framesize = Config.getInt("pipeline.framesize")
 
   /**
     * Creates a pipeline including the following steps:
@@ -36,6 +38,8 @@ object Pipeline {
 
     implicit val logger = system.log
 
+    val frame = Framing.delimiter(ByteString("\n"), maximumFrameLength = framesize, allowTruncation = false)
+
     val logIO = LoggerModule[ByteString, ByteString]()
     val serialize = SerializationModule()
     val logMessage = LoggerModule[Request, Response]()
@@ -48,10 +52,14 @@ object Pipeline {
       }
     }
 
-    logIO
-      .atop(serialize)
-      .atop(logMessage)
-      .join(execute.transform(() => dispatch))
+    Flow[ByteString]
+      .via(frame)
+      .via(
+        logIO
+          .atop(serialize)
+          .atop(logMessage)
+          .join(execute.transform(() => dispatch))
+      )
   }
 
 }
