@@ -3,6 +3,7 @@ package yields.server.actions.groups
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
+import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
 
 /**
@@ -12,7 +13,7 @@ import yields.server.mpi.Metadata
   * @param users users to put in the group
   * @param visibility private or public
   */
-case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], visibility: String) extends Action {
+case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq[String], visibility: String) extends Action {
 
   /**
     * Run the action given the sender.
@@ -25,6 +26,15 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], visibilit
         val group = Group.createGroup(name, metadata.sender)
         group.addMultipleNodes(nodes)
         group.addMultipleUser(users)
+        /** Create or get tags id */
+        val tids: List[TID] = tags.map { text: String =>
+          Tag.getIdFromText(text) match {
+            case Some(x) => x
+            case None => Tag.createTag(text).tid
+          }
+        }.toList
+
+        group.addTags(tids)
         GroupCreateRes(group.nid)
       } else {
         val errorMessage = getClass.getSimpleName

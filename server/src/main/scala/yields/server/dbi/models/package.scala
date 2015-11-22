@@ -19,9 +19,6 @@ package object models {
   /** Represent a tag identifier */
   type TID = Long
 
-  /** Represent a tag content */
-  type TagContent = String
-
   /** Represents an email address. */
   type Email = String
 

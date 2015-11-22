@@ -14,12 +14,17 @@ class Group private(override val nid: NID) extends Node {
 
 
   object GroupKey {
-    val admins = s"${NodeKey.node}:admins"
-    val visibility = "visibility"           // can only be "private" or "public"
+    val node = NodeKey.node
+    val admins = s"$node:admins"
+    val tags = s"$node:tags"
+
+    /** can only be "private" or "public" */
+    val visibility = "visibility"
   }
 
   private var _admins: Option[List[UID]] = None
   private var _visibility: Option[String] = None
+  private var _tags: Option[List[TID]] = None
 
   /** add admin */
   def addAdmin(id: UID): Boolean =
@@ -46,6 +51,17 @@ class Group private(override val nid: NID) extends Node {
     _visibility = redis.withClient(_.hget[String](NodeKey.node, GroupKey.visibility))
     valueOrDefault(_visibility, "")
   }
+
+  /** add tags to group */
+  def addTags(tags: Seq[TID]): Unit = {
+    redis.withClient(_.sadd(GroupKey.tags, tags))
+  }
+
+  /** get the tags of a group */
+  /* def getTags: List[TID] = {
+    val mem = redis.withClient(_.smembers[TID](GroupKey.tags))
+    val list = mem.getOrElse(List()).toList
+  } */
 }
 
 /**
