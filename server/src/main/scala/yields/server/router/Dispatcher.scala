@@ -12,7 +12,7 @@ final class Dispatcher() extends Actor with ActorLogging {
 
   import Dispatcher._
 
-  val FindUID = """.+"metadata".+"client":\s?([0-9]+).+""".r
+  val uidPattern = """"client":"""
 
   def receive = state(Map.empty)
 
@@ -25,15 +25,18 @@ final class Dispatcher() extends Actor with ActorLogging {
   def state(pool: Map[UID, ActorRef]): Receive = {
 
     case InitConnection(data) =>
-      data.utf8String match {
-        case FindUID(uid) =>
-          val clientHub = sender()
-          log.debug(s"dispatch pool: +$uid")
-          context.become(state(pool + (uid.toLong -> clientHub)))
-        case _ => log.warning(s"init connection without metadata.client ${data.utf8String}")
+      val message = data.utf8String
+      val pos = message.indexOf(uidPattern)
+      if (pos < 0) {
+        log.warning(s"init connection without metadata.client")
+      } else {
+        val uid = message.drop(pos + uidPattern.length).takeWhile(_ != ',').trim.toInt
+        val clientHub = sender()
+        log.debug(s"dispatch pool: +$uid")
+        context.become(state(pool + (uid.toLong -> clientHub)))
       }
 
-    case TerminateConnection() =>
+    case TerminateConnection =>
       pool.find(_._2 == sender()) match {
 
         case Some((uid, _)) =>
@@ -41,7 +44,7 @@ final class Dispatcher() extends Actor with ActorLogging {
           context.become(state(pool - uid))
 
         case None =>
-          log.warning(s"terminate not existing connection")
+          log.warning(s"terminate non-existing connection")
       }
 
     case x =>

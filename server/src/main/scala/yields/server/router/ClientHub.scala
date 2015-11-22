@@ -35,6 +35,7 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
       count += 1
       onNext(data)
       dispatcher ! InitConnection(data)
+      context.become(alive)
 
     case Request(_) =>
       // expected
@@ -69,7 +70,7 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
     case Request(_) =>
     // onNext counterpart
 
-    case PeerClosed =>
+    case PeerClosed | ErrorClosed(_) =>
       dispatcher ! TerminateConnection
       context stop self
 
