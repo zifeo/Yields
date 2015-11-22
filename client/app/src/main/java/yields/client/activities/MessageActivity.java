@@ -95,20 +95,8 @@ public class MessageActivity extends AppCompatActivity
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        /*mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();*/
-        /** FOR TESTING ONLY ! **/
-        // Set the binder.
-        YieldsApplication.setBinder(new FakeBinder(new YieldService()));
-        // Set the user.
-        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
-                .createBitmap(80, 80, Bitmap.Config.RGB_565));
-        YieldsApplication.setUser(mUser);
-        // Set the group.
-        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
-                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
-                .GroupVisibility.PUBLIC, true);
-        /** **/
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
 
         mImage = null;
         mSendImage = false;
