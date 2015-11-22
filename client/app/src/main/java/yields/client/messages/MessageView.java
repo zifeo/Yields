@@ -98,12 +98,6 @@ public class MessageView extends LinearLayout{
         // TODO : Choose the right image. For now placeHolder.
         Bitmap sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(), R
                 .drawable.ic_query_builder_black_24dp);
-        if (sentImage == null){
-            Log.d("MessageView", "sentImage is null fuck android.");
-        }
-        else{
-            Log.d("MessageView", "sentImage not null, but still fuck android.");
-        }
         sentIndicator.setImageBitmap(sentImage);
 
         RelativeLayout contentLayout = (RelativeLayout) v.findViewById(R.id.contentfield);
