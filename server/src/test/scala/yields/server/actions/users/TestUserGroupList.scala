@@ -30,7 +30,7 @@ class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
-  "Test with empty groupList" should "return empty list" in {
+  it should "return empty list when the group list is empty" in {
     val u = User.create("an@SAs678email.com")
     val action = new UserGroupList(u.uid)
     val res = action.run(m)
@@ -40,7 +40,7 @@ class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
     }
   }
 
-  "Test with 2 groups in list" should "return the group list" in {
+  it should "return the group list when it is not empty" in {
     val u = User.create("an@email.com")
     val g1 = Group.createGroup("g1", m.sender)
     g1.name = "n1"

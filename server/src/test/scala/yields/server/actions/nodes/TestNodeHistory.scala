@@ -40,7 +40,7 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
     } yield g.addMessage(msg)
   }
 
-  "retrieving n messages from a group" should "return the n messages" in {
+  it should "return n messages" in {
     val group = Group.createGroup("name", m.sender)
     add10Msgs(group.nid)
     val n = 5
@@ -53,7 +53,7 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
     }
   }
 
-  "getting messages containing media" should "give the media back" in {
+  it should "give the media back" in {
     val group = Group.createGroup("name", 1)
 
     val messagesToReceive = List((Temporal.current, 1, None, "this entry has some text"), (Temporal.current, 2, Some("Some content"), ""),

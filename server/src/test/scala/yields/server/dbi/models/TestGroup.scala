@@ -20,7 +20,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
 
   val testName = "Group Test"
 
-  "Creating a group with a name" should "insert it in the database" in {
+  it should "insert the group in the database" in {
     val g1 = Group.createGroup(testName, 1)
     val g2 = Group(g1.nid)
 

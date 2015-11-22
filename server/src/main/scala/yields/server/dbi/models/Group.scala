@@ -1,5 +1,6 @@
 package yields.server.dbi.models
 
+import com.redis.serialization.Format
 import yields.server.dbi._
 import yields.server.utils.Temporal
 import com.redis.serialization.Parse.Implicits._
@@ -59,14 +60,17 @@ class Group private(override val nid: NID) extends Node {
 
   /** get the tags of a group */
   def tags: Set[TID] = _tags.getOrElse {
-    val mem = redis.withClient(_.smembers[TID](GroupKey.tags))
+    val mem: Option[Set[Option[TID]]] = redis.withClient(_.smembers[TID](GroupKey.tags))
     val t: Set[TID] = mem match {
       case Some(x: Set[Option[TID]]) =>
-        x.filter(_.isDefined).map(_.get)
+        val defined: Set[Option[TID]] = x.filter(_.isDefined)
+        val noOpt: Set[TID] = defined.map(_.get)
+        noOpt
       case _ => Set()
     }
     _tags = Some(t)
-    t
+    t.toSet
+
   }
 }
 

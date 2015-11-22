@@ -29,7 +29,7 @@ class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
 
   val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
-  "connecting an existing user" should "return the user" in {
+  it should "return the user it it exist in db" in {
     val email = "emai12763l@email.com"
     val u = User.create(email)
     val action = new UserConnect(email)
@@ -43,7 +43,7 @@ class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
     }
   }
 
-  "connecting an non-existing user" should "create the user" in {
+  it should "create the user if the user doesn't exist" in {
     val nonRegisteredEmail = "91b9cc47d30be9fb2e543201d78fb8f6@email.com"
     val action = new UserConnect(nonRegisteredEmail)
     val res = action.run(m)

@@ -27,7 +27,7 @@ class TestUserInfo extends FlatSpec with Matchers with BeforeAndAfter {
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
-  "an user with entourage" should "get some entourage" in {
+  it should "get some infos" in {
     val u1 = User.create("e1@email.com")
     val u2 = User.create("e2@email.com")
     val u3 = User.create("e3@email.com")
