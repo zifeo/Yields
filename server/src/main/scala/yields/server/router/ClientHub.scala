@@ -17,6 +17,7 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
   import ActorSubscriberMessage._
   import Tcp._
   import Dispatcher._
+  import ClientHub._
 
   private var count = 0
 
@@ -38,7 +39,7 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
       context.become(alive)
 
     case Request(_) =>
-      // expected
+    // expected
 
     case x =>
       log.error(s"unexpected born letter: $x")
@@ -59,13 +60,17 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
       assert(count >= 0)
       socket ! Write(data)
 
+    case OnPush(data) =>
+      debug("[OUT]", data.utf8String)
+      socket ! Write(data)
+
     case OnComplete =>
       debug("[OUT]", "completed letter /!\\")
 
     case OnError(cause) =>
       debug("[OUT]", s"error letter /!\\: $cause")
       socket ! Write(ByteString("server error"))
-      // TODO : improve error handling taking into account the supervisor too
+    // TODO : improve error handling taking into account the supervisor too
 
     case Request(_) =>
     // onNext counterpart
@@ -87,6 +92,9 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
 
 /** [[ClientHub]] companion object. */
 object ClientHub {
+
+  /** Handle a notification. */
+  private[router] case class OnPush(data: ByteString)
 
   /** Creates a router props with a materializer. */
   def props(socket: ActorRef, name: String, dispatcher: ActorRef): Props =

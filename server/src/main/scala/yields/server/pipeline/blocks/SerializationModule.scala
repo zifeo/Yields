@@ -12,22 +12,28 @@ import yields.server.mpi.{Request, Response}
   */
 class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Request, Response, ByteString] {
 
+  import SerializationModule._
+
   /** Incoming log with given channel. */
-  override val incoming = { raw: ByteString =>
-    val json = raw.utf8String.parseJson
-    json.convertTo[Request]
-  }
+  override val incoming: ByteString => Request = deserialize
 
   /** Outgoing log with given channel. '\n' is needed by client to detect end of response. */
-  override val outgoing = { result: Response =>
-    val json = result.toJson.toString()
-    ByteString(s"$json\n")
-  }
+  override val outgoing: Response => ByteString = serialize
 
 }
 
 /** [[SerializationModule]] companion object. */
 object SerializationModule {
+
+  /** Serialize to [[ByteString]]. */
+  def serialize(response: Response): ByteString = {
+    val json = response.toJson.toString()
+    ByteString(s"$json\n")
+  }
+
+  /** Deserialize to [[Request]]. */
+  def deserialize(raw: ByteString): Request =
+    raw.utf8String.parseJson.convertTo[Request]
 
   /** Shortcut for creating a new logging module. */
   def apply()(implicit logger: LoggingAdapter): BidiFlow[ByteString, Request, Response, ByteString, Unit] =

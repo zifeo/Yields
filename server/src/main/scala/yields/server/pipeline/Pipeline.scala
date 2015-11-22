@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import akka.stream.io.Framing
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
-import yields.server.mpi.{Metadata, Request, Response}
-import yields.server.pipeline.blocks.{DispatchStep, LoggerModule, SerializationModule}
-import yields.server.utils.{Temporal, Config}
+import yields.server.mpi.{Request, Response}
+import yields.server.pipeline.blocks.{LoggerModule, SerializationModule}
+import yields.server.utils.Config
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Pipeline creator object.
@@ -42,7 +42,6 @@ object Pipeline {
 
     val serialize = SerializationModule()
     val logMessage = LoggerModule[Request, Response]()
-    val dispatch = DispatchStep()
 
     val execute = Flow[Request].mapAsyncUnordered(parallelism) { case Request(action, metadata) =>
       Future {
@@ -56,9 +55,7 @@ object Pipeline {
       .via(
         serialize
           .atop(logMessage)
-          .join(execute
-            .transform(() => dispatch)
-          )
+          .join(execute)
       )
   }
 

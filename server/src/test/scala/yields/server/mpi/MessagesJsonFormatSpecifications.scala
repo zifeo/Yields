@@ -20,5 +20,4 @@ object MessagesJsonFormatSpecifications extends Properties("MessagesJsonFormat")
     toAndFromJson(x) == x
   }
 
-
 }
