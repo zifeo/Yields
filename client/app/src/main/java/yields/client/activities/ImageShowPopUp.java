@@ -18,6 +18,11 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class ImageShowPopUp extends Activity {
 
+    /**
+     * Overriden method called on creation.
+     * Set the image to be displayed on the screen.
+     * @param savedInstanceState The bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
