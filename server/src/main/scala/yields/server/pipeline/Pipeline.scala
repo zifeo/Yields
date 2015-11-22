@@ -40,7 +40,6 @@ object Pipeline {
 
     val frame = Framing.delimiter(ByteString("\n"), maximumFrameLength = framesize, allowTruncation = false)
 
-    val logIO = LoggerModule[ByteString, ByteString]()
     val serialize = SerializationModule()
     val logMessage = LoggerModule[Request, Response]()
     val dispatch = DispatchStep()
@@ -55,10 +54,11 @@ object Pipeline {
     Flow[ByteString]
       .via(frame)
       .via(
-        logIO
-          .atop(serialize)
+        serialize
           .atop(logMessage)
-          .join(execute.transform(() => dispatch))
+          .join(execute
+            .transform(() => dispatch)
+          )
       )
   }
 

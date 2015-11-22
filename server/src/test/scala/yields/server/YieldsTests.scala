@@ -1,11 +1,9 @@
 package yields.server
 
-import java.io.{OutputStreamWriter, BufferedWriter, BufferedReader, InputStreamReader}
-import java.net.{InetSocketAddress, Socket}
+import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
+import java.net.Socket
 
-import akka.io.Tcp.SO
 import akka.stream.scaladsl.{Sink, Source, Tcp}
-import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 import org.slf4j.LoggerFactory
@@ -18,9 +16,9 @@ import yields.server.io._
 import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
 import yields.server.utils.{Config, Temporal}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
 
@@ -66,7 +64,7 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
 
   implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
-  "A client without a socket" should "be able to connect to the server" in scenario (
+  /*"A client without a socket" should "be able to connect to the server" in scenario (
     UserConnect("tests@yields.im") -> UserConnectRes(1)
   )
 
@@ -74,7 +72,7 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     GroupCreate("test group", Seq.empty, Seq(1)) -> GroupCreateRes(1),
     GroupMessage(1, "test message") -> None,
     GroupHistory(1, Temporal.current, 1) -> None
-  )
+  )*/
 
   /** Fakes a client connection through a socket. */
   class FakeClient {
@@ -112,6 +110,16 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     val client = new FakeClient
     client.send(UserConnect("tests@yields.im"))
     await(client.receive()).result should be (UserConnectRes(1))
+  }
+
+  it should "receive pushes from the server" in {
+
+    val client = new FakeClient
+    client.send(UserConnect("tests@yields.im"))
+    await(client.receive()).result should be (UserConnectRes(1))
+
+    //println(await(client.receive()))
+
   }
 
 }

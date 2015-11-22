@@ -62,6 +62,7 @@ class DispatchStep(logger: LoggingAdapter) extends StatefulStage[Response, Respo
         emit(sendList.iterator, ctx)
 
       case _ =>
+        logger.warning(elem.toString)
         ctx.push(elem)
     }
 
