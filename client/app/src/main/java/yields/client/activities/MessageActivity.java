@@ -24,10 +24,14 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 
 import yields.client.R;
 
+import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -39,8 +43,12 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
+import yields.client.node.User;
+import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -61,6 +69,7 @@ public class MessageActivity extends NotifiableActivity {
 
     private static ContentType mType;
     private static Message mCommentMessage;
+    private static Group mLastApplicationGroup;
     private static FragmentManager mFragmentManager;
     private static Fragment mCurrentFragment;
 
@@ -94,10 +103,10 @@ public class MessageActivity extends NotifiableActivity {
         mSendImage = false;
 
         mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
-                .getApplicationContext(), R.layout.messagelayout,
+                .getApplicationContext(), R.layout.messagelayoutsender,
                 new ArrayList<Message>());
         mCommentAdapter = new ListAdapterMessages((YieldsApplication
-                .getApplicationContext()), R.layout.messagelayout, new
+                .getApplicationContext()), R.layout.messagelayoutsender, new
                 ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
@@ -156,19 +165,20 @@ public class MessageActivity extends NotifiableActivity {
         else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(0), mUser, content,
-                new Date());
+        Message message = new Message("message", new Id(0), mUser, content, new Date());
         if (mType == ContentType.GROUP_MESSAGES){
+            Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
             YieldsApplication.getBinder().sendRequest(request);
         }
         else{
+            Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
-            // TODO : implement method to send comments in the message binder.
-            // mYieldsServiceBinder.sendComment(...);
+            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
+            YieldsApplication.getBinder().sendRequest(request);
         }
     }
 
@@ -215,16 +225,24 @@ public class MessageActivity extends NotifiableActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
+            case android.R.id.home:
+                Log.d("MessageActivity", "Back upper arrow pressed.");
+                onBackPressed();
+                return true;
+
             case R.id.actionSettingsGroup:
+                Log.d("MessageActivity", "actionSettingsGroup.");
                 Intent intent = new Intent(this, GroupSettingsActivity.class);
                 startActivity(intent);
                 return true;
+
             case R.id.iconConnect:
                 YieldsApplication.getBinder().reconnect();
                 return true;
+
             default:
+                Log.d("MessageActivity", "default.");
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -238,7 +256,11 @@ public class MessageActivity extends NotifiableActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                retrieveGroupMessages();
+                if (mType == ContentType.GROUP_MESSAGES) {
+                    retrieveGroupMessages();
+                } else {
+                    retrieveCommentMessages();
+                }
             }
         });
     }
@@ -306,10 +328,20 @@ public class MessageActivity extends NotifiableActivity {
     }
 
     /**
+     * Allows tests to send image message instead of text message and thus being able to comment
+     * them.
+     */
+    public void simulateImageMessage(){
+        mImage = YieldsApplication.getDefaultGroupImage();
+        mSendImage = true;
+    }
+
+    /**
      * Creates a comment fragment and put it in the fragment container of the
      * MessageActivity (id fragmentPlaceHolder).
      */
     private void createCommentFragment(){
+        Log.d("MessageActivity", "createCommentFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -318,12 +350,31 @@ public class MessageActivity extends NotifiableActivity {
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
-        // TODO : Retrieve comments from the server using the message binder.
         ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
         ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
-        Log.d("MessageActivity", "Fragment created");
+        ((CommentFragment) mCurrentFragment).setCommentViewOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("CommentFragment", "CommentView clicked.");
+                if (mCommentMessage.getContent().getType() == Content.ContentType.IMAGE){
+                    YieldsApplication.setShownImage(((ImageContent)mCommentMessage.getContent()).getImage());
+                    startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                }
+            }
+        });
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
+        loadComments();
+    }
+
+    /**
+     * Make request to load comments for a message and sends it to the server using the
+     * ServiceBinder.
+     */
+    private void loadComments(){
+        Log.d("MessageActivity", "loadComments");
+        GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
+        YieldsApplication.getBinder().sendRequest(request);
     }
 
     /**
@@ -331,6 +382,7 @@ public class MessageActivity extends NotifiableActivity {
      * the MessageActivity (id fragmentPlaceHolder).
      */
     private void createGroupMessageFragment(){
+        Log.d("MessageActivity", "createGroupMessageFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -343,13 +395,21 @@ public class MessageActivity extends NotifiableActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent,
                                             View view, int position, long id) {
-                        mCommentMessage = mGroupMessageAdapter.
-                                getItem(position);
-                        mType = ContentType.MESSAGE_COMMENTS;
-                        createCommentFragment();
+                        Message message = mGroupMessageAdapter.getItem(position);
+                        // Only non text messages can be commented.
+                        if (message.getContent().getType() != Content.ContentType.TEXT) {
+                            // First keep a reference to the message that has been clicked on.
+                            mCommentMessage = message;
+                            // We save the reference of the last group in the YieldsApplication class.
+                            mLastApplicationGroup = mGroup;
+                            // Then we update the group currently displayed as it is the commented
+                            // message
+                            mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
+                            mType = ContentType.MESSAGE_COMMENTS;
+                            createCommentFragment();
+                        }
                     }
                 });
-        Log.d("MessageActivity", "Fragment created");
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
     }
@@ -365,24 +425,39 @@ public class MessageActivity extends NotifiableActivity {
         if (mType == ContentType.GROUP_MESSAGES){
             Log.d("MessageActivity", "Quit activity");
             super.onBackPressed();
-        }
-        else{
+        } else{
             Log.d("MessageActivity", "Back to group message fragment");
             mType = ContentType.GROUP_MESSAGES;
+            // We need to go back to the last reference of mGroup.
+            mGroup = mLastApplicationGroup;
             createGroupMessageFragment();
         }
     }
 
     /**
-     * Retrieve message from the server and puts them in the mMessages attribute.
+     * Retrieve message from the server and puts them in the group message adapter.
      */
     private void retrieveGroupMessages() {
+        Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
             mGroupMessageAdapter.add(message);
         }
         mGroupMessageAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Retrieve comments for a message an puts them in the comments adapter.
+     */
+    private void retrieveCommentMessages() {
+        Log.d("MessageActivity", "retrieveCommentMessages");
+        SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
+
+        for(Message message : messagesTree.values()){
+            mCommentAdapter.add(message);
+        }
+        mCommentAdapter.notifyDataSetChanged();
     }
 
     /**
