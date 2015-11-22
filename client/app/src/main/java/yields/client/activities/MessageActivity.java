@@ -54,8 +54,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Activity used to display messages for a group
  */
-public class MessageActivity extends AppCompatActivity
-        implements NotifiableActivity {
+public class MessageActivity extends NotifiableActivity {
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
     private static ClientUser mUser;
@@ -65,6 +64,7 @@ public class MessageActivity extends AppCompatActivity
     private boolean mSendImage;
     private static EditText mInputField;
     private static ActionBar mActionBar;
+    private Menu mMenu;
     private ImageButton mSendButton;
 
     private static ContentType mType;
@@ -99,6 +99,16 @@ public class MessageActivity extends AppCompatActivity
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
+        YieldsApplication.setBinder(new FakeBinder(new YieldService()));
+                // Set the user.
+                        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+                                .createBitmap(80, 80, Bitmap.Config.RGB_565));
+                YieldsApplication.setUser(mUser);
+                // Set the group.
+                        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
+                                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
+                                .GroupVisibility.PUBLIC, true);
+
         mImage = null;
         mSendImage = false;
 
@@ -130,25 +140,6 @@ public class MessageActivity extends AppCompatActivity
     }
 
     /**
-     * Automatically called when the activity is resumed after another
-     * activity  was displayed
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        YieldsApplication.getBinder().attachActivity(this);
-    }
-
-    /**
-     * Called to pause the activity
-     */
-    @Override
-    public void onPause(){
-        super.onPause();
-        YieldsApplication.getBinder().unsetMessageActivity();
-    }
-
-    /**
      * @return The id of the current group
      */
     public Id getGroupId() {
@@ -163,7 +154,10 @@ public class MessageActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_message, menu);
-        return super.onCreateOptionsMenu(menu);
+        boolean res = super.onCreateOptionsMenu(menu);
+        mMenu = menu;
+        YieldsApplication.getBinder().connectionStatus();
+        return res;
     }
 
     /**
@@ -253,6 +247,9 @@ public class MessageActivity extends AppCompatActivity
                 startActivity(intent);
                 return true;
 
+            case R.id.iconConnect:
+                YieldsApplication.getBinder().reconnect();
+                return true;
 
             default:
                 Log.d("MessageActivity", "default.");
@@ -273,6 +270,30 @@ public class MessageActivity extends AppCompatActivity
                     retrieveGroupMessages();
                 } else {
                     retrieveCommentMessages();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void notifyOnServerConnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mMenu != null) {
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.tick);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void notifyOnServerDisconnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mMenu != null) {
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.cross);
                 }
             }
         });
@@ -414,8 +435,7 @@ public class MessageActivity extends AppCompatActivity
         if (mType == ContentType.GROUP_MESSAGES){
             Log.d("MessageActivity", "Quit activity");
             super.onBackPressed();
-        }
-        else{
+        } else{
             Log.d("MessageActivity", "Back to group message fragment");
             mType = ContentType.GROUP_MESSAGES;
             // We need to go back to the last reference of mGroup.

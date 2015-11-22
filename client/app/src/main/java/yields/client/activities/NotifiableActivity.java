@@ -1,17 +1,49 @@
 package yields.client.activities;
 
-import java.io.IOException;
+import android.support.v7.app.AppCompatActivity;
+
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Small interface that requires to implement a
  * notifyChange() method, which tells the activity
  * that the data set it holds has changed
  */
-public interface NotifiableActivity {
+public abstract class NotifiableActivity extends AppCompatActivity{
+
+    /**
+     * Automatically called when the activity is resumed after another
+     * activity  was displayed
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        YieldsApplication.getBinder().attachActivity(this);
+        YieldsApplication.getBinder().connectionStatus();
+    }
+
+    /**
+     * Called to pause the activity
+     */
+    @Override
+    public void onPause(){
+        super.onPause();
+        YieldsApplication.getBinder().unsetMessageActivity();
+    }
 
     /**
      * Method that tells the activity
      * that the data set it holds has changed
      */
-    void notifyChange();
+    abstract public void notifyChange();
+
+    /**
+     * Method called when the server is connected
+     */
+    abstract public void notifyOnServerConnected();
+
+    /**
+     * Method called when the server is disconnected
+     */
+    abstract public void notifyOnServerDisconnected();
 }

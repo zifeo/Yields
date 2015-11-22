@@ -58,10 +58,10 @@ public class Message extends Node {
         super(object.getString(0),
                 new Id(DateSerialization.toDate(object.getString(0)).getTime()));
 
-        Id idUser = new Id(object.getString(1));
+        Id idUser = new Id(Long.parseLong(object.getString(1)));
         /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
         // TODO : The same apply for the profil pic and the email.
-        User sender = new User(idUser.getId() , idUser, "",
+        User sender = new User(idUser.getId().toString() , idUser, "",
                 BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
                         R.drawable.userpicture));
 

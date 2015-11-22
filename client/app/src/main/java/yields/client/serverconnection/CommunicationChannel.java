@@ -11,4 +11,9 @@ public interface CommunicationChannel {
      * @throws IOException if there was an error with the retrieval of the message
      */
     void sendRequest(ServerRequest serverRequest) throws IOException;
+
+    /**
+     * Closes the connection to the server.
+     */
+    void destroy();
 }

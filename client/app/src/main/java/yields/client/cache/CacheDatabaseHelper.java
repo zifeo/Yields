@@ -168,7 +168,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
                     + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
             Cursor cursor = mDatabase.rawQuery(selectQuery,
-                    new String[]{message.getId().getId()});
+                    new String[]{message.getId().getId().toString()});
             if (cursor.getCount() != 0) {
                 cursor.close();
                 deleteMessage(message.getId());
@@ -210,7 +210,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_USERS
                 + " WHERE " + KEY_USER_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{user.getId().getId()});
+                new String[]{user.getId().getId().toString()});
         if (cursor.getCount() == 1) {
             cursor.close();
             updateUser(user);
@@ -246,7 +246,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = createContentValuesForUser(user);
             mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
-                    new String[]{user.getId().getId()});
+                    new String[]{user.getId().getId().toString()});
         } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to update User with id: " + user.getId().getId(),
                     exception);
@@ -269,7 +269,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
                 + KEY_USER_NODEID + " = ?";
         Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
-                new String[]{userID.getId()});
+                new String[]{userID.getId().toString()});
         if (!userCursor.moveToFirst()) {
             userCursor.close();
             return null;
@@ -317,9 +317,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(group);
 
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_GROUPID + " = ?",
-                new String[]{group.getId().getId()});
+                new String[]{group.getId().getId().toString()});
         mDatabase.delete(TABLE_GROUPS, KEY_GROUP_NODEID + " = ?",
-                new String[]{group.getId().getId()});
+                new String[]{group.getId().getId().toString()});
     }
 
     /**
@@ -338,7 +338,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
                 + " WHERE " + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{group.getId().getId()});
+                new String[]{group.getId().getId().toString()});
         if (cursor.getCount() >= 1) {
             cursor.close();
             updateGroup(group);
@@ -380,7 +380,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                    new String[]{group.getId().getId()});
+                    new String[]{group.getId().getId().toString()});
             for (User user : group.getUsers()) {
                 addUser(user);
             }
@@ -408,7 +408,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NAME, newGroupName);
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                new String[]{groupId.getId()});
+                new String[]{groupId.getId().toString()});
     }
 
     /**
@@ -424,7 +424,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_IMAGE, serializeBitmap(newGroupImage));
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                new String[]{groupId.getId()});
+                new String[]{groupId.getId().toString()});
     }
 
     /**
@@ -440,7 +440,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_VISIBILITY, visibility.getValue());
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                new String[]{groupId.getId()});
+                new String[]{groupId.getId().toString()});
     }
 
     /**
@@ -463,7 +463,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_USERS, getStringFromIds(ids));
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                new String[]{groupId.getId()});
+                new String[]{groupId.getId().toString()});
     }
 
     /**
@@ -488,7 +488,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_GROUP_USERS, getStringFromIds(ids));
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
-                    new String[]{groupId.getId()});
+                    new String[]{groupId.getId().toString()});
         }
     }
 
@@ -506,7 +506,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{groupId.getId()});
+                new String[]{groupId.getId().toString()});
         if (!cursor.moveToFirst()) {
             cursor.close();
             return null;
@@ -535,7 +535,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
                 + KEY_GROUP_NODEID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{groupId.getId()});
+                new String[]{groupId.getId().toString()});
 
         if (!cursor.moveToFirst()) {
             cursor.close();
@@ -624,7 +624,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 + "strftime('%Y-%m-%d %H:%M:%f', " + KEY_MESSAGE_DATE + ") DESC";
 
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{group.getId().getId()});
+                new String[]{group.getId().getId().toString()});
 
         List<Message> messages = new ArrayList<>();
         if (!cursor.moveToFirst()) {
@@ -645,8 +645,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 boolean foundUser = false;
                 while (iterator.hasNext() && !foundUser) {
                     User tmpUser = (User) iterator.next();
-                    String userID = tmpUser.getId().getId();
-                    if (userID.equals(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDERID)))) {
+                    Long userID = tmpUser.getId().getId();
+                    if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex
+                            (KEY_MESSAGE_SENDERID))))) {
                         messageSender = tmpUser;
                         foundUser = true;
                     }
@@ -996,7 +997,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         String[] idsAsArray = idsAsString.split(",");
         List<Id> ids = new ArrayList<>();
         for (String string : idsAsArray) {
-            ids.add(new Id(string));
+            ids.add(new Id(Long.parseLong(string)));
         }
         return ids;
     }

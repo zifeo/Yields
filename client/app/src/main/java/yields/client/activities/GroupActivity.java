@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import java.io.IOException;
@@ -41,7 +43,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Central activity of Yields where the user can discover new nodes, create groups, see its contact
  * list, change its settings and go to chats of different groups
  */
-public class GroupActivity extends AppCompatActivity implements NotifiableActivity {
+public class GroupActivity extends NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
 
@@ -77,6 +79,15 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
             }
         });
         listView.setItemsCanFocus(false);
+
+        View connectionStatusView = findViewById(R.id.connectionStatus);
+
+        connectionStatusView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YieldsApplication.getBinder().reconnect();
+            }
+        });
 
         YieldsApplication.setResources(getResources());
         YieldsApplication.setApplicationContext(getApplicationContext());
@@ -149,6 +160,26 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         });
     }
 
+    @Override
+    public void notifyOnServerConnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.connectionStatus).setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void notifyOnServerDisconnected() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.connectionStatus).setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     /**
      * Automatically called when the activity is started
      */
@@ -157,20 +188,6 @@ public class GroupActivity extends AppCompatActivity implements NotifiableActivi
         super.onStart();
 
         mAdapterGroups.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        YieldsApplication.getBinder().attachActivity(this);
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-
-        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**

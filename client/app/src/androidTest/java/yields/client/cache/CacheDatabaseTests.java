@@ -481,7 +481,8 @@ public class CacheDatabaseTests {
             assertEquals(10, messagesFromDatabase.size());
             for (int i = 0; i < 10; i++) {
                 Message message = messagesFromDatabase.get(i);
-                assertEquals("2", message.getSender().getId().getId());
+                // Long.valueOf(2), for real java ?
+                assertEquals(Long.valueOf(2), message.getSender().getId().getId());
                 assertEquals("Mock message #" + (59-i), ((TextContent) message.getContent()).getText());
             }
         } catch (CacheDatabaseException exception) {
@@ -501,7 +502,8 @@ public class CacheDatabaseTests {
      * @return A boolean which is true if the information is correct, and false otherwise.
      */
     private boolean checkUserInformation(Cursor cursor, User user) {
-        boolean idIsCorrect = user.getId().getId().equals(cursor.getString(cursor.getColumnIndex("nodeID")));
+        boolean idIsCorrect = user.getId().getId().equals(Long.parseLong(cursor.getString(cursor
+                .getColumnIndex("nodeID"))));
         boolean userNameIsCorrect = user.getName().equals(
                 cursor.getString(cursor.getColumnIndex("userName")));
         boolean userEmailIsCorrect = user.getEmail().equals(cursor.getString(
