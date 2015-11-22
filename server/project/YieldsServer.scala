@@ -36,9 +36,10 @@ object YieldsServer extends Build {
     cancelable in Global := true,
     fork := true,
     autoAPIMappings := true,
+    parallelExecution in Test := false,
     evictionWarningOptions in update := EvictionWarningOptions.empty,
 
-    target in Compile in doc := baseDirectory.value / "api"
+    target in (Compile, doc) := baseDirectory.value / "api"
 
   )
 

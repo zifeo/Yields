@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
 
 import akka.stream.scaladsl.{Sink, Source, Tcp}
 import akka.util.ByteString
-import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import org.scalatest.{BeforeAndAfterAll, Matchers}
 import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.actions.groups._
@@ -16,13 +16,13 @@ import yields.server.dbi._
 import yields.server.dbi.models.UID
 import yields.server.io._
 import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
-import yields.server.utils.{Config, Temporal}
+import yields.server.utils.Config
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
-class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
+class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
 
   val logger = LoggerFactory.getLogger(getClass)
   val connection = Tcp().outgoingConnection(Config.getString("addr"), Config.getInt("port"))
@@ -33,7 +33,6 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     logger.info("Starting server on background")
     redis(_.flushdb)
     server.start()
-    Thread.sleep(1000) // ensure server is started
   }
 
   override def afterAll(): Unit = {
