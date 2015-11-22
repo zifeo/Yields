@@ -9,6 +9,9 @@ import com.redis.serialization.Parse.Implicits._
   * Representation of a group
   * A group is a kind of node dedicated to chat between users
   *
+  * nodes:[nid]:admins    zset
+  * nodes:[nid]:tags      set
+  *
   * @param nid Node id to build
   */
 class Group private(override val nid: NID) extends Node {
@@ -55,7 +58,9 @@ class Group private(override val nid: NID) extends Node {
 
   /** add tags to group */
   def addTags(tags: Seq[TID]): Unit = {
-    redis.withClient(_.sadd(GroupKey.tags, tags))
+    tags.foreach { x =>
+      redis.withClient(_.sadd(GroupKey.tags, x))
+    }
   }
 
   /** get the tags of a group */

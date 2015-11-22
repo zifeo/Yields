@@ -53,7 +53,7 @@ class TestUser extends FlatSpec with Matchers with BeforeAndAfter {
     u2.name should be(name)
   }
 
-  it should "have the correct email set" in {
+  it should "have the correct email set when modifying the email" in {
     val newEmail = "test1@test.com"
     val u1 = User.create(email)
     u1.email = newEmail
