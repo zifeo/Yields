@@ -1,23 +1,20 @@
 package yields.client.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
-import yields.client.listadapter.ListAdapterSettings;
 import yields.client.listadapter.ListAdapterUsers;
-import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -25,7 +22,6 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Class used to display a list of users, set in YieldsApplication
  */
 public class UserListActivity extends AppCompatActivity {
-    private List<User> mUsers;
 
     public final static String TITLE_KEY = "TITLE";
 

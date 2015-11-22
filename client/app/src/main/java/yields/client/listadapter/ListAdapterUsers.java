@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import yields.client.R;
+import yields.client.gui.GraphicTransforms;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -59,13 +60,8 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
 
         textViewUserName.setText(user.getName());
 
-        Bitmap userImage = user.getImg();
-        if (userImage == null){
-            imageUser.setImageBitmap(YieldsApplication.getDefaultUserImage());
-        }
-        else {
-            imageUser.setImageBitmap(userImage);
-        }
+        imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+                mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
         return userView;
     }

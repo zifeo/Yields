@@ -1,21 +1,16 @@
 package yields.client.activities;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
-import yields.client.gui.GraphicTransforms;
-import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -44,8 +39,8 @@ public class UserInfoActivity extends AppCompatActivity {
                 "getUserSearched() in YieldsApplication cannot be null when this activity is created");
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewUser);
-        imageView.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
-                getResources().getInteger(R.integer.groupImageDiameter)));
+        int size = getResources().getInteger(R.integer.largeGroupImageDiameter);
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(user.getImg(), size, size, false));
 
         TextView textViewName = (TextView) findViewById(R.id.textViewUserName);
         textViewName.setText(user.getName());

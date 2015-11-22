@@ -93,12 +93,9 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         Bitmap defaultUserImage = BitmapFactory.decodeResource(getResources(),
                 R.drawable.default_user_image);
 
-        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
-        YieldsApplication.setDefaultGroupImage(
-                GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
+        YieldsApplication.setDefaultGroupImage(defaultGroupImage);
 
-        YieldsApplication.setDefaultUserImage(
-                GraphicTransforms.getCroppedCircleBitmap(defaultUserImage, diameter));
+        YieldsApplication.setDefaultUserImage(defaultUserImage);
     }
 
     /**

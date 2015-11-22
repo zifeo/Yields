@@ -132,6 +132,8 @@ public class GroupActivity extends NotifiableActivity {
             break;
 
             case R.id.actionSettings:
+                //TODO Create a UserSettingsActivity
+
                 intent = new Intent(this, CreatingAccountActivity.class);
             break;
 
@@ -242,7 +244,6 @@ public class GroupActivity extends NotifiableActivity {
      */
     private void createFakeUserAndGroups() {
         Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
-        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
 
         try {
             YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));

@@ -2,12 +2,6 @@ package yields.client.activities;
 
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
-import android.view.View;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import org.junit.Test;
 
 import java.util.ArrayList;
 
