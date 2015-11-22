@@ -52,7 +52,8 @@ public class Group extends Node {
      * @param validated  If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
+    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility,
+                 boolean validated) {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
@@ -101,7 +102,19 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<User> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE, false);
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+                false);
+    }
+
+    /**
+     * Create a wrapper for the comment message in order to be able to send and retreive comment
+     * for this message.
+     * @param messageComment The message commented.
+     * @param group The parent group containing the message.
+     * @return The group wrapper for this message.
+     */
+    public static Group createGroupForMessageComment(Message messageComment, Group group) {
+        return new Group("message comment", messageComment.getId(), group.getUsers());
     }
 
     /**

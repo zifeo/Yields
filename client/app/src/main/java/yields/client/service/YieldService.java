@@ -81,7 +81,7 @@ public class YieldService extends Service {
                 synchronized (serviceControllerLock) {
                     while (mServiceRequestController == null) {
                         try {
-                            this.wait();
+                            serviceControllerLock.wait();
                         } catch (InterruptedException e) {
                             Log.d("Y:" + this.getClass().getName(),
                                     "Stopped waiting for request controller" + e.getMessage());
@@ -291,7 +291,7 @@ public class YieldService extends Service {
             synchronized (serviceControllerLock) {
                 while (mServiceRequestController == null) {
                     try {
-                        this.wait();
+                        serviceControllerLock.wait();
                     } catch (InterruptedException e) {
                         Log.d("Y:" + this.getClass().getName(), "Stopped waiting for request controller" + e.getMessage());
                     }
