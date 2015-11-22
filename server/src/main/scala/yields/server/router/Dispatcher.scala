@@ -2,8 +2,9 @@ package yields.server.router
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.ByteString
+import yields.server.actions.Result
 import yields.server.dbi.models.UID
-import yields.server.mpi.Response
+import yields.server.mpi.{Metadata, Response}
 import yields.server.pipeline.blocks.SerializationModule
 
 /**
@@ -12,8 +13,8 @@ import yields.server.pipeline.blocks.SerializationModule
   */
 final class Dispatcher() extends Actor with ActorLogging {
 
-  import Dispatcher._
   import ClientHub._
+  import Dispatcher._
 
   val uidPattern = """"client":"""
 
@@ -50,8 +51,10 @@ final class Dispatcher() extends Actor with ActorLogging {
           log.warning(s"terminate non-existing connection")
       }
 
-    case Notify(uids, response) =>
-      val push = OnPush(SerializationModule.serialize(response))
+    case Notify(uids, result) =>
+      log.debug(s"notify $uids with $result")
+      val metadata = Metadata.now(0)
+      val push = OnPush(SerializationModule.serialize(Response(result, metadata)))
       uids.flatMap(pool.get).foreach(_ ! push)
 
     case x =>
@@ -71,7 +74,7 @@ object Dispatcher {
   private[router] case class TerminateConnection()
 
   /** Sent each time a push notification is requested. */
-  private[router] case class Notify(uids: Seq[UID], response: Response)
+  private[server] case class Notify(uids: Seq[UID], result: Result)
 
   /** Creates a dispatcher props . */
   def props: Props =

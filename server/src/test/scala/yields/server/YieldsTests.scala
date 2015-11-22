@@ -2,6 +2,7 @@ package yields.server
 
 import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
 import java.net.Socket
+import java.time.OffsetDateTime
 
 import akka.stream.scaladsl.{Sink, Source, Tcp}
 import akka.util.ByteString
@@ -12,6 +13,7 @@ import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
+import yields.server.dbi.models.UID
 import yields.server.io._
 import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
 import yields.server.utils.{Config, Temporal}
@@ -31,6 +33,7 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     logger.info("Starting server on background")
     redis(_.flushdb)
     server.start()
+    Thread.sleep(1000) // ensure server is started
   }
 
   override def afterAll(): Unit = {
@@ -39,7 +42,19 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     logger.info("Stopping server on background")
   }
 
-  /** Creates and runs some actions expecting some result. */
+  /**
+    * Creates and runs some actions expecting some result.
+    * TODO : refactor this method with socket.
+    *
+    * {{{
+    * "A client without a socket" should "be able to send and retrieve message" in scenario (
+    *   GroupCreate("test group", Seq.empty, Seq(1)) -> GroupCreateRes(1),
+    *   GroupMessage(1, "test message") -> None,
+    *   GroupHistory(1, Temporal.current, 1) -> None
+    * }
+    * }}}
+    * @param acting some actions resulting in their results
+    */
   def scenario(acting: (Action, Option[Result])*): Unit = {
     require(acting.nonEmpty, "scenario must contains some acting")
 
@@ -64,18 +79,8 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
 
   implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
-  /*"A client without a socket" should "be able to connect to the server" in scenario (
-    UserConnect("tests@yields.im") -> UserConnectRes(1)
-  )
-
-  it should "be able to send and retrieve message" in scenario (
-    GroupCreate("test group", Seq.empty, Seq(1)) -> GroupCreateRes(1),
-    GroupMessage(1, "test message") -> None,
-    GroupHistory(1, Temporal.current, 1) -> None
-  )*/
-
   /** Fakes a client connection through a socket. */
-  class FakeClient {
+  class FakeClient(uid: UID) {
 
     private val socket = new Socket(Config.getString("addr"), Config.getInt("port"))
     private val receiver = new BufferedReader(new InputStreamReader(socket.getInputStream))
@@ -89,9 +94,10 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
     }
 
     /** Send an action to the server. */
-    def send(action: Action): Unit = {
-      val metadata = Metadata.now(1)
+    def send(action: Action): OffsetDateTime = {
+      val metadata = Metadata.now(uid)
       send(Request(action, metadata))
+      metadata.ref
     }
 
     /** Gets next response from the server. */
@@ -107,19 +113,27 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
   }
 
   "A client with a socket" should "be able to connect to the server" in {
-    val client = new FakeClient
-    client.send(UserConnect("tests@yields.im"))
+    val client = new FakeClient(1)
+    client.send(UserConnect("client@yields.im"))
     await(client.receive()).result should be (UserConnectRes(1))
   }
 
   it should "receive pushes from the server" in {
+    val clientA = new FakeClient(1)
+    val clientB = new FakeClient(2)
 
-    val client = new FakeClient
-    client.send(UserConnect("tests@yields.im"))
-    await(client.receive()).result should be (UserConnectRes(1))
+    clientA.send(UserConnect("clientA@yields.im"))
+    await(clientA.receive()).result should be (UserConnectRes(1))
 
-    //println(await(client.receive()))
+    clientB.send(UserConnect("clientB@yields.im"))
+    await(clientB.receive()).result should be (UserConnectRes(2))
 
+    clientA.send(GroupCreate("clients", Seq.empty, Seq(1, 2)))
+    await(clientA.receive()).result should be (GroupCreateRes(1))
+
+    val ref = clientB.send(GroupMessage(1, "hello"))
+    await(clientB.receive()).metadata.ref should be (ref)
+    await(clientA.receive()).metadata.ref should be (ref)
   }
 
 }

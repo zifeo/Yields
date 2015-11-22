@@ -2,6 +2,7 @@ package yields.server.actions.groups
 
 import java.time.OffsetDateTime
 
+import yields.server.Yields
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
@@ -26,7 +27,9 @@ case class GroupMessage(nid: NID, content: String) extends Action {
         val group = Group(nid)
         val c = (Temporal.now, metadata.client, None, content)
         group.addMessage(c)
-        GroupMessageRes(c._1)
+        Yields.broadcast(group.users.filter(_ != metadata.client)) {
+          GroupMessageRes(c._1)
+        }
       } else {
         val errorMessage = getClass.getSimpleName
         throw new ActionArgumentException(s"Empty content in : $errorMessage")
