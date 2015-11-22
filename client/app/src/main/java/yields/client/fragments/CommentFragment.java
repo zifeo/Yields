@@ -1,6 +1,8 @@
 package yields.client.fragments;
 
 import android.app.Fragment;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +11,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import yields.client.R;
+import yields.client.activities.ImageShowPopUp;
+import yields.client.activities.MessageActivity;
 import yields.client.listadapter.ListAdapterMessages;
+import yields.client.messages.CommentView;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -25,6 +30,7 @@ public class CommentFragment extends Fragment{
     private static Message mMessage;
     private static View mMessageView;
     private static ListAdapterMessages mAdapter;
+    private static View.OnClickListener mCommentViewOCL;
 
     /**
      * Default constructor for the comment fragment.
@@ -57,6 +63,10 @@ public class CommentFragment extends Fragment{
         mAdapter = adapter;
     }
 
+    public void setCommentViewOnClickListener(View.OnClickListener ocl){
+        mCommentViewOCL = ocl;
+    }
+
     /**
      * Override of the onCreateView method, called every time the fragment is
      * created and put into a fragment container.
@@ -73,7 +83,10 @@ public class CommentFragment extends Fragment{
         LinearLayout messageContainer = (LinearLayout) mLayout.findViewById(R
                 .id.messageContainer);
         messageContainer.removeAllViews();
-        messageContainer.addView(mMessageView);
+        CommentView commentView = new CommentView(YieldsApplication.getApplicationContext(), mMessage);
+        messageContainer.addView(commentView);
+        commentView.setClickable(true);
+        commentView.setOnClickListener(mCommentViewOCL);
         ListView listView = (ListView) mLayout.findViewById(R.id.commentList);
         listView.setAdapter(mAdapter);
         return mLayout;
