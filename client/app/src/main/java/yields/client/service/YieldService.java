@@ -12,6 +12,8 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import yields.client.R;
@@ -191,6 +193,26 @@ public class YieldService extends Service {
         } else {
             mCurrentGroup.addMessage(message);
             mCurrentNotifiableActivity.notifyChange();
+        }
+    }
+
+    /**
+     * Updates a Message that is already in the Group bound to the service.
+     *
+     * @param group   The group to which the Message was sent.
+     * @param message The message's updated version.
+     * @param oldDate The original date of the Message before it's update.
+     */
+    synchronized public void updateMessage(Group group, Message message, Date oldDate) {
+        if (mCurrentNotifiableActivity != null || mCurrentGroup.getId() == group.getId()) {
+            Collection<Message> existingMessages = mCurrentGroup.getLastMessages().values();
+            for (Message existingMessage : existingMessages) {
+                if (existingMessage.getDate().compareTo(oldDate) == 0 &&
+                        existingMessage.getSender().getEmail().equals(message.getSender().getEmail())) {
+                    mCurrentGroup.getLastMessages().remove(oldDate);
+                    mCurrentGroup.addMessage(message);
+                }
+            }
         }
     }
 

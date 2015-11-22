@@ -167,10 +167,10 @@ public class ServiceRequestController {
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
             case NODE_HISTORY_RESPONSE:
-                handleGroupHistoryResponse(serverResponse);
+                handleNodeHistoryResponse(serverResponse);
                 break;
             case NODE_MESSAGE_RESPONSE:
-                handleGroupMessageResponse(serverResponse);
+                handleNodeMessageResponse(serverResponse);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
@@ -202,19 +202,36 @@ public class ServiceRequestController {
         }
     }
 
-    private void handleGroupMessageResponse(Response serverResponse) {
+    /**
+     * Handles NodeMessage responses.
+     *
+     * @param serverResponse The Response received from the server.
+     */
+    private void handleNodeMessageResponse(Response serverResponse) {
         try {
-            JSONObject jsonObject = serverResponse.getMetadata();
-            String time = jsonObject.getString("dateTime");
+            JSONObject responseMessage = serverResponse.getMessage();
+            JSONObject metadata = serverResponse.getMetadata();
+            String time = metadata.getString("ref");
             Date date = DateSerialization.dateSerializer.toDate(time);
-            mCacheHelper.updateMessageStatus(Message.MessageStatus.NOT_SENT, Message.MessageStatus.SENT, date);
-            //TODO : Notify app
-        } catch (JSONException | ParseException e) {
-            e.printStackTrace();
+            Group group = mCacheHelper.getGroup(new Id(Long.valueOf(responseMessage.getString("nid"))));
+            Message message = mCacheHelper.getMessagesForGroup(group, date, 1).get(0);
+            mCacheHelper.deleteMessage(message, group.getId());
+            Message updatedMessage = new Message("", new Id(-1), message.getSender(), message.getContent(),
+                    DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
+                    Message.MessageStatus.SENT);
+            mCacheHelper.addMessage(updatedMessage, group.getId());
+            mService.updateMessage(group, updatedMessage, date);
+        } catch (JSONException | ParseException | CacheDatabaseException e) {
+            //TODO : Define what happens !
         }
     }
 
-    private void handleGroupHistoryResponse(Response serverResponse) {
+    /**
+     * Handles NodeHistory responses.
+     *
+     * @param serverResponse The response received from the server.
+     */
+    private void handleNodeHistoryResponse(Response serverResponse) {
         try {
             JSONArray array = serverResponse.getMessage().getJSONArray("nodes");
             if (array.length() > 0) {

@@ -74,7 +74,7 @@ public class CacheDatabaseTests {
                 mDatabaseHelper.addMessage(message, new Id(666));
             }
             for (Message message : messages) {
-                mDatabaseHelper.deleteMessage(message.getId(), new Id(666));
+                mDatabaseHelper.deleteMessage(message, new Id(666));
             }
 
             String selectQuery = "SELECT * FROM messages;";
@@ -101,7 +101,7 @@ public class CacheDatabaseTests {
             }
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
             assertEquals(3, cursor.getCount());
-            assertEquals(8, cursor.getColumnCount());
+            assertEquals(9, cursor.getColumnCount());
             cursor.close();
         } catch (CacheDatabaseException e) {
             e.printStackTrace();
