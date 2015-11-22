@@ -54,7 +54,7 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
   }
 
   "getting messages containing media" should "give the media back" in {
-    /* val group = Group.createGroup("name")
+    val group = Group.createGroup("name", 1)
 
     val messagesToReceive = List((Temporal.current, 1, None, "this entry has some text"), (Temporal.current, 2, Some("Some content"), ""),
       (Temporal.current, 3, Some("other content"), "text"), (Temporal.current, 4, None, "some text again"))
@@ -73,8 +73,8 @@ class TestNodeHistory extends FlatSpec with Matchers with ModelsGenerators with 
 
     res match {
       case NodeHistoryRes(nid, messages) =>
-        messages.reverse should be(messagesToReceive)
-    } */
+        messages.map(x => (x._2, x._3, x._4)).reverse should be(messagesToReceive.map(x => (x._2, x._3, x._4)))
+    }
   }
 
 }

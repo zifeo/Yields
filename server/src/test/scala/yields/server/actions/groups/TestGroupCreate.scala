@@ -31,9 +31,10 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
 
   val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
-  "running groupCreate action with all parameters set" should "create a group" in {
+  it should "create a group" in {
     val users: List[User] = List(User.create("e1@epfl.ch"), User.create("e2@epfl.ch"), User.create("e3@epfl.ch"), User.create("e4@epfl.ch"))
     val nodes: List[Node] = List(Group.createGroup("g1", m.sender), Group.createGroup("g2", m.sender), Group.createGroup("g3", m.sender))
+    Tag.createTag("sport")
     val tags: List[String] = List("tennis", "sport", "fun")
     val action = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
     val res = action.run(m)
@@ -43,6 +44,13 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
         g.users.toSet should be(users.map(_.uid).toSet)
         g.name should be("GroupName")
         g.nodes.toSet should be(nodes.map(_.nid).toSet)
+        val tids = tags.map((x: String) => Tag.getIdFromText(x))
+        val filtered: List[TID] = tids.filter(_.isDefined).map(_.get)
+        g.tags should be(filtered.toSet)
+        Tag.getIdFromText("tennis").isDefined should be(true)
+        Tag.getIdFromText("fun").isDefined should be(true)
+        Tag.getIdFromText("sport").isDefined should be(true)
+
     }
   }
 

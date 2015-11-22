@@ -39,9 +39,10 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
     obj match {
       case x: GroupCreateRes => packWithKind(x)
       case x: GroupUpdateRes => packWithKind(x)
+      case x: GroupSearchRes => packWithKind(x)
+      case x: GroupManageRes => packWithKind(x)
       case x: NodeMessageRes => packWithKind(x)
       case x: NodeHistoryRes => packWithKind(x)
-      case x: GroupSearchRes => packWithKind(x)
 
       case x: UserConnectRes => packWithKind(x)
       case x: UserUpdateRes => packWithKind(x)
@@ -58,9 +59,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
         kind match {
           case "GroupCreateRes" => message.convertTo[GroupCreateRes]
           case "GroupUpdateRes" => message.convertTo[GroupUpdateRes]
+          case "GroupSearchRes" => message.convertTo[GroupSearchRes]
+          case "GroupManageRes" => message.convertTo[GroupManageRes]
           case "NodeMessageRes" => message.convertTo[NodeMessageRes]
           case "NodeHistoryRes" => message.convertTo[NodeHistoryRes]
-          case "GroupSearchRes" => message.convertTo[GroupSearchRes]
+
 
           case "UserConnectRes" => message.convertTo[UserConnectRes]
           case "UserUpdateRes" => message.convertTo[UserUpdateRes]

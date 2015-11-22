@@ -122,6 +122,10 @@ abstract class Node {
   def addNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
 
+  /** Remove node */
+  def removeNode(nid: NID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
+
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
     _feed = redis.withClient(_.zrangebyscore[IncomingFeedContent](
@@ -148,6 +152,9 @@ abstract class Node {
   def addMultipleNodes(nodes: Seq[NID]): Unit =
     nodes.foreach(addNode)
 
+  /** Remove multiple nodes */
+  def remMultipleNodes(nodes: Seq[NID]): Unit =
+    nodes.foreach(removeNode)
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {

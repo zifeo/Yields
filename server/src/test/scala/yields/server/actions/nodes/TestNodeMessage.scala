@@ -27,7 +27,8 @@ class TestNodeMessage extends FlatSpec with Matchers with BeforeAndAfter {
   lazy val nodes: List[Node] = List(Group.createGroup("g1", m.sender), Group.createGroup("g2", m.sender), Group.createGroup("g3", m.sender))
 
   "running nodeMessage action on a group" should "add new entry to feed" in {
-    val create = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), "private")
+    val tags = List("nature")
+    val create = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
     val res = create.run(m)
 
     res match {

@@ -4,6 +4,7 @@ import yields.server.dbi.exceptions.UnincrementableIdentifierException
 import yields.server.dbi.models.{TID, NID}
 import yields.server.dbi._
 import yields.server.utils.Temporal
+import com.redis.serialization.Parse.Implicits._
 
 
 /**

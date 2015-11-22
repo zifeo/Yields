@@ -24,7 +24,7 @@ class Group private(override val nid: NID) extends Node {
 
   private var _admins: Option[List[UID]] = None
   private var _visibility: Option[String] = None
-  private var _tags: Option[List[TID]] = None
+  private var _tags: Option[Set[TID]] = None
 
   /** add admin */
   def addAdmin(id: UID): Boolean =
@@ -58,10 +58,16 @@ class Group private(override val nid: NID) extends Node {
   }
 
   /** get the tags of a group */
-  /* def getTags: List[TID] = {
+  def tags: Set[TID] = _tags.getOrElse {
     val mem = redis.withClient(_.smembers[TID](GroupKey.tags))
-    val list = mem.getOrElse(List()).toList
-  } */
+    val t: Set[TID] = mem match {
+      case Some(x) =>
+        x.filter(_.isDefined).map(_.get)
+      case None => Set()
+    }
+    _tags = Some(t)
+    t
+  }
 }
 
 /**
