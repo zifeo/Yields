@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -28,7 +27,7 @@ public class ImageShowPopUp extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_show_pop_up);
 
-        Bitmap image = YieldsApplication.getShowImage();
+        Bitmap image = YieldsApplication.getShownImage();
 
         WindowManager wm = (WindowManager) YieldsApplication.getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();

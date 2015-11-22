@@ -95,6 +95,7 @@ public class YieldsApplication {
      * @param gac The google api client.
      */
     public static void setGoogleApiClient(GoogleApiClient gac){
+        Objects.requireNonNull(gac);
         mGoogleApiClient = gac;
     }
 
@@ -103,6 +104,7 @@ public class YieldsApplication {
      * @param r The ressources to use.
      */
     public static void setResources(Resources r){
+        Objects.requireNonNull(r);
         mResources = r;
     }
 
@@ -111,6 +113,7 @@ public class YieldsApplication {
      * @param g The group.
      */
     public static void setGroup(Group g){
+        Objects.requireNonNull(g);
         mGroup = g;
     }
 
@@ -119,6 +122,7 @@ public class YieldsApplication {
      * @param u The client user to use.
      */
     public static void setUser(ClientUser u){
+        Objects.requireNonNull(u);
         mUser = u;
     }
 
@@ -127,6 +131,7 @@ public class YieldsApplication {
      * @param groups The group.
      */
     public static void setGroupsSearched(List<Group> groups){
+        Objects.requireNonNull(groups);
         mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
     }
 
@@ -135,6 +140,7 @@ public class YieldsApplication {
      * @param c The context to use.
      */
     public static void setApplicationContext(Context c){
+        Objects.requireNonNull(c);
         mApplicationContext = c;
     }
 
@@ -143,6 +149,7 @@ public class YieldsApplication {
      * @param b The default group image to use.
      */
     public static void setDefaultGroupImage(Bitmap b){
+        Objects.requireNonNull(b);
         mDefaultGroupImage = b;
     }
 
@@ -151,6 +158,7 @@ public class YieldsApplication {
      * @param b The default user image to use.
      */
     public static void setDefaultUserImage(Bitmap b){
+        Objects.requireNonNull(b);
         mDefaultUserImage = b;
     }
 
@@ -202,11 +210,20 @@ public class YieldsApplication {
         }
     }
 
+    /**
+     * Setter for the image to be displayed in the popup.
+     * @param image The image to be displayed in the popup.
+     */
     public static void setShownImage(Bitmap image){
+        Objects.requireNonNull(image);
         mShownImage = image;
     }
 
-    public static Bitmap getShowImage(){
+    /**
+     * Getter for the image to be displayed in the popup window.
+     * @return The image.
+     */
+    public static Bitmap getShownImage(){
         return mShownImage;
     }
 }
