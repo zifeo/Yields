@@ -6,6 +6,8 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
@@ -19,10 +21,15 @@ import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.serverconnection.RequestBuilder;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.ServiceRequest;
+import yields.client.servicerequest.UserConnectRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
@@ -58,11 +65,21 @@ public class YieldService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO : to be defined what to do when starting a connection
-        /*if (intent != null && intent.getBooleanExtra("newUser", false)) {
+        if (intent != null) {
             String email = intent.getStringExtra("email");
-            ServerRequest connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
+            ClientUser user = YieldsApplication.getUser();
+
+            if (user == null || user.getEmail() != email) {
+                Bitmap imageUser = BitmapFactory.decodeResource(getResources(),
+                        R.drawable.default_user_image);
+                imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser,
+                        getResources().getInteger(R.integer.groupImageDiameter));
+                user = new ClientUser("", new Id(-1), email, imageUser);
+            }
+
+            ServiceRequest connectReq = new UserConnectRequest(user);
             sendRequest(connectReq);
-        }*/
+        }
 
         Log.d("Y:" + this.getClass().getName(), "Starting yield service");
 

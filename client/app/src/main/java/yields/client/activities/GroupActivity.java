@@ -198,33 +198,6 @@ public class GroupActivity extends NotifiableActivity {
         public MockClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
             super(name, id, email, img);
         }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-            /* Nothing */
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            ArrayList<Message> messageList =  new ArrayList<>();
-            return messageList;
-        }
-
-        @Override
-        public void createNewGroup(Group group) throws IOException {
-            mGroups.add(group);
-            mAdapterGroups.notifyDataSetChanged();
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-            /* Nothing */
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return null;
-        }
     }
 
     /**

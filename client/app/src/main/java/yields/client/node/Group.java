@@ -40,6 +40,7 @@ public class Group extends Node {
     private Bitmap mImage;
     private GroupVisibility mVisibility;
     private Set<Tag> mTags;
+    private Date mDate;
 
     /**
      * Constructor for groups
@@ -102,6 +103,22 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<User> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE, false);
+    }
+
+    /**
+     * Get the last time the group was updated.
+     * @return The sus-mentioned date.
+     */
+    public Date getLastUpdate(){
+        return new Date(mDate.getTime());
+    }
+
+    /**
+     * Set's the last time the group was updated.
+     * @param date The date of the last update.
+     */
+    public void setLastUpdate(Date date){
+        mDate = new Date(date.getTime());
     }
 
     /**

@@ -18,6 +18,7 @@ import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ServiceRequestException;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
@@ -40,6 +41,7 @@ import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserUpdateRequest;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Controller for ServiceRequests.
@@ -172,10 +174,20 @@ public class ServiceRequestController {
             case NODE_MESSAGE_RESPONSE:
                 handleGroupMessageResponse(serverResponse);
                 break;
+            case USER_CONNECT_RESPONSE:
+                handleUserConnectResponse(serverResponse);
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
                 //TODO: In need of another exception ?
         }
+    }
+
+    private void handleUserConnectResponse(Response serverResponse) {
+        ClientUser user = YieldsApplication.getUser();
+        user.update(serverResponse);
+        YieldsApplication.setUser(user);
+        ServiceRequest serviceRequest = new UserGroupListRequest(user);
+        mService.sendRequest(serviceRequest);
     }
 
     /**

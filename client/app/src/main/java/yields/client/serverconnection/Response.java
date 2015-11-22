@@ -14,8 +14,8 @@ public class Response {
      * The Kind of possible Responses.
      */
     public enum ResKind {
-
-        NODE_HISTORY_RESPONSE("NodeHistoryRes"), NODE_MESSAGE_RESPONSE("NodeMessageRes");
+        GROUP_HISTORY_RESPONSE("GroupHistoryRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes"),
+        USER_CONNECT_RESPONSE("UserConnectRes");
 
         private final String name;
 
