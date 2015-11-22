@@ -158,7 +158,6 @@ public class CacheDatabaseTests {
         }
     }
 
-
     /**
      * Tests if users are correctly deleted from the database.
      * (Test for CacheDatabaseHelper.deleteUser(ID id))
@@ -508,7 +507,6 @@ public class CacheDatabaseTests {
         }
     }
 
-
     /**
      * Tests if it can retrieve a Group.
      * (Test for CacheDatabaseHelper.getGroup(ID userID))
@@ -721,7 +719,7 @@ public class CacheDatabaseTests {
         boolean equal = originalMessage.getSender().getId().getId().equals(messageFromCache.getSender().getId().getId());
         equal = equal && originalMessage.getSender().getEmail().equals(messageFromCache.getSender().getEmail());
         equal = equal && originalMessage.getSender().getName().equals(messageFromCache.getSender().getName());
-        
+
         equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
         equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);
         equal = equal && originalMessage.getPreview().equals(messageFromCache.getPreview());
