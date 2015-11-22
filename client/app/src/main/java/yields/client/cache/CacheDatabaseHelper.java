@@ -70,6 +70,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
     private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
     private static final String KEY_MESSAGE_DATE = "messageDate";
+    private static final String KEY_MESSAGE_TIMEZONE = "messageTimezone";
 
     private static final String KEY_INTERNAL_ID = "interalId";
 

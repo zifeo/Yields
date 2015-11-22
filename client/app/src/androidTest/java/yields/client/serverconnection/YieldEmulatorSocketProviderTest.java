@@ -17,7 +17,7 @@ public class YieldEmulatorSocketProviderTest {
         SocketProvider socketProvider;
 
         try {
-            socketProvider = new YieldEmulatorSocketProvider();
+            socketProvider = new YieldsSocketProvider();
             Socket socket;
             socket = socketProvider.getConnection();
             Assert.assertTrue(socket.isConnected());
