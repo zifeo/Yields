@@ -2,7 +2,7 @@ package yields.server.router
 
 import java.net.InetSocketAddress
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{ActorRef, Actor, ActorLogging, Props}
 import akka.io.{IO, Tcp}
 import akka.stream.ActorMaterializer
 import akka.stream.actor.{ActorPublisher, ActorSubscriber}
@@ -12,11 +12,15 @@ import yields.server.utils.Config
 
 /**
   * Actor in charge of handling connections and creating a client hub.
+  * @param stream streaming operations pipeline
+  * @param materializer stream materializer
   */
-final class Router(stream: Flow[ByteString, ByteString, Unit], implicit val materializer: ActorMaterializer)
+final class Router(val stream: Flow[ByteString, ByteString, Unit], private val dispatcher: ActorRef,
+                   private implicit val materializer: ActorMaterializer)
   extends Actor with ActorLogging {
 
   import Tcp._
+  import Dispatcher._
   import context.system
 
   override def preStart(): Unit = {
@@ -29,7 +33,7 @@ final class Router(stream: Flow[ByteString, ByteString, Unit], implicit val mate
     )
   }
 
-  def receive = {
+  def receive: Receive = {
 
     case Bound(_) =>
     case CommandFailed(Bind(_, addr, _, _, _)) => context stop self
@@ -38,7 +42,7 @@ final class Router(stream: Flow[ByteString, ByteString, Unit], implicit val mate
       log.info(s"connection from $clientAddr.")
 
       val socket = sender()
-      val bindings = context.actorOf(Props(classOf[ClientHub], socket, clientAddr.toString))
+      val bindings = context.actorOf(ClientHub.props(socket, clientAddr.toString, dispatcher))
       // one actor per client
 
       val pub = ActorPublisher[ByteString](bindings)
@@ -61,7 +65,8 @@ final class Router(stream: Flow[ByteString, ByteString, Unit], implicit val mate
 object Router {
 
   /** Creates a router props with a materializer. */
-  def props(stream: Flow[ByteString, ByteString, Unit])(implicit materializer: ActorMaterializer): Props =
-    Props(classOf[Router], stream, materializer)
+  def props(stream: Flow[ByteString, ByteString, Unit], dispatcher: ActorRef)
+           (implicit materializer: ActorMaterializer): Props =
+    Props(classOf[Router], stream, dispatcher, materializer)
 
 }

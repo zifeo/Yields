@@ -5,7 +5,7 @@ import java.util.logging.LogManager
 import akka.actor._
 import akka.stream._
 import yields.server.pipeline.Pipeline
-import yields.server.router.Router
+import yields.server.router.{Dispatcher, Router}
 
 import scala.io.StdIn
 import scala.util.control.NonFatal
@@ -15,13 +15,11 @@ import scala.util.control.NonFatal
   */
 object Yields {
 
-  // Configure logging with LogBack
-  {
+  { // Configure logging with LogBack
     val manager = LogManager.getLogManager
     manager.readConfiguration()
   }
 
-  // Starts system and enable flow errors logging on demand
   private implicit lazy val system = ActorSystem("Yields-server")
   private implicit lazy val materializer = {
     val decider: Supervision.Decider = {
@@ -34,7 +32,9 @@ object Yields {
     ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
   }
 
-  private val pipeline = Pipeline()
+  private lazy val pipeline = Pipeline()
+  private lazy val dispatcher = system.actorOf(Dispatcher.props, "Yields-dispatcher")
+  private lazy val router = system.actorOf(Router.props(pipeline, dispatcher), "Yields-router")
 
   /**
     * Launches the Yields app.
@@ -53,30 +53,12 @@ object Yields {
     * @return empty future representing server liveness
     */
   private[server] def start(): Unit = {
-
-    // Setup networking and pipeline.
-    /*
-    val connections = scaladsl.Tcp().bind(
-      interface = Config.getString("addr"),
-      port = Config.getInt("port"),
-      options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = true)),
-      halfClose = false,
-      idleTimeout = Duration.Inf
-    )
-    val pipeline = Pipeline()
-    */
-
-    // Handles connections.
-    /*
-    connections runForeach { case IncomingConnection(_, remoteAddress, flow) =>
-      system.log.info(s"connection from $remoteAddress")
-      flow.join(pipeline).run()
-    }
-    */
-
     system.log.info("Server starting.")
-    system.actorOf(Router.props(pipeline), "Yields-router")
-
+    system
+    materializer
+    dispatcher
+    router
+    system.log.info("Server started.")
   }
 
   /**
@@ -86,6 +68,7 @@ object Yields {
   private[server] def close(): Unit = {
     system.log.info("Server closing.")
     system.terminate()
+    system.log.info("Server closed.")
   }
 
 }
