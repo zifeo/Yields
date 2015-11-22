@@ -2,6 +2,9 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,8 +42,9 @@ public class ClientUser extends User {
         return Collections.unmodifiableList(mGroups);
     }
 
-    public void update(Response response) {
-
+    public void update(JSONObject response) throws JSONException{
+        this.setName(response.getString("name"));
+        this.setEmail(response.getString("email"));
     }
 
     public void addUserToEntourage(User user) {

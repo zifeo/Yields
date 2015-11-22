@@ -176,18 +176,56 @@ public class ServiceRequestController {
                 break;
             case USER_CONNECT_RESPONSE:
                 handleUserConnectResponse(serverResponse);
+            case USER_GROUP_LIST_RESPONSE:
+                handleUserGroupListResponse(serverResponse);
+            case USER_INFO_RESPONSE:
+                handleUserInfoResponse(serverResponse);
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
                 //TODO: In need of another exception ?
         }
     }
 
+    private void handleUserInfoResponse(Response serverResponse) {
+        try {
+            YieldsApplication.getUser().update(serverResponse.getMessage());
+            // TODO : entourage
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
+    }
+
+    private void handleUserGroupListResponse(Response serverResponse) {
+        try {
+            JSONArray groupSeq = serverResponse.getMessage().getJSONArray("groups");
+            for (int i = 0; i < groupSeq.length(); i++) {
+                JSONArray jsonGroup = groupSeq.getJSONArray(i);
+                Group group = new Group(jsonGroup);
+                YieldsApplication.getUser().addGroup(group);
+                ServiceRequest historyResquest = new GroupHistoryRequest(group, new Date());
+                mService.sendRequest(historyResquest);
+            }
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
+
+    }
+
     private void handleUserConnectResponse(Response serverResponse) {
         ClientUser user = YieldsApplication.getUser();
-        user.update(serverResponse);
+        try {
+            user.setId(new Id(serverResponse.getMessage().getLong("uid")));
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
         YieldsApplication.setUser(user);
-        ServiceRequest serviceRequest = new UserGroupListRequest(user);
-        mService.sendRequest(serviceRequest);
+        ServiceRequest groupListRequest = new UserGroupListRequest(user);
+        mService.sendRequest(groupListRequest);
+        ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
+        mService.sendRequest(userInfoRequest);
     }
 
     /**

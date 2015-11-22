@@ -45,4 +45,13 @@ public class User extends Node {
     public String getEmail() {
         return mEmail;
     }
+
+    /**
+     * Setter for the email of the user.
+     *
+     * @param email The new email of the user.
+     */
+    public void setEmail(String email) {
+        mEmail = email;
+    }
 }

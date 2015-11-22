@@ -151,12 +151,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                 Group group = new Group(mGroupName, new Id(1), userList);
                 group.setVisibility(mGroupType);
-
-                try {
-                    YieldsApplication.getUser().createNewGroup(group);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                YieldsApplication.getUser().addGroup(group);
 
                 Intent createGroupIntent = new Intent(this, GroupActivity.class);
                 createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP

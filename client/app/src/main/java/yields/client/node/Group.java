@@ -2,6 +2,9 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,6 +106,16 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<User> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE, false);
+    }
+
+    /**
+     * Creates a group from a Json response coming from the server.
+     *
+     * @param jsonGroup The JsonArray containing the group.
+     * @throws JSONException
+     */
+    public Group(JSONArray jsonGroup) throws JSONException{
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>());
     }
 
     /**

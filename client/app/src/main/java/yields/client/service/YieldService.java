@@ -196,15 +196,21 @@ public class YieldService extends Service {
     }
 
     /**
-     * Called when a message is received from the server
+     * Called when a message is received from the server.
      *
-     * @param group   The group the message s from
-     * @param message The message in question
+     * @param groupId The id of the group the message is from.
+     * @param message The message in question.
      */
-    synchronized public void receiveMessage(Group group, Message message) {
+    synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null ||
-                mCurrentGroup.getId() != group.getId()) {
-            sendMessageNotification(group, message);
+                mCurrentGroup.getId().getId().equals(groupId.getId())) {
+            List<Group> groups = YieldsApplication.getUser().getUserGroups();
+            for (Group group : groups) {
+                if (group.getId().getId().equals(groupId.getId())) {
+                    group.addMessage(message);
+                    sendMessageNotification(group, message);
+                }
+            }
         } else {
             mCurrentGroup.addMessage(message);
             mCurrentNotifiableActivity.notifyChange();
@@ -223,6 +229,13 @@ public class YieldService extends Service {
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
             mCurrentNotifiableActivity.notifyChange();
+        } else {
+            List<Group> groups = YieldsApplication.getUser().getUserGroups();
+            for (Group group : groups) {
+                if (group.getId().getId().equals(groupId.getId())) {
+                    group.addMessages(messages);
+                }
+            }
         }
     }
 
