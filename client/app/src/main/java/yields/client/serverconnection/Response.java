@@ -15,7 +15,7 @@ public class Response {
      */
     public enum ResKind {
 
-        GROUP_HISTORY_RESPONSE("GroupHistoryRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes");
+        NODE_HISTORY_RESPONSE("NodeHistoryRes"), NODE_MESSAGE_RESPONSE("NodeMessageRes");
 
         private final String name;
 

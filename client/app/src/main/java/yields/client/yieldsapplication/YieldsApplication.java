@@ -218,18 +218,4 @@ public class YieldsApplication {
             mToast.cancel();
         }
     }
-
-    /**
-     * Returns a new unique Id which was created by the ClientUser.
-     *
-     * @return A new unique Id which was created by the ClientUser.
-     */
-    public static synchronized Id getId() {
-        if (internalNodeId != 0) {
-            internalNodeId--;
-            return new Id(internalNodeId);
-        } else {
-            return null;
-        }
-    }
 }

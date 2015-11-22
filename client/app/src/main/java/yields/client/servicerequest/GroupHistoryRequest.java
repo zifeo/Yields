@@ -1,13 +1,10 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Date;
 import java.util.Objects;
 
 import yields.client.node.Group;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -44,7 +41,7 @@ public class GroupHistoryRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUP_HISTORY;
+        return RequestKind.NODE_HISTORY;
     }
 
     /**

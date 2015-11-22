@@ -4,10 +4,12 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,7 +22,7 @@ import yields.client.node.Group;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
-import yields.client.serverconnection.RequestBuilder;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
@@ -151,11 +153,11 @@ public class ServiceRequestController {
             case GROUP_REMOVE:
                 handleGroupRemoveRequest((GroupRemoveRequest) serviceRequest);
                 break;
-            case GROUP_MESSAGE:
-                handleGroupMessageRequest((NodeMessageRequest) serviceRequest);
+            case NODE_MESSAGE:
+                handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
                 break;
-            case GROUP_HISTORY:
-                handleGroupHistoryRequest((GroupHistoryRequest) serviceRequest);
+            case NODE_HISTORY:
+                handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceRequest type !");
@@ -164,10 +166,10 @@ public class ServiceRequestController {
 
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
-            case GROUP_HISTORY_RESPONSE:
+            case NODE_HISTORY_RESPONSE:
                 handleGroupHistoryResponse(serverResponse);
                 break;
-            case GROUP_MESSAGE_RESPONSE:
+            case NODE_MESSAGE_RESPONSE:
                 handleGroupMessageResponse(serverResponse);
                 break;
             default:
@@ -202,22 +204,13 @@ public class ServiceRequestController {
 
     private void handleGroupMessageResponse(Response serverResponse) {
         try {
-            JSONArray array = serverResponse.getMessage().getJSONArray(RequestBuilder.Fields.NODES.getValue());
-            if (array.length() > 0) {
-                ArrayList<Message> list = new ArrayList<>();
-                Message message;
-                Id groupId = new Id(serverResponse.getMessage().getLong(RequestBuilder.Fields.NID.getValue()));
-                for (int i = 0; i < array.length(); i++) {
-                    message = new Message(array.getJSONArray(i));
-                    list.add(message);
-                    mCacheHelper.addMessage(message, groupId);
-                }
-                mService.receiveMessages(groupId, list);
-            }
+            JSONObject jsonObject = serverResponse.getMetadata();
+            String time = jsonObject.getString("dateTime");
+            Date date = DateSerialization.dateSerializer.toDate(time);
+            mCacheHelper.updateMessageStatus(Message.MessageStatus.NOT_SENT, Message.MessageStatus.SENT, date);
+            //TODO : Notify app
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
-        } catch (CacheDatabaseException e) {
-            //TODO : Decice what happens when cache adding failed.
         }
     }
 
@@ -448,7 +441,7 @@ public class ServiceRequestController {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    private void handleGroupMessageRequest(NodeMessageRequest serviceRequest) {
+    private void handleNodeMessageRequest(NodeMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
@@ -467,7 +460,7 @@ public class ServiceRequestController {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    private void handleGroupHistoryRequest(GroupHistoryRequest serviceRequest) {
+    private void handleNodeHistoryRequest(GroupHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),

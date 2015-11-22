@@ -33,7 +33,7 @@ public class RequestBuilder {
         EMAIL("email"), TEXT("content"), NAME("name"),
         NODES("nodes"), KIND("kind"),
         LAST("datetime"), TO("to"), COUNT("count"),
-        IMAGE("image"), NID("nid"), VISIBILITY("visibility"),
+        IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
         CONTENT_TYPE("contentType");
 
         private final String name;
@@ -206,7 +206,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newName);
 
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, sender);
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE, sender);
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
@@ -227,7 +227,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newVisibility);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
-                .GROUP_UPDATE_VISIBILITY, sender);
+                .GROUP_UPDATE, sender);
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
 
@@ -249,7 +249,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newImage);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
-                .GROUP_UPDATE_IMAGE, sender);
+                .GROUP_UPDATE, sender);
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.IMAGE, newImage);
         return builder.request();
@@ -336,7 +336,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
+                ServiceRequest.RequestKind.NODE_MESSAGE, sender);
 
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
@@ -360,7 +360,7 @@ public class RequestBuilder {
         Objects.requireNonNull(content);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
+                ServiceRequest.RequestKind.NODE_MESSAGE, sender);
 
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
@@ -385,7 +385,7 @@ public class RequestBuilder {
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUP_HISTORY, senderId);
+                ServiceRequest.RequestKind.NODE_HISTORY, senderId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);

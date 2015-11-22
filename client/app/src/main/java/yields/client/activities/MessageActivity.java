@@ -278,7 +278,7 @@ public class MessageActivity extends NotifiableActivity {
      */
     public ListView getCurrentFragmentListView(){
         if (mType == ContentType.GROUP_MESSAGES) {
-            Log.d("MessageActivity", "GROUP_MESSAGE ListView");
+            Log.d("MessageActivity", "NODE_MESSAGE ListView");
             return ((GroupMessageFragment) mCurrentFragment)
                     .getMessageListView();
         }

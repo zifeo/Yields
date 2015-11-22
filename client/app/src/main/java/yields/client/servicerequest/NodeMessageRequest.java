@@ -37,7 +37,7 @@ public class NodeMessageRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUP_MESSAGE;
+        return RequestKind.NODE_MESSAGE;
     }
 
     /**

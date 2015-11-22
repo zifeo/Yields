@@ -69,10 +69,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_TEXT = "messageText";
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
     private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
+    private static final String KEY_MESSAGE_STATUS = "messageStatus";
     private static final String KEY_MESSAGE_DATE = "messageDate";
-    private static final String KEY_MESSAGE_TIMEZONE = "messageTimezone";
-
-    private static final String KEY_INTERNAL_ID = "interalId";
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODE_ID + " TEXT,"
@@ -89,9 +87,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             + KEY_MESSAGE_GROUP_ID + " TEXT," + KEY_MESSAGE_SENDER_ID + " TEXT,"
             + KEY_MESSAGE_TEXT + " TEXT," + KEY_MESSAGE_CONTENT_TYPE + " TEXT,"
             + KEY_MESSAGE_CONTENT + " BLOB," + KEY_MESSAGE_DATE + " TEXT" + ")";
-
-    private static final String CREATE_TABLE_INTERNAL = "CREATE TABLE " + TABLE_INTERNAL
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_INTERNAL_ID + " INTEGER" + ")";
 
     private final SQLiteDatabase mDatabase;
 
@@ -124,7 +119,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_USERS);
         db.execSQL(CREATE_TABLE_GROUPS);
         db.execSQL(CREATE_TABLE_MESSAGES);
-        db.execSQL(CREATE_TABLE_INTERNAL);
     }
 
     /**
@@ -146,12 +140,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public Long retrieveInternalId() {
-        String selectQuery = "SELECT * FROM " + TABLE_INTERNAL;
-        Cursor cursor = mDatabase.rawQuery(selectQuery, null);
-        return null;
-    }
-
     /**
      * Deletes the given Message from the database.
      *
@@ -162,6 +150,29 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODE_ID + " = ? AND " + KEY_MESSAGE_GROUP_ID
                 + " = ?", new String[]{messageId.getId().toString(), groupId.getId().toString()});
+    }
+
+    public void updateMessageStatus(Message.MessageStatus oldStatus, Message.MessageStatus newStatus, Date date) {
+        Objects.requireNonNull(date);
+        Objects.requireNonNull(oldStatus);
+
+        String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE " + KEY_MESSAGE_STATUS + " = ? "
+                + "AND " + KEY_MESSAGE_DATE + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{oldStatus.getValue(), DateSerialization
+                .dateSerializer.toStringForCache(date)});
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+        } else if (cursor.getCount() != 1) {
+            cursor.close();
+            //TODO : Invalid cache ! We have two messages that were sent at the exact same time.
+        } else {
+            ContentValues content = new ContentValues();
+            content.put(KEY_MESSAGE_STATUS, newStatus.getValue());
+            mDatabase.update(TABLE_MESSAGES, content, KEY_MESSAGE_STATUS + " = ? "
+                    + "AND " + KEY_MESSAGE_DATE + " = ?", new String[]{oldStatus.getValue(), DateSerialization
+                    .dateSerializer.toStringForCache(date)});
+            cursor.close();
+        }
     }
 
     /**
@@ -865,7 +876,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param content The TextContent to be serialized.
      * @return The serialized version of the TextContent.
-     * @throws CacheDatabaseException if the TextContent could not be serialized.
      */
     private static byte[] serializeImageContent(ImageContent content) {
         Objects.requireNonNull(content);
@@ -957,6 +967,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_TEXT, message.getContent().getTextForRequest());
         values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
+        values.put(KEY_MESSAGE_STATUS, message.getStatus().getValue());
         values.put(KEY_MESSAGE_DATE, DateSerialization.dateSerializer.toStringForCache(message.getDate()));
 
         return values;
