@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import java.io.IOException;
@@ -78,6 +79,15 @@ public class GroupActivity extends NotifiableActivity {
             }
         });
         listView.setItemsCanFocus(false);
+
+        View connectionStatusView = findViewById(R.id.connectionStatus);
+
+        connectionStatusView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YieldsApplication.getBinder().reconnect();
+            }
+        });
 
         YieldsApplication.setResources(getResources());
         YieldsApplication.setApplicationContext(getApplicationContext());
@@ -159,7 +169,12 @@ public class GroupActivity extends NotifiableActivity {
      */
     @Override
     public void notifyOnServerConnected() {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.connectionStatus).setVisibility(View.GONE);
+            }
+        });
     }
 
     /**
@@ -167,7 +182,12 @@ public class GroupActivity extends NotifiableActivity {
      */
     @Override
     public void notifyOnServerDisconnected() {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.connectionStatus).setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     /**

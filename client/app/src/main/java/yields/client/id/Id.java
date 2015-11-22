@@ -5,23 +5,15 @@ import java.util.Objects;
 /**
  * Id used in the App.
  */
-public class Id implements IdInterface<String> {
+public class Id implements IdInterface<Long> {
 
-    private String mId;
+    private Long mId;
 
     /**
      * Constructor for the Id taking a long in parameter.
      * @param value The id in Long.
      */
     public Id(long value){
-        mId = Long.toString(value);
-    }
-
-    /**
-     * Constructor for the id taking a string in parameter.
-     * @param value The id in a string.
-     */
-    public Id(String value){
         mId = value;
     }
 
@@ -30,7 +22,7 @@ public class Id implements IdInterface<String> {
      * @return
      */
     @Override
-    public String getId() {
+    public Long getId() {
         return mId;
     }
 
@@ -40,7 +32,7 @@ public class Id implements IdInterface<String> {
      * @return True if they are the same, false otherwise.
      */
     @Override
-    public boolean equals(IdInterface<String> other) {
-        return Objects.equals(mId, other);
+    public boolean equals(IdInterface<Long> other) {
+        return Objects.equals(mId, other.getId());
     }
 }

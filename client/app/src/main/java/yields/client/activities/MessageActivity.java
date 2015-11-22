@@ -56,6 +56,7 @@ public class MessageActivity extends NotifiableActivity {
     private boolean mSendImage;
     private static EditText mInputField;
     private static ActionBar mActionBar;
+    private Menu mMenu;
     private ImageButton mSendButton;
 
     private static ContentType mType;
@@ -134,7 +135,10 @@ public class MessageActivity extends NotifiableActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_message, menu);
-        return super.onCreateOptionsMenu(menu);
+        boolean res = super.onCreateOptionsMenu(menu);
+        mMenu = menu;
+        YieldsApplication.getBinder().connectionStatus();
+        return res;
     }
 
     /**
@@ -217,7 +221,9 @@ public class MessageActivity extends NotifiableActivity {
                 Intent intent = new Intent(this, GroupSettingsActivity.class);
                 startActivity(intent);
                 return true;
-
+            case R.id.iconConnect:
+                YieldsApplication.getBinder().reconnect();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -239,12 +245,26 @@ public class MessageActivity extends NotifiableActivity {
 
     @Override
     public void notifyOnServerConnected() {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mMenu != null) {
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.tick);
+                }
+            }
+        });
     }
 
     @Override
     public void notifyOnServerDisconnected() {
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (mMenu != null) {
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.cross);
+                }
+            }
+        });
     }
 
     /**

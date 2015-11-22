@@ -55,9 +55,15 @@ public class YieldServiceBinder extends Binder {
     /**
      * Can be used to know if the server is connected to the server
      */
-    public boolean isServerConnected(){
-        //TODO implement a mean of knowing if the server is connected
-        return true;
+    public void connectionStatus(){
+        mService.connectionStatusResponse();
+    }
+
+    /**
+     * Asks the service to try and reconnect the server
+     */
+    public void reconnect(){
+        mService.reconnectServer();
     }
 
     /**

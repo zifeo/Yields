@@ -19,6 +19,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
     public void onResume(){
         super.onResume();
         YieldsApplication.getBinder().attachActivity(this);
+        YieldsApplication.getBinder().connectionStatus();
     }
 
     /**
