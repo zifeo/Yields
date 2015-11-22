@@ -93,7 +93,7 @@ object Group {
     redis.withClient { r =>
       import group.NodeKey
       val infos = List(
-        (NodeKey.created_at, Temporal.current),
+        (NodeKey.created_at, Temporal.now),
         (NodeKey.name, name),
         (NodeKey.kind, classOf[Group].getSimpleName),
         (NodeKey.creator, creator)

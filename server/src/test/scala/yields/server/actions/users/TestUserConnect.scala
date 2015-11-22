@@ -1,18 +1,17 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Test class for User Connect action
   */
-class TestUserConnect extends DBFlatSpec with Matchers {
+class TestUserConnect extends DBFlatSpec with Matchers with AllGenerators {
 
-  val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   "UserConnect" should "return the user if it exist in db" in {
     val email = "emai12763l@email.com"

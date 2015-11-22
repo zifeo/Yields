@@ -1,19 +1,18 @@
 package yields.server.actions.groups
 
-import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Test class for Group Update action
   * TODO updating picture
   */
-class TestGroupUpdate extends DBFlatSpec with Matchers {
+class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "update the group in db" in {
     val g1 = Group.createGroup("name1", m.sender)

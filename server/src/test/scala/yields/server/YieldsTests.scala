@@ -43,7 +43,7 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
   def scenario(acting: (Action, Option[Result])*): Unit = {
     require(acting.nonEmpty, "scenario must contains some acting")
 
-    val metadata = Metadata(1, Temporal.current)
+    val metadata = Metadata.now(1)
     val (actions, expected) = acting.toList.unzip
     val requests = actions.map { action =>
       val json = Request(action, metadata).toJson.toString
@@ -90,7 +90,7 @@ class YieldsTests extends FlatSpec with Matchers with BeforeAndAfterAll with Mes
 
     /** Send an action to the server. */
     def send(action: Action): Unit = {
-      val metadata = Metadata(1, Temporal.current)
+      val metadata = Metadata.now(1)
       send(Request(action, metadata))
     }
 

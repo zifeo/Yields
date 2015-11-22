@@ -65,7 +65,7 @@ final class User private(val uid: UID) {
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (Key.updated_at, Temporal.current))
+    val updates = List((field, value), (Key.updated_at, Temporal.now))
     redis.withClient(_.hmset(Key.user, updates))
     Some(value)
   }
@@ -120,7 +120,7 @@ final class User private(val uid: UID) {
 
   /** Adds a group and returns whether this group has been added. */
   def addToGroups(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.now.toEpochSecond, nid)))
 
   /** Remove a group and returns whether this group has been removed. */
   def removeFromGroups(nid: NID): Boolean =
@@ -134,7 +134,7 @@ final class User private(val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.current.toEpochSecond, uid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.now.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
@@ -191,7 +191,7 @@ object User {
       val user = User(uid)
       redis.withClient { r =>
         import user.Key
-        val infos = List((Key.created_at, Temporal.current), (Key.email, email))
+        val infos = List((Key.created_at, Temporal.now), (Key.email, email))
         r.hmset(user.Key.user, infos)
         r.hset(StaticKey.emailIndex, email, uid)
       }

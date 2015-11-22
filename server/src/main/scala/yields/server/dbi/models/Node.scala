@@ -58,7 +58,7 @@ abstract class Node {
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (NodeKey.updated_at, Temporal.current))
+    val updates = List((field, value), (NodeKey.updated_at, Temporal.now))
     redis.withClient(_.hmset(NodeKey.node, updates))
     Some(value)
   }
@@ -151,7 +151,7 @@ abstract class Node {
 
   /** Add user */
   def addUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.current.toEpochSecond, id)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.now.toEpochSecond, id)))
 
   /** Add multiple nodes to the group */
   def addMultipleNodes(nodes: Seq[NID]): Unit =
@@ -163,7 +163,7 @@ abstract class Node {
 
   /** Add node */
   def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {

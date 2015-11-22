@@ -24,7 +24,7 @@ case class GroupMessage(nid: NID, content: String) extends Action {
     if (nid > 0) {
       if (!content.isEmpty) {
         val group = Group(nid)
-        val c = (Temporal.current, metadata.client, None, content)
+        val c = (Temporal.now, metadata.client, None, content)
         group.addMessage(c)
         GroupMessageRes(c._1)
       } else {

@@ -3,7 +3,7 @@ package yields
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import spray.json._
 
 import scala.concurrent.duration._
@@ -36,5 +36,9 @@ package object server {
   /** Serialize and deserialize a given element. */
   def toAndFromJson[T : JsonWriter : JsonReader](elem: T): T =
     elem.toJson.toString().parseJson.convertTo[T]
+
+  /** Sample an element of some type. */
+  def sample[T](implicit a: Arbitrary[T]): T =
+    Arbitrary.arbitrary[T].sample.get
 
 }

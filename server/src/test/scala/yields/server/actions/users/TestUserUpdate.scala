@@ -1,18 +1,17 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Test class for User Update
   */
-class TestUserUpdate extends DBFlatSpec with Matchers {
+class TestUserUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "update everything in database" in {
     val u = User.create("email12344321@email.com")

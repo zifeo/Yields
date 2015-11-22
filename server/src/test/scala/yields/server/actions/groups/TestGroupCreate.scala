@@ -1,21 +1,20 @@
 package yields.server.actions.groups
 
-import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.Matchers
+import yields.server._
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.dbi._
-import yields.server.dbi.models.{Group, Node, UID, User}
+import yields.server.dbi.models.{Group, Node, User}
 import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Test if GroupCreate action performed well
   * TODO test GroupCreate without users
   */
-class TestGroupCreate extends DBFlatSpec with Matchers {
+class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
 
-  val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "create a group" in {
     val users: List[User] = List(User.create("e1@epfl.ch"), User.create("e2@epfl.ch"), User.create("e3@epfl.ch"), User.create("e4@epfl.ch"))

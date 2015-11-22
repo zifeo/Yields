@@ -1,19 +1,18 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Test class User group list
   * TODO implement user group list correctly
   */
-class TestUserGroupList extends DBFlatSpec with Matchers {
+class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "return empty list when the group list is empty" in {
     val u = User.create("an@SAs678email.com")

@@ -1,19 +1,17 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
-
 
 /**
   * Test class for UserGetEntourage action
   */
-class TestUserInfo extends DBFlatSpec with Matchers {
+class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "get some infos" in {
     val u1 = User.create("e1@email.com")
