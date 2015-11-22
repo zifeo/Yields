@@ -23,8 +23,8 @@ package object server {
     * @tparam T type of element
     * @return pair of a source and a sequence of the same elements
     */
-  def generateSource[T](gen: Gen[T], num: Int): (Source[T, Unit], scala.collection.immutable.Seq[T]) = {
-    val generated = (0 until num).flatMap(_ => gen.sample)
+  def generateSource[T](gen: Gen[T], num: Int): (Source[T, Unit], List[T]) = {
+    val generated = (0 until num).flatMap(_ => gen.sample).toList
     (Source(generated), generated)
   }
 
