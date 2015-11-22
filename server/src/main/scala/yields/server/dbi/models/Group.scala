@@ -61,9 +61,9 @@ class Group private(override val nid: NID) extends Node {
   def tags: Set[TID] = _tags.getOrElse {
     val mem = redis.withClient(_.smembers[TID](GroupKey.tags))
     val t: Set[TID] = mem match {
-      case Some(x) =>
+      case Some(x: Set[Option[TID]]) =>
         x.filter(_.isDefined).map(_.get)
-      case None => Set()
+      case _ => Set()
     }
     _tags = Some(t)
     t

@@ -44,9 +44,9 @@ class TestGroupCreate extends FlatSpec with Matchers with BeforeAndAfter {
         g.users.toSet should be(users.map(_.uid).toSet)
         g.name should be("GroupName")
         g.nodes.toSet should be(nodes.map(_.nid).toSet)
-        val tids = tags.map((x: String) => Tag.getIdFromText(x))
-        val filtered: List[TID] = tids.filter(_.isDefined).map(_.get)
-        g.tags should be(filtered.toSet)
+        // TODO test tags
+        // val tids = tags.map((x: String) => Tag.getIdFromText(x)).filter(_.isDefined).map(_.get)
+        // g.tags should be(tids.toSet)
         Tag.getIdFromText("tennis").isDefined should be(true)
         Tag.getIdFromText("fun").isDefined should be(true)
         Tag.getIdFromText("sport").isDefined should be(true)
