@@ -49,6 +49,7 @@ public class ServiceRequestController {
     private final AtomicBoolean isConnecting;
     // Not final because we may have to recreate it in case of connection error
     private CommunicationChannel mCommunicationChannel;
+    private Thread mConnector;
 
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
@@ -62,12 +63,12 @@ public class ServiceRequestController {
      *
      * @param e the exception that was triggered the connection error
      */
-    synchronized public void handleConnectionError(final IOException e) {
-        if (!isConnecting.get()) {
+
+    public void handleConnectionError(final IOException e) {
+        if (!isConnecting.getAndSet(true)) {
             mService.onServerDisconnected();
             mService.receiveError("Problem connecting to server : " + e.getMessage());
-            isConnecting.set(true);
-            new Thread(new Runnable() {
+            mConnector = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -80,7 +81,17 @@ public class ServiceRequestController {
                         connectToServer();
                     }
                 }
-            }).run();
+            });
+            mConnector.start();
+        }
+    }
+
+    /**
+     * Notify connector to reconnect faster
+     */
+    public void notifyConnector() {
+        if (mConnector != null && mConnector.isAlive()) {
+            mConnector.interrupt();
         }
     }
 
@@ -89,7 +100,8 @@ public class ServiceRequestController {
      *
      * @return
      */
-    synchronized public boolean isConnected() {
+
+    public boolean isConnected() {
         return !isConnecting.get();
     }
 
@@ -465,10 +477,12 @@ public class ServiceRequestController {
             //TODO : @Nroussel Decide what happens if cache adding failed.
         }
 
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
+        if (isConnected()) {
+            try {
+                mCommunicationChannel.sendRequest(serverRequest);
+            } catch (IOException e) {
+                mService.receiveError("No connection available : " + e.getMessage());
+            }
         }
     }
 

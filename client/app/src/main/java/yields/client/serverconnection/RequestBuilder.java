@@ -178,7 +178,7 @@ public class RequestBuilder {
         if (nodes.size() < 1) {
             throw new IllegalArgumentException("No nodes to add...");
         }
-        List<String> nodeIds = new ArrayList<>();
+        List<Long> nodeIds = new ArrayList<>();
         for (Id id : nodes) {
             nodeIds.add(id.getId());
         }
@@ -440,7 +440,7 @@ public class RequestBuilder {
     }
 
     private void addField(Fields fieldType, Id field) {
-        this.mConstructingMap.put(fieldType.getValue(), Long.parseLong(field.getId()));
+        this.mConstructingMap.put(fieldType.getValue(), field.getId());
     }
 
     private void addField(Fields fieldType, int field) {
@@ -472,7 +472,7 @@ public class RequestBuilder {
         request.put(Fields.KIND.getValue(), mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
-        metadata.put("sender", Long.parseLong(mSender.getId()));
+        metadata.put("sender", mSender.getId());
 
         metadata.put("datetime", formatDate(
                 new Date()));

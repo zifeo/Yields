@@ -7,7 +7,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.Socket;
 
-public class YieldEmulatorSocketProviderTest {
+public class YieldsSocketProviderTest {
 
     /**
      * needs the server running

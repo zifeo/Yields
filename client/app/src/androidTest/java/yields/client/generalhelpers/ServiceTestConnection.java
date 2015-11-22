@@ -10,7 +10,6 @@ public class ServiceTestConnection {
 
     public static void connectActivityToService(){
         YieldServiceBinder mockBinder = mock(YieldServiceBinder.class);
-        when(mockBinder.isServerConnected()).thenReturn(true);
         YieldsApplication.setBinder(mockBinder);
     }
 }

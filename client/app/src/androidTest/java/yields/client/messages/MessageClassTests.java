@@ -188,7 +188,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException, ParseException {
         Message m = new Message(new JSONArray(JSON_MESSAGE));
         User u = m.getSender();
-        assertEquals((new Id("117")).getId(), u.getId().getId());
+        assertEquals((new Id(117)).getId(), u.getId().getId());
     }
 
     @Test
