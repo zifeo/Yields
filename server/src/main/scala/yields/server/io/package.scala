@@ -36,7 +36,7 @@ package object io {
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
 
   implicit lazy val nodeMessageJF = jsonFormat4(NodeMessage)
-  implicit lazy val nodeMessageResJF = jsonFormat0(NodeMessageRes)
+  implicit lazy val nodeMessageResJF = jsonFormat1(NodeMessageRes)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
   implicit lazy val nodeHistoryResJF = jsonFormat2(NodeHistoryRes)
