@@ -30,6 +30,8 @@ import yields.client.R;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
+import yields.client.messages.CommentView;
+import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
@@ -177,6 +179,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
+        messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
@@ -192,6 +195,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testWrittenCommentIsCorrect() {
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
+        messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
 
@@ -223,6 +227,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock comment";
+        messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
@@ -235,8 +240,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         fragment = messageActivity.getCurrentFragment();
         LinearLayout messageContainer = (LinearLayout) fragment.getView().findViewById(R.id.messageContainer);
 
-        MessageView messageView = (MessageView) messageContainer.getChildAt(0);
-        assertEquals("Mock comment", ((TextContent) messageView.getMessage().getContent()).getText());
+        CommentView commentView = (CommentView) messageContainer.getChildAt(0);
+        assertEquals("Mock comment", ((ImageContent) commentView.getMessage().getContent()).getCaption());
     }
 
     @Test
@@ -244,6 +249,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
+        messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         input = "Should be flushed";
@@ -262,6 +268,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         final MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
+        messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
