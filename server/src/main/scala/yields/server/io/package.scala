@@ -59,13 +59,13 @@ package object io {
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
 
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
-  implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
+  implicit lazy val userInfoResJF = jsonFormat4(UserInfoRes)
 
 
   /** *** Message passing interface *****/
 
   implicit lazy val requestJF = RequestJsonFormat
   implicit lazy val responseJF = ResponseJsonFormat
-  implicit lazy val metadataJF = jsonFormat2(Metadata)
+  implicit lazy val metadataJF = jsonFormat3(Metadata.apply)
 
 }

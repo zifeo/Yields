@@ -1,22 +1,10 @@
 package yields.server.dbi.models
 
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.Matchers
 import yields.server.dbi._
-import yields.server.utils.{Config, Temporal}
+import yields.server.utils.Temporal
 
-class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
-
-  /** Switch on test database */
-  before {
-    redis.withClient(_.select(Config.getInt("test.database.id")))
-    redis.withClient(_.flushdb)
-  }
-
-  /** Switch back on main database */
-  after {
-    redis.withClient(_.flushdb)
-    redis.withClient(_.select(Config.getInt("database.id")))
-  }
+class TestGroup extends DBFlatSpec with Matchers {
 
   val testName = "Group Test"
 
@@ -53,14 +41,14 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
     val g1 = Group.createGroup(testName, 1)
     val u1 = User.create("email")
     val u2 = User.create("other email")
-    val m1 = (Temporal.current, u1.uid, None, "This is the body")
-    val m2 = (Temporal.current, u2.uid, None, "other body")
-    val m3 = (Temporal.current, u1.uid, None, "other other body")
+    val m1 = (Temporal.now, u1.uid, None, "This is the body")
+    val m2 = (Temporal.now, u2.uid, None, "other body")
+    val m3 = (Temporal.now, u1.uid, None, "other other body")
     g1.addMessage(m1)
     g1.addMessage(m2)
     g1.addMessage(m3)
     val g2 = Group(g1.nid)
-    val feed = g2.getMessagesInRange(Temporal.current, 3)
+    val feed = g2.getMessagesInRange(Temporal.now, 3)
 
     feed.length should be(3)
     feed should contain(m1)

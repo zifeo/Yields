@@ -1,11 +1,10 @@
 package yields.server.actions.users
 
-import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizeActionException}
-import yields.server.dbi.models.{User, UID, Email}
-import yields.server.actions.{Result, Action}
+import yields.server.actions._
+import yields.server.actions.exceptions.ActionArgumentException
+import yields.server.dbi.models.{Email, UID, User}
 import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
-import yields.server.actions._
 
 /**
   * Connects an user to the server.
@@ -24,11 +23,11 @@ case class UserConnect(email: Email) extends Action {
     if (checkValidEmail(email)) {
       User.fromEmail(email) match {
         case Some(user) =>
-          user.connected_at = Temporal.current
+          user.connected_at = Temporal.now
           UserConnectRes(user.uid)
         case None =>
           val newUser = User.create(email)
-          newUser.connected_at = Temporal.current
+          newUser.connected_at = Temporal.now
           UserConnectRes(newUser.uid)
       }
     } else {

@@ -1,32 +1,17 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Properties
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.actions.ActionsGenerators
+import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.{Config, Temporal}
 
 /**
   * Test class for User Update
   */
-class TestUserUpdate extends FlatSpec with Matchers with BeforeAndAfter {
+class TestUserUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
-  /** Switch on test database */
-  before {
-    redis(_.select(Config.getInt("test.database.id")))
-    redis(_.flushdb)
-  }
-
-  /** Switch back on main database */
-  after {
-    redis(_.flushdb)
-    redis(_.select(Config.getInt("database.id")))
-  }
-
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "update everything in database" in {
     val u = User.create("email12344321@email.com")

@@ -17,10 +17,11 @@ object Dependencies {
   }
 
   val akkaExp = {
-    val version = "1.0"
+    val version = "2.0-M1"
     Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % version,
-      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % version
+      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % version,
+      "com.typesafe.akka" %% "akka-stream-testkit-experimental" % version % "test"
     )
   }
 

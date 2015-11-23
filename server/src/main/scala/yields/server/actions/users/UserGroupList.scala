@@ -6,7 +6,6 @@ import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models.{Group, NID, UID, User}
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Lists the groups of the user.

@@ -1,31 +1,17 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
+import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.{Temporal, Config}
-
 
 /**
   * Test class for UserGetEntourage action
   */
-class TestUserInfo extends FlatSpec with Matchers with BeforeAndAfter {
+class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
 
-  /** Switch on test database */
-  before {
-    redis(_.select(Config.getInt("test.database.id")))
-    redis(_.flushdb)
-  }
-
-  /** Switch back on main database */
-  after {
-    redis(_.flushdb)
-    redis(_.select(Config.getInt("database.id")))
-  }
-
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
+  lazy val m = sample[Metadata]
 
   it should "get some infos" in {
     val u1 = User.create("e1@email.com")
@@ -43,9 +29,10 @@ class TestUserInfo extends FlatSpec with Matchers with BeforeAndAfter {
     val res = action.run(m)
 
     res match {
-      case UserInfoRes(name, email, entourage) =>
-        name should be("name")
-        email should be("e1@email.com")
+      case UserInfoRes(uid, name, email, entourage) =>
+        uid should be (u1.uid)
+        name should be ("name")
+        email should be ("e1@email.com")
         entourage.toSet should contain(u2.uid)
         entourage.toSet should contain(u3.uid)
         entourage.toSet should contain(u4.uid)

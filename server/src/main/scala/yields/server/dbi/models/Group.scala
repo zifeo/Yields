@@ -1,11 +1,8 @@
 package yields.server.dbi.models
 
-import com.redis.serialization.Format
 import yields.server.dbi._
 import yields.server.utils.Temporal
 import com.redis.serialization.Parse.Implicits._
-
-import scala.Option
 
 /**
   * Representation of a group
@@ -17,7 +14,6 @@ import scala.Option
   * @param nid Node id to build
   */
 class Group private(override val nid: NID) extends Node {
-
 
   object GroupKey {
     val node = NodeKey.node
@@ -34,7 +30,7 @@ class Group private(override val nid: NID) extends Node {
 
   /** add admin */
   def addAdmin(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(GroupKey.admins, Temporal.current.toEpochSecond, id)))
+    hasChangeOneEntry(redis.withClient(_.zadd(GroupKey.admins, Temporal.now.toEpochSecond, id)))
 
   /** remove admin */
   def removeAdmin(id: UID): Boolean =
@@ -89,6 +85,7 @@ object Group {
   /**
     * Create a new group with the given name
     * @param name name of the new group
+    * @param creator group creator
     * @return the newly created group
     */
   def createGroup(name: String, creator: UID): Group = {
@@ -96,7 +93,7 @@ object Group {
     redis.withClient { r =>
       import group.NodeKey
       val infos = List(
-        (NodeKey.created_at, Temporal.current),
+        (NodeKey.created_at, Temporal.now),
         (NodeKey.name, name),
         (NodeKey.kind, classOf[Group].getSimpleName),
         (NodeKey.creator, creator)

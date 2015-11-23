@@ -1,35 +1,19 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Properties
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.actions.ActionsGenerators
-import yields.server.actions.exceptions.UnauthorizeActionException
+import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.{Config, Temporal}
 
 /**
   * Test class for User Connect action
   */
-class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
+class TestUserConnect extends DBFlatSpec with Matchers with AllGenerators {
 
-  /** Switch on test database */
-  before {
-    redis(_.select(Config.getInt("test.database.id")))
-    redis(_.flushdb)
-  }
+  lazy val m = sample[Metadata]
 
-  /** Switch back on main database */
-  after {
-    redis(_.flushdb)
-    redis(_.select(Config.getInt("database.id")))
-  }
-
-  val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
-
-  it should "return the user it it exist in db" in {
+  "UserConnect" should "return the user if it exist in db" in {
     val email = "emai12763l@email.com"
     val u = User.create(email)
     val action = new UserConnect(email)
@@ -37,9 +21,9 @@ class TestUserConnect extends FlatSpec with Matchers with BeforeAndAfter {
 
     connectedUser match {
       case UserConnectRes(x: UID) =>
-        x should be(u.uid)
+        x should be (u.uid)
         val user = User(x)
-        user.email should be(email)
+        user.email should be (email)
     }
   }
 

@@ -2,12 +2,11 @@ package yields.server.dbi.models
 
 import java.time.OffsetDateTime
 
+import com.redis.RedisClient.DESC
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
-import com.redis.RedisClient.DESC
-import yields.server.dbi.models._
 
 /**
   * Model of a node with link to the database
@@ -37,7 +36,6 @@ abstract class Node {
   }
 
   val nid: NID
-
   private var _name: Option[String] = None
   private var _kind: Option[String] = None
   private var _created_at: Option[OffsetDateTime] = None
@@ -57,6 +55,13 @@ abstract class Node {
   /** Name setter. */
   def name_=(n: String): Unit =
     _name = update(NodeKey.name, n)
+
+  // Updates the field with given value and actualize timestamp.
+  private def update[T](field: String, value: T): Option[T] = {
+    val updates = List((field, value), (NodeKey.updated_at, Temporal.now))
+    redis.withClient(_.hmset(NodeKey.node, updates))
+    Some(value)
+  }
 
   /** Kind getter. */
   def kind: String = _kind.getOrElse {
@@ -104,10 +109,6 @@ abstract class Node {
     valueOrDefault(_users, List.empty)
   }
 
-  /** Add user */
-  def addUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.current.toEpochSecond, id)))
-
   /** Remove user */
   def removeUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
@@ -120,11 +121,11 @@ abstract class Node {
 
   /** Add node */
   def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
 
   /** Remove node */
   def removeNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
 
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
@@ -148,6 +149,10 @@ abstract class Node {
   def addMultipleUser(users: Seq[UID]): Unit =
     users.foreach(addUser)
 
+  /** Add user */
+  def addUser(id: UID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.now.toEpochSecond, id)))
+
   /** Add multiple nodes to the group */
   def addMultipleNodes(nodes: Seq[NID]): Unit =
     nodes.foreach(addNode)
@@ -167,25 +172,18 @@ abstract class Node {
     _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
   }
 
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (NodeKey.updated_at, Temporal.current))
-    redis.withClient(_.hmset(NodeKey.node, updates))
-    Some(value)
-  }
-
 }
 
 /** [[Node]] companion. */
 object Node {
 
-  object StaticKey {
-    val nid = "nodes:nid"
-  }
-
   /** Creates a new node by reserving a node identifier. */
   def newNID(): NID =
     redis.withClient(_.incr(StaticKey.nid)
       .getOrElse(throw new UnincrementableIdentifierException("new node identifier (nid) fails")))
+
+  object StaticKey {
+    val nid = "nodes:nid"
+  }
 
 }
