@@ -46,6 +46,7 @@ import yields.client.servicerequest.UserUpdateRequest;
  */
 public class ServiceRequestController {
 
+    private final String TAG = "RequestController";
     private final CacheDatabaseHelper mCacheHelper;
     private final YieldService mService;
     private final AtomicBoolean isConnecting;
@@ -222,7 +223,7 @@ public class ServiceRequestController {
             mCacheHelper.addMessage(updatedMessage, group.getId());
             mService.updateMessage(group, updatedMessage, date);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
-            //TODO : Define what happens !
+            Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
         }
     }
 
@@ -245,10 +246,8 @@ public class ServiceRequestController {
                 }
                 mService.receiveMessages(groupId, list);
             }
-        } catch (JSONException | ParseException e) {
-            e.printStackTrace();
-        } catch (CacheDatabaseException e) {
-            //TODO : Decice what happens when cache adding failed.
+        } catch (JSONException | ParseException | CacheDatabaseException e) {
+            Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
         }
     }
 
@@ -262,7 +261,7 @@ public class ServiceRequestController {
             List<Group> groups = mCacheHelper.getAllGroups();
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle UserGroupListRequest correctly !");
         }
         try {
             mCommunicationChannel.sendRequest(serverRequest);
@@ -279,7 +278,7 @@ public class ServiceRequestController {
         try {
             mCacheHelper.updateUser(serviceRequest.getUserToRemove());
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle UserEntourageRemove correctly !");
         }
         try {
             mCommunicationChannel.sendRequest(serverRequest);
@@ -311,7 +310,7 @@ public class ServiceRequestController {
             mCacheHelper.addGroup(serviceRequest.getGroup());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle GroupCreateRequest correctly !");
         }
 
         try {
@@ -329,7 +328,7 @@ public class ServiceRequestController {
         try {
             mCacheHelper.addUser(serviceRequest.getUserToAdd());
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle UserEntourageAddRequest correctly !");
         }
         try {
             mCommunicationChannel.sendRequest(serverRequest);
@@ -389,7 +388,7 @@ public class ServiceRequestController {
             mCacheHelper.addUserToGroup(serviceRequest.getGroupId(), serviceRequest.getUser());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle handleGroupAddRequest correctly !");
         }
         try {
             mCommunicationChannel.sendRequest(serverRequest);
@@ -422,7 +421,7 @@ public class ServiceRequestController {
             mCacheHelper.updateUser(serviceRequest.getUser());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle UserUpdateRequest correctly !");
         }
         try {
             mCommunicationChannel.sendRequest(serverRequest);
@@ -464,7 +463,7 @@ public class ServiceRequestController {
             mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle NodeMessageRequest correctly !");
         }
 
         try {
@@ -484,7 +483,7 @@ public class ServiceRequestController {
                     serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            //TODO : @Nroussel Decide what happens if cache adding failed.
+            Log.d(TAG, "Couldn't handle NodeHistoryRequest correctly !");
         }
 
         if (isConnected()) {
