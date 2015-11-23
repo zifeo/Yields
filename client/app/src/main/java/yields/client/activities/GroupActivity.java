@@ -116,7 +116,11 @@ public class GroupActivity extends NotifiableActivity {
 
         switch (item.getItemId()) {
             case R.id.actionEntourage:
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, UserListActivity.class);
+                String title = "Entourage";
+                intent.putExtra(UserListActivity.TITLE_KEY, title);
+
+                YieldsApplication.setUserList(YieldsApplication.getUser().getEntourage());
             break;
 
             case R.id.actionDiscover:
@@ -128,6 +132,8 @@ public class GroupActivity extends NotifiableActivity {
             break;
 
             case R.id.actionSettings:
+                //TODO Create a UserSettingsActivity
+
                 intent = new Intent(this, CreatingAccountActivity.class);
             break;
 
@@ -160,6 +166,9 @@ public class GroupActivity extends NotifiableActivity {
         });
     }
 
+    /**
+     * Method called when the server is connected
+     */
     @Override
     public void notifyOnServerConnected() {
         runOnUiThread(new Runnable() {
@@ -170,6 +179,9 @@ public class GroupActivity extends NotifiableActivity {
         });
     }
 
+    /**
+     * Method called when the server is disconnected
+     */
     @Override
     public void notifyOnServerDisconnected() {
         runOnUiThread(new Runnable() {
@@ -232,7 +244,6 @@ public class GroupActivity extends NotifiableActivity {
      */
     private void createFakeUserAndGroups() {
         Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
-        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
 
         try {
             YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
@@ -244,11 +255,6 @@ public class GroupActivity extends NotifiableActivity {
         } catch (NodeException e) {
             e.printStackTrace();
         }
-
-        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(), R.drawable.default_group_image);
-
-        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
-        YieldsApplication.setDefaultGroupImage(GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
 
         mGroups = new ArrayList<>();
 

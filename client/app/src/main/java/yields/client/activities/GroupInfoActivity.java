@@ -1,8 +1,12 @@
 package yields.client.activities;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -10,15 +14,17 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
-import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
+import yields.client.servicerequest.GroupAddRequest;
+import yields.client.servicerequest.GroupRemoveRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the main information of a group are displayed :
  * name, image, tags.
  */
-public class GroupInfoActivity extends AppCompatActivity {
+public class GroupInfoActivity extends NotifiableActivity{
     private Group mGroup;
 
     private static final int MAX_TAGS = 10;
@@ -40,11 +46,11 @@ public class GroupInfoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         mGroup = Objects.requireNonNull(YieldsApplication.getGroup(),
-                "The group in YieldsApplication cannot be null when this activity is created");
+                "The group in YieldsApplication cannot be null when GroupInfoActivity is created");
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewGroup);
-        imageView.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(mGroup.getImage(),
-                getResources().getInteger(R.integer.groupImageDiameter)));
+        int size = getResources().getInteger(R.integer.largeGroupImageDiameter);
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(mGroup.getImage(), size, size, false));
 
         TextView textViewName = (TextView) findViewById(R.id.textViewGroupName);
         textViewName.setText(mGroup.getName());
@@ -68,6 +74,114 @@ public class GroupInfoActivity extends AppCompatActivity {
                 builder.append(tags.get(i).getText());
             }
             textViewTags.setText(builder.toString());
+        }
+
+        Button usersButton = (Button) findViewById(R.id.buttonUsers);
+
+        usersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
+                String title = "Users of " + mGroup.getName();
+                intent.putExtra(UserListActivity.TITLE_KEY, title);
+                startActivity(intent);
+            }
+        });
+
+        checkButtons();
+    }
+
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Notify the activity that a response has been received
+     */
+    @Override
+    public void notifyChange() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                checkButtons();
+
+                if (mGroup.containsUser(YieldsApplication.getUser())){
+                    YieldsApplication.showToast(getApplicationContext(), "Group joined !");
+                }
+                else {
+                    YieldsApplication.showToast(getApplicationContext(), "Group left !");
+                }
+            }
+        });
+    }
+
+    /**
+     * Method called when the server is connected
+     */
+    @Override
+    public void notifyOnServerConnected() {
+
+    }
+
+    /**
+     * Method called when the server is disconnected
+     */
+    @Override
+    public void notifyOnServerDisconnected() {
+
+    }
+
+    /**
+     * Check if the user is in the group and set the appropriate states to the buttons
+     */
+    private void checkButtons(){
+        YieldsApplication.setUserList(mGroup.getUsers());
+
+        final Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
+
+        joinButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ServiceRequest request = new GroupAddRequest(YieldsApplication.getUser(),
+                        mGroup, YieldsApplication.getUser());
+                YieldsApplication.getBinder().sendRequest(request);
+
+                joinButton.setEnabled(false);
+            }
+        });
+
+        final Button leaveButton = (Button) findViewById(R.id.buttonLeaveGroup);
+
+        leaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
+                        mGroup, YieldsApplication.getUser());
+                YieldsApplication.getBinder().sendRequest(request);
+
+                leaveButton.setEnabled(false);
+            }
+        });
+
+        if (mGroup.containsUser(YieldsApplication.getUser())){
+            joinButton.setVisibility(View.GONE);
+            leaveButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            joinButton.setVisibility(View.VISIBLE);
+            leaveButton.setVisibility(View.GONE);
         }
     }
 }

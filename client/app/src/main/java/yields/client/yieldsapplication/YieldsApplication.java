@@ -14,10 +14,13 @@ import java.util.Objects;
 
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.service.YieldServiceBinder;
 
 public class YieldsApplication {
     private static ClientUser mUser;
+    private static User mUserSearched;
+    private static List<User> mUserList;
     private static Group mGroup;
     private static List<Group> mGroupsSearched;
 
@@ -56,6 +59,22 @@ public class YieldsApplication {
      */
     public static List<Group> getGroupsSearched(){
         return mGroupsSearched;
+    }
+
+    /**
+     * Getter for the list of users currently displayed in the UserListActivity.
+     * @return The list of users displayed.
+     */
+    public static List<User> getUserList(){
+        return mUserList;
+    }
+
+    /**
+     * Getter for the user currently displayed in the UserInfoActivity.
+     * @return The user displayed
+     */
+    public static User getUserSearched(){
+        return mUserSearched;
     }
 
     /**
@@ -133,6 +152,22 @@ public class YieldsApplication {
     public static void setGroupsSearched(List<Group> groups){
         Objects.requireNonNull(groups);
         mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
+    }
+
+    /**
+     * Setter for the user list to be displayed in UserListActivity
+     * @param users The user list.
+     */
+    public static void setUserList(List<User> users){
+        mUserList = Collections.unmodifiableList(Objects.requireNonNull(users));
+    }
+
+    /**
+     * Setter for the user to be displayed in UserInfoActivity
+     * @param user The user that will be displayed.
+     */
+    public static void setUserSearched(User user){
+        mUserSearched = Objects.requireNonNull(user);
     }
 
     /**
