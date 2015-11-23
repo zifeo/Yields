@@ -20,8 +20,8 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
 
   val testName = "Group Test"
 
-  "Creating a group with a name" should "insert it in the database" in {
-    val g1 = Group.createGroup(testName)
+  it should "insert the group in the database" in {
+    val g1 = Group.createGroup(testName, 1)
     val g2 = Group(g1.nid)
 
     g2.nid should be(g1.nid)
@@ -30,7 +30,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "Adding user to a group" should "modify the model" in {
-    val g1 = Group.createGroup(testName)
+    val g1 = Group.createGroup(testName, 1)
     val u1 = User.create("email")
     g1.addUser(u1.uid)
     val g2 = Group(g1.nid)
@@ -39,7 +39,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "Removing a user from a group" should "modify the model" in {
-    val g1 = Group.createGroup(testName)
+    val g1 = Group.createGroup(testName, 1)
     val u1 = User.create("email")
     g1.addUser(u1.uid)
     val g2 = Group(g1.nid)
@@ -50,7 +50,7 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "Adding multiple messages to a group" should "add the messages" in {
-    val g1 = Group.createGroup(testName)
+    val g1 = Group.createGroup(testName, 1)
     val u1 = User.create("email")
     val u2 = User.create("other email")
     val m1 = (Temporal.current, u1.uid, None, "This is the body")
@@ -69,8 +69,8 @@ class TestGroup extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "Adding a node" should "add the node in the model" in {
-    val g1 = Group.createGroup(testName)
-    val g2 = Group.createGroup("A chat group")
+    val g1 = Group.createGroup(testName, 1)
+    val g2 = Group.createGroup("A chat group", 1)
     g1.addNode(g2.nid)
     val g3 = Group(g1.nid)
 

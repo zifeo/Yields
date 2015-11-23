@@ -28,7 +28,7 @@ class TestUserUpdate extends FlatSpec with Matchers with BeforeAndAfter {
 
   lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
 
-  "updating all values" should "update everything in database" in {
+  it should "update everything in database" in {
     val u = User.create("email12344321@email.com")
     u.name = "name"
     val action = new UserUpdate(u.uid, Some("newemail@email.com"), Some("new name"), None)
