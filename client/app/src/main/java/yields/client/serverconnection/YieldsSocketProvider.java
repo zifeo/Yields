@@ -11,7 +11,6 @@ import java.net.UnknownHostException;
  * A default implementation of the {@link SocketProvider} interface that uses
  * the mechanism available in the {@link URL} object to create
  * {@link HttpURLConnection} objects.
- *
  */
 public class YieldsSocketProvider implements SocketProvider {
     private final static int DST_PORT = 27777;
@@ -23,7 +22,7 @@ public class YieldsSocketProvider implements SocketProvider {
      *
      * @throws UnknownHostException In case of trouble connecting
      */
-    public YieldsSocketProvider() throws UnknownHostException{
+    public YieldsSocketProvider() throws UnknownHostException {
         this.mDstAddress = InetAddress.getByName(LOCAL_ADDRESS);
     }
 
