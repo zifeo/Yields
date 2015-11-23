@@ -2,6 +2,7 @@ package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
 import android.util.ArrayMap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -72,7 +73,7 @@ public class RequestBuilder {
         builder.addField(Fields.NAME, name);
         builder.addField(Fields.EMAIL, email);
         builder.addField(Fields.IMAGE, image);
-        
+
         return builder.request();
     }
 
@@ -309,7 +310,7 @@ public class RequestBuilder {
      * @param sender  The Id of the sender.
      * @param groupId The Id of the group to which the Message is sent to.
      * @param content The Content of the Message that is sent.
-     * @param date The date of when the Message was created.
+     * @param date    The date of when the Message was created.
      * @return The request itself.
      */
     public static ServerRequest nodeMessageRequest(Id sender, Id groupId, Content content, Date date) {
@@ -487,7 +488,7 @@ public class RequestBuilder {
                     DateSerialization.dateSerializer.toDate((String) mConstructingMap.get(Fields.DATE.getValue()))
                     : new Date();
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.d("RequestBuilder", "Couldn't handle build ServerRequest correctly !");
         }
 
 
