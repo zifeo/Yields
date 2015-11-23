@@ -405,6 +405,7 @@ public class MessageActivity extends NotifiableActivity {
                             // Then we update the group currently displayed as it is the commented
                             // message
                             mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
+                            YieldsApplication.setGroup(mGroup);
                             mType = ContentType.MESSAGE_COMMENTS;
                             createCommentFragment();
                         }
@@ -430,6 +431,7 @@ public class MessageActivity extends NotifiableActivity {
             mType = ContentType.GROUP_MESSAGES;
             // We need to go back to the last reference of mGroup.
             mGroup = mLastApplicationGroup;
+            YieldsApplication.setGroup(mGroup);
             createGroupMessageFragment();
         }
     }

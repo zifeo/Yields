@@ -2,9 +2,10 @@ package yields.server.actions
 
 import java.time.OffsetDateTime
 
-import org.scalacheck.Arbitrary
+import org.scalacheck._
 import yields.server._
 import yields.server.actions.groups._
+import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory, NodeMessageRes, NodeMessage}
 import yields.server.dbi.models._
 
 trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
@@ -16,7 +17,9 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
       name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
       users <- arbitrary[List[UID]]
-    } yield GroupCreate(name, nodes, users)
+      tags <- arbitrary[List[String]]
+      visibility: String <- Gen.oneOf("private", "public")
+    } yield GroupCreate(name, nodes, users, tags, visibility)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
@@ -37,32 +40,46 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     GroupUpdateRes()
   }
 
-  implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
+  implicit lazy val groupHistoryArb: Arbitrary[NodeHistory] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      content <- arbitrary[String]
-    } yield GroupMessage(nid, content)
-  }
-
-  implicit lazy val groupMessageResArb: Arbitrary[GroupMessageRes] = Arbitrary {
-    for {
-      datetime <- arbitrary[OffsetDateTime]
-    } yield GroupMessageRes(datetime)
-  }
-
-  implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      datetime <- arbitrary[OffsetDateTime]
+      date <- arbitrary[OffsetDateTime]
       count <- arbitrary[Int]
-    } yield GroupHistory(nid, datetime, count)
+    } yield NodeHistory(nid, date, count)
   }
 
-  implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
+  implicit lazy val groupMessageArb: Arbitrary[NodeMessage] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      nodes <- arbitrary[List[FeedContent]]
-    } yield GroupHistoryRes(nid, nodes)
+      text <- arbitrary[Option[String]]
+      contentType <- arbitrary[Option[String]]
+      content <- arbitrary[Option[Blob]]
+    } yield NodeMessage(nid, text, contentType, content)
+  }
+
+  implicit lazy val groupHistoryResArb: Arbitrary[NodeHistoryRes] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+      nodes <- arbitrary[List[ResponseFeedContent]]
+    } yield NodeHistoryRes(nid, nodes)
+  }
+
+  implicit lazy val groupMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
+    for {
+      datetime <- arbitrary[OffsetDateTime]
+    } yield NodeMessageRes(datetime)
+  }
+
+  implicit lazy val groupSearchArb: Arbitrary[GroupSearch] = Arbitrary {
+    for {
+      pattern <- arbitrary[String]
+    } yield GroupSearch(pattern)
+  }
+
+  implicit lazy val groupSearchResArb: Arbitrary[GroupSearchRes] = Arbitrary {
+    for {
+      res <- arbitrary[Seq[(NID, String)]]
+    } yield GroupSearchRes(res)
   }
 
 }

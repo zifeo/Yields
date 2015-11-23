@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -29,6 +30,11 @@ import yields.client.listadapter.ListAdapterSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.servicerequest.GroupAddRequest;
+import yields.client.servicerequest.GroupUpdateImageRequest;
+import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateVisibilityRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -36,7 +42,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * where the admin can change its name, image, users...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, TYPE, IMAGE, USERS}
+    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
@@ -68,6 +74,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
+        itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
@@ -107,7 +114,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     String message = "Group image changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
 
-                    //TODO Change group image and send notification to server
+                    ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup, image);
+                    YieldsApplication.getBinder().sendRequest(request);
                 }
                 else {
                     String message = "Could not retrieve image";
@@ -123,23 +131,22 @@ public class GroupSettingsActivity extends AppCompatActivity {
             ArrayList<String> emailList = data.getStringArrayListExtra(
                     AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
-            int count = 0;
-
+            List<User> newUsers = new ArrayList<>();
             List<User> entourage = mUser.getEntourage();
             for (int i = 0; i < emailList.size(); i++){
                 for (int j = 0; j < entourage.size(); j++){
                     if (entourage.get(j).getEmail().equals(emailList.get(i))
                             && !mGroup.containsUser(entourage.get(j))){
 
-                        // TODO Add user to group and send notification to server
-
-                        count++;
+                        newUsers.add(entourage.get(j));
                     }
                 }
             }
 
-            String message = count + " user(s) added to group";
+            String message = newUsers.size() + " user(s) added to group";
             YieldsApplication.showToast(getApplicationContext(), message);
+
+            // TODO Send request to add multiple users to server
         }
     }
 
@@ -171,6 +178,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     changeImageListener();
                     break;
 
+                case ADD_TAG:
+                    changeTagListener();
+                    break;
+
                 default:
                     addUsersListener();
                     break;
@@ -191,10 +202,13 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String message = "Group name changed to \"" + editTextName.getText().toString() + "\"";
+                            String newName = editTextName.getText().toString();
+                            String message = "Group name changed to \"" + newName + "\"";
                             YieldsApplication.showToast(getApplicationContext(), message);
 
-                            // TODO Add change in group's name, not just display
+                            ServiceRequest request = new GroupUpdateNameRequest(mUser,
+                                    mGroup, newName);
+                            YieldsApplication.getBinder().sendRequest(request);
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -230,11 +244,16 @@ public class GroupSettingsActivity extends AppCompatActivity {
                         String message = "Group type changed to : " + type;
                         YieldsApplication.showToast(getApplicationContext(), message);
 
-                        if (type.equals("public")) {
-                            mGroup.setVisibility(Group.GroupVisibility.PUBLIC);
-                        } else {
-                            mGroup.setVisibility(Group.GroupVisibility.PRIVATE);
+                        Group.GroupVisibility visibility;
+                        if (itemSelected[0] == 1) {
+                            visibility = Group.GroupVisibility.PRIVATE;
                         }
+                        else {
+                            visibility = Group.GroupVisibility.PUBLIC;
+                        }
+                        ServiceRequest request = new GroupUpdateVisibilityRequest(mUser,
+                                mGroup, visibility);
+                        YieldsApplication.getBinder().sendRequest(request);
                     }
                 })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -248,7 +267,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Change group image" item.
          */
-        void changeImageListener(){
+        private void changeImageListener(){
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -258,7 +277,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Add users" item.
          */
-        void addUsersListener(){
+        private void addUsersListener(){
             ArrayList<String> emailList = new ArrayList<>();
             List<User> currentUsers = mGroup.getUsers();
 
@@ -271,6 +290,57 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     EMAIL_LIST_INPUT_KEY, emailList);
 
             startActivityForResult(intentSelectUsers, REQUEST_ADD_USERS);
+        }
+
+        /**
+         * Listener for the "Add tag" item.
+         */
+        private void changeTagListener() {
+            final EditText editTextTag = new EditText(GroupSettingsActivity.this);
+            editTextTag.setId(R.id.editText);
+
+            final AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
+                    .setTitle("Add new tag")
+                    .setMessage("The new tag must be between 2 and 20 characters" +
+                            ", in lowercase, with no spaces.")
+                    .setView(editTextTag)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String text = editTextTag.getText().toString().toLowerCase().replace(' ', '_');
+
+                    if (text.length() < Group.Tag.MIN_TAG_LENGTH) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The tag is too short");
+                    } else if (text.length() > Group.Tag.MAX_TAG_LENGTH) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The tag is too long");
+                    } else {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "Tag \"" + text + "\" added");
+
+                        Group.Tag tag = new Group.Tag(text);
+
+                        mGroup.addTag(tag);
+
+                        // TODO Send request to server to add tag in database
+
+                        dialog.dismiss();
+                    }
+                }
+            });
         }
     }
 

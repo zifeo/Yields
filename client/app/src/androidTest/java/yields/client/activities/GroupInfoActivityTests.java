@@ -13,7 +13,9 @@ import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
@@ -32,6 +34,9 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
+        YieldsApplication.setUser(MockFactory.generateFakeClientUser("Arnaud", new Id(1), "aa",
+                YieldsApplication.getDefaultUserImage()));
     }
 
     /**
@@ -85,5 +90,22 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         assertTrue(tags.startsWith("Tags : "));
         assertTrue(tags.contains("fun"));
         assertTrue(tags.contains("happy"));
+    }
+
+    /**
+     * Test that the correct users are displayed
+     */
+    public void testCorrectUsers(){
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
+        g.addUser(new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage()));
+        g.addUser(new User("Clank", new Id(121), "c@veldin.com", YieldsApplication.getDefaultUserImage()));
+
+        YieldsApplication.setGroup(g);
+        getActivity();
+
+        onView(withId(R.id.buttonUsers)).perform(click());
+        onView(withText("Ratchet")).perform(click());
+
+        onView(withId(R.id.textViewUserName)).check(matches(isDisplayed()));
     }
 }

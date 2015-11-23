@@ -2,6 +2,7 @@ package yields.server
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
+import yields.server.actions.nodes._
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, ResultJsonFormat}
 import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
@@ -28,20 +29,23 @@ package object io {
 
   // Groups
 
-  implicit lazy val groupCreateJF = jsonFormat3(GroupCreate)
+  implicit lazy val groupCreateJF = jsonFormat5(GroupCreate)
   implicit lazy val groupCreateResJF = jsonFormat1(GroupCreateRes)
 
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
 
-  implicit lazy val groupMessageJF = jsonFormat2(GroupMessage)
-  implicit lazy val groupMessageResJF = jsonFormat1(GroupMessageRes)
+  implicit lazy val nodeMessageJF = jsonFormat4(NodeMessage)
+  implicit lazy val nodeMessageResJF = jsonFormat1(NodeMessageRes)
 
-  implicit lazy val groupHistoryJF = jsonFormat3(GroupHistory)
-  implicit lazy val groupHistoryResJF = jsonFormat2(GroupHistoryRes)
+  implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
+  implicit lazy val nodeHistoryResJF = jsonFormat2(NodeHistoryRes)
 
   implicit lazy val groupSearchJF = jsonFormat1(GroupSearch)
   implicit lazy val groupSearchResJF = jsonFormat1(GroupSearchRes)
+
+  implicit lazy val groupManageJF = jsonFormat5(GroupManage)
+  implicit lazy val groupManageResJF = jsonFormat0(GroupManageRes)
 
   // Users
 
@@ -54,16 +58,14 @@ package object io {
   implicit lazy val userUpdateJF = jsonFormat4(UserUpdate)
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
 
-  implicit lazy val userCreateJF = jsonFormat2(UserCreate)
-  implicit lazy val userCreateResJF = jsonFormat1(UserCreateRes)
-
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
-  implicit lazy val userInfoResJF = jsonFormat3(UserInfoRes)
+  implicit lazy val userInfoResJF = jsonFormat4(UserInfoRes)
+
 
   /** *** Message passing interface *****/
 
   implicit lazy val requestJF = RequestJsonFormat
   implicit lazy val responseJF = ResponseJsonFormat
-  implicit lazy val metadataJF = jsonFormat2(Metadata)
+  implicit lazy val metadataJF = jsonFormat3(Metadata.apply)
 
 }

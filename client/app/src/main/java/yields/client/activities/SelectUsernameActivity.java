@@ -17,7 +17,7 @@ public class SelectUsernameActivity extends AppCompatActivity {
     private EditText mEditTextCreateAccount;
 
     /**
-     * OnCrate method for the SelectUsernameActivity.
+     * OnCreate method for the SelectUsernameActivity.
      * @param savedInstanceState The bundle.
      */
     @Override

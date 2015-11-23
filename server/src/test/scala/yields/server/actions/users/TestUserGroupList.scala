@@ -1,36 +1,20 @@
 package yields.server.actions.users
 
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Properties
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.actions.ActionsGenerators
+import org.scalatest.Matchers
+import yields.server._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.KeyNotSetException
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.utils.{Config, Temporal}
 
 /**
   * Test class User group list
   * TODO implement user group list correctly
   */
-class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
+class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
 
-  /** Switch on test database */
-  before {
-    redis(_.select(Config.getInt("test.database.id")))
-    redis(_.flushdb)
-  }
+  lazy val m = sample[Metadata]
 
-  /** Switch back on main database */
-  after {
-    redis(_.flushdb)
-    redis(_.select(Config.getInt("database.id")))
-  }
-
-  lazy val m = new Metadata(arbitrary[UID].sample.getOrElse(1), Temporal.current)
-
-  "Test with empty groupList" should "return empty list" in {
+  it should "return empty list when the group list is empty" in {
     val u = User.create("an@SAs678email.com")
     val action = new UserGroupList(u.uid)
     val res = action.run(m)
@@ -40,11 +24,11 @@ class TestUserGroupList extends FlatSpec with Matchers with BeforeAndAfter {
     }
   }
 
-  "Test with 2 groups in list" should "return the group list" in {
+  it should "return the group list when it is not empty" in {
     val u = User.create("an@email.com")
-    val g1 = Group.createGroup("g1")
+    val g1 = Group.createGroup("g1", m.client)
     g1.name = "n1"
-    val g2 = Group.createGroup("g2")
+    val g2 = Group.createGroup("g2", m.client)
     g2.name = "n2"
     u.addToGroups(g1.nid)
     u.addToGroups(g2.nid)

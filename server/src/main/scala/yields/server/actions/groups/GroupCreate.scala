@@ -3,14 +3,17 @@ package yields.server.actions.groups
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
+import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
 
 /**
   * Creation of a named group including some nodes
   * @param name group name
   * @param nodes grouped nodes
+  * @param users users to put in the group
+  * @param visibility private or public
   */
-case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID]) extends Action {
+case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq[String], visibility: String) extends Action {
 
   /**
     * Run the action given the sender.
@@ -19,10 +22,24 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID]) extends A
     */
   override def run(metadata: Metadata): Result = {
     if (!name.isEmpty) {
-      val group = Group.createGroup(name)
-      group.addMultipleNodes(nodes)
-      group.addMultipleUser(users)
-      GroupCreateRes(group.nid)
+      if (visibility == "private" || visibility == "public") {
+        val group = Group.createGroup(name, metadata.client)
+        group.addMultipleNodes(nodes)
+        group.addMultipleUser(users)
+        /** Create or get tags id */
+        val tids: List[TID] = tags.map { text: String =>
+          Tag.getIdFromText(text) match {
+            case Some(x) => x
+            case None => Tag.createTag(text).tid
+          }
+        }.toList
+
+        group.addTags(tids)
+        GroupCreateRes(group.nid)
+      } else {
+        val errorMessage = getClass.getSimpleName
+        throw new ActionArgumentException(s"Bad visibility : $visibility in : $errorMessage")
+      }
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"Empty name : $errorMessage")

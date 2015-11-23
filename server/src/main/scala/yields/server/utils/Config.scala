@@ -2,15 +2,18 @@ package yields.server.utils
 
 import com.typesafe.config.ConfigFactory
 
-/** Yields configuration accessor. */
+/** Yields configuration adapter accessor. */
 object Config {
 
-  private[utils] lazy val config = ConfigFactory.load().getConfig("yields")
+  private lazy val config = ConfigFactory.load().getConfig("yields")
 
-  /** Get a String from the key. */
+  /** Gets a String from the key. */
   def getString(e: String): String = config.getString(e)
 
-  /** Get an Int from the key. */
+  /** Gets an Int from the key. */
   def getInt(e: String): Int = config.getInt(e)
+
+  /** Gets a Long from the key. */
+  def getLong(e: String): Long = config.getLong(e)
 
 }

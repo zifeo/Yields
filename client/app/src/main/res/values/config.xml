@@ -2,4 +2,5 @@
 
 <resources>
     <integer name="groupImageDiameter">80</integer>
+    <integer name="largeGroupImageDiameter">200</integer>
 </resources>

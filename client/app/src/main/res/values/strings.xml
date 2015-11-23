@@ -52,6 +52,9 @@
     <string name="users">Users</string>
     <string name="joinGroup">Join Group !</string>
     <string name="noTags">No tags for this group</string>
+    <string name="userImage">User image</string>
+    <string name="addTag">Add tag</string>
+    <string name="leaveGroup">Leave group</string>
     <string name="title_activity_image_show_pop_up">ImageShowPopUp</string>
     <string name="hello_world">Hello world!</string>
     <string name="connectIcon">Connect Icon</string>

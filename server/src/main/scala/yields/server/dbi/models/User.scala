@@ -1,12 +1,11 @@
 package yields.server.dbi.models
 
 import java.time.OffsetDateTime
-import java.util.regex.{Matcher, Pattern}
 
 import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.{UnauthorizeActionException, NewUserExistException}
+import yields.server.actions.exceptions.{NewUserExistException, UnauthorizeActionException}
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{KeyNotSetException, IllegalValueException, UnincrementableIdentifierException}
+import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
 
 /**
@@ -18,7 +17,7 @@ import yields.server.utils.Temporal
   *
   * Database structure:
   * users:uid Long - last user id created
-  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at
+  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at / connected_at
   * users:[uid]:groups Zset[NID] with score datetime
   * users:[uid]:entourage Zset[UID] with score datetime
   * users:indexes:email Map[Email, UID] - email
@@ -39,6 +38,7 @@ final class User private(val uid: UID) {
     val picture = "picture"
     val created_at = "created_at"
     val updated_at = "updated_at"
+    val connected_at = "connected_at"
     val groups = s"$user:groups"
     val entourage = s"$user:entourage"
   }
@@ -46,9 +46,9 @@ final class User private(val uid: UID) {
   private var _name: Option[String] = None
   private var _email: Option[Email] = None
   private var _picture: Option[Blob] = None
-
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
+  private var _connected_at: Option[OffsetDateTime] = None
 
   private var _groups: Option[List[NID]] = None
   private var _entourage: Option[List[UID]] = None
@@ -62,6 +62,13 @@ final class User private(val uid: UID) {
   /** Name setter. */
   def name_=(newName: String): Unit =
     _name = update(Key.name, newName)
+
+  // Updates the field with given value and actualize timestamp.
+  private def update[T](field: String, value: T): Option[T] = {
+    val updates = List((field, value), (Key.updated_at, Temporal.now))
+    redis.withClient(_.hmset(Key.user, updates))
+    Some(value)
+  }
 
   /** Email getter. */
   def email: Email = _email.getOrElse {
@@ -95,6 +102,16 @@ final class User private(val uid: UID) {
     valueOrException(_updated_at)
   }
 
+  /** Connected datetime getter. */
+  def connected_at: OffsetDateTime = _connected_at.getOrElse {
+    _connected_at = redis.withClient(_.hget[OffsetDateTime](Key.user, Key.connected_at))
+    valueOrException(_connected_at)
+  }
+
+  /** Connected datetime getter. */
+  def connected_at_=(offsetDateTime: OffsetDateTime): Unit =
+    _connected_at = update(Key.connected_at, offsetDateTime)
+
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {
     _groups = redis.withClient(_.zrange[NID](Key.groups, 0, -1))
@@ -103,7 +120,7 @@ final class User private(val uid: UID) {
 
   /** Adds a group and returns whether this group has been added. */
   def addToGroups(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.now.toEpochSecond, nid)))
 
   /** Remove a group and returns whether this group has been removed. */
   def removeFromGroups(nid: NID): Boolean =
@@ -117,7 +134,7 @@ final class User private(val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addToEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.current.toEpochSecond, uid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.now.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
@@ -137,13 +154,6 @@ final class User private(val uid: UID) {
     _picture = values.get(Key.picture)
     _created_at = values.get(Key.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(Key.updated_at).map(OffsetDateTime.parse)
-  }
-
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (Key.updated_at, Temporal.current))
-    redis.withClient(_.hmset(Key.user, updates))
-    Some(value)
   }
 
 }
@@ -170,19 +180,13 @@ object User {
       val user = User(uid)
       redis.withClient { r =>
         import user.Key
-        val infos = List((Key.created_at, Temporal.current), (Key.email, email))
+        val infos = List((Key.created_at, Temporal.now), (Key.email, email))
         r.hmset(user.Key.user, infos)
         r.hset(StaticKey.emailIndex, email, uid)
       }
       user
     } else throw new NewUserExistException("email already registered")
   }
-
-  /** Prepares user model for retrieving data given an user id. */
-  def apply(uid: UID): User = {
-    new User(uid)
-  }
-
 
   /** Retrieves user model given an user email. */
   def fromEmail(email: String): Option[User] = {
@@ -192,6 +196,11 @@ object User {
     if (checkValidEmail(email)) {
       redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
     } else throw new UnauthorizeActionException(s"invalid email in fromEmail method")
+  }
+
+  /** Prepares user model for retrieving data given an user id. */
+  def apply(uid: UID): User = {
+    new User(uid)
   }
 
 }
