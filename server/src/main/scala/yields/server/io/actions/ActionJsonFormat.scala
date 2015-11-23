@@ -6,6 +6,7 @@ import yields.server.actions._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeHistory, NodeMessage}
 import yields.server.actions.users._
+import yields.server.io._
 
 /** Json format for [[Action]]. */
 object ActionJsonFormat extends RootJsonFormat[Action] {

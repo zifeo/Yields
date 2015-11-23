@@ -15,7 +15,7 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
   lazy val m = sample[Metadata]
 
   it should "update the group in db" in {
-    val g1 = Group.createGroup("name1", m.sender)
+    val g1 = Group.createGroup("name1", m.client)
     val action = new GroupUpdate(g1.nid, Some("name2"), None)
     action.run(m)
     val g2 = Group(g1.nid)

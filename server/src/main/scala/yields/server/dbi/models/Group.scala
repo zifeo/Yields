@@ -30,7 +30,7 @@ class Group private(override val nid: NID) extends Node {
 
   /** add admin */
   def addAdmin(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(GroupKey.admins, Temporal.current.toEpochSecond, id)))
+    hasChangeOneEntry(redis.withClient(_.zadd(GroupKey.admins, Temporal.now.toEpochSecond, id)))
 
   /** remove admin */
   def removeAdmin(id: UID): Boolean =

@@ -3,7 +3,7 @@ package yields
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Gen
 import spray.json._
 
 import scala.concurrent.duration._
@@ -17,7 +17,6 @@ package object server {
 
   /**
     * Generates elements given the generator and creates a source from it.
-    * FIXME 'scala.collection.immutable.Seq' is to avoid type confusion.
     * @param gen element generator
     * @param num number of generated elements, by default 20 (be careful on test timeout if too many)
     * @tparam T type of element
@@ -36,9 +35,5 @@ package object server {
   /** Serialize and deserialize a given element. */
   def toAndFromJson[T : JsonWriter : JsonReader](elem: T): T =
     elem.toJson.toString().parseJson.convertTo[T]
-
-  /** Sample an element of some type. */
-  def sample[T](implicit a: Arbitrary[T]): T =
-    Arbitrary.arbitrary[T].sample.get
 
 }

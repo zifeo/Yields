@@ -121,11 +121,11 @@ abstract class Node {
 
   /** Add node */
   def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
 
   /** Remove node */
   def removeNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.current.toEpochSecond, nid)))
+    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
 
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
@@ -161,10 +161,6 @@ abstract class Node {
   def remMultipleNodes(nodes: Seq[NID]): Unit =
     nodes.foreach(removeNode)
 
-  /** Add node */
-  def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
-
   /** Fill the model with the database content */
   def hydrate(): Unit = {
     val values = redis.withClient(_.hgetall[String, String](NodeKey.node))
@@ -174,18 +170,6 @@ abstract class Node {
     _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(NodeKey.updated_at).map(OffsetDateTime.parse)
     _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
-  }
-
-  object NodeKey {
-    val node = s"nodes:$nid"
-    val name = "name"
-    val kind = "kind"
-    val refreshed_at = "refreshed_at"
-    val created_at = "created_at"
-    val updated_at = "updated_at"
-    val users = s"$node:users"
-    val nodes = s"$node:nodes"
-    val feed = s"$node:feed"
   }
 
 }

@@ -26,9 +26,9 @@ class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
 
   it should "return the group list when it is not empty" in {
     val u = User.create("an@email.com")
-    val g1 = Group.createGroup("g1", m.sender)
+    val g1 = Group.createGroup("g1", m.client)
     g1.name = "n1"
-    val g2 = Group.createGroup("g2", m.sender)
+    val g2 = Group.createGroup("g2", m.client)
     g2.name = "n2"
     u.addToGroups(g1.nid)
     u.addToGroups(g2.nid)

@@ -23,7 +23,7 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq
   override def run(metadata: Metadata): Result = {
     if (!name.isEmpty) {
       if (visibility == "private" || visibility == "public") {
-        val group = Group.createGroup(name, metadata.sender)
+        val group = Group.createGroup(name, metadata.client)
         group.addMultipleNodes(nodes)
         group.addMultipleUser(users)
         /** Create or get tags id */

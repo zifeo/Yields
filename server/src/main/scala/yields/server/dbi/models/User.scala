@@ -156,17 +156,6 @@ final class User private(val uid: UID) {
     _updated_at = values.get(Key.updated_at).map(OffsetDateTime.parse)
   }
 
-  object Key {
-    val user = s"users:$uid"
-    val name = "name"
-    val email = "email"
-    val picture = "picture"
-    val created_at = "created_at"
-    val updated_at = "updated_at"
-    val groups = s"$user:groups"
-    val entourage = s"$user:entourage"
-  }
-
 }
 
 /** [[User]] companion. */

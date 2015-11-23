@@ -23,11 +23,11 @@ case class UserConnect(email: Email) extends Action {
     if (checkValidEmail(email)) {
       User.fromEmail(email) match {
         case Some(user) =>
-          user.connected_at = Temporal.current
+          user.connected_at = Temporal.now
           UserConnectRes(user.uid)
         case None =>
           val newUser = User.create(email)
-          newUser.connected_at = Temporal.current
+          newUser.connected_at = Temporal.now
           UserConnectRes(newUser.uid)
       }
     } else {

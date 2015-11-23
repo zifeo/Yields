@@ -23,16 +23,16 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
   override def run(metadata: Metadata): Result = {
     if (nid > 0) {
       val group = Group(nid)
-      val datetime = Temporal.current
+      val datetime = Temporal.now
 
       val media = for {
         cntType <- contentType
         cnt <- content
-      } yield Media.createMedia(cntType, cnt, metadata.sender)
+      } yield Media.createMedia(cntType, cnt, metadata.client)
 
       media match {
-        case Some(x) => group.addMessage((datetime, metadata.sender, Some(x.nid), text.getOrElse("")))
-        case None => group.addMessage((datetime, metadata.sender, None, text.getOrElse("")))
+        case Some(x) => group.addMessage((datetime, metadata.client, Some(x.nid), text.getOrElse("")))
+        case None => group.addMessage((datetime, metadata.client, None, text.getOrElse("")))
       }
 
       NodeMessageRes(datetime)
