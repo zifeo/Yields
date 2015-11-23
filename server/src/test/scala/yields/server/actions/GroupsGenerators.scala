@@ -5,7 +5,6 @@ import java.time.OffsetDateTime
 import org.scalacheck._
 import yields.server._
 import yields.server.actions.groups._
-import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory, NodeMessageRes, NodeMessage}
 import yields.server.dbi.models._
 
 trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
@@ -38,37 +37,6 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
 
   implicit lazy val groupUpdateResArb: Arbitrary[GroupUpdateRes] = Arbitrary {
     GroupUpdateRes()
-  }
-
-  implicit lazy val groupHistoryArb: Arbitrary[NodeHistory] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      date <- arbitrary[OffsetDateTime]
-      count <- arbitrary[Int]
-    } yield NodeHistory(nid, date, count)
-  }
-
-  implicit lazy val groupMessageArb: Arbitrary[NodeMessage] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      text <- arbitrary[Option[String]]
-      contentType <- arbitrary[Option[String]]
-      content <- arbitrary[Option[Blob]]
-    } yield NodeMessage(nid, text, contentType, content)
-  }
-
-  implicit lazy val groupHistoryResArb: Arbitrary[NodeHistoryRes] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      nodes <- arbitrary[List[ResponseFeedContent]]
-    } yield NodeHistoryRes(nid, nodes)
-  }
-
-  implicit lazy val groupMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      datetime <- arbitrary[OffsetDateTime]
-    } yield NodeMessageRes(nid, datetime)
   }
 
   implicit lazy val groupSearchArb: Arbitrary[GroupSearch] = Arbitrary {

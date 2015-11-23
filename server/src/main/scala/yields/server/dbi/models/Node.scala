@@ -147,7 +147,7 @@ abstract class Node {
 
   /** Add multiple users to the group */
   def addMultipleUser(users: Seq[UID]): Unit =
-    users.foreach(addUser)
+    redis.withClient(_.zadd(NodeKey.users, Temporal.now.toEpochSecond, users))
 
   /** Add user */
   def addUser(id: UID): Boolean =
@@ -155,11 +155,11 @@ abstract class Node {
 
   /** Add multiple nodes to the group */
   def addMultipleNodes(nodes: Seq[NID]): Unit =
-    nodes.foreach(addNode)
+    redis.withClient(_.zadd(NodeKey.nodes, Temporal.now.toEpochSecond, nodes))
 
   /** Remove multiple nodes */
   def remMultipleNodes(nodes: Seq[NID]): Unit =
-    nodes.foreach(removeNode)
+    redis.withClient(_.zrem(NodeKey.nodes, nodes))
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {

@@ -43,7 +43,11 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
   }
 
   "running groupCreate without name" should "throw an exception" in {
-    val users: List[User] = List(User.create("e12@email.com"), User.create("e22@email.com"), User.create("e32@email.com"), User.create("e42@email.com"))
+    val users: List[User] = List(
+      User.create("e12@email.com"),
+      User.create("e22@email.com"),
+      User.create("e32@email.com"),
+      User.create("e42@email.com"))
     val nodes: List[Node] = List(Group.createGroup("g1", m.client), Group.createGroup("g2", m.client), Group.createGroup("g3", m.client))
     val tags: List[String] = List("music", "acdc")
     val action = new GroupCreate("", nodes.map(_.nid), users.map(_.uid), tags, "private")
