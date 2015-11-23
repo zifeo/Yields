@@ -29,10 +29,10 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
 
       // Get media
       val contentWithMedia = content.map {
-        case (d, u, Some(x), t) =>
-          val m = Media(x)
-          (d, u, Some(m.content), t)
-        case (d, u, None, t) => (d, u, None, t)
+        case (date, uid, Some(nid), text) =>
+          val m = Media(nid)
+          (date, uid, Some(m.content), text)
+        case (date, uid, None, text) => (date, uid, None, text)
       }
 
       NodeHistoryRes(nid, contentWithMedia)

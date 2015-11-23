@@ -26,7 +26,7 @@ case class UserConnect(email: Email) extends Action {
         case Some(user) =>
           user.connected_at = Temporal.current
           UserConnectRes(user.uid)
-        case _ =>
+        case None =>
           val newUser = User.create(email)
           newUser.connected_at = Temporal.current
           UserConnectRes(newUser.uid)

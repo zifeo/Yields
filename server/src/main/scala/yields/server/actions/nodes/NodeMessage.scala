@@ -21,16 +21,17 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
   override def run(metadata: Metadata): Result = {
     if (nid > 0) {
       val group = Group(nid)
-      var media: Option[Media] = None
-      if (contentType.isDefined && content.isDefined) {
-        media = Some(Media.createMedia(contentType.get, content.get, metadata.sender))
+
+      val media = for {
+        cntType <- contentType
+        cnt <- content
+      } yield Media.createMedia(cntType, cnt, metadata.sender)
+
+      media match {
+        case Some(x) => group.addMessage((Temporal.current, metadata.sender, Some(x.nid), text.getOrElse("")))
+        case None => group.addMessage((Temporal.current, metadata.sender, None, text.getOrElse("")))
       }
 
-      if (media.isDefined) {
-        group.addMessage((Temporal.current, metadata.sender, Some(media.get.nid), text.getOrElse("")))
-      } else {
-        group.addMessage((Temporal.current, metadata.sender, None, text.getOrElse("")))
-      }
     }
     NodeMessageRes(nid)
   }

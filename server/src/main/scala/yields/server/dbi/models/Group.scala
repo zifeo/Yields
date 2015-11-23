@@ -5,6 +5,8 @@ import yields.server.dbi._
 import yields.server.utils.Temporal
 import com.redis.serialization.Parse.Implicits._
 
+import scala.Option
+
 /**
   * Representation of a group
   * A group is a kind of node dedicated to chat between users
