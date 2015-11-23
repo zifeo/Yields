@@ -1,18 +1,17 @@
 package yields.server.actions
 
 import java.time.OffsetDateTime
+
 import org.scalacheck._
 import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary._
 import yields.server.DefaultsGenerators
-import yields.server.AllGenerators
-import yields.server.actions.nodes.{NodeMessageRes, NodeHistoryRes, NodeMessage, NodeHistory}
+import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes, NodeMessage, NodeMessageRes}
 import yields.server.dbi.models._
-import java.time.OffsetDateTime
-import yields.server._
-import com.redis.serialization.Parse.Implicits._
 
-trait NodesGenerators extends AllGenerators {
+trait NodesGenerators extends DefaultsGenerators {
+
+  import Arbitrary.arbitrary
+
   implicit lazy val nodeHistoryArb: Arbitrary[NodeHistory] = Arbitrary {
     for {
       nid <- arbitrary[NID]
@@ -24,9 +23,9 @@ trait NodesGenerators extends AllGenerators {
   implicit lazy val nodeMessageArb: Arbitrary[NodeMessage] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      text <- sample[Option[String]]
-      contentType <- sample[Option[String]]
-      content <- sample[Option[Blob]]
+      text <- arbitrary[Option[String]]
+      contentType <- arbitrary[Option[String]]
+      content <- arbitrary[Option[Blob]]
     } yield NodeMessage(nid, text, contentType, content)
   }
 
@@ -42,4 +41,5 @@ trait NodesGenerators extends AllGenerators {
       date <- arbitrary[OffsetDateTime]
     } yield NodeMessageRes(date)
   }
+
 }
