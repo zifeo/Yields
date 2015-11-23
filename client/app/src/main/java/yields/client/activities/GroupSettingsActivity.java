@@ -319,7 +319,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String text = editTextTag.getText().toString();
+                    String text = editTextTag.getText().toString().toLowerCase().replace(' ', '_');
 
                     if (text.length() < Group.Tag.MIN_TAG_LENGTH) {
                         YieldsApplication.showToast(getApplicationContext(),
@@ -327,12 +327,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     } else if (text.length() > Group.Tag.MAX_TAG_LENGTH) {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "The tag is too long");
-                    } else if (!text.toLowerCase().equals(text)) {
-                        YieldsApplication.showToast(getApplicationContext(),
-                                "The tag is not in lowercase");
-                    } else if (text.contains(" ")) {
-                        YieldsApplication.showToast(getApplicationContext(),
-                                "The tag contains spaces");
                     } else {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "Tag \"" + text + "\" added");

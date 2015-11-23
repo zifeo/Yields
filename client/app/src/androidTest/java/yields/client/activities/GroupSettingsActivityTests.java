@@ -144,9 +144,8 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withId(R.id.editText)).perform(typeText("hello world"), closeSoftKeyboard());
 
         onView(withText("Ok")).perform(click());
-        onView(withText("Cancel")).perform(click());
 
-        onView(withText("The tag contains spaces")).inRoot(withDecorView(not(is(getActivity().
+        onView(withText("Tag \"hello_world\" added")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 
@@ -159,9 +158,8 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withId(R.id.editText)).perform(typeText("HELLO"), closeSoftKeyboard());
 
         onView(withText("Ok")).perform(click());
-        onView(withText("Cancel")).perform(click());
 
-        onView(withText("The tag is not in lowercase")).inRoot(withDecorView(not(is(getActivity().
+        onView(withText("Tag \"hello\" added")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 
