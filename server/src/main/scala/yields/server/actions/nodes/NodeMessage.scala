@@ -2,6 +2,7 @@ package yields.server.actions.nodes
 
 import java.time.OffsetDateTime
 
+import yields.server.Yields
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
@@ -35,7 +36,9 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
         case None => group.addMessage((datetime, metadata.client, None, text.getOrElse("")))
       }
 
-      NodeMessageRes(datetime)
+      Yields.broadcast(group.users) {
+        NodeMessageRes(datetime)
+      }
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"Bad nid value in : $errorMessage")

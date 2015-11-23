@@ -1,25 +1,19 @@
 package yields.server
 
-import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
-import java.net.Socket
-import java.time.OffsetDateTime
-
 import akka.stream.scaladsl.{Sink, Source, Tcp}
 import akka.util.ByteString
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.actions.groups._
+import yields.server.actions.nodes.NodeMessage
 import yields.server.actions.users.{UserConnect, UserConnectRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
-import yields.server.dbi.models.UID
 import yields.server.io._
 import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
 import yields.server.utils.Config
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.language.implicitConversions
 
 class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
@@ -33,6 +27,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
     logger.info("Starting server on background")
     redis(_.flushdb)
     server.start()
+    Thread.sleep(500)
   }
 
   override def afterAll(): Unit = {
@@ -78,39 +73,6 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
 
   implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
-  /** Fakes a client connection through a socket. */
-  class FakeClient(uid: UID) {
-
-    private val socket = new Socket(Config.getString("addr"), Config.getInt("port"))
-    private val receiver = new BufferedReader(new InputStreamReader(socket.getInputStream))
-    private val sender = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream))
-
-    /** Send a request to the server. */
-    def send(request: Request): Unit = {
-      sender.write(request.toJson.toString())
-      sender.newLine()
-      sender.flush()
-    }
-
-    /** Send an action to the server. */
-    def send(action: Action): OffsetDateTime = {
-      val metadata = Metadata.now(uid)
-      send(Request(action, metadata))
-      metadata.ref
-    }
-
-    /** Gets next response from the server. */
-    def receive(): Future[Response] = Future {
-      val message = receiver.readLine()
-      message.parseJson.convertTo[Response]
-    }
-
-    def close(): Unit = {
-      socket.close()
-    }
-
-  }
-
   "A client with a socket" should "be able to connect to the server" in {
     val client = new FakeClient(1)
     client.send(UserConnect("client@yields.im"))
@@ -127,10 +89,10 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
     clientB.send(UserConnect("clientB@yields.im"))
     await(clientB.receive()).result should be (UserConnectRes(2))
 
-    clientA.send(GroupCreate("clients", Seq.empty, Seq(1, 2), Seq.empty, ""))
+    clientA.send(GroupCreate("clients", Seq.empty, Seq(1, 2), Seq.empty, "private"))
     await(clientA.receive()).result should be (GroupCreateRes(1))
 
-    val ref = clientB.send(GroupMessage(1, "hello"))
+    val ref = clientB.send(NodeMessage(1, Some("hello"), None, None))
     await(clientB.receive()).metadata.ref should be (ref)
     await(clientA.receive()).metadata.ref should be (ref)
   }
