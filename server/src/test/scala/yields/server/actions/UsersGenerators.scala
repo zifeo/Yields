@@ -56,10 +56,11 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
 
   implicit lazy val userInfoResArb: Arbitrary[UserInfoRes] = Arbitrary {
     for {
+      uid <- arbitrary[UID]
       name <- arbitrary[String]
       email <- arbitrary[String]
       entourage <- arbitrary[Seq[UID]]
-    } yield UserInfoRes(name, email, entourage)
+    } yield UserInfoRes(uid, name, email, entourage)
   }
 
 }

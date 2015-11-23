@@ -18,7 +18,7 @@ case class UserInfo(uid: UID) extends Action {
   override def run(metadata: Metadata): Result = {
     if (uid > 0) {
       val u = User(uid)
-      UserInfoRes(u.name, u.email, u.entourage)
+      UserInfoRes(u.uid, u.name, u.email, u.entourage)
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"bad uid in : $errorMessage")
@@ -30,4 +30,4 @@ case class UserInfo(uid: UID) extends Action {
   * UserGetEntourage result
   * @param entourage sequence of uids corresponding to user's entourage
   */
-case class UserInfoRes(name: String, email: String, entourage: Seq[UID]) extends Result
+case class UserInfoRes(uid: UID, name: String, email: String, entourage: Seq[UID]) extends Result
