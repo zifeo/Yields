@@ -2,10 +2,14 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class User extends Node {
 
@@ -22,10 +26,21 @@ public class User extends Node {
      * @throws NodeException If any of those parameters are invalid.
      */
     public User(String name, Id id,
-                String email, Bitmap img) throws NodeException {
+                String email, Bitmap img) {
         super(name, id);
         this.mEmail = Objects.requireNonNull(email);
         this.mImg = Objects.requireNonNull(img);
+    }
+
+    /**
+     * Constructs a User from a server Response message.
+     *
+     * @param response The response from the server.
+     * @throws JSONException
+     */
+    public User(JSONObject response) throws JSONException{
+        this(response.getString("name"), new Id(response.getLong("uid")),
+                response.getString("email"), YieldsApplication.getDefaultUserImage());
     }
 
     /**

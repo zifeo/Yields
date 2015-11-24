@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,9 +11,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import yields.client.R;
 import yields.client.exceptions.NodeException;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.serverconnection.Response;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Connected user who will do the connexion with the outside world.
@@ -28,8 +32,18 @@ public class ClientUser extends User {
         mEntourage = new ArrayList<>();
     }
 
+    /**
+     * constructs a shell for a clientUser waiting for update from server.
+     * @param email The email of the user.
+     * @throws NodeException
+     */
+    public ClientUser(String email) throws NodeException {
+        this("", new Id(0l), email, YieldsApplication.getDefaultUserImage());
+    }
+
     public void addGroups(List<Group> groups) {
-        mGroups = groups;
+        mGroups.clear();
+        mGroups.addAll(groups);
         Collections.sort(mGroups, mComparator);
     }
 
@@ -62,4 +76,14 @@ public class ClientUser extends User {
             return lhs.getLastUpdate().compareTo(rhs.getLastUpdate());
         }
     };
+
+    //TODO: to be changed when response from server changed
+    public void activateGroup(Id id) {
+        for (Group group : mGroups) {
+            if (!group.isValidated()) {
+                group.setValidated();
+                group.setId(id);
+            }
+        }
+    }
 }

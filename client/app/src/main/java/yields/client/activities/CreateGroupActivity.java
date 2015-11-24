@@ -25,6 +25,7 @@ import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -152,6 +153,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                 Group group = new Group(mGroupName, new Id(1), userList);
                 group.setVisibility(mGroupType);
                 YieldsApplication.getUser().addGroup(group);
+                YieldsApplication.getBinder().sendRequest(
+                        new GroupCreateRequest(YieldsApplication.getUser(), group));
 
                 Intent createGroupIntent = new Intent(this, GroupActivity.class);
                 createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP

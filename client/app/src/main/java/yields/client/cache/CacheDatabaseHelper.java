@@ -629,7 +629,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
             }
             cursor.close();
-            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility, groupValidated);
+            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility,
+                    groupValidated, new Date());
         }
     }
 

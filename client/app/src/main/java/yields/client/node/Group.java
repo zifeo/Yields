@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.TreeMap;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
@@ -56,15 +58,18 @@ public class Group extends Node {
      * @param validated  If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
+    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility,
+                 boolean validated, Date lastUpdate) {
         super(name, id);
         Objects.requireNonNull(users);
+        Objects.requireNonNull(lastUpdate);
         this.mMessages = new TreeMap<>();
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
         mTags = new HashSet<>();
+        mDate = lastUpdate;
     }
 
     /**
@@ -79,7 +84,7 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
-        this(name, id, users, image, visibility, false);
+        this(name, id, users, image, visibility, false, new Date());
     }
 
     /**
@@ -93,7 +98,7 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image) {
-        this(name, id, users, image, GroupVisibility.PRIVATE, false);
+        this(name, id, users, image, GroupVisibility.PRIVATE, false, new Date());
     }
 
     /**
@@ -105,7 +110,21 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<User> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE, false);
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+                false, new Date());
+    }
+
+    /**
+     * Overloaded constructor.
+     *
+     * @param name  The name of the group
+     * @param id    The id of the group
+     * @param users The current users of the group
+     * @throws NodeException if one of the node is null.
+     */
+    public Group(String name, Id id, List<User> users, Date lastUpdate) {
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+                false, lastUpdate);
     }
 
     /**
@@ -114,8 +133,9 @@ public class Group extends Node {
      * @param jsonGroup The JsonArray containing the group.
      * @throws JSONException
      */
-    public Group(JSONArray jsonGroup) throws JSONException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>());
+    public Group(JSONArray jsonGroup) throws JSONException, ParseException{
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(),
+                DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
     /**

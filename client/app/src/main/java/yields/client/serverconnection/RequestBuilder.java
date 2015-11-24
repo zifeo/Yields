@@ -31,10 +31,11 @@ public class RequestBuilder {
      */
     public enum Fields {
         EMAIL("email"), TEXT("content"), NAME("name"),
-        NODES("nodes"), KIND("kind"),
+        NODES("nodes"), KIND("kind"), USERS("users"),
         LAST("datetime"), TO("to"), COUNT("count"),
         IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
-        CONTENT_TYPE("contentType");
+        CONTENT_TYPE("contentType"), UID("uid"),
+        TAG("tags");
 
         private final String name;
 
@@ -85,6 +86,8 @@ public class RequestBuilder {
         Objects.requireNonNull(senderId);
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.USER_GROUP_LIST, senderId);
+
+        builder.addField(Fields.UID, senderId);
 
         return builder.request();
     }
@@ -154,7 +157,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_INFO, sender);
-        builder.addField(Fields.NID, userInfo);
+        builder.addField(Fields.UID, userInfo);
 
         return builder.request();
     }
@@ -187,8 +190,10 @@ public class RequestBuilder {
                 ServiceRequest.RequestKind.GROUP_CREATE, sender);
 
         builder.addField(Fields.NAME, name);
-        builder.addField(Fields.NODES, nodeIds);
+        builder.addField(Fields.NODES, new ArrayList());
+        builder.addField(Fields.USERS, nodeIds);
         builder.addField(Fields.VISIBILITY, visibility);
+        builder.addField(Fields.TAG, new ArrayList());
 
         return builder.request();
     }
@@ -274,7 +279,7 @@ public class RequestBuilder {
                 ServiceRequest.RequestKind.GROUP_ADD, sender);
 
         builder.addField(Fields.NID, groupId);
-        builder.addField(Fields.NID, newUser);
+        builder.addField(Fields.UID, newUser);
 
         return builder.request();
     }
@@ -459,7 +464,7 @@ public class RequestBuilder {
     }
 
     private void addField(Fields fieldType, Group.GroupVisibility field) {
-        this.mConstructingMap.put(fieldType.getValue(), field.getValue());
+        this.mConstructingMap.put(fieldType.getValue(), field.getValue().toLowerCase());
     }
 
     /**
@@ -472,10 +477,12 @@ public class RequestBuilder {
         request.put(Fields.KIND.getValue(), mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
-        metadata.put("sender", mSender.getId());
+        metadata.put("client", mSender.getId());
 
         metadata.put("datetime", formatDate(
                 new Date()));
+
+        metadata.put("ref", formatDate(new Date()));
 
         request.put("metadata", new JSONObject(metadata));
 

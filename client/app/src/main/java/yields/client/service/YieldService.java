@@ -70,14 +70,10 @@ public class YieldService extends Service {
             ClientUser user = YieldsApplication.getUser();
 
             if (user == null || user.getEmail() != email) {
-                Bitmap imageUser = BitmapFactory.decodeResource(getResources(),
-                        R.drawable.default_user_image);
-                imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser,
-                        getResources().getInteger(R.integer.groupImageDiameter));
-                user = new ClientUser("", new Id(-1), email, imageUser);
+                YieldsApplication.setUser(new ClientUser(email));
             }
 
-            ServiceRequest connectReq = new UserConnectRequest(user);
+            ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
             sendRequest(connectReq);
         }
 
@@ -111,6 +107,15 @@ public class YieldService extends Service {
                 }
             }
         }).start();
+    }
+
+    public void notifyChange() {
+        if (mCurrentNotifiableActivity != null) {
+            Log.d("Y:" + this.getClass().getName(), "notified activity");
+            mCurrentNotifiableActivity.notifyChange();
+        } else {
+            Log.d("Y:" + this.getClass().getName(), "not notified activity");
+        }
     }
 
     /**
@@ -225,8 +230,10 @@ public class YieldService extends Service {
      */
     synchronized public void receiveMessages(Id groupId, List<Message> messages) {
         //TODO: To be refactor !
+        Log.d("TEST", Boolean.toString(mCurrentNotifiableActivity == null));
         if (mCurrentNotifiableActivity != null &&
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
+            Log.d("TEST", "hello : ");
             mCurrentGroup.addMessages(messages);
             mCurrentNotifiableActivity.notifyChange();
         } else {
@@ -317,7 +324,7 @@ public class YieldService extends Service {
     }
 
     /**
-     * Connects to server // TODO: If not try again later
+     * Connects to server
      */
     private class ConnectControllerTask extends AsyncTask<Void, Void, Void> {
 
@@ -329,7 +336,7 @@ public class YieldService extends Service {
                         YieldService.this);
             }
 
-            Log.d("D:" + this.getClass().getName(), "done");
+            Log.d("Y:" + this.getClass().getName(), "done");
 
             return null;
         }

@@ -187,6 +187,16 @@ public class GroupActivity extends NotifiableActivity {
     protected void onStart(){
         super.onStart();
 
+    }
+
+    /**
+     * Automatically called when the activity is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mGroups.clear();
+        mGroups.addAll(YieldsApplication.getUser().getUserGroups());
         mAdapterGroups.notifyDataSetChanged();
     }
 
