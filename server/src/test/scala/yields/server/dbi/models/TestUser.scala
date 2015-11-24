@@ -51,7 +51,7 @@ class TestUser extends DBFlatSpec with Matchers {
 
   it should "have this group in his list" in {
     val u1 = User.create(email)
-    u1.addToGroups(1234)
+    u1.addGroup(1234)
     val u2 = User(u1.uid)
 
     u2.groups should contain(1234)
@@ -59,9 +59,9 @@ class TestUser extends DBFlatSpec with Matchers {
 
   it should "remove the group in the user" in {
     val u1 = User.create(email)
-    u1.addToGroups(1234)
+    u1.addGroup(1234)
     val u2 = User(u1.uid)
-    u2.removeFromGroups(1234)
+    u2.removeGroups(1234)
     val u3 = User(u1.uid)
 
     u3.groups should not contain 1234
@@ -80,7 +80,7 @@ class TestUser extends DBFlatSpec with Matchers {
     val u1 = User.create(email)
     val u2 = User.create("another@mail.com")
 
-    u1.addToEntourage(u2.uid)
+    u1.addEntourage(u2.uid)
 
     val u3 = User(u1.uid)
     u3.entourage should contain(u2.uid)
@@ -89,9 +89,9 @@ class TestUser extends DBFlatSpec with Matchers {
   "removing a user from another" should "remove it in the model" in {
     val u1 = User.create(email)
     val u2 = User.create("another@mail.com")
-    u1.addToEntourage(u2.uid)
+    u1.addEntourage(u2.uid)
     val u3 = User(u1.uid)
-    u3.removeFromEntourage(u2.uid)
+    u3.removeEntourage(u2.uid)
     val u4 = User(u3.uid)
 
     u4.entourage should not contain u2.uid

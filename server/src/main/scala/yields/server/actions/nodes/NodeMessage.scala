@@ -37,7 +37,7 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
       }
 
       Yields.broadcast(group.users) {
-        NodeMessageRes(datetime)
+        NodeMessageRes(group.nid, datetime)
       }
     } else {
       val errorMessage = getClass.getSimpleName
@@ -48,4 +48,4 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
 }
 
 /** [[NodeMessage]] result. */
-case class NodeMessageRes(datetime: OffsetDateTime) extends Result
+case class NodeMessageRes(nid: NID, datetime: OffsetDateTime) extends Result

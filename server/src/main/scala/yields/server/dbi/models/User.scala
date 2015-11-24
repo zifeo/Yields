@@ -115,15 +115,15 @@ final class User private(val uid: UID) {
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {
     _groups = redis.withClient(_.zrange[NID](Key.groups, 0, -1))
-    valueOrException(_groups)
+    valueOrDefault(_groups, List.empty)
   }
 
   /** Adds a group and returns whether this group has been added. */
-  def addToGroups(nid: NID): Boolean =
+  def addGroup(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(Key.groups, Temporal.now.toEpochSecond, nid)))
 
   /** Remove a group and returns whether this group has been removed. */
-  def removeFromGroups(nid: NID): Boolean =
+  def removeGroups(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, nid)))
 
   /** entourage getter. */
@@ -133,12 +133,12 @@ final class User private(val uid: UID) {
   }
 
   /** Adds a user and returns whether this user has been added. */
-  def addToEntourage(uid: UID): Boolean =
+  def addEntourage(uid: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.now.toEpochSecond, uid)))
 
 
   /** Remove a user and returns whether this user has been removed. */
-  def removeFromEntourage(uid: UID): Boolean =
+  def removeEntourage(uid: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(Key.entourage, uid)))
 
   /**

@@ -66,8 +66,9 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
 
   implicit lazy val groupMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
     for {
+      nid <- arbitrary[NID]
       datetime <- arbitrary[OffsetDateTime]
-    } yield NodeMessageRes(datetime)
+    } yield NodeMessageRes(nid, datetime)
   }
 
   implicit lazy val groupSearchArb: Arbitrary[GroupSearch] = Arbitrary {
