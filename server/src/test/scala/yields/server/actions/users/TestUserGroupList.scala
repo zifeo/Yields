@@ -30,8 +30,8 @@ class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
     g1.name = "n1"
     val g2 = Group.createGroup("g2", m.client)
     g2.name = "n2"
-    u.addToGroups(g1.nid)
-    u.addToGroups(g2.nid)
+    u.addGroup(g1.nid)
+    u.addGroup(g2.nid)
     val action = new UserGroupList(u.uid)
     val res = action.run(m)
     res match {

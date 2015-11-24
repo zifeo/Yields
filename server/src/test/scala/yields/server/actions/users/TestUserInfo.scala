@@ -21,9 +21,9 @@ class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
 
     u1.name = "name"
 
-    u1.addToEntourage(u2.uid)
-    u1.addToEntourage(u3.uid)
-    u1.addToEntourage(u4.uid)
+    u1.addEntourage(u2.uid)
+    u1.addEntourage(u3.uid)
+    u1.addEntourage(u4.uid)
 
     val action = new UserInfo(u1.uid)
     val res = action.run(m)

@@ -35,7 +35,7 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq
         }.toList
         group.addTags(tids)
         val user = User(metadata.client)
-        user.addToGroups(group.nid)
+        user.addGroup(group.nid)
         GroupCreateRes(group.nid)
       } else {
         val errorMessage = getClass.getSimpleName

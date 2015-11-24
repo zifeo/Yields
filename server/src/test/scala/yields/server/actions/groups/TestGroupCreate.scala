@@ -7,6 +7,7 @@ import yields.server.dbi._
 import yields.server.dbi.models.{Group, Node, User}
 import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
+import yields.server.utils.Temporal
 
 /**
   * Test if GroupCreate action performed well
@@ -17,12 +18,14 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
   lazy val m = sample[Metadata]
 
   it should "create a group" in {
+    val u = User.create("email@email.com")
+    val meta = new Metadata(u.uid, Temporal.now, Temporal.now)
     val users: List[User] = List(User.create("e1@epfl.ch"), User.create("e2@epfl.ch"), User.create("e3@epfl.ch"), User.create("e4@epfl.ch"))
     val nodes: List[Node] = List(Group.createGroup("g1", m.client), Group.createGroup("g2", m.client), Group.createGroup("g3", m.client))
     Tag.createTag("sport")
     val tags: List[String] = List("tennis", "sport", "fun")
     val action = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
-    val res = action.run(m)
+    val res = action.run(meta)
     res match {
       case GroupCreateRes(nid) =>
         val g = Group(nid)
@@ -31,10 +34,11 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
         g.nodes.toSet should be(nodes.map(_.nid).toSet)
         val tids = tags.map((x: String) => Tag.getIdFromText(x)).filter(_.isDefined).map(_.get)
         g.tags should be(tids.toSet)
-        Tag.getIdFromText("tennis").isDefined should be (true)
-        Tag.getIdFromText("fun").isDefined should be (true)
-        Tag.getIdFromText("sport").isDefined should be (true)
-
+        Tag.getIdFromText("tennis").isDefined should be(true)
+        Tag.getIdFromText("fun").isDefined should be(true)
+        Tag.getIdFromText("sport").isDefined should be(true)
+        val creator = User(u.uid)
+        creator.groups should contain(nid)
     }
   }
 
