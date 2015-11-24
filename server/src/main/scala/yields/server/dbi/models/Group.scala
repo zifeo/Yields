@@ -96,7 +96,8 @@ object Group {
         (NodeKey.created_at, Temporal.now),
         (NodeKey.name, name),
         (NodeKey.kind, classOf[Group].getSimpleName),
-        (NodeKey.creator, creator)
+        (NodeKey.creator, creator),
+        (NodeKey.updated_at, Temporal.now)
       )
       r.hmset(group.NodeKey.node, infos)
     }
