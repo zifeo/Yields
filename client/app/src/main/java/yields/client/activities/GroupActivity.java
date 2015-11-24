@@ -259,6 +259,7 @@ public class GroupActivity extends NotifiableActivity {
         mGroups = new ArrayList<>();
 
         List<User> users = new ArrayList<>();
+        users.add(YieldsApplication.getUser());
         for(User user : YieldsApplication.getUser().getEntourage()){
             users.add(user);
         }

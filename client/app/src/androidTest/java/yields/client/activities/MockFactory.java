@@ -93,7 +93,7 @@ public class MockFactory {
     private static class FakeClientUser extends ClientUser {
 
         public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
-            super(name, new Id(2), email, img);
+            super(name, id, email, img);
         }
 
         @Override

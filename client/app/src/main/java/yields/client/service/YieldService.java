@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -205,17 +204,11 @@ public class YieldService extends Service {
      */
     synchronized public void updateMessage(Group group, Message message, Date oldDate) {
         if (mCurrentNotifiableActivity != null || mCurrentGroup.getId() == group.getId()) {
-            Collection<Message> existingMessages = mCurrentGroup.getLastMessages().values();
-            for (Message existingMessage : existingMessages) {
-                if (existingMessage.getDate().compareTo(oldDate) == 0 &&
-                        existingMessage.getSender().getEmail().equals(message.getSender().getEmail())) {
-                    mCurrentGroup.getLastMessages().remove(oldDate);
-                    mCurrentGroup.addMessage(message);
-                    mCurrentNotifiableActivity.notifyChange();
-                }
-            }
+            mCurrentGroup.addMessage(message);
+            mCurrentNotifiableActivity.notifyChange();
         }
     }
+
 
     /**
      * Called when multiple message is received from the server

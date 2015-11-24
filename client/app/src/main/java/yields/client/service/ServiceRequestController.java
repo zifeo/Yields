@@ -41,6 +41,8 @@ import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserUpdateRequest;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Controller for ServiceRequests.
  */
@@ -77,7 +79,7 @@ public class ServiceRequestController {
                 public void run() {
                     try {
                         Log.d("Y:" + this.getClass().getName(), "waiting for connection");
-                        Thread.sleep(60000);
+                        sleep(60000);
                     } catch (InterruptedException e) {
                         Log.d("Y:" + this.getClass().getName(),
                                 "Interrupted while waiting we therefore try to connect again now.");
@@ -210,7 +212,10 @@ public class ServiceRequestController {
      * @param serverResponse The Response received from the server.
      */
     private void handleNodeMessageResponse(Response serverResponse) {
-         /*try {
+        try {
+            //FOR DEMO
+            sleep(3000);
+            //FOR DEMO
             JSONObject responseMessage = serverResponse.getMessage();
             JSONObject metadata = serverResponse.getMetadata();
             String time = metadata.getString("ref");
@@ -222,10 +227,12 @@ public class ServiceRequestController {
                     DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
                     Message.MessageStatus.SENT);
             mCacheHelper.addMessage(updatedMessage, group.getId());
-             mService.updateMessage(group, updatedMessage, date);
+            mService.updateMessage(group, updatedMessage, date);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
             Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        }*/
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

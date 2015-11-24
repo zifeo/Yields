@@ -444,6 +444,7 @@ public class MessageActivity extends NotifiableActivity {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
+            mGroupMessageAdapter.remove(message);
             mGroupMessageAdapter.add(message);
         }
         mGroupMessageAdapter.notifyDataSetChanged();
@@ -457,6 +458,7 @@ public class MessageActivity extends NotifiableActivity {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         for(Message message : messagesTree.values()){
+            mCommentAdapter.remove(message);
             mCommentAdapter.add(message);
         }
         mCommentAdapter.notifyDataSetChanged();
