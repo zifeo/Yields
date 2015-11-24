@@ -1,5 +1,6 @@
 import sbt.Keys._
 import sbt._
+import sbtassembly.AssemblyKeys._
 
 object YieldsServer extends Build {
 
@@ -38,6 +39,10 @@ object YieldsServer extends Build {
     autoAPIMappings := true,
     parallelExecution in Test := false,
     evictionWarningOptions in update := EvictionWarningOptions.empty,
+
+    assemblyJarName in assembly := "yields.jar",
+    test in assembly := {},
+    mainClass in assembly := Some("yields.server.Yields"),
 
     target in (Compile, doc) := baseDirectory.value / "api"
 

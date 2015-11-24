@@ -44,10 +44,6 @@ object Yields {
     */
   def main(args: Array[String]): Unit = {
     start()
-    StdIn.readLine() // get rid of remaining input buffer
-    StdIn.readLine() // wait on a new line for stopping
-    close()
-    dbi.close()
   }
 
   /**
