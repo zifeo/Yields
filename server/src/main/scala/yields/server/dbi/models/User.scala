@@ -115,7 +115,7 @@ final class User private(val uid: UID) {
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {
     _groups = redis.withClient(_.zrange[NID](Key.groups, 0, -1))
-    valueOrException(_groups)
+    valueOrDefault(_groups, List.empty)
   }
 
   /** Adds a group and returns whether this group has been added. */
