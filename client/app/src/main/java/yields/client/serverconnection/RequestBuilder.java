@@ -480,7 +480,7 @@ public class RequestBuilder {
         request.put(Fields.KIND.getValue(), mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
-        metadata.put("sender", mSender.getId());
+        metadata.put("client", mSender.getId());
 
         Date ref = new Date();
         try {
@@ -491,9 +491,7 @@ public class RequestBuilder {
             Log.d("RequestBuilder", "Couldn't handle build ServerRequest correctly !");
         }
 
-
-        metadata.put("datetime", formatDate(
-                new Date()));
+        metadata.put("datetime", formatDate(new Date()));
 
         metadata.put("ref", formatDate(ref));
 

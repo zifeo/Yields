@@ -211,6 +211,7 @@ public class YieldService extends Service {
                         existingMessage.getSender().getEmail().equals(message.getSender().getEmail())) {
                     mCurrentGroup.getLastMessages().remove(oldDate);
                     mCurrentGroup.addMessage(message);
+                    mCurrentNotifiableActivity.notifyChange();
                 }
             }
         }

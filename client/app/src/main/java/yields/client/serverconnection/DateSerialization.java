@@ -14,7 +14,7 @@ public class DateSerialization {
     private SimpleDateFormat mDateFormatForCache;
 
     public DateSerialization() {
-        mDateFormatISO6101 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        mDateFormatISO6101 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ");
         mDateFormatISO6101.setTimeZone(TimeZone.getDefault());
         mDateFormatForCache = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         mDateFormatForCache.setTimeZone(TimeZone.getTimeZone("UTC"));

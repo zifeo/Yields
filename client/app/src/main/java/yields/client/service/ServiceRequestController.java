@@ -56,6 +56,7 @@ public class ServiceRequestController {
 
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
+        mCacheHelper.clearDatabase();
         mService = service;
         isConnecting = new AtomicBoolean(true);
         connectToServer();
@@ -209,7 +210,7 @@ public class ServiceRequestController {
      * @param serverResponse The Response received from the server.
      */
     private void handleNodeMessageResponse(Response serverResponse) {
-        try {
+         /*try {
             JSONObject responseMessage = serverResponse.getMessage();
             JSONObject metadata = serverResponse.getMetadata();
             String time = metadata.getString("ref");
@@ -221,10 +222,10 @@ public class ServiceRequestController {
                     DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
                     Message.MessageStatus.SENT);
             mCacheHelper.addMessage(updatedMessage, group.getId());
-            mService.updateMessage(group, updatedMessage, date);
+             mService.updateMessage(group, updatedMessage, date);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
             Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        }
+        }*/
     }
 
     /**
@@ -479,9 +480,9 @@ public class ServiceRequestController {
     private void handleNodeHistoryRequest(GroupHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
-            mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
+            List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
                     serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
-            //TODO : Notify app
+            mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
         } catch (CacheDatabaseException e) {
             Log.d(TAG, "Couldn't handle NodeHistoryRequest correctly !");
         }
