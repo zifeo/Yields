@@ -15,14 +15,14 @@ import yields.client.messages.Message;
 
 /**
  * Connected user who will do the connexion with the outside world.
- *
  */
 public abstract class ClientUser extends User {
+
     List<Group> groups;
     List<User> mEntourage;
 
     public ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
-        super(name, id, email,img);
+        super(name, id, email, img);
         this.groups = new ArrayList<>();
         mEntourage = new ArrayList<>();
     }
@@ -41,8 +41,7 @@ public abstract class ClientUser extends User {
         return Collections.unmodifiableList(groups);
     }
 
-    // maybe change it later
-    public void addUserToEntourage(User user){
+    public void addUserToEntourage(User user) {
         mEntourage.add(user);
     }
 

@@ -1,14 +1,12 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
 import android.graphics.Bitmap;
 
 import java.util.Objects;
 
-import yields.client.node.Group;
+import yields.client.id.Id;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -17,25 +15,25 @@ import yields.client.serverconnection.ServerRequest;
 public class GroupUpdateImageRequest extends ServiceRequest {
 
     private final User mSender;
-    private final Group mGroup;
+    private final Id mGroupId;
     private final Bitmap mImage;
 
     /**
      * Main constructor for this type of ServiceRequest (updating a Group's image).
      *
-     * @param sender The User that created this request.
-     * @param group  The Group that should have it's image updated.
-     * @param image  The new image for Group.
+     * @param sender  The User that created this request.
+     * @param groupId The Group that should have it's image updated.
+     * @param image   The new image for Group.
      */
-    public GroupUpdateImageRequest(User sender, Group group, Bitmap image) {
+    public GroupUpdateImageRequest(User sender, Id groupId, Bitmap image) {
         super();
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(image);
 
         mSender = sender;
-        mGroup = group;
-        mImage = image.copy(image.getConfig(), true);
+        mGroupId = groupId;
+        mImage = image.copy(image.getConfig(), false);
     }
 
     /**
@@ -55,6 +53,24 @@ public class GroupUpdateImageRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupUpdateImageRequest(mSender.getId(), mGroup.getId(), mImage);
+        return RequestBuilder.groupUpdateImageRequest(mSender.getId(), mGroupId, mImage);
+    }
+
+    /**
+     * Returns the new Bitmap image of the Group.
+     *
+     * @return The new new Bitmap image of the Group.
+     */
+    public Bitmap getNewGroupImage() {
+        return mImage;
+    }
+
+    /**
+     * Returns the Id of the Group that will have it's image updated.
+     *
+     * @return The Id of the Group that will have it's image updated.
+     */
+    public Id getGroupId() {
+        return mGroupId;
     }
 }

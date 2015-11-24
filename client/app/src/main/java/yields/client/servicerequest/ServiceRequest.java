@@ -13,17 +13,17 @@ public abstract class ServiceRequest {
     public enum RequestKind {
         PING("PING"), USER_CONNECT("UserConnect"), USER_UPDATE("UserUpdateRequest"),
         USER_GROUP_LIST("UserGroupList"), USER_ENTOURAGE_ADD("UserEntourageAdd"),
-        USER_ENTOURAGE_REMOVE("UserEntourageRemove"), USER_STATUS("UserStatus"),
-        GROUP_CREATE("GroupCreate"), GROUP_UPDATE_NAME("GroupUpdateName"),
-        GROUP_UPDATE_VISIBILITY("GroupUpdateVisibility"), GROUP_UPDATE_IMAGE
-                ("GroupUpdateImage"),
+        USER_ENTOURAGE_REMOVE("UserEntourageRemove"), USER_INFO("UserInfo"),
+        GROUP_CREATE("GroupCreate"), GROUP_UPDATE("GroupUpdate"), GROUP_UPDATE_NAME("GroupUpdateName"),
+        GROUP_UPDATE_VISIBILITY("GroupUpdateVisibility"), GROUP_UPDATE_IMAGE("GroupUpdateImage"),
         GROUP_ADD("GroupAdd"), GROUP_REMOVE("GroupRemove"),
-        GROUP_MESSAGE("GroupMessage"), GROUP_HISTORY("GroupHistory");
+        NODE_MESSAGE("NodeMessage"), NODE_HISTORY("NodeHistory");
 
         private final String mName;
 
         /**
          * Enumeration constructor
+         *
          * @param name The String representation of the request type
          */
         RequestKind(String name) {
@@ -32,6 +32,7 @@ public abstract class ServiceRequest {
 
         /**
          * Get's the String representation of the request
+         *
          * @return The String representation of the request
          */
         public String getValue() {

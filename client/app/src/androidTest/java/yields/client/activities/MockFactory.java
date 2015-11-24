@@ -90,14 +90,6 @@ public class MockFactory {
 
     }
 
-    public static ImageContent generateFakeImageContent(Bitmap img, String caption) {
-        return new ImageContent(img, caption);
-    }
-
-    public static TextContent generateFakeTextContent(String text) {
-        return new TextContent(text);
-    }
-
     private static class FakeClientUser extends ClientUser {
 
         public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
@@ -115,7 +107,7 @@ public class MockFactory {
         }
 
         @Override
-        public void createNewGroup(Group group){
+        public void createNewGroup(Group group) {
 
         }
 

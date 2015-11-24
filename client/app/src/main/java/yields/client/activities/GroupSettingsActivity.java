@@ -13,12 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import org.w3c.dom.ProcessingInstruction;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +26,6 @@ import yields.client.listadapter.ListAdapterSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
-import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateVisibilityRequest;
@@ -54,6 +49,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -88,15 +84,16 @@ public class GroupSettingsActivity extends AppCompatActivity {
         mGroup = YieldsApplication.getGroup();
         mUser = YieldsApplication.getUser();
 
-        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created" ;
-        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created" ;
+        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
+        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created";
     }
 
     /**
      * Method automatically called when the user has selected the new group image
+     *
      * @param requestCode The code of the request
-     * @param resultCode The code of the result
-     * @param data The data where the uri, or the list of email is
+     * @param resultCode  The code of the result
+     * @param data        The data where the uri, or the list of email is
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -114,10 +111,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     String message = "Group image changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
 
-                    ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup, image);
+                    ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(), image);
                     YieldsApplication.getBinder().sendRequest(request);
-                }
-                else {
+                } else {
                     String message = "Could not retrieve image";
                     YieldsApplication.showToast(getApplicationContext(), message);
                 }
@@ -126,17 +122,16 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 YieldsApplication.showToast(getApplicationContext(), message);
                 Log.d(TAG, message);
             }
-        }
-        else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK){
+        } else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK) {
             ArrayList<String> emailList = data.getStringArrayListExtra(
                     AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
             List<User> newUsers = new ArrayList<>();
             List<User> entourage = mUser.getEntourage();
-            for (int i = 0; i < emailList.size(); i++){
-                for (int j = 0; j < entourage.size(); j++){
+            for (int i = 0; i < emailList.size(); i++) {
+                for (int j = 0; j < entourage.size(); j++) {
                     if (entourage.get(j).getEmail().equals(emailList.get(i))
-                            && !mGroup.containsUser(entourage.get(j))){
+                            && !mGroup.containsUser(entourage.get(j))) {
 
                         newUsers.add(entourage.get(j));
                     }
@@ -156,16 +151,17 @@ public class GroupSettingsActivity extends AppCompatActivity {
     private class CustomListener implements AdapterView.OnItemClickListener {
 
         /**
-         *  Method called when an item in the listview is clicked
-         * @param parent The AdapterView
-         * @param view The view clicked
+         * Method called when an item in the listview is clicked
+         *
+         * @param parent   The AdapterView
+         * @param view     The view clicked
          * @param position The position in the list
-         * @param id The id of the view
+         * @param id       The id of the view
          */
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Settings[] settings = Settings.values();
-            switch(settings[position]){
+            switch (settings[position]) {
                 case NAME:
                     changeNameListener();
                     break;
@@ -191,7 +187,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Change group name" item.
          */
-        private void changeNameListener(){
+        private void changeNameListener() {
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
             editTextName.setId(R.id.editText);
             editTextName.setText(mGroup.getName());
@@ -206,8 +202,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
                             String message = "Group name changed to \"" + newName + "\"";
                             YieldsApplication.showToast(getApplicationContext(), message);
 
-                            ServiceRequest request = new GroupUpdateNameRequest(mUser,
-                                    mGroup, newName);
+                            ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
                             YieldsApplication.getBinder().sendRequest(request);
                         }
                     })
@@ -221,41 +216,39 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Change group type" item.
          */
-        private void changeTypeListener(){
-            final CharSequence[] types = {" Public"," Private"};
+        private void changeTypeListener() {
+            final CharSequence[] types = {" Public", " Private"};
             final int[] itemSelected = {0}; // used as a pointer
             AlertDialog groupTypeDialog;
 
             // Creating and Building the Dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(GroupSettingsActivity.this)
-                .setTitle("Change group type")
-                .setSingleChoiceItems(types, 0, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        itemSelected[0] = item;
-                    }
-                })
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String type = "public";
-                        if (itemSelected[0] == 1) {
-                            type = "private";
+                    .setTitle("Change group type")
+                    .setSingleChoiceItems(types, 0, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            itemSelected[0] = item;
                         }
+                    })
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            String type = "public";
+                            if (itemSelected[0] == 1) {
+                                type = "private";
+                            }
 
-                        String message = "Group type changed to : " + type;
-                        YieldsApplication.showToast(getApplicationContext(), message);
+                            String message = "Group type changed to : " + type;
+                            YieldsApplication.showToast(getApplicationContext(), message);
 
-                        Group.GroupVisibility visibility;
-                        if (itemSelected[0] == 1) {
-                            visibility = Group.GroupVisibility.PRIVATE;
+                            Group.GroupVisibility visibility;
+                            if (itemSelected[0] == 1) {
+                                visibility = Group.GroupVisibility.PRIVATE;
+                            } else {
+                                visibility = Group.GroupVisibility.PUBLIC;
+                            }
+                            ServiceRequest request = new GroupUpdateVisibilityRequest(mUser, mGroup.getId(), visibility);
+                            YieldsApplication.getBinder().sendRequest(request);
                         }
-                        else {
-                            visibility = Group.GroupVisibility.PUBLIC;
-                        }
-                        ServiceRequest request = new GroupUpdateVisibilityRequest(mUser,
-                                mGroup, visibility);
-                        YieldsApplication.getBinder().sendRequest(request);
-                    }
-                })
+                    })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                         }
@@ -267,7 +260,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Change group image" item.
          */
-        private void changeImageListener(){
+        private void changeImageListener() {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -277,11 +270,11 @@ public class GroupSettingsActivity extends AppCompatActivity {
         /**
          * Listener for the "Add users" item.
          */
-        private void addUsersListener(){
+        private void addUsersListener() {
             ArrayList<String> emailList = new ArrayList<>();
             List<User> currentUsers = mGroup.getUsers();
 
-            for (int i = 0; i < currentUsers.size(); i++){
+            for (int i = 0; i < currentUsers.size(); i++) {
                 emailList.add(currentUsers.get(i).getEmail());
             }
 

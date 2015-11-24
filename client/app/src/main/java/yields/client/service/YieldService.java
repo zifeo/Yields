@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.Date;
 import java.util.List;
 
 import yields.client.R;
@@ -72,7 +73,7 @@ public class YieldService extends Service {
     /**
      * Responds to a connection status request.
      */
-    public void connectionStatusResponse(){
+    public void connectionStatusResponse() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -115,7 +116,7 @@ public class YieldService extends Service {
      * @return true to authorize rebinding
      */
     @Override
-    public boolean onUnbind(Intent intent){
+    public boolean onUnbind(Intent intent) {
         Log.d("Y:" + this.getClass().getName(), "unbind : " +
                 (intent.getBooleanExtra("bindMessageActivity", false) ?
                         "messageActivity" : "groupActivity"));
@@ -147,7 +148,7 @@ public class YieldService extends Service {
      * @param notifiableActivity The concerned messageActivity
      */
     synchronized public void setNotifiableActivity(NotifiableActivity notifiableActivity) {
-        Log.d("Y:" + this.getClass().getName(),"add activity");
+        Log.d("Y:" + this.getClass().getName(), "add activity");
         mCurrentNotifiableActivity = notifiableActivity;
         mCurrentGroup = YieldsApplication.getGroup();
     }
@@ -156,7 +157,7 @@ public class YieldService extends Service {
      * Unset the current messageActivity
      */
     synchronized public void unsetMessageActivity() {
-        Log.d("Y:" + this.getClass().getName(),"remove activity");
+        Log.d("Y:" + this.getClass().getName(), "remove activity");
         mCurrentNotifiableActivity = null;
     }
 
@@ -181,7 +182,7 @@ public class YieldService extends Service {
     /**
      * Called when a message is received from the server
      *
-     * @param group The group the message s from
+     * @param group   The group the message s from
      * @param message The message in question
      */
     synchronized public void receiveMessage(Group group, Message message) {
@@ -195,9 +196,24 @@ public class YieldService extends Service {
     }
 
     /**
+     * Updates a Message that is already in the Group bound to the service.
+     *
+     * @param group   The group to which the Message was sent.
+     * @param message The message's updated version.
+     * @param oldDate The original date of the Message before it's update.
+     */
+    synchronized public void updateMessage(Group group, Message message, Date oldDate) {
+        if (mCurrentNotifiableActivity != null || mCurrentGroup.getId() == group.getId()) {
+            mCurrentGroup.addMessage(message);
+            mCurrentNotifiableActivity.notifyChange();
+        }
+    }
+
+
+    /**
      * Called when multiple message is received from the server
      *
-     * @param groupId The group the messages are from
+     * @param groupId  The group the messages are from
      * @param messages The message in question
      */
     synchronized public void receiveMessages(Id groupId, List<Message> messages) {
@@ -205,7 +221,6 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity != null &&
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
-
             mCurrentNotifiableActivity.notifyChange();
         }
     }
@@ -223,6 +238,7 @@ public class YieldService extends Service {
 
     /**
      * Create notification for message.
+     *
      * @param message The message.
      */
     private void sendMessageNotification(Group group, Message message) {
@@ -245,14 +261,9 @@ public class YieldService extends Service {
         stackBuilder.addParentStack(GroupActivity.class);
         // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_ONE_SHOT
-                );
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
         notificationBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
         mIdLastNotification++;
         mNotificationManager.notify(mIdLastNotification, notificationBuilder.build());
@@ -266,7 +277,7 @@ public class YieldService extends Service {
     }
 
     /**
-     * AsncTask sending th requests.
+     * AsyncTask sending th requests.
      */
     private class SendRequestTask extends AsyncTask<ServiceRequest, Void, Void> {
         @Override
@@ -276,7 +287,7 @@ public class YieldService extends Service {
                     try {
                         serviceControllerLock.wait();
                     } catch (InterruptedException e) {
-                        Log.d("Y:" + this.getClass().getName(),"Stopped waiting for request controller" + e.getMessage());
+                        Log.d("Y:" + this.getClass().getName(), "Stopped waiting for request controller" + e.getMessage());
                     }
                 }
             }

@@ -1,12 +1,9 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -50,5 +47,14 @@ public class UserEntourageAddRequest extends ServiceRequest {
     @Override
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.userEntourageAddRequest(mUser.getId(), mUserToAdd.getEmail());
+    }
+
+    /**
+     * Returns the User that should be added to the entourage.
+     *
+     * @return The User that should be added to the entourage.
+     */
+    public User getUserToAdd() {
+        return mUserToAdd;
     }
 }

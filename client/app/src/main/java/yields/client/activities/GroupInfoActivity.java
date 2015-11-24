@@ -155,7 +155,7 @@ public class GroupInfoActivity extends NotifiableActivity{
             @Override
             public void onClick(View v) {
                 ServiceRequest request = new GroupAddRequest(YieldsApplication.getUser(),
-                        mGroup, YieldsApplication.getUser());
+                        mGroup.getId(), YieldsApplication.getUser());
                 YieldsApplication.getBinder().sendRequest(request);
 
                 joinButton.setEnabled(false);
@@ -168,7 +168,7 @@ public class GroupInfoActivity extends NotifiableActivity{
             @Override
             public void onClick(View v) {
                 ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
-                        mGroup, YieldsApplication.getUser());
+                        mGroup.getId(), YieldsApplication.getUser().getId());
                 YieldsApplication.getBinder().sendRequest(request);
 
                 leaveButton.setEnabled(false);

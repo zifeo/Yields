@@ -37,21 +37,21 @@ public class NodeMessageRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUP_MESSAGE;
+        return RequestKind.NODE_MESSAGE;
     }
 
     /**
      * Build a ServerRequest for sending a message to a node.
      *
-     * @return The ServerRequest corresponding to this ServiceRequest.
+     * @return The ServerRequest corresponding to this ServiceRequest.<<
      */
     @Override
     public ServerRequest parseRequestForServer() {
         Node group = getReceivingNode();
         Message message = getMessage();
 
-        return RequestBuilder.groupMessageRequest(message.getSender().getId(), group.getId(),
-                message.getContent());
+        return RequestBuilder.nodeMessageRequest(message.getSender().getId(), group.getId(),
+                message.getContent(), message.getDate());
     }
 
     /**

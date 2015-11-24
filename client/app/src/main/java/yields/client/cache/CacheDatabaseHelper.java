@@ -14,9 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -48,50 +46,55 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_USERS = "users";
     private static final String TABLE_GROUPS = "groups";
     private static final String TABLE_MESSAGES = "messages";
+    private static final String TABLE_INTERNAL = "internal";
 
     private static final String KEY_ID = "id";
 
-    private static final String KEY_USER_NODEID = "nodeID";
+    private static final String KEY_USER_NODE_ID = "nodeID";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_IMAGE = "userImage";
+    private static final String KEY_USER_ENTOURAGE = "userEntourage";
 
-    private static final String KEY_GROUP_NODEID = "nodeID";
+    private static final String KEY_GROUP_NODE_ID = "nodeID";
     private static final String KEY_GROUP_NAME = "groupName";
     private static final String KEY_GROUP_USERS = "groupUsers";
     private static final String KEY_GROUP_IMAGE = "groupImage";
     private static final String KEY_GROUP_VISIBILITY = "groupVisibility";
+    private static final String KEY_GROUP_VALIDATED = "groupValidated";
 
-    private static final String KEY_MESSAGE_NODEID = "nodeID";
-    private static final String KEY_MESSAGE_GROUPID = "messageGroup";
-    private static final String KEY_MESSAGE_SENDERID = "messageSender";
+    private static final String KEY_MESSAGE_NODE_ID = "nodeID";
+    private static final String KEY_MESSAGE_GROUP_ID = "messageGroup";
+    private static final String KEY_MESSAGE_SENDER_ID = "messageSender";
+    private static final String KEY_MESSAGE_TEXT = "messageText";
     private static final String KEY_MESSAGE_CONTENT = "messageContent";
-    private static final String KEY_MESSAGE_TYPE = "messageType";
+    private static final String KEY_MESSAGE_CONTENT_TYPE = "messageContentType";
+    private static final String KEY_MESSAGE_STATUS = "messageStatus";
     private static final String KEY_MESSAGE_DATE = "messageDate";
 
-
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODEID + " TEXT,"
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODE_ID + " TEXT,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
-            + " BLOB" + ")";
+            + " BLOB, " + KEY_USER_ENTOURAGE + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODEID + " TEXT,"
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODE_ID + " TEXT,"
             + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
-            + " BLOB," + KEY_GROUP_VISIBILITY + " TEXT" + ")";
+            + " BLOB," + KEY_GROUP_VISIBILITY + " TEXT," + KEY_GROUP_VALIDATED + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODEID + " TEXT,"
-            + KEY_MESSAGE_GROUPID + " TEXT," + KEY_MESSAGE_SENDERID + " TEXT,"
-            + KEY_MESSAGE_TYPE + " TEXT," + KEY_MESSAGE_CONTENT
-            + " BLOB," + KEY_MESSAGE_DATE + " TEXT" + ")";
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " TEXT,"
+            + KEY_MESSAGE_GROUP_ID + " TEXT," + KEY_MESSAGE_SENDER_ID + " TEXT,"
+            + KEY_MESSAGE_TEXT + " TEXT," + KEY_MESSAGE_CONTENT_TYPE + " TEXT,"
+            + KEY_MESSAGE_CONTENT + " BLOB," + KEY_MESSAGE_DATE + " TEXT,"
+            + KEY_MESSAGE_STATUS + " TEXT" + ")";
 
     private final SQLiteDatabase mDatabase;
 
     /**
      * Main constructor, creates the database.
      *
-     * @param context The contex for the database.
+     * @param context The context for the database.
      */
     public CacheDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -104,7 +107,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public CacheDatabaseHelper() {
         this(YieldsApplication.getApplicationContext());
     }
-
 
 
     /**
@@ -135,19 +137,30 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_GROUPS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_INTERNAL);
         onCreate(db);
     }
 
     /**
      * Deletes the given Message from the database.
      *
-     * @param messageId The Id of the Message to be deleted.
+     * @param message The Message to be deleted.
+     * @param groupId The Id of the Group to which the message was sent.
      */
-    public void deleteMessage(Id messageId) {
-        Objects.requireNonNull(messageId);
+    public void deleteMessage(Message message, Id groupId) throws CacheDatabaseException {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(groupId);
 
-        mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODEID + " = ?",
-                new String[]{String.valueOf(messageId.getId())});
+        try {
+            mDatabase.execSQL("DELETE FROM " + TABLE_MESSAGES + " WHERE " + KEY_MESSAGE_GROUP_ID + " = ? " + "AND "
+                    + KEY_MESSAGE_DATE + " = ? " + "AND " + KEY_MESSAGE_TEXT + " = ?" + "AND "
+                    + KEY_MESSAGE_CONTENT + " = ?", new Object[]{groupId.getId().toString(),
+                    DateSerialization.dateSerializer.toStringForCache(message.getDate()),
+                    message.getContent().getTextForRequest(),
+                    serializeContent(message.getContent())});
+        } catch (CacheDatabaseException e) {
+            throw new CacheDatabaseException("Couldn't delete Message from cache !");
+        }
     }
 
     /**
@@ -158,24 +171,16 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @throws CacheDatabaseException If the message could not be added to the
      *                                database.
      */
-    public void addMessage(Message message, Id groupId)
-            throws CacheDatabaseException
-    {
+    public void addMessage(Message message, Id groupId) throws CacheDatabaseException {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
+        addUser(message.getSender());
+
         try {
-            String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
-                    + " WHERE " + KEY_MESSAGE_NODEID + " = ?";
-            Cursor cursor = mDatabase.rawQuery(selectQuery,
-                    new String[]{message.getId().getId().toString()});
-            if (cursor.getCount() != 0) {
-                cursor.close();
-                deleteMessage(message.getId());
-            }
+            deleteMessage(message, groupId);
             mDatabase.insert(TABLE_MESSAGES, null,
                     createContentValuesForMessage(message, groupId));
-            cursor.close();
         } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to insert Message with id: "
                     + message.getId().getId(), exception);
@@ -191,24 +196,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void deleteUser(Id userId) {
         Objects.requireNonNull(userId);
 
-        mDatabase.delete(TABLE_USERS, KEY_USER_NODEID + " = ?",
+        mDatabase.delete(TABLE_USERS, KEY_USER_NODE_ID + " = ?",
                 new String[]{String.valueOf(userId.getId())});
     }
 
     /**
-     * Adds the User from the database.
+     * Adds the User to the database.
      *
      * @param user The User to be added.
      * @throws CacheDatabaseException If the User could not be inserted into the
      *                                database.
      */
     public void addUser(User user)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(user);
 
-        String selectQuery = "SELECT * FROM " + TABLE_USERS
-                + " WHERE " + KEY_USER_NODEID + " = ?";
+        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_NODE_ID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{user.getId().getId().toString()});
         if (cursor.getCount() == 1) {
@@ -239,13 +242,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *                                database.
      */
     public void updateUser(User user)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(user);
 
         try {
             ContentValues values = createContentValuesForUser(user);
-            mDatabase.update(TABLE_USERS, values, KEY_USER_NODEID + " = ?",
+            mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
                     new String[]{user.getId().getId().toString()});
         } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to update User with id: " + user.getId().getId(),
@@ -267,7 +269,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(userID);
 
         String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
-                + KEY_USER_NODEID + " = ?";
+                + KEY_USER_NODE_ID + " = ?";
         Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
                 new String[]{userID.getId().toString()});
         if (!userCursor.moveToFirst()) {
@@ -300,7 +302,29 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         } else {
             do {
                 Id userId = new Id(cursor.getLong(
-                        cursor.getColumnIndex(KEY_USER_NODEID)));
+                        cursor.getColumnIndex(KEY_USER_NODE_ID)));
+                users.add(getUser(userId));
+            } while (cursor.moveToNext());
+            cursor.close();
+            return users;
+        }
+    }
+
+    /**
+     * Returns all Users that are in the ClientUser's entourage in the database.
+     *
+     * @return An exhaustive List of all Users in the database that are in the ClientUser's entourage.
+     */
+    public List<User> getClientUserEntourage() {
+        String selectAllUsersQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_ENTOURAGE + " = ?";
+        Cursor cursor = mDatabase.rawQuery(selectAllUsersQuery, new String[]{"1"});
+        List<User> users = new ArrayList<>();
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return users;
+        } else {
+            do {
+                Id userId = new Id(Long.valueOf(cursor.getString(cursor.getColumnIndex(KEY_USER_NODE_ID))));
                 users.add(getUser(userId));
             } while (cursor.moveToNext());
             cursor.close();
@@ -311,15 +335,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deletes the Group and all it's Messages from the database.
      *
-     * @param group The Group to be deleted.
+     * @param groupId The Id of the Group to be deleted.
      */
-    public void deleteGroup(Group group) {
-        Objects.requireNonNull(group);
+    public void deleteGroup(Id groupId) {
+        Objects.requireNonNull(groupId);
 
-        mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_GROUPID + " = ?",
-                new String[]{group.getId().getId().toString()});
-        mDatabase.delete(TABLE_GROUPS, KEY_GROUP_NODEID + " = ?",
-                new String[]{group.getId().getId().toString()});
+        mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_GROUP_ID + " = ?",
+                new String[]{groupId.getId().toString()});
+        mDatabase.delete(TABLE_GROUPS, KEY_GROUP_NODE_ID + " = ?",
+                new String[]{groupId.getId().toString()});
     }
 
     /**
@@ -331,19 +355,18 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *                                the database.
      */
     public void addGroup(Group group)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(group);
 
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
-                + " WHERE " + KEY_GROUP_NODEID + " = ?";
+                + " WHERE " + KEY_GROUP_NODE_ID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{group.getId().getId().toString()});
         if (cursor.getCount() >= 1) {
             cursor.close();
             updateGroup(group);
         } else if (cursor.getCount() > 1) { //There should not be several Groups with the same Id.
-            deleteGroup(group);
+            deleteGroup(group.getId());
         }
 
         if (cursor.getCount() > 1 || cursor.getCount() == 0) {
@@ -373,13 +396,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *                                in the database.
      */
     public void updateGroup(Group group)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(group);
 
         try {
             ContentValues values = createContentValuesForGroup(group);
-            mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+            mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                     new String[]{group.getId().getId().toString()});
             for (User user : group.getUsers()) {
                 addUser(user);
@@ -407,7 +429,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NAME, newGroupName);
-        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                 new String[]{groupId.getId().toString()});
     }
 
@@ -423,7 +445,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_IMAGE, serializeBitmap(newGroupImage));
-        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                 new String[]{groupId.getId().toString()});
     }
 
@@ -439,7 +461,24 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_VISIBILITY, visibility.getValue());
-        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
+                new String[]{groupId.getId().toString()});
+    }
+
+    /**
+     * Updates the validity of a Group in the database.
+     *
+     * @param groupId  The Id field of the Group that will have it's validity changed.
+     * @param validity The new validity of the Group.
+     */
+    public void updateGroupValidity(Id groupId, boolean validity) {
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(validity);
+
+        ContentValues values = new ContentValues();
+        int validated = validity ? 1 : 0;
+        values.put(KEY_GROUP_VALIDATED, validated);
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                 new String[]{groupId.getId().toString()});
     }
 
@@ -453,6 +492,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(userId);
 
+        if (YieldsApplication.getUser().getId().getId().equals(userId.getId())) {
+            deleteGroup(groupId);
+            return;
+        }
+
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
@@ -462,7 +506,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_USERS, getStringFromIds(ids));
-        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                 new String[]{groupId.getId().toString()});
     }
 
@@ -470,24 +514,28 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * Adds a User to a Group in the database.
      *
      * @param groupId The Id of the Group to which the User shall be added.
-     * @param userId  The Id of the User that will be added to the Group.
+     * @param user    The User that will be added to the Group.
+     * @throws CacheDatabaseException If the User couldn't be added in the database.
      */
-    public void addUserToGroup(Id groupId, Id userId) {
+    public void addUserToGroup(Id groupId, User user)
+            throws CacheDatabaseException {
         Objects.requireNonNull(groupId);
-        Objects.requireNonNull(userId);
+        Objects.requireNonNull(user);
+
+        addUser(user);
 
         List<Id> ids = getUserIdsFromGroup(groupId);
         boolean userIsInCache = false;
         for (Id id : ids) {
-            if (id.getId().equals(userId.getId())) {
+            if (id.getId().equals(user.getId().getId())) {
                 userIsInCache = true;
             }
         }
         if (!userIsInCache) {
-            ids.add(userId);
+            ids.add(user.getId());
             ContentValues values = new ContentValues();
             values.put(KEY_GROUP_USERS, getStringFromIds(ids));
-            mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODEID + " = ?",
+            mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                     new String[]{groupId.getId().toString()});
         }
     }
@@ -504,7 +552,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(groupId);
 
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
-                + KEY_GROUP_NODEID + " = ?";
+                + KEY_GROUP_NODE_ID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{groupId.getId().toString()});
         if (!cursor.moveToFirst()) {
@@ -524,16 +572,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param groupId The Id of the wanted Group.
      * @return The Group which has groupId as its Id or null if there is no
-     * such Group
-     * in the database.
+     * such Group in the database.
      */
     public Group getGroup(Id groupId)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(groupId);
 
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS + " WHERE "
-                + KEY_GROUP_NODEID + " = ?";
+                + KEY_GROUP_NODE_ID + " = ?";
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{groupId.getId().toString()});
 
@@ -547,6 +593,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     cursor.getBlob(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
             Group.GroupVisibility groupVisibility = Group.GroupVisibility.valueOf(
                     cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+            int validated = cursor.getInt(cursor.getColumnIndex(KEY_GROUP_VALIDATED));
+            boolean groupValidated = (1 == validated);
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
@@ -561,7 +609,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
             }
             cursor.close();
-            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility);
+            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility, groupValidated);
         }
     }
 
@@ -571,8 +619,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return An exhaustive List of all Groups in the database.
      */
     public List<Group> getAllGroups()
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS;
         Cursor groupCursor = mDatabase.rawQuery(selectQuery, null);
 
@@ -582,8 +629,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             return groups;
         } else {
             do {
-                Id groupId = new Id(groupCursor.getLong(
-                        groupCursor.getColumnIndex(KEY_GROUP_NODEID)));
+                Id groupId = new Id(groupCursor.getLong(groupCursor.getColumnIndex(KEY_GROUP_NODE_ID)));
                 Group group = getGroup(groupId);
                 if (group != null) {
                     groups.add(group);
@@ -599,20 +645,19 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * passed as an argument. Only messageCount Messages are retrieves, or less if
      * there aren't as many.
      *
-     * @param group         The Group from which we want to retrieve the Messages.
+     * @param group        The Group from which we want to retrieve the Messages.
      * @param furthestDate The Date boundary.
      * @param messageCount The number of Messages that should be retrieved..
      * @return The list of Messages from the Group.
      * @throws CacheDatabaseException If the database was unable to fetch some
      *                                information.
      */
-    public List<Message> getMessagesForGroup(Group group,
-                                             Date furthestDate,
-                                             int messageCount)
-            throws CacheDatabaseException
-    {
+    public List<Message> getMessagesForGroup(Group group, Date furthestDate, int messageCount)
+            throws CacheDatabaseException {
         Objects.requireNonNull(group);
         Objects.requireNonNull(furthestDate);
+
+        addGroup(group);
 
         if (messageCount < 0) {
             throw new IllegalArgumentException("Illegal messageCount ! The number of messages must" +
@@ -620,7 +665,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
-                + KEY_MESSAGE_GROUPID + " = ? " + " ORDER BY "
+                + KEY_MESSAGE_GROUP_ID + " = ? " + " ORDER BY "
                 + "strftime('%Y-%m-%d %H:%M:%f', " + KEY_MESSAGE_DATE + ") DESC";
 
         Cursor cursor = mDatabase.rawQuery(selectQuery,
@@ -630,13 +675,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         if (!cursor.moveToFirst()) {
             cursor.close();
             return new ArrayList<>();
-        } else if(!goToFirstOccurrenceOfEarlierDate(cursor, furthestDate)) {
+        } else if (!goToFirstOccurrenceOfEarlierDate(cursor, furthestDate)) {
             cursor.close();
             return new ArrayList<>();
         } else {
             int counter = 0;
             do {
-                Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODEID)));
+                Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
                 String nodeName = ""; //TODO: Define message's Node name attribute
 
                 List<User> users = group.getUsers();
@@ -645,22 +690,21 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 boolean foundUser = false;
                 while (iterator.hasNext() && !foundUser) {
                     User tmpUser = (User) iterator.next();
+
                     Long userID = tmpUser.getId().getId();
-                    if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex
-                            (KEY_MESSAGE_SENDERID))))) {
+                    if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID))))) {
                         messageSender = tmpUser;
                         foundUser = true;
                     }
                 }
 
                 try {
-                    byte[] contentAsBytes = cursor.getBlob(
-                            cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
                     String contentType = cursor.getString(
-                            cursor.getColumnIndex(KEY_MESSAGE_TYPE));
-                    Content content = deserializeContent(contentAsBytes, contentType);
+                            cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
+                    Content content = deserializeContent(cursor,
+                            Content.ContentType.valueOf(contentType));
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                    Date date = DateSerialization.toDateForCache(dateAsString);
+                    Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
                     if (messageSender != null && content != null) {
                         messages.add(new Message(nodeName, id, messageSender, content, date));
                     }
@@ -682,25 +726,24 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * contains a Date that is older than the Date passed as an argument.
      * It returns true if the row exists and false otherwise.
      *
-     * @param cursor The cursor than is moved until it reaches an accepting row.
-     * @param furthestDate  The Date that serves as a limit to this search.
+     * @param cursor       The cursor than is moved until it reaches an accepting row.
+     * @param furthestDate The Date that serves as a limit to this search.
      * @return True if there exists such a row, false otherwise.
      * @throws CacheDatabaseException If one row that the cursor passed couldn't be read.
      */
+
     private boolean goToFirstOccurrenceOfEarlierDate(Cursor cursor, Date furthestDate)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         boolean done = false;
         boolean retValue = false;
-        while(!done) {
+        while (!done) {
             try {
                 String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                Date date = DateSerialization.toDateForCache(dateAsString);
-                if(date.compareTo(furthestDate) <= 0){
+                Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
+                if (date.compareTo(furthestDate) <= 0) {
                     done = true;
-                    retValue =  true;
-                }
-                else if(!cursor.moveToNext()) {
+                    retValue = true;
+                } else if (!cursor.moveToNext()) {
                     done = true;
                     retValue = false;
                 }
@@ -761,8 +804,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @throws CacheDatabaseException If the Content could not be serialized.
      */
     private static byte[] serializeContent(Content content)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(content);
 
         try {
@@ -783,23 +825,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deserializes a byte array into a Content.
      *
-     * @param bytes       The byte array to be deserialized.
+     * @param cursor      The byte array to be deserialized.
      * @param contentType The type of the Content.
      * @return The Content corresponding to the byte array.
      * @throws CacheDatabaseException If the Content could not be deserialized.
      */
-    private static Content deserializeContent(byte[] bytes, String contentType)
-            throws CacheDatabaseException
-    {
+    private static Content deserializeContent(Cursor cursor, Content.ContentType contentType)
+            throws CacheDatabaseException {
         Objects.requireNonNull(contentType);
-        Objects.requireNonNull(bytes);
+        Objects.requireNonNull(cursor);
 
         try {
             switch (contentType) {
-                case "text":
-                    return deserializeTextContent(bytes);
-                case "image":
-                    return deserializeImageContent(bytes);
+                case TEXT:
+                    return deserializeTextContent(cursor);
+                case IMAGE:
+                    return deserializeImageContent(cursor);
                 default:
                     throw new ContentException("No such content exists !");
             }
@@ -814,50 +855,23 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *
      * @param content The TextContent to be serialized.
      * @return The serialized version of the TextContent.
-     * @throws CacheDatabaseException if the TextContent could not be serialized.
      */
-    private static byte[] serializeImageContent(ImageContent content)
-            throws CacheDatabaseException
-    {
+    private static byte[] serializeImageContent(ImageContent content) {
         Objects.requireNonNull(content);
 
-        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-        try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
-            outputStream.writeObject(content);
-            outputStream.close();
-            byte[] bytes = byteOutputStream.toByteArray();
-            byteOutputStream.close();
-            return bytes;
-        } catch (IOException exception) {
-            Log.d(TAG, "Could not serialize ImageContent !", exception);
-            throw new CacheDatabaseException("Could not serialize ImageContent !");
-        }
+        return serializeBitmap(content.getImage());
     }
 
     /**
      * Deserializes a Byte array into an ImageContent.
      *
-     * @param bytes The bytes to be deserialized.
+     * @param cursor The bytes to be deserialized.
      * @return The deserialized version of the bytes.
-     * @throws CacheDatabaseException if the TextContent could not be deserialized.
      */
-    private static Content deserializeImageContent(byte[] bytes)
-            throws CacheDatabaseException
-    {
-        Objects.requireNonNull(bytes);
-
-        try {
-            ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
-            ImageContent content = (ImageContent) objectInputStream.readObject();
-            objectInputStream.close();
-            byteInputStream.close();
-            return content;
-        } catch (IOException | ClassNotFoundException exception) {
-            Log.d(TAG, "Could not deserialize TextContent !", exception);
-            throw new CacheDatabaseException("Could not deserialize Content !");
-        }
+    private static Content deserializeImageContent(Cursor cursor) {
+        Bitmap image = deserializeBitmap(cursor.getBlob(cursor.getColumnIndex(KEY_MESSAGE_CONTENT)));
+        String caption = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_TEXT));
+        return new ImageContent(image, caption);
     }
 
     /**
@@ -868,12 +882,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @throws CacheDatabaseException if the TextContent could not be serialized.
      */
     private static byte[] serializeTextContent(TextContent content)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(content);
 
-        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
         try {
+            ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(byteOutputStream);
             outputStream.writeUTF(content.getText());
             outputStream.close();
@@ -889,16 +902,16 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deserializes a Byte array into a TextContent.
      *
-     * @param bytes The bytes to be deserialized.
+     * @param cursor The bytes to be deserialized.
      * @return The deserialized version of the bytes.
      * @throws CacheDatabaseException if the TextContent could not be deserialized.
      */
-    private static Content deserializeTextContent(byte[] bytes)
-            throws CacheDatabaseException
-    {
-        Objects.requireNonNull(bytes);
+    private static Content deserializeTextContent(Cursor cursor)
+            throws CacheDatabaseException {
+        Objects.requireNonNull(cursor);
 
         try {
+            byte[] bytes = cursor.getBlob(cursor.getColumnIndex(KEY_MESSAGE_CONTENT));
             ByteArrayInputStream byteInputStream = new ByteArrayInputStream(bytes);
             ObjectInputStream objectInputStream = new ObjectInputStream(byteInputStream);
             String text = objectInputStream.readUTF();
@@ -922,18 +935,20 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *                                not be serialized.
      */
     private static ContentValues createContentValuesForMessage(Message message, Id groupId)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_MESSAGE_NODEID, message.getId().getId());
-        values.put(KEY_MESSAGE_SENDERID, message.getSender().getId().getId());
-        values.put(KEY_MESSAGE_GROUPID, groupId.getId());
-        values.put(KEY_MESSAGE_TYPE, message.getContent().getType().getType());
+        values.put(KEY_MESSAGE_NODE_ID, message.getId().getId());
+        values.put(KEY_MESSAGE_SENDER_ID, message.getSender().getId().getId());
+        values.put(KEY_MESSAGE_GROUP_ID, groupId.getId());
+        values.put(KEY_MESSAGE_TEXT, message.getContent().getTextForRequest());
+        values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType().getType());
         values.put(KEY_MESSAGE_CONTENT, serializeContent(message.getContent()));
-        values.put(KEY_MESSAGE_DATE, DateSerialization.toStringForCache(message.getDate()));
+        values.put(KEY_MESSAGE_STATUS, message.getStatus().getValue());
+        values.put(KEY_MESSAGE_DATE, DateSerialization.dateSerializer.toStringForCache(message.getDate()));
+
         return values;
     }
 
@@ -946,15 +961,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *                                could not be serialized.
      */
     private static ContentValues createContentValuesForUser(User user)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(user);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_USER_NODEID, user.getId().getId());
+        values.put(KEY_USER_NODE_ID, user.getId().getId());
         values.put(KEY_USER_NAME, user.getName());
         values.put(KEY_USER_EMAIL, user.getEmail());
         values.put(KEY_USER_IMAGE, serializeBitmap(user.getImg()));
+
+        List<User> entourage = YieldsApplication.getUser().getEntourage();
+        List<String> entourageIds = new ArrayList<>();
+        for (User entourageUser : entourage) {
+            entourageIds.add(entourageUser.getId().getId().toString());
+        }
+        int inEntourage = entourageIds.contains(user.getId().getId().toString()) ? 1 : 0;
+        values.put(KEY_USER_ENTOURAGE, inEntourage);
         return values;
     }
 
@@ -967,15 +989,18 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      *                                could not be serialized.
      */
     private static ContentValues createContentValuesForGroup(Group group)
-            throws CacheDatabaseException
-    {
+            throws CacheDatabaseException {
         Objects.requireNonNull(group);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_GROUP_NODEID, group.getId().getId());
+        values.put(KEY_GROUP_NODE_ID, group.getId().getId());
         values.put(KEY_GROUP_IMAGE, serializeBitmap(group.getImage()));
         values.put(KEY_GROUP_VISIBILITY, group.getVisibility().getValue());
         values.put(KEY_GROUP_NAME, group.getName());
+
+        int validated = group.isValidated() ? 1 : 0;
+        values.put(KEY_GROUP_VALIDATED, validated);
+
         List<User> users = group.getUsers();
         List<Id> userIDs = new ArrayList<>();
         for (User user : users) {

@@ -36,7 +36,6 @@ public class Group extends Node {
 
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
-    private boolean mConsumed;
     private List<User> mUsers;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
@@ -58,7 +57,6 @@ public class Group extends Node {
         super(name, id);
         Objects.requireNonNull(users);
         this.mMessages = new TreeMap<>();
-        mConsumed = false;
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
@@ -282,6 +280,7 @@ public class Group extends Node {
      * Class used to represent a tag, which defines the subjects of the group
      */
     public static class Tag {
+
         private String mText;
         public static final int MIN_TAG_LENGTH = 2;
         public static final int MAX_TAG_LENGTH = 20;

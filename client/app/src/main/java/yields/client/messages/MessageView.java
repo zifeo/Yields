@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -25,13 +24,14 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * A View which corresponds to a given message.
  */
-public class MessageView extends LinearLayout{
+public class MessageView extends LinearLayout {
 
     private Message mMessage;
 
     /**
      * Main constructor for MessageView, it constructs itself based on the information which
      * the Message parameter contains.
+     *
      * @param context The context of the Application.
      * @param message The Message from which the MessageView is built.
      * @throws MessageViewException If the message contains incorrect infromation.
@@ -45,14 +45,16 @@ public class MessageView extends LinearLayout{
 
     /**
      * Returns the Message from which this View was built.
+     *
      * @return The Message from which this View was built.
      */
-    public Message getMessage(){
+    public Message getMessage() {
         return mMessage;
     }
 
     /**
      * Creates the view for this instance.
+     *
      * @return The View for this instance.
      * @throws MessageViewException If the message contains incorrect information.
      */
@@ -67,13 +69,12 @@ public class MessageView extends LinearLayout{
         View v;
         if (userIsSender) {
             v = vi.inflate(R.layout.messagelayoutsender, null);
-        }
-        else{
+        } else {
             v = vi.inflate(R.layout.messagelayoutnotsender, null);
         }
 
         ImageView imageViewProfilPicture;
-            imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
+        imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
 
         Bitmap image = mMessage.getSender().getImg();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
@@ -95,10 +96,32 @@ public class MessageView extends LinearLayout{
         dateTextView.setTextColor(Color.GRAY);
 
         ImageView sentIndicator = (ImageView) v.findViewById(R.id.sentindicator);
-        // TODO : Choose the right image. For now placeHolder.
-        Bitmap sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(), R
-                .drawable.ic_query_builder_black_24dp);
-        sentIndicator.setImageBitmap(sentImage);
+        Bitmap sentImage;
+
+        if(userIsSender) {
+            switch (mMessage.getStatus()) {
+                case SEEN:
+                    sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                            R.drawable.ic_check_circle_black_24dp);
+                    sentIndicator.setImageBitmap(sentImage);
+                    break;
+                case SENT:
+                    sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                            R.drawable.ic_check_circle_black_24dp);
+                    sentIndicator.setImageBitmap(sentImage);
+                    break;
+                case NOT_SENT:
+                    sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                            R.drawable.ic_query_builder_black_24dp);
+                    sentIndicator.setImageBitmap(sentImage);
+                    break;
+                default:
+                    sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
+                            R.drawable.ic_query_builder_black_24dp);
+                    sentIndicator.setImageBitmap(sentImage);
+                    break;
+            }
+        }
 
         RelativeLayout contentLayout = (RelativeLayout) v.findViewById(R.id.contentfield);
         try {

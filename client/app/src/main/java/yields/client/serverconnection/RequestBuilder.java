@@ -2,11 +2,13 @@ package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
 import android.util.ArrayMap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,11 +32,11 @@ public class RequestBuilder {
      * The Fields possible for the request
      */
     public enum Fields {
-        EMAIL("email"), TEXT("content"), NAME("name"),
+        EMAIL("email"), TEXT("text"), NAME("name"),
         NODES("nodes"), KIND("kind"),
-        LAST("datetime"), TO("to"), COUNT("count"),
-        IMAGE("image"), NID("nid"), VISIBILITY("visibility"),
-        CONTENT_TYPE("contentType");
+        LAST("datetime"), TO("to"), COUNT("count"), CONTENT("content"),
+        IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
+        CONTENT_TYPE("contentType"), DATE("date");
 
         private final String name;
 
@@ -54,27 +56,23 @@ public class RequestBuilder {
     /**
      * ServerRequest for updating user properties.
      *
-     * @param sender The sender of the request.
-     * @param args   The properties to be changed organized in a form
-     *               property -> new value
-     * @return The request.
+     * @param sender The sender of the request, which wants to be updated.
+     * @param name   The name of the updated User.
+     * @param email  The email ot the updated User.
+     * @param image  The image of the updated User.
+     * @return The appropriate ServerRequest.
      */
-    public static ServerRequest userUpdateRequest(Id sender,
-                                                  Map<Fields, String> args) {
+    public static ServerRequest userUpdateRequest(Id sender, String name, String email, Bitmap image) {
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(args);
-        RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USER_UPDATE, sender);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(email);
+        Objects.requireNonNull(image);
 
-        if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }
-        if (args.containsKey(Fields.NAME)) {
-            builder.addField(Fields.NAME, args.get(Fields.NAME));
-        }
-        /* PIC if (args.containsKey(Fields.EMAIL)) {
-            builder.addField(Fields.EMAIL, args.get(Fields.EMAIL));
-        }*/
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
+
+        builder.addField(Fields.NAME, name);
+        builder.addField(Fields.EMAIL, email);
+        builder.addField(Fields.IMAGE, image);
 
         return builder.request();
     }
@@ -148,27 +146,29 @@ public class RequestBuilder {
     }
 
     /**
-     * Update the user info on server
+     * Created a User information request.
      *
-     * @param sender The sender of the request.
+     * @param sender   The Id of the sender of the request.
+     * @param userInfo The Id of the User from which information shall be retrieved.
      * @return The request.
      */
-    public static ServerRequest userUpdateRequest(Id sender) {
+    public static ServerRequest userInfoRequest(Id sender, Id userInfo) {
         Objects.requireNonNull(sender);
-        RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USER_STATUS, sender);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_INFO, sender);
+        builder.addField(Fields.NID, userInfo);
 
         return builder.request();
     }
 
     /**
-     * Creates a Group create request
+     * Creates a Group create request.
      *
-     * @param sender     The id of the sender
-     * @param name       The new name of the group
+     * @param sender     The id of the sender.
+     * @param name       The new name of the group.
      * @param visibility The visibility of the group.
-     * @param nodes      The nodes attached to the group
-     * @return The request itself
+     * @param nodes      The nodes attached to the group.
+     * @return The request itself.
      */
     public static ServerRequest groupCreateRequest(Id sender, String name,
                                                    Group.GroupVisibility visibility,
@@ -208,7 +208,7 @@ public class RequestBuilder {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newName);
 
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, sender);
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE, sender);
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.NAME, newName);
         return builder.request();
@@ -229,7 +229,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newVisibility);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
-                .GROUP_UPDATE_VISIBILITY, sender);
+                .GROUP_UPDATE, sender);
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.VISIBILITY, newVisibility);
 
@@ -251,7 +251,7 @@ public class RequestBuilder {
         Objects.requireNonNull(newImage);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind
-                .GROUP_UPDATE_IMAGE, sender);
+                .GROUP_UPDATE, sender);
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.IMAGE, newImage);
         return builder.request();
@@ -305,19 +305,20 @@ public class RequestBuilder {
     }
 
     /**
-     * Creates a Group message request for a Message (no matter what it's Content is).
+     * Creates a Node message request for a Message (no matter what it's Content is).
      *
      * @param sender  The Id of the sender.
      * @param groupId The Id of the group to which the Message is sent to.
      * @param content The Content of the Message that is sent.
+     * @param date    The date of when the Message was created.
      * @return The request itself.
      */
-    public static ServerRequest groupMessageRequest(Id sender, Id groupId, Content content) {
+    public static ServerRequest nodeMessageRequest(Id sender, Id groupId, Content content, Date date) {
         switch (content.getType()) {
             case TEXT:
-                return groupTextMessageRequest(sender, groupId, (TextContent) content);
+                return nodeTextMessageRequest(sender, groupId, (TextContent) content, date);
             case IMAGE:
-                return groupImageMessageRequest(sender, groupId, (ImageContent) content);
+                return nodeImageMessageRequest(sender, groupId, (ImageContent) content, date);
             default:
                 throw new ContentException("No such ContentType exists !");
         }
@@ -331,18 +332,21 @@ public class RequestBuilder {
      * @param content The content of the message.
      * @return The request itself.
      */
-    public static ServerRequest groupTextMessageRequest(Id sender, Id groupId,
-                                                        TextContent content) {
+    public static ServerRequest nodeTextMessageRequest(Id sender, Id groupId,
+                                                       TextContent content, Date date) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(content);
+        Objects.requireNonNull(date);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
+                ServiceRequest.RequestKind.NODE_MESSAGE, sender);
 
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
         builder.addField(Fields.TEXT, content.getText());
+        builder.addField(Fields.DATE, DateSerialization.dateSerializer.toString(date));
+
 
         return builder.request();
     }
@@ -355,19 +359,21 @@ public class RequestBuilder {
      * @param content The ImageContent to send.
      * @return The request itself.
      */
-    public static ServerRequest groupImageMessageRequest(Id sender, Id groupId,
-                                                         ImageContent content) {
+    public static ServerRequest nodeImageMessageRequest(Id sender, Id groupId,
+                                                        ImageContent content, Date date) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(content);
+        Objects.requireNonNull(date);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUP_MESSAGE, sender);
+                ServiceRequest.RequestKind.NODE_MESSAGE, sender);
 
         builder.addField(Fields.NID, groupId);
         builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
         builder.addField(Fields.TEXT, content.getCaption());
-        builder.addField(Fields.IMAGE, content.getImage());
+        builder.addField(Fields.CONTENT, content.getImage());
+        builder.addField(Fields.DATE, DateSerialization.dateSerializer.toString(date));
 
         return builder.request();
     }
@@ -387,7 +393,7 @@ public class RequestBuilder {
         Objects.requireNonNull(messageCount);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.GROUP_HISTORY, senderId);
+                ServiceRequest.RequestKind.NODE_HISTORY, senderId);
 
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
@@ -474,10 +480,20 @@ public class RequestBuilder {
         request.put(Fields.KIND.getValue(), mKind.getValue());
 
         Map<String, Object> metadata = new ArrayMap<>();
-        metadata.put("sender", mSender.getId());
+        metadata.put("client", mSender.getId());
 
-        metadata.put("datetime", formatDate(
-                new Date()));
+        Date ref = new Date();
+        try {
+            ref = mKind.equals(ServiceRequest.RequestKind.NODE_MESSAGE) ?
+                    DateSerialization.dateSerializer.toDate((String) mConstructingMap.get(Fields.DATE.getValue()))
+                    : new Date();
+        } catch (ParseException e) {
+            Log.d("RequestBuilder", "Couldn't handle build ServerRequest correctly !");
+        }
+
+        metadata.put("datetime", formatDate(new Date()));
+
+        metadata.put("ref", formatDate(ref));
 
         request.put("metadata", new JSONObject(metadata));
 
@@ -494,6 +510,6 @@ public class RequestBuilder {
      */
     private String formatDate(Date date) {
         Objects.requireNonNull(date);
-        return DateSerialization.toString(date);
+        return DateSerialization.dateSerializer.toString(date);
     }
 }

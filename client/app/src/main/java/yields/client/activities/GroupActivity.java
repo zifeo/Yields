@@ -258,13 +258,18 @@ public class GroupActivity extends NotifiableActivity {
 
         mGroups = new ArrayList<>();
 
-        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
+        List<User> users = new ArrayList<>();
+        users.add(YieldsApplication.getUser());
+        for(User user : YieldsApplication.getUser().getEntourage()){
+            users.add(user);
+        }
+        Group group1 = new Group("SWENG", new Id(666), users);
         group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !"), new java.util.Date()));
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !"), new java.util.Date()));
         group1.setValidated();
         mGroups.add(group1);
 
-        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
+        Group group2 = new Group("Answer to the Universe", new Id(42), users);
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date()));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date()));
         group2.setValidated();

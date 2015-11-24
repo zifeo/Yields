@@ -5,9 +5,7 @@ import android.graphics.BitmapFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
@@ -16,7 +14,6 @@ import yields.client.R;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-import yields.client.node.Group;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
@@ -28,9 +25,24 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class Message extends Node {
 
+    public enum MessageStatus {
+        SENT("SENT"), SEEN("SEEN"), NOT_SENT("NOT_SENT");
+
+        private String mValue;
+
+        MessageStatus(String value) {
+            mValue = value;
+        }
+
+        public String getValue() {
+            return mValue;
+        }
+    }
+
     private final User mSender;
     private final Content mContent;
     private final Date mDate;
+    private final MessageStatus mStatus;
 
     /**
      * Main constructor for a Message.
@@ -39,29 +51,48 @@ public class Message extends Node {
      * @param nodeID   ID of the Node.
      * @param sender   The sender of the message.
      * @param content  The content of the message.
+     * @param status   The status of the message.
      * @throws MessageException If the message content or sender is incorrect.
-     * @throws NodeException If the Node information is incorrect.
+     * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, User sender, Content content, Date date) {
+    public Message(String nodeName, Id nodeID, User sender, Content content,
+                   Date date, MessageStatus status) {
         super(nodeName, nodeID);
         this.mSender = Objects.requireNonNull(sender);
         this.mContent = Objects.requireNonNull(content);
         this.mDate = new Date(date.getTime());
+        this.mStatus = status;
+    }
+
+    /**
+     * Constructor for a Message, sets it's MessageStatus to NOT_SENT.
+     *
+     * @param nodeName Name of the Node.
+     * @param nodeID   ID of the Node.
+     * @param sender   The sender of the message.
+     * @param content  The content of the message.
+     * @throws MessageException If the message content or sender is incorrect.
+     * @throws NodeException    If the Node information is incorrect.
+     */
+    public Message(String nodeName, Id nodeID, User sender, Content content, Date date) {
+        this(nodeName, nodeID, sender, content, date, MessageStatus.NOT_SENT);
     }
 
     /**
      * Create a message from a JSON object.
+     *
      * @param object The JSON representing the message.
      * @throws JSONException if the json is invalid.
      */
-    public Message(JSONArray object ) throws JSONException, ParseException{
+    public Message(JSONArray object) throws JSONException, ParseException {
         super(object.getString(0),
-                new Id(DateSerialization.toDate(object.getString(0)).getTime()));
+                new Id(DateSerialization.dateSerializer.toDate(object.getString(0)).getTime()));
 
         Id idUser = new Id(Long.parseLong(object.getString(1)));
         /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
         // TODO : The same apply for the profil pic and the email.
-        User sender = new User(idUser.getId().toString() , idUser, "",
+
+        User sender = new User(idUser.getId().toString(), idUser, "",
                 BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
                         R.drawable.userpicture));
 
@@ -71,10 +102,12 @@ public class Message extends Node {
         //TODO : Implement Groups
 
         try {
-            this.mDate = DateSerialization.toDate(object.getString(0));
+            this.mDate = DateSerialization.dateSerializer.toDate(object.getString(0));
         } catch (ParseException e) {
             throw new JSONException(e.getMessage());
         }
+
+        mStatus = MessageStatus.SENT;
     }
 
     /**
@@ -105,11 +138,20 @@ public class Message extends Node {
     }
 
     /**
-     * Returns a preview of the message, displayed in the group list
+     * Returns a preview of the message, displayed in the group list.
      *
-     * @return a string describing the message
+     * @return A string describing the message.
      */
     public String getPreview() {
         return mSender.getName() + " : " + mContent.getPreview();
+    }
+
+    /**
+     * Returns the MessageStatus of the message.
+     *
+     * @return The MessageStatus of the message.
+     */
+    public MessageStatus getStatus() {
+        return mStatus;
     }
 }
