@@ -20,30 +20,43 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
   it should "create a group" in {
     val u = User.create("email@email.com")
     val meta = new Metadata(u.uid, Temporal.now, Temporal.now)
-    val users: List[User] = List(User.create("e1@epfl.ch"), User.create("e2@epfl.ch"), User.create("e3@epfl.ch"), User.create("e4@epfl.ch"))
-    val nodes: List[Node] = List(Group.createGroup("g1", m.client), Group.createGroup("g2", m.client), Group.createGroup("g3", m.client))
+    val users: List[User] = List(
+      User.create("e1@epfl.ch"),
+      User.create("e2@epfl.ch"),
+      User.create("e3@epfl.ch"),
+      User.create("e4@epfl.ch")
+    )
+    val nodes: List[Node] = List(
+      Group.createGroup("g1", m.client),
+      Group.createGroup("g2", m.client),
+      Group.createGroup("g3", m.client)
+    )
     Tag.createTag("sport")
     val tags: List[String] = List("tennis", "sport", "fun")
-    val action = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
-    val res = action.run(meta)
-    res match {
+    val action = GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
+
+    action.run(meta) match {
       case GroupCreateRes(nid) =>
         val g = Group(nid)
-        g.users.toSet should be(users.map(_.uid).toSet)
-        g.name should be("GroupName")
+        g.users.toSet should be (users.map(_.uid).toSet + u.uid)
+        g.name should be ("GroupName")
         g.nodes.toSet should be(nodes.map(_.nid).toSet)
-        val tids = tags.map((x: String) => Tag.getIdFromText(x)).filter(_.isDefined).map(_.get)
-        g.tags should be(tids.toSet)
-        Tag.getIdFromText("tennis").isDefined should be(true)
-        Tag.getIdFromText("fun").isDefined should be(true)
-        Tag.getIdFromText("sport").isDefined should be(true)
+        val tids = tags.flatMap((x: String) => Tag.getIdFromText(x))
+        g.tags should be (tids.toSet)
+        Tag.getIdFromText("tennis").isDefined should be (true)
+        Tag.getIdFromText("fun").isDefined should be (true)
+        Tag.getIdFromText("sport").isDefined should be (true)
         val creator = User(u.uid)
-        creator.groups should contain(nid)
+        creator.groups should contain (nid)
     }
   }
 
   "running groupCreate without name" should "throw an exception" in {
-    val users: List[User] = List(User.create("e12@email.com"), User.create("e22@email.com"), User.create("e32@email.com"), User.create("e42@email.com"))
+    val users: List[User] = List(
+      User.create("e12@email.com"),
+      User.create("e22@email.com"),
+      User.create("e32@email.com"),
+      User.create("e42@email.com"))
     val nodes: List[Node] = List(Group.createGroup("g1", m.client), Group.createGroup("g2", m.client), Group.createGroup("g3", m.client))
     val tags: List[String] = List("music", "acdc")
     val action = new GroupCreate("", nodes.map(_.nid), users.map(_.uid), tags, "private")

@@ -23,19 +23,20 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq
   override def run(metadata: Metadata): Result = {
     if (!name.isEmpty) {
       if (visibility == "private" || visibility == "public") {
+
         val group = Group.createGroup(name, metadata.client)
         group.addMultipleNodes(nodes)
-        group.addMultipleUser(users)
+        group.addMultipleUser(metadata.client +: users)
+
         /** Create or get tags id */
-        val tids: List[TID] = tags.map { text: String =>
-          Tag.getIdFromText(text) match {
-            case Some(x) => x
-            case None => Tag.createTag(text).tid
-          }
-        }.toList
+        val tids  = tags.map { text =>
+          Tag.getIdFromText(text).getOrElse(Tag.createTag(text).tid)
+        }
         group.addTags(tids)
+
         val user = User(metadata.client)
         user.addGroup(group.nid)
+
         GroupCreateRes(group.nid)
       } else {
         val errorMessage = getClass.getSimpleName

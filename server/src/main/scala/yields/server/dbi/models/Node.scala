@@ -136,7 +136,6 @@ abstract class Node {
       limit = Some((0, count)),
       sortAs = DESC
     ))
-    //TODO: Fix key
     valueOrException(_feed)
   }
 
@@ -145,21 +144,35 @@ abstract class Node {
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, content._1.toEpochSecond, content)))
   }
 
-  /** Add multiple users to the group */
-  def addMultipleUser(users: Seq[UID]): Unit =
-    users.foreach(addUser)
+  /** Add multiple users to the group. Users must have different keys. */
+  def addMultipleUser(users: Seq[UID]): Unit = {
+    if (users.nonEmpty) {
+      val dateTime = Temporal.now.toEpochSecond.toDouble
+      val pairs = users.zipWithIndex.map { case (u, i) =>
+        dateTime + i -> u
+      }
+      redis.withClient(_.zadd(NodeKey.users, pairs.head._1, pairs.head._2, pairs.tail: _*))
+    }
+  }
 
   /** Add user */
   def addUser(id: UID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.now.toEpochSecond, id)))
 
-  /** Add multiple nodes to the group */
-  def addMultipleNodes(nodes: Seq[NID]): Unit =
-    nodes.foreach(addNode)
+  /** Add multiple nodes to the group. Nodes must have different keys. */
+  def addMultipleNodes(nodes: Seq[NID]): Unit = {
+    if (nodes.nonEmpty) {
+      val dateTime = Temporal.now.toEpochSecond.toDouble
+      val pairs = nodes.zipWithIndex.map { case (u, i) =>
+        dateTime + i -> u
+      }
+      redis.withClient(_.zadd(NodeKey.nodes, pairs.head._1, pairs.head._2, pairs.tail: _*))
+    }
+  }
 
   /** Remove multiple nodes */
   def remMultipleNodes(nodes: Seq[NID]): Unit =
-    nodes.foreach(removeNode)
+    redis.withClient(_.zrem(NodeKey.nodes, nodes))
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {
