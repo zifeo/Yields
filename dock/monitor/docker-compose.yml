@@ -1,0 +1,23 @@
+logstash:
+  ports:
+  - 25000:5000/tcp
+  entrypoint:
+  - logstash
+  - -f
+  - /etc/logstash/conf.d/logstash.conf
+  image: logstash:latest
+  links:
+  - elasticsearch
+  volumes:
+  - /var/dock/monitor/logstash.conf:/etc/logstash/conf.d/logstash.conf:ro
+kibana:
+  ports:
+  - 25601:5601/tcp
+  image: kibana:latest
+  links:
+  - elasticsearch
+elasticsearch:
+  ports:
+  - 29200:9200/tcp
+  image: elasticsearch:latest
+

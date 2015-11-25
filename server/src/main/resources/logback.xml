@@ -8,8 +8,17 @@
         </encoder>
     </appender>
 
+    <appender name="STASH" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
+            <destination>91.121.7.102:25000</destination>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+            <keepAliveDuration>5 minutes</keepAliveDuration>
+        </appender>
+    </appender>
+
     <root level="ALL">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STASH"/>
     </root>
 
 </configuration>
