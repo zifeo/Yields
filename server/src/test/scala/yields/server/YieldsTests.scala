@@ -24,16 +24,14 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   private val server = Yields
 
   override def beforeAll(): Unit = {
-    logger.info("Starting server on background")
-    redis(_.flushdb)
+    logger.info("Starting local server on background")
     server.start()
-    Thread.sleep(500)
+    Thread.sleep(1000)
   }
 
   override def afterAll(): Unit = {
     server.close()
-    redis(_.flushdb)
-    logger.info("Stopping server on background")
+    logger.info("Stopping local server on background")
   }
 
   /**
