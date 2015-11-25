@@ -1,0 +1,25 @@
+database:
+  ports:
+  - 26379:6379/tcp
+  command:
+  - redis-server
+  - /usr/local/etc/redis/redis.conf
+  tty: true
+  image: redis
+  volumes:
+  - /var/dock/yields/redis.conf:/usr/local/etc/redis/redis.conf:ro
+  stdin_open: true
+server:
+  ports:
+  - 27777:7777/tcp
+  tty: true
+  entrypoint:
+  - java
+  - -jar
+  - /data/yields.jar
+  image: java:8
+  links:
+  - database
+  volumes:
+  - /var/dock/yields/yields.jar:/data/yields.jar
+  stdin_open: true
