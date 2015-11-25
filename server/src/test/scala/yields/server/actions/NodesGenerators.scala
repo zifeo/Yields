@@ -38,8 +38,9 @@ trait NodesGenerators extends DefaultsGenerators {
 
   implicit lazy val nodeMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
     for {
-      date <- arbitrary[OffsetDateTime]
-    } yield NodeMessageRes(date)
+      nid <- arbitrary[NID]
+      datetime <- arbitrary[OffsetDateTime]
+    } yield NodeMessageRes(nid, datetime)
   }
 
 }
