@@ -136,7 +136,6 @@ abstract class Node {
       limit = Some((0, count)),
       sortAs = DESC
     ))
-    //TODO: Fix key
     valueOrException(_feed)
   }
 
