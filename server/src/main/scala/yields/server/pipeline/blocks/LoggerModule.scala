@@ -13,6 +13,7 @@ class LoggerModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
 
   /** Logs incoming item. */
   override val incoming: C => C = log("IN")
+
   /** Logs outgoing item. */
   override val outgoing: G => G = log("OUT")
 

@@ -2,5 +2,4 @@
 
 <configuration>
     <root level="OFF"/>
-    <shutdownHook />
 </configuration>
