@@ -2,7 +2,6 @@ package yields.server.actions
 
 import java.time.OffsetDateTime
 
-import org.scalacheck._
 import org.scalacheck.Arbitrary
 import yields.server.DefaultsGenerators
 import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes, NodeMessage, NodeMessageRes}
