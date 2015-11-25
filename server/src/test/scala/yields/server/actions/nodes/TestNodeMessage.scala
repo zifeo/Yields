@@ -1,6 +1,5 @@
 package yields.server.actions.nodes
 
-import org.scalacheck.Arbitrary._
 import org.scalatest.Matchers
 import yields.server.AllGenerators
 import yields.server.actions.groups.{GroupCreate, GroupCreateRes}
@@ -11,11 +10,20 @@ import yields.server.utils.Temporal
 
 class TestNodeMessage extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = sample[Metadata]
-  lazy val users: List[User] = List(User.create("e1"), User.create("e2"), User.create("e3"), User.create("e4"))
-  lazy val nodes: List[Node] = List(Group.createGroup("g1", m.client), Group.createGroup("g2", m.client), Group.createGroup("g3", m.client))
+  val m = sample[Metadata]
 
   it should "add new entry to feed" in {
+    val users = List(
+      User.create("e1"),
+      User.create("e2"),
+      User.create("e3"),
+      User.create("e4")
+    )
+    val nodes = List(
+      Group.createGroup("g1", m.client),
+      Group.createGroup("g2", m.client),
+      Group.createGroup("g3", m.client)
+    )
     val tags = List("nature")
     val create = new GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
     val res = create.run(m)

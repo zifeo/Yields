@@ -27,22 +27,6 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x) == x
   }
 
-  property("GroupMessage") = forAll { (x: NodeMessage) =>
-    toAndFromJson(x) == x
-  }
-
-  property("GroupMessageRes") = forAll { (x: NodeMessageRes) =>
-    toAndFromJson(x) == x
-  }
-
-  property("GroupHistory") = forAll { (x: NodeHistory) =>
-    toAndFromJson(x) == x
-  }
-
-  property("GroupHistoryRes") = forAll { (x: NodeHistoryRes) =>
-    toAndFromJson(x) == x
-  }
-
   property("GroupSearch") = forAll { (x: GroupSearch) =>
     toAndFromJson(x) == x
   }
