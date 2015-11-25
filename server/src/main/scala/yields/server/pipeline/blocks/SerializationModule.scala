@@ -14,10 +14,10 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
 
   import SerializationModule._
 
-  /** Incoming log with given channel. */
+  /** Incoming deserialization. */
   override val incoming: ByteString => Request = deserialize
 
-  /** Outgoing log with given channel. '\n' is needed by client to detect end of response. */
+  /** Outgoing serialization. */
   override val outgoing: Response => ByteString = serialize
 
 }
@@ -31,7 +31,7 @@ object SerializationModule {
     ByteString(s"$json\n")
   }
 
-  /** Deserialize to [[Request]]. */
+  /** Deserialize to [[Request]]. '\n' is needed by client to detect end of response. */
   def deserialize(raw: ByteString): Request =
     raw.utf8String.parseJson.convertTo[Request]
 

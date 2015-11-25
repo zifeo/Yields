@@ -9,7 +9,6 @@ import yields.server.dbi.models.UID
 import yields.server.pipeline.Pipeline
 import yields.server.router.{Dispatcher, Router}
 
-import scala.io.StdIn
 import scala.util.control.NonFatal
 
 /**
@@ -34,9 +33,8 @@ object Yields {
     ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
   }
 
-  private lazy val pipeline = Pipeline()
   private lazy val dispatcher = system.actorOf(Dispatcher.props, "Yields-dispatcher")
-  private lazy val router = system.actorOf(Router.props(pipeline, dispatcher), "Yields-router")
+  private lazy val router = system.actorOf(Router.props(Pipeline(), dispatcher), "Yields-router")
 
   /**
     * Launches the Yields app.
@@ -64,8 +62,6 @@ object Yields {
     */
   private[server] def start(): Unit = {
     system.log.info("Server starting.")
-    system
-    materializer
     dispatcher
     router
     system.log.info("Server started.")
