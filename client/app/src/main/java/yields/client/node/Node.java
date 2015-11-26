@@ -10,7 +10,7 @@ import yields.client.id.Id;
  */
 public abstract class Node {
     private String mName;
-    private final Id mId;
+    private Id mId;
 
     /**
      * Creates a node.
@@ -49,6 +49,15 @@ public abstract class Node {
      */
     public Id getId() {
         return mId;
+    }
+
+    /**
+     * Set's the id of the node.
+     *
+     * @param id The new id of the node.
+     */
+    public void setId(Id id) {
+        mId = id;
     }
 
 }

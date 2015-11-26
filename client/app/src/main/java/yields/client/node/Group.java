@@ -2,7 +2,11 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -16,6 +20,7 @@ import java.util.TreeMap;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
@@ -40,6 +45,7 @@ public class Group extends Node {
     private Bitmap mImage;
     private GroupVisibility mVisibility;
     private Set<Tag> mTags;
+    private Date mDate;
 
     /**
      * Constructor for groups
@@ -53,15 +59,17 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility,
-                 boolean validated) {
+                 boolean validated, Date lastUpdate) {
         super(name, id);
         Objects.requireNonNull(users);
+        Objects.requireNonNull(lastUpdate);
         this.mMessages = new TreeMap<>();
         mUsers = new ArrayList<>(Objects.requireNonNull(users));
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
         mTags = new HashSet<>();
+        mDate = lastUpdate;
     }
 
     /**
@@ -76,7 +84,7 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
-        this(name, id, users, image, visibility, false);
+        this(name, id, users, image, visibility, false, new Date());
     }
 
     /**
@@ -90,7 +98,7 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<User> users, Bitmap image) {
-        this(name, id, users, image, GroupVisibility.PRIVATE, false);
+        this(name, id, users, image, GroupVisibility.PRIVATE, false, new Date());
     }
 
     /**
@@ -103,7 +111,47 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<User> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
-                false);
+                false, new Date());
+    }
+
+    /**
+     * Overloaded constructor.
+     *
+     * @param name  The name of the group
+     * @param id    The id of the group
+     * @param users The current users of the group
+     * @throws NodeException if one of the node is null.
+     */
+    public Group(String name, Id id, List<User> users, Date lastUpdate) {
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+                false, lastUpdate);
+    }
+
+    /**
+     * Creates a group from a Json response coming from the server.
+     *
+     * @param jsonGroup The JsonArray containing the group.
+     * @throws JSONException
+     */
+    public Group(JSONArray jsonGroup) throws JSONException, ParseException{
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(),
+                DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
+    }
+
+    /**
+     * Get the last time the group was updated.
+     * @return The sus-mentioned date.
+     */
+    public Date getLastUpdate(){
+        return new Date(mDate.getTime());
+    }
+
+    /**
+     * Set's the last time the group was updated.
+     * @param date The date of the last update.
+     */
+    public void setLastUpdate(Date date){
+        mDate = new Date(date.getTime());
     }
 
     /**
