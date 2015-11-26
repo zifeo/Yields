@@ -32,20 +32,31 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
      * @param users The list of users
      * @param groups The list of groups
      */
-    public ListAdapterUsersGroupsCheckBox(Context context, int resource, List<User> users, List<Group> groups) {
+    public ListAdapterUsersGroupsCheckBox(Context context, int resource, List<User> users,
+                                          List<Group> groups) {
         super(context, resource, users);
         mContext = context;
         mUsers = users;
         mGroups = groups;
     }
 
+    /**
+     * Return the number of item in this adapter
+     * @return the number of item in this adapter
+     */
     @Override
     public int getCount() {
         return mUsers.size() + mGroups.size();
     }
 
+    /**
+     * Get an item of the list
+     * (Must be overridden to avoid access to non-existing users)
+     * @param unused
+     * @return The first user
+     */
     @Override
-    public User getItem(int position) {
+    public User getItem(int unused) {
         return mUsers.get(0);
     }
 
@@ -136,15 +147,5 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
         });
 
         return groupView;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return IGNORE_ITEM_VIEW_TYPE;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return 1;
     }
 }
