@@ -213,7 +213,7 @@ public class YieldService extends Service {
      */
     synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null ||
-                mCurrentGroup.getId().getId().equals(groupId.getId())) {
+                !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             List<Group> groups = YieldsApplication.getUser().getUserGroups();
             for (Group group : groups) {
                 if (group.getId().getId().equals(groupId.getId())) {
