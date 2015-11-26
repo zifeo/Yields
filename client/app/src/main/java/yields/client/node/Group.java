@@ -155,6 +155,17 @@ public class Group extends Node {
     }
 
     /**
+     * Create a wrapper for the comment message in order to be able to send and retreive comment
+     * for this message.
+     * @param messageComment The message commented.
+     * @param group The parent group containing the message.
+     * @return The group wrapper for this message.
+     */
+    public static Group createGroupForMessageComment(Message messageComment, Group group) {
+        return new Group("message comment", messageComment.getId(), group.getUsers());
+    }
+
+    /**
      * Set the visibility of a group.
      *
      * @param visibility The new visibility.

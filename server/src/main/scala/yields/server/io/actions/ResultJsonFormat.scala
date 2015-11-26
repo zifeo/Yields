@@ -4,6 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
+import yields.server.actions.nodes.{NodeHistoryRes, NodeMessageRes}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -12,17 +13,6 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
 
   private val kindFld = "kind"
   private val messageFld = "message"
-
-  /**
-    * Format the message with its message type.
-    * @param obj message to pack
-    * @tparam T message type
-    * @return packed message json format
-    */
-  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
-    kindFld -> obj.getClass.getSimpleName.toJson,
-    messageFld -> obj.toJson
-  )
 
   /**
     * Serializes the result of an action in a json format
@@ -38,19 +28,30 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
     obj match {
       case x: GroupCreateRes => packWithKind(x)
       case x: GroupUpdateRes => packWithKind(x)
-      case x: GroupMessageRes => packWithKind(x)
-      case x: GroupHistoryRes => packWithKind(x)
       case x: GroupSearchRes => packWithKind(x)
+      case x: GroupManageRes => packWithKind(x)
+      case x: NodeMessageRes => packWithKind(x)
+      case x: NodeHistoryRes => packWithKind(x)
 
       case x: UserConnectRes => packWithKind(x)
       case x: UserUpdateRes => packWithKind(x)
       case x: UserGroupListRes => packWithKind(x)
-      case x: UserCreateRes => packWithKind(x)
       case x: UserInfoRes => packWithKind(x)
 
       case _ => serializationError(s"unregistered action kind: $kind")
     }
   }
+
+  /**
+    * Format the message with its message type.
+    * @param obj message to pack
+    * @tparam T message type
+    * @return packed message json format
+    */
+  def packWithKind[T: JsonWriter](obj: T): JsValue = JsObject(
+    kindFld -> obj.getClass.getSimpleName.toJson,
+    messageFld -> obj.toJson
+  )
 
   override def read(json: JsValue): Result =
     json.asJsObject.getFields(kindFld, messageFld) match {
@@ -58,14 +59,15 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
         kind match {
           case "GroupCreateRes" => message.convertTo[GroupCreateRes]
           case "GroupUpdateRes" => message.convertTo[GroupUpdateRes]
-          case "GroupMessageRes" => message.convertTo[GroupMessageRes]
-          case "GroupHistoryRes" => message.convertTo[GroupHistoryRes]
           case "GroupSearchRes" => message.convertTo[GroupSearchRes]
+          case "GroupManageRes" => message.convertTo[GroupManageRes]
+          case "NodeMessageRes" => message.convertTo[NodeMessageRes]
+          case "NodeHistoryRes" => message.convertTo[NodeHistoryRes]
+
 
           case "UserConnectRes" => message.convertTo[UserConnectRes]
           case "UserUpdateRes" => message.convertTo[UserUpdateRes]
           case "UserGroupListRes" => message.convertTo[UserGroupListRes]
-          case "UserCreateRes" => message.convertTo[UserCreateRes]
           case "UserInfoRes" => message.convertTo[UserInfoRes]
 
           case _ => deserializationError(s"unregistered action kind: $kind")

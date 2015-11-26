@@ -86,7 +86,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " TEXT,"
             + KEY_MESSAGE_GROUP_ID + " TEXT," + KEY_MESSAGE_SENDER_ID + " TEXT,"
             + KEY_MESSAGE_TEXT + " TEXT," + KEY_MESSAGE_CONTENT_TYPE + " TEXT,"
-            + KEY_MESSAGE_CONTENT + " BLOB," + KEY_MESSAGE_DATE + " TEXT" + ")";
+            + KEY_MESSAGE_CONTENT + " BLOB," + KEY_MESSAGE_DATE + " TEXT,"
+            + KEY_MESSAGE_STATUS + " TEXT" + ")";
 
     private final SQLiteDatabase mDatabase;
 
@@ -143,35 +144,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Deletes the given Message from the database.
      *
-     * @param messageId The Id of the Message to be deleted.
+     * @param message The Message to be deleted.
+     * @param groupId The Id of the Group to which the message was sent.
      */
-    public void deleteMessage(Id messageId, Id groupId) {
-        Objects.requireNonNull(messageId);
+    public void deleteMessage(Message message, Id groupId) throws CacheDatabaseException {
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(groupId);
 
-        mDatabase.delete(TABLE_MESSAGES, KEY_MESSAGE_NODE_ID + " = ? AND " + KEY_MESSAGE_GROUP_ID
-                + " = ?", new String[]{messageId.getId().toString(), groupId.getId().toString()});
-    }
-
-    public void updateMessageStatus(Message.MessageStatus oldStatus, Message.MessageStatus newStatus, Date date) {
-        Objects.requireNonNull(date);
-        Objects.requireNonNull(oldStatus);
-
-        String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE " + KEY_MESSAGE_STATUS + " = ? "
-                + "AND " + KEY_MESSAGE_DATE + " = ?";
-        Cursor cursor = mDatabase.rawQuery(selectQuery, new String[]{oldStatus.getValue(), DateSerialization
-                .dateSerializer.toStringForCache(date)});
-        if (!cursor.moveToFirst()) {
-            cursor.close();
-        } else if (cursor.getCount() != 1) {
-            cursor.close();
-            //TODO : Invalid cache ! We have two messages that were sent at the exact same time.
-        } else {
-            ContentValues content = new ContentValues();
-            content.put(KEY_MESSAGE_STATUS, newStatus.getValue());
-            mDatabase.update(TABLE_MESSAGES, content, KEY_MESSAGE_STATUS + " = ? "
-                    + "AND " + KEY_MESSAGE_DATE + " = ?", new String[]{oldStatus.getValue(), DateSerialization
-                    .dateSerializer.toStringForCache(date)});
-            cursor.close();
+        try {
+            mDatabase.execSQL("DELETE FROM " + TABLE_MESSAGES + " WHERE " + KEY_MESSAGE_GROUP_ID + " = ? " + "AND "
+                    + KEY_MESSAGE_DATE + " = ? " + "AND " + KEY_MESSAGE_TEXT + " = ?" + "AND "
+                    + KEY_MESSAGE_CONTENT + " = ?", new Object[]{groupId.getId().toString(),
+                    DateSerialization.dateSerializer.toStringForCache(message.getDate()),
+                    message.getContent().getTextForRequest(),
+                    serializeContent(message.getContent())});
+        } catch (CacheDatabaseException e) {
+            throw new CacheDatabaseException("Couldn't delete Message from cache !");
         }
     }
 
@@ -190,17 +178,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         addUser(message.getSender());
 
         try {
-            String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
-                    + " WHERE " + KEY_MESSAGE_NODE_ID + " = ?";
-            Cursor cursor = mDatabase.rawQuery(selectQuery,
-                    new String[]{message.getId().getId().toString()});
-            if (cursor.getCount() != 0) {
-                cursor.close();
-                deleteMessage(message.getId(), groupId);
-            }
+            deleteMessage(message, groupId);
             mDatabase.insert(TABLE_MESSAGES, null,
                     createContentValuesForMessage(message, groupId));
-            cursor.close();
         } catch (CacheDatabaseException exception) {
             Log.d(TAG, "Unable to insert Message with id: "
                     + message.getId().getId(), exception);
@@ -713,8 +693,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     User tmpUser = (User) iterator.next();
 
                     Long userID = tmpUser.getId().getId();
-                    if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex
-                            (KEY_MESSAGE_SENDER_ID))))) {
+                    if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID))))) {
                         messageSender = tmpUser;
                         foundUser = true;
                     }

@@ -11,13 +11,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.service.YieldServiceBinder;
 
 public class YieldsApplication {
     private static ClientUser mUser;
+    private static User mUserSearched;
+    private static List<User> mUserList;
     private static Group mGroup;
     private static List<Group> mGroupsSearched;
 
@@ -32,7 +34,7 @@ public class YieldsApplication {
 
     private static YieldServiceBinder mBinder = null;
 
-    private static Long internalNodeId = 0l;
+    private static Bitmap mShownImage;
 
     /**
      * Getter for the user of the application.
@@ -59,6 +61,22 @@ public class YieldsApplication {
      */
     public static List<Group> getGroupsSearched() {
         return mGroupsSearched;
+    }
+
+    /**
+     * Getter for the list of users currently displayed in the UserListActivity.
+     * @return The list of users displayed.
+     */
+    public static List<User> getUserList(){
+        return mUserList;
+    }
+
+    /**
+     * Getter for the user currently displayed in the UserInfoActivity.
+     * @return The user displayed
+     */
+    public static User getUserSearched(){
+        return mUserSearched;
     }
 
     /**
@@ -102,7 +120,10 @@ public class YieldsApplication {
      *
      * @param gac The google api client.
      */
+
     public static void setGoogleApiClient(GoogleApiClient gac) {
+        Objects.requireNonNull(gac);
+
         mGoogleApiClient = gac;
     }
 
@@ -111,7 +132,9 @@ public class YieldsApplication {
      *
      * @param r The ressources to use.
      */
+
     public static void setResources(Resources r) {
+        Objects.requireNonNull(r);
         mResources = r;
     }
 
@@ -120,7 +143,9 @@ public class YieldsApplication {
      *
      * @param g The group.
      */
+
     public static void setGroup(Group g) {
+        Objects.requireNonNull(g);
         mGroup = g;
     }
 
@@ -129,7 +154,9 @@ public class YieldsApplication {
      *
      * @param u The client user to use.
      */
+
     public static void setUser(ClientUser u) {
+        Objects.requireNonNull(u);
         mUser = u;
     }
 
@@ -138,8 +165,26 @@ public class YieldsApplication {
      *
      * @param groups The group.
      */
+
     public static void setGroupsSearched(List<Group> groups) {
+        Objects.requireNonNull(groups);
         mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
+    }
+
+    /**
+     * Setter for the user list to be displayed in UserListActivity
+     * @param users The user list.
+     */
+    public static void setUserList(List<User> users){
+        mUserList = Collections.unmodifiableList(Objects.requireNonNull(users));
+    }
+
+    /**
+     * Setter for the user to be displayed in UserInfoActivity
+     * @param user The user that will be displayed.
+     */
+    public static void setUserSearched(User user){
+        mUserSearched = Objects.requireNonNull(user);
     }
 
     /**
@@ -148,6 +193,7 @@ public class YieldsApplication {
      * @param c The context to use.
      */
     public static void setApplicationContext(Context c) {
+        Objects.requireNonNull(c);
         mApplicationContext = c;
     }
 
@@ -156,7 +202,9 @@ public class YieldsApplication {
      *
      * @param b The default group image to use.
      */
+
     public static void setDefaultGroupImage(Bitmap b) {
+        Objects.requireNonNull(b);
         mDefaultGroupImage = b;
     }
 
@@ -165,7 +213,10 @@ public class YieldsApplication {
      *
      * @param b The default user image to use.
      */
+
     public static void setDefaultUserImage(Bitmap b) {
+        Objects.requireNonNull(b);
+
         mDefaultUserImage = b;
     }
 
@@ -217,5 +268,24 @@ public class YieldsApplication {
         if (mToast != null) {
             mToast.cancel();
         }
+    }
+
+    /**
+     * Setter for the image to be displayed in the popup.
+     *
+     * @param image The image to be displayed in the popup.
+     */
+    public static void setShownImage(Bitmap image) {
+        Objects.requireNonNull(image);
+        mShownImage = image;
+    }
+
+    /**
+     * Getter for the image to be displayed in the popup window.
+     *
+     * @return The image.
+     */
+    public static Bitmap getShownImage() {
+        return mShownImage;
     }
 }

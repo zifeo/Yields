@@ -1,8 +1,8 @@
 package yields.server.actions.users
 
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{User, UID}
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.{UID, User}
 import yields.server.mpi.Metadata
 
 /**
@@ -18,7 +18,7 @@ case class UserInfo(uid: UID) extends Action {
   override def run(metadata: Metadata): Result = {
     if (uid > 0) {
       val u = User(uid)
-      UserInfoRes(u.name, u.email, u.entourage)
+      UserInfoRes(u.uid, u.name, u.email, u.entourage)
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"bad uid in : $errorMessage")
@@ -30,4 +30,4 @@ case class UserInfo(uid: UID) extends Action {
   * UserGetEntourage result
   * @param entourage sequence of uids corresponding to user's entourage
   */
-case class UserInfoRes(name: String, email: String, entourage: Seq[UID]) extends Result
+case class UserInfoRes(uid: UID, name: String, email: String, entourage: Seq[UID]) extends Result

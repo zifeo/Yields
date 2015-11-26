@@ -116,7 +116,11 @@ public class GroupActivity extends NotifiableActivity {
 
         switch (item.getItemId()) {
             case R.id.actionEntourage:
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, UserListActivity.class);
+                String title = "Entourage";
+                intent.putExtra(UserListActivity.TITLE_KEY, title);
+
+                YieldsApplication.setUserList(YieldsApplication.getUser().getEntourage());
             break;
 
             case R.id.actionDiscover:
@@ -128,6 +132,8 @@ public class GroupActivity extends NotifiableActivity {
             break;
 
             case R.id.actionSettings:
+                //TODO Create a UserSettingsActivity
+
                 intent = new Intent(this, CreatingAccountActivity.class);
             break;
 
@@ -160,6 +166,9 @@ public class GroupActivity extends NotifiableActivity {
         });
     }
 
+    /**
+     * Method called when the server is connected
+     */
     @Override
     public void notifyOnServerConnected() {
         runOnUiThread(new Runnable() {
@@ -170,6 +179,9 @@ public class GroupActivity extends NotifiableActivity {
         });
     }
 
+    /**
+     * Method called when the server is disconnected
+     */
     @Override
     public void notifyOnServerDisconnected() {
         runOnUiThread(new Runnable() {
@@ -215,7 +227,6 @@ public class GroupActivity extends NotifiableActivity {
      */
     private void createFakeUserAndGroups() {
         Bitmap imageUser = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_image);
-        imageUser = GraphicTransforms.getCroppedCircleBitmap(imageUser, getResources().getInteger(R.integer.groupImageDiameter));
 
         try {
             YieldsApplication.setUser(new MockClientUser("Arnaud", new Id(1), "m@m.is", imageUser));
@@ -228,20 +239,20 @@ public class GroupActivity extends NotifiableActivity {
             e.printStackTrace();
         }
 
-        Bitmap defaultGroupImage = BitmapFactory.decodeResource(getResources(), R.drawable.default_group_image);
-
-        int diameter = getResources().getInteger(R.integer.groupImageDiameter);
-        YieldsApplication.setDefaultGroupImage(GraphicTransforms.getCroppedCircleBitmap(defaultGroupImage, diameter));
-
         mGroups = new ArrayList<>();
 
-        Group group1 = new Group("SWENG", new Id(666), new ArrayList<User>());
+        List<User> users = new ArrayList<>();
+        users.add(YieldsApplication.getUser());
+        for(User user : YieldsApplication.getUser().getEntourage()){
+            users.add(user);
+        }
+        Group group1 = new Group("SWENG", new Id(666), users);
         group1.addMessage(new Message("", new Id(667), YieldsApplication.getUser(), new TextContent("Nice to see you !"), new java.util.Date()));
         group1.addMessage(new Message("", new Id(668), YieldsApplication.getUser(), new TextContent("You too !"), new java.util.Date()));
         group1.setValidated();
         mGroups.add(group1);
 
-        Group group2 = new Group("Answer to the Universe", new Id(42), new ArrayList<User>());
+        Group group2 = new Group("Answer to the Universe", new Id(42), users);
         group2.addMessage(new Message("", new Id(43), YieldsApplication.getUser(), new TextContent("42 ?"), new java.util.Date()));
         group2.addMessage(new Message("", new Id(44), YieldsApplication.getUser(), new TextContent("42 !"), new java.util.Date()));
         group2.setValidated();

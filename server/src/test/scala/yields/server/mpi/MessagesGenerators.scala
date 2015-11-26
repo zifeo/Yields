@@ -28,7 +28,8 @@ trait MessagesGenerators extends ActionsGenerators {
     for {
       uid <- arbitrary[UID]
       datetime <- arbitrary[OffsetDateTime]
-    } yield Metadata(uid, datetime)
+      ref <- arbitrary[OffsetDateTime]
+    } yield Metadata(uid, datetime, ref)
   }
 
 }

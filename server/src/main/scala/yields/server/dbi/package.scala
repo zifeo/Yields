@@ -11,18 +11,25 @@ import scala.language.implicitConversions
   */
 package object dbi {
 
-  private[dbi] val redis = new RedisClientPool(
-    host = Config.getString("database.addr"),
-    port = Config.getInt("database.port"),
-    secret = Some(Config.getString("database.pass")),
-    database = Config.getInt("database.id")
-  )
+  private[dbi] lazy val redis = {
+    val pool = new RedisClientPool(
+      host = Config.getString("database.addr"),
+      port = Config.getInt("database.port"),
+      secret = Some(Config.getString("database.pass"))
+    )
+    /* TODO : upgrade to newest scala redis client where selecting
+     * database when creating the pool is supported. Current version
+     * has sadly the "select" query executed before "auth" one...
+     */
+    pool.withClient(_.select(Config.getInt("database.id")))
+    pool
+  }
 
   /**
-    * Public accessor to database via local redis object
-    * @param query
-    * @tparam T
-    * @return
+    * Public accessor to database via local redis object.
+    * @param query query to be run on redis
+    * @tparam T return type of the query
+    * @return values or status of redis query
     */
   def redis[T](query: RedisClient => T): T = redis.withClient(query)
 

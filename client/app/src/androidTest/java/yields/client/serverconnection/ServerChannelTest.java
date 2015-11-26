@@ -41,8 +41,6 @@ public class ServerChannelTest {
     public void testNonWorkingConnection() {
         ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
 
-        ByteArrayInputStream input = new ByteArrayInputStream(
-                FAKE_RESPONSE.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         ServerChannel channel = new ServerChannel(toWriter(output), simpleStatus(false));

@@ -49,13 +49,28 @@ public class ListAdapterSettings extends ArrayAdapter<String> {
 
         ImageView imageSetting = (ImageView) setting.findViewById(R.id.imageSetting);
 
-        //TODO : better if we make use of switch
-        int idDrawable = R.drawable.ic_mode_edit_black_24dp;
-        if (position == GroupSettingsActivity.Settings.IMAGE.ordinal()){
-            idDrawable = R.drawable.ic_photo_camera_black_24dp;
-        }
-        else if (position == GroupSettingsActivity.Settings.USERS.ordinal()){
-            idDrawable = R.drawable.ic_group_black_24dp;
+        int idDrawable;
+        GroupSettingsActivity.Settings[] settings = GroupSettingsActivity.Settings.values();
+        switch(settings[position]){
+            case NAME:
+                idDrawable = R.drawable.ic_mode_edit_black_24dp;
+                break;
+
+            case TYPE:
+                idDrawable = R.drawable.ic_lock_black_24dp;
+                break;
+
+            case IMAGE:
+                idDrawable = R.drawable.ic_photo_camera_black_24dp;
+                break;
+
+            case USERS:
+                idDrawable = R.drawable.ic_group_black_24dp;
+                break;
+
+            default:
+                idDrawable = R.drawable.ic_short_text_black_24dp;
+                break;
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

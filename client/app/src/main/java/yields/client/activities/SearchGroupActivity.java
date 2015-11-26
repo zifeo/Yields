@@ -323,11 +323,17 @@ public class SearchGroupActivity extends NotifiableActivity{
         });
     }
 
+    /**
+     * Method called when the server is connected
+     */
     @Override
     public void notifyOnServerConnected() {
 
     }
 
+    /**
+     * Method called when the server is disconnected
+     */
     @Override
     public void notifyOnServerDisconnected() {
 
@@ -341,6 +347,7 @@ public class SearchGroupActivity extends NotifiableActivity{
         mGlobalGroups = new ArrayList<>();
         Group g1 = new Group("SWENG", new Id(666), new ArrayList<User>());
         g1.addTag(new Group.Tag("hard"));
+        g1.addUser(new User("Jean", new Id(13), "a@a.a", YieldsApplication.getDefaultUserImage()));
         mGlobalGroups.add(g1);
 
         Group g2 = new Group("Hello", new Id(667), new ArrayList<User>());

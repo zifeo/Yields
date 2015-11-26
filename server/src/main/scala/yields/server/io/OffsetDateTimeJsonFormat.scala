@@ -1,7 +1,6 @@
 package yields.server.io
 
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 import spray.json._
 

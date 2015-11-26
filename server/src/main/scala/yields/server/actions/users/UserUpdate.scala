@@ -1,10 +1,9 @@
 package yields.server.actions.users
 
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{User, Blob, Email, UID}
+import yields.server.actions.{Action, Result, _}
+import yields.server.dbi.models.{Blob, Email, UID, User}
 import yields.server.mpi.Metadata
-import yields.server.actions._
 
 /**
   * Update an user given optional fields.
