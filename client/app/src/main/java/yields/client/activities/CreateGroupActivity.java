@@ -229,6 +229,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                     }
                 }
             }
+
+            mAdapterUsersGroupsCheckBox.notifyDataSetChanged();
         }
     }
 
