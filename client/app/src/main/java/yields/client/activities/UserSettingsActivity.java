@@ -52,7 +52,7 @@ public class UserSettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Group Settings");
+        getSupportActionBar().setTitle("User Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         List<String> itemList = new ArrayList<>(Settings.values().length);
@@ -135,6 +135,8 @@ public class UserSettingsActivity extends AppCompatActivity {
                             String newName = editTextName.getText().toString();
                             String message = "Username changed to \"" + newName + "\"";
                             YieldsApplication.showToast(getApplicationContext(), message);
+
+                            mUser.setName(newName);
 
                             ServiceRequest request = new UserUpdateRequest(mUser);
                             YieldsApplication.getBinder().sendRequest(request);
