@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.exceptions.IllegalIntentExtraException;
+import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.node.Group;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
@@ -24,10 +26,12 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the main information of a group are displayed :
  * name, image, tags.
  */
-public class GroupInfoActivity extends NotifiableActivity{
+public class GroupInfoActivity extends NotifiableActivity {
     private Group mGroup;
 
     private static final int MAX_TAGS = 10;
+
+    private SearchGroupActivity.Mode mMode;
 
     /**
      * Method automatically called on the creation of the activity
@@ -44,6 +48,22 @@ public class GroupInfoActivity extends NotifiableActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Group Information");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        Intent intent = getIntent();
+        if (!intent.hasExtra(SearchGroupActivity.MODE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Mode extra is missing from intent in GroupInfoActivity");
+        }
+
+        int indexMode = intent.getIntExtra(SearchGroupActivity.MODE_KEY, 0);
+
+        if (indexMode < 0 || indexMode >= SearchGroupActivity.Mode.values().length){
+            throw new IllegalIntentExtraException(
+                    "Mode extra must be between 0 and "
+                            + (SearchGroupActivity.Mode.values().length - 1) +  " in GroupInfoActivity");
+        }
+
+        mMode = SearchGroupActivity.Mode.values()[indexMode];
 
         mGroup = Objects.requireNonNull(YieldsApplication.getGroup(),
                 "The group in YieldsApplication cannot be null when GroupInfoActivity is created");
@@ -63,7 +83,8 @@ public class GroupInfoActivity extends NotifiableActivity{
             textViewTags.setText(getString(R.string.noTags));
         }
         else if (tags.size() == 1){
-            textViewTags.setText("Tag : " + tags.get(0).getText());
+            String text = "Tag : " + tags.get(0).getText();
+            textViewTags.setText(text);
         }
         else {
             StringBuilder builder = new StringBuilder("Tags : ");
@@ -147,41 +168,61 @@ public class GroupInfoActivity extends NotifiableActivity{
      * Check if the user is in the group and set the appropriate states to the buttons
      */
     private void checkButtons(){
-        YieldsApplication.setUserList(mGroup.getUsers());
+        if (mMode == SearchGroupActivity.Mode.SEARCH){
+            YieldsApplication.setUserList(mGroup.getUsers());
 
-        final Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
+            final Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
 
-        joinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ServiceRequest request = new GroupAddRequest(YieldsApplication.getUser(),
-                        mGroup.getId(), YieldsApplication.getUser());
-                YieldsApplication.getBinder().sendRequest(request);
+            joinButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ServiceRequest request = new GroupAddRequest(YieldsApplication.getUser(),
+                            mGroup.getId(), YieldsApplication.getUser());
+                    YieldsApplication.getBinder().sendRequest(request);
 
-                joinButton.setEnabled(false);
+                    joinButton.setEnabled(false);
+                }
+            });
+
+            final Button leaveButton = (Button) findViewById(R.id.buttonLeaveGroup);
+
+            leaveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
+                            mGroup.getId(), YieldsApplication.getUser().getId());
+                    YieldsApplication.getBinder().sendRequest(request);
+
+                    leaveButton.setEnabled(false);
+                }
+            });
+
+            if (mGroup.containsUser(YieldsApplication.getUser())){
+                joinButton.setVisibility(View.GONE);
+                leaveButton.setVisibility(View.VISIBLE);
             }
-        });
-
-        final Button leaveButton = (Button) findViewById(R.id.buttonLeaveGroup);
-
-        leaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
-                        mGroup.getId(), YieldsApplication.getUser().getId());
-                YieldsApplication.getBinder().sendRequest(request);
-
-                leaveButton.setEnabled(false);
+            else {
+                joinButton.setVisibility(View.VISIBLE);
+                leaveButton.setVisibility(View.GONE);
             }
-        });
-
-        if (mGroup.containsUser(YieldsApplication.getUser())){
-            joinButton.setVisibility(View.GONE);
-            leaveButton.setVisibility(View.VISIBLE);
         }
         else {
-            joinButton.setVisibility(View.VISIBLE);
-            leaveButton.setVisibility(View.GONE);
+            final Button addButton = (Button) findViewById(R.id.buttonAddGroup);
+            addButton.setVisibility(View.VISIBLE);
+
+            addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    YieldsApplication.setGroupAdded(mGroup);
+                    YieldsApplication.setGroupAddedValid(true);
+
+                    Intent intent = new Intent(GroupInfoActivity.this, CreateGroupActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                    startActivity(intent);
+                }
+            });
         }
     }
 }
