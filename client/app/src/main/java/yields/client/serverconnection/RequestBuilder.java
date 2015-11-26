@@ -170,30 +170,31 @@ public class RequestBuilder {
      * @param sender     The id of the sender.
      * @param name       The new name of the group.
      * @param visibility The visibility of the group.
-     * @param nodes      The nodes attached to the group.
+     * @param users      The users attached to the group.
      * @return The request itself.
      */
     public static ServerRequest groupCreateRequest(Id sender, String name,
                                                    Group.GroupVisibility visibility,
-                                                   List<Id> nodes) {
+                                                   List<Id> users) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(name);
-        Objects.requireNonNull(nodes);
+        Objects.requireNonNull(users);
 
-        if (nodes.size() < 1) {
+        if (users.size() < 1) {
             throw new IllegalArgumentException("No nodes to add...");
         }
-        List<Long> nodeIds = new ArrayList<>();
-        for (Id id : nodes) {
-            nodeIds.add(id.getId());
+        List<Long> usersId = new ArrayList<>();
+        for (Id id : users) {
+            usersId.add(id.getId());
         }
 
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_CREATE, sender);
 
         builder.addField(Fields.NAME, name);
+        // TODO : correct when nodes are really implemented
         builder.addField(Fields.NODES, new ArrayList());
-        builder.addField(Fields.USERS, nodeIds);
+        builder.addField(Fields.USERS, usersId);
         builder.addField(Fields.VISIBILITY, visibility);
         builder.addField(Fields.TAG, new ArrayList());
 
