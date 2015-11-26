@@ -125,6 +125,8 @@ public class GroupActivity extends NotifiableActivity {
 
             case R.id.actionDiscover:
                 intent = new Intent(this, SearchGroupActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY,
+                        SearchGroupActivity.Mode.SEARCH.ordinal());
             break;
 
             case R.id.actionCreate:

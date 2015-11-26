@@ -139,8 +139,12 @@ public class CreateGroupActivity extends AppCompatActivity {
             break;
 
             case R.id.actionAddNodeToGroup:
+                Intent intent = new Intent(this, SearchGroupActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY,
+                        SearchGroupActivity.Mode.ADD_NODE.ordinal());
 
-            break;
+                startActivity(intent);
+                break;
 
             case R.id.actionDoneCreateGroup:
                 List<User> userList = new ArrayList<>();
