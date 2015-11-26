@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -19,7 +18,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,10 +78,13 @@ public class MessageActivity extends NotifiableActivity {
     private static ListAdapterMessages mGroupMessageAdapter;
     private static ListAdapterMessages mCommentAdapter;
 
+    private static final int THUMBNAIL_PADDING = 6;
+    private static ImageView mImageThumbnail;
 
     /**
      * Starts the activity by displaying the group info and showing the most
      * recent messages.
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -99,6 +104,17 @@ public class MessageActivity extends NotifiableActivity {
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
+        YieldsApplication.setBinder(new FakeBinder(new YieldService()));
+        // Set the user.
+        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+                .createBitmap(80, 80, Bitmap.Config.RGB_565));
+        YieldsApplication.setUser(mUser);
+        // Set the group.
+        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
+                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
+                .GroupVisibility.PUBLIC, true);
+
+
         mImage = null;
         mSendImage = false;
 
@@ -111,7 +127,7 @@ public class MessageActivity extends NotifiableActivity {
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
-        if(mUser == null || mGroup == null) {
+        if (mUser == null || mGroup == null) {
             String message = "Couldn't get group information.";
             YieldsApplication.showToast(getApplicationContext(), message);
             mActionBar.setTitle("Unknown group");
@@ -122,12 +138,16 @@ public class MessageActivity extends NotifiableActivity {
 
         // By default, we show the messages of the group.
         mType = ContentType.GROUP_MESSAGES;
-        mFragmentManager =  getFragmentManager();
+        mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
 
         GroupHistoryRequest historyRequest = new GroupHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
+
+        mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
+        mImageThumbnail.setPadding(0, 0, 0, 0);
     }
+
 
     /**
      * @return The id of the current group
@@ -138,6 +158,7 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -153,27 +174,27 @@ public class MessageActivity extends NotifiableActivity {
     /**
      * Listener called when the user sends a message to the group.
      */
-    public void onSendMessage(View v){
-        String inputMessage =  mInputField.getText().toString().trim();
+    public void onSendMessage(View v) {
+        String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
         Content content;
-        if (mSendImage && mImage != null){
+        if (mSendImage && mImage != null) {
             content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
             mImage = null;
-        }
-        else {
+            mImageThumbnail.setImageBitmap(null);
+            mImageThumbnail.setPadding(0, 0, 0, 0);
+        } else {
             content = new TextContent(inputMessage);
         }
         Message message = new Message("message", new Id(0), mUser, content, new Date());
-        if (mType == ContentType.GROUP_MESSAGES){
+        if (mType == ContentType.GROUP_MESSAGES) {
             Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
             YieldsApplication.getBinder().sendRequest(request);
-        }
-        else{
+        } else {
             Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
@@ -184,11 +205,13 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Listener called when the user presses the picture icon.
+     *
      * @param v The view which called this method
      */
-    public void onClickAddImage(View v){
+    public void onClickAddImage(View v) {
         mSendImage = true;
         pickImageFromGallery();
+        Log.d("MessageActivity", "Test null image");
     }
 
     /**
@@ -210,7 +233,11 @@ public class MessageActivity extends NotifiableActivity {
                         uri);
                 if (mImage != null) {
                     String message = "Image added to message";
-                    YieldsApplication.showToast(getApplicationContext(),message);
+                    YieldsApplication.showToast(getApplicationContext(), message);
+                    Log.d("MessageActivity", "Update Thumbnail");
+                    mImageThumbnail.setPadding(THUMBNAIL_PADDING, THUMBNAIL_PADDING,
+                            THUMBNAIL_PADDING, THUMBNAIL_PADDING);
+                    mImageThumbnail.setImageBitmap(mImage);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -218,7 +245,8 @@ public class MessageActivity extends NotifiableActivity {
         }
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -291,20 +319,20 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Return the list view of the current fragment.
-     * @return  If the current fragment is a groupMessageFragment then the
+     *
+     * @return If the current fragment is a groupMessageFragment then the
      * method returns the list view containing the messages (currently in
      * local memory) of the group.
-     *           If the current fragment is a commentFragment then the method
-     *           returns the list view containing the comments for the
-     *           message the user had clicked on.
+     * If the current fragment is a commentFragment then the method
+     * returns the list view containing the comments for the
+     * message the user had clicked on.
      */
-    public ListView getCurrentFragmentListView(){
+    public ListView getCurrentFragmentListView() {
         if (mType == ContentType.GROUP_MESSAGES) {
             Log.d("MessageActivity", "NODE_MESSAGE ListView");
             return ((GroupMessageFragment) mCurrentFragment)
                     .getMessageListView();
-        }
-        else{
+        } else {
             Log.d("MessageActivity", "MESSAGE_COMMENT ListView");
             return ((CommentFragment) mCurrentFragment)
                     .getCommentListView();
@@ -313,17 +341,19 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Getter for the fragment currently displayed.
+     *
      * @return The current fragment.
      */
-    public Fragment getCurrentFragment(){
+    public Fragment getCurrentFragment() {
         return mCurrentFragment;
     }
 
     /**
      * Getter for the type of fragment.
+     *
      * @return The type of the fragment currently displayed.
      */
-    public ContentType getType(){
+    public ContentType getType() {
         return mType;
     }
 
@@ -331,16 +361,27 @@ public class MessageActivity extends NotifiableActivity {
      * Allows tests to send image message instead of text message and thus being able to comment
      * them.
      */
-    public void simulateImageMessage(){
+    public void simulateImageMessage() {
         mImage = YieldsApplication.getDefaultGroupImage();
         mSendImage = true;
+    }
+
+    /**
+     * Cancel an image in a message when clicking on the thumbnail.
+     * @param v The view clicked on.
+     */
+    public void cancelImageSending(View v){
+        mImageThumbnail.setPadding(0, 0, 0, 0);
+        mSendImage = false;
+        mImageThumbnail.setImageBitmap(null);
+        mImage = null;
     }
 
     /**
      * Creates a comment fragment and put it in the fragment container of the
      * MessageActivity (id fragmentPlaceHolder).
      */
-    private void createCommentFragment(){
+    private void createCommentFragment() {
         Log.d("MessageActivity", "createCommentFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
@@ -356,8 +397,8 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void onClick(View v) {
                 Log.d("CommentFragment", "CommentView clicked.");
-                if (mCommentMessage.getContent().getType() == Content.ContentType.IMAGE){
-                    YieldsApplication.setShownImage(((ImageContent)mCommentMessage.getContent()).getImage());
+                if (mCommentMessage.getContent().getType() == Content.ContentType.IMAGE) {
+                    YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).getImage());
                     startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
                 }
             }
@@ -371,7 +412,7 @@ public class MessageActivity extends NotifiableActivity {
      * Make request to load comments for a message and sends it to the server using the
      * ServiceBinder.
      */
-    private void loadComments(){
+    private void loadComments() {
         Log.d("MessageActivity", "loadComments");
         GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
@@ -381,7 +422,7 @@ public class MessageActivity extends NotifiableActivity {
      * Creates a group message fragment and put it in the fragment container of
      * the MessageActivity (id fragmentPlaceHolder).
      */
-    private void createGroupMessageFragment(){
+    private void createGroupMessageFragment() {
         Log.d("MessageActivity", "createGroupMessageFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
@@ -423,10 +464,10 @@ public class MessageActivity extends NotifiableActivity {
      */
     @Override
     public void onBackPressed() {
-        if (mType == ContentType.GROUP_MESSAGES){
+        if (mType == ContentType.GROUP_MESSAGES) {
             Log.d("MessageActivity", "Quit activity");
             super.onBackPressed();
-        } else{
+        } else {
             Log.d("MessageActivity", "Back to group message fragment");
             mType = ContentType.GROUP_MESSAGES;
             // We need to go back to the last reference of mGroup.
@@ -443,7 +484,7 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        for(Message message : messagesTree.values()){
+        for (Message message : messagesTree.values()) {
             mGroupMessageAdapter.remove(message);
             mGroupMessageAdapter.add(message);
         }
@@ -457,7 +498,7 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveCommentMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        for(Message message : messagesTree.values()){
+        for (Message message : messagesTree.values()) {
             mCommentAdapter.remove(message);
             mCommentAdapter.add(message);
         }
@@ -468,7 +509,7 @@ public class MessageActivity extends NotifiableActivity {
      * Starts the activity which allows the user to pick which image from his
      * gallery he wants to send.
      */
-    private void pickImageFromGallery(){
+    private void pickImageFromGallery() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -479,7 +520,74 @@ public class MessageActivity extends NotifiableActivity {
     /**
      * Sets the correct information on the header.
      */
-    private void setHeaderBar(){
+    private void setHeaderBar() {
         mActionBar.setTitle(mGroup.getName());
+    }
+
+
+    private class FakeBinder extends YieldServiceBinder {
+        public FakeBinder(YieldService service) {
+            super(service);
+        }
+
+        public void attachActivity(NotifiableActivity activity) {
+            Log.d("MessageActivity", "Attach activity");
+        }
+
+        public void unsetMessageActivity() {
+            Log.d("MessageActivity", "Attach activity");
+        }
+
+        public boolean isServerConnected() {
+            return true;
+        }
+
+        public void sendRequest(ServiceRequest request) {
+            Objects.requireNonNull(request);
+            Log.d("MessageActivity", "Send request : " + request.getType().toString());
+        }
+    }
+
+    private class FakeUser extends ClientUser {
+        public FakeUser(String name, Id id, String email, Bitmap img) throws
+                NodeException {
+            super(name, id, email, img);
+        }
+
+        @Override
+        public void sendMessage(Group group, Message message)
+                throws IOException {
+
+        }
+
+        @Override
+        public List<Message> getGroupMessages(Group group, Date lastDate)
+                throws IOException {
+            return null;
+        }
+
+        @Override
+        public void createNewGroup(Group group) throws IOException {
+
+        }
+
+        @Override
+        public void deleteGroup(Group group) {
+
+        }
+
+        @Override
+        public Map<User, String> getHistory(Group group, Date from) {
+            return null;
+        }
+    }
+
+    /**
+     * Privte class for quick testing purposes.-
+     */
+    private class FakeGroup extends Group {
+        public FakeGroup(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated) {
+            super(name, id, users, image, visibility, validated);
+        }
     }
 }
