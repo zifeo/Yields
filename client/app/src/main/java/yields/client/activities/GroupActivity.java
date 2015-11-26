@@ -134,9 +134,7 @@ public class GroupActivity extends NotifiableActivity {
             break;
 
             case R.id.actionSettings:
-                //TODO Create a UserSettingsActivity
-
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, UserSettingsActivity.class);
             break;
 
             default:
