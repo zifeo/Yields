@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
-import yields.client.listadapter.ListAdapterSettings;
+import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -74,7 +75,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
-        ListAdapterSettings arrayAdapter = new ListAdapterSettings(getApplicationContext(),
+        ListAdapterGroupSettings arrayAdapter = new ListAdapterGroupSettings(getApplicationContext(),
                 R.layout.group_settings_layout, itemList);
 
         listView.setAdapter(arrayAdapter);
@@ -142,6 +143,24 @@ public class GroupSettingsActivity extends AppCompatActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
 
             // TODO Send request to add multiple users to server
+        }
+    }
+
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
         }
     }
 
@@ -336,5 +355,4 @@ public class GroupSettingsActivity extends AppCompatActivity {
             });
         }
     }
-
 }

@@ -17,18 +17,18 @@ import yields.client.activities.GroupSettingsActivity;
 /**
  * Class used to represent the list of settings of a group, in a listview
  */
-public class ListAdapterSettings extends ArrayAdapter<String> {
+public class ListAdapterGroupSettings extends ArrayAdapter<String> {
     private Context mContext;
     private int mSettingLayout;
     private List<String> mSettings;
 
     /**
-     * Constructor for the ListAdapterSettings.
+     * Constructor for the ListAdapterGroupSettings.
      * @param context The context of the application.
      * @param settingLayout The layout Settings.
      * @param settings Text for the icons.
      */
-    public ListAdapterSettings(Context context, int settingLayout, List<String> settings) {
+    public ListAdapterGroupSettings(Context context, int settingLayout, List<String> settings) {
         super(context, settingLayout, settings);
         mContext = context;
         mSettingLayout = settingLayout;

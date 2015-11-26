@@ -60,4 +60,6 @@
     <string name="connectIcon">Connect Icon</string>
     <string name="noConnectionText">You aren\'t connected</string>
     <string name="addGroup">Add group</string>
+    <string name="changeUserName">Change username</string>
+    <string name="changeUserImage">Change your picture</string>
 </resources>
