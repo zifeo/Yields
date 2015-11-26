@@ -49,7 +49,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.USER_GROUP_LIST.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
@@ -70,7 +70,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.USER_ENTOURAGE_ADD.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
                     email);
@@ -93,7 +93,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.USER_ENTOURAGE_REMOVE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
                     email);
@@ -116,7 +116,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.USER_CONNECT.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
                     email);
@@ -148,7 +148,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_CREATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME.getValue()),
                     groupName);
@@ -176,7 +176,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME.getValue()),
                     newGroupName);
@@ -203,7 +203,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
                     Group.GroupVisibility.PRIVATE.getValue());
@@ -216,7 +216,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
                     Group.GroupVisibility.PUBLIC.getValue());
@@ -247,7 +247,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
                     stream.toString());
@@ -276,7 +276,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_ADD.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             /* // TODO: Définir pour la request le field correct
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
@@ -305,7 +305,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.GROUP_REMOVE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             /* // TODO: Définir pour la request le field correct
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
@@ -319,8 +319,8 @@ public class ServerRequestsTests {
     }
 
     /**
-     * Tests if a groupMessageRequest is correctly built.
-     * (Test for groupMessageRequest(Id sender, Id groupId, Content content))
+     * Tests if a nodeMessageRequest is correctly built.
+     * (Test for nodeMessageRequest(Id sender, Id groupId, Content content))
      */
     @Test
     public void testGroupMessageRequest() {
@@ -334,13 +334,13 @@ public class ServerRequestsTests {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
 
-            ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
-                    textContent);
+            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
+                    textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.NODE_MESSAGE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
@@ -349,13 +349,13 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
 
-            serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
-                    imageContent);
+            serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
+                    imageContent, new Date());
             json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.NODE_MESSAGE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
@@ -363,7 +363,7 @@ public class ServerRequestsTests {
                     imageContent.getType().getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
+            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
                     stream.toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
@@ -372,7 +372,7 @@ public class ServerRequestsTests {
 
     /**
      * Tests if a GroupTextMessageRequest is correctly built.
-     * (Test for groupTextMessageRequest(Id sender, Id groupId, TextContent content))
+     * (Test for nodeTextMessageRequest(Id sender, Id groupId, TextContent content))
      */
     @Test
     public void testGroupTextMessageRequest() {
@@ -382,13 +382,13 @@ public class ServerRequestsTests {
             String text = "Apple pie is best pie !";
             TextContent textContent = new TextContent(text);
 
-            ServerRequest serverRequest = RequestBuilder.groupTextMessageRequest(senderId, groupId,
-                    textContent);
+            ServerRequest serverRequest = RequestBuilder.nodeTextMessageRequest(senderId, groupId,
+                    textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.NODE_MESSAGE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
@@ -403,7 +403,7 @@ public class ServerRequestsTests {
 
     /**
      * Tests if a GroupImageMessageRequest is correctly built.
-     * (Test for groupImageMessageRequest(Id sender, Id groupId, ImageContent content))
+     * (Test for nodeImageMessageRequest(Id sender, Id groupId, ImageContent content))
      */
     @Test
     public void testGroupImageMessageRequest() {
@@ -416,13 +416,13 @@ public class ServerRequestsTests {
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
             ImageContent imageContent = new ImageContent(newImage, text);
 
-            ServerRequest serverRequest = RequestBuilder.groupImageMessageRequest(senderId, groupId,
-                    imageContent);
+            ServerRequest serverRequest = RequestBuilder.nodeImageMessageRequest(senderId, groupId,
+                    imageContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.NODE_MESSAGE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
@@ -430,7 +430,7 @@ public class ServerRequestsTests {
                     imageContent.getType().getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
+            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
                     stream.toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
@@ -455,7 +455,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.NODE_HISTORY.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.LAST.getValue()),
                     DateSerialization.dateSerializer.toString(date));
@@ -483,7 +483,7 @@ public class ServerRequestsTests {
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.PING.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("sender"), senderId
+            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);

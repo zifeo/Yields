@@ -2,7 +2,7 @@ package yields.server.actions
 
 import java.time.OffsetDateTime
 
-import org.scalacheck.Arbitrary
+import org.scalacheck._
 import yields.server._
 import yields.server.actions.groups._
 import yields.server.dbi.models._
@@ -16,7 +16,9 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
       name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
       users <- arbitrary[List[UID]]
-    } yield GroupCreate(name, nodes, users)
+      tags <- arbitrary[List[String]]
+      visibility: String <- Gen.oneOf("private", "public")
+    } yield GroupCreate(name, nodes, users, tags, visibility)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
@@ -37,32 +39,16 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     GroupUpdateRes()
   }
 
-  implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
+  implicit lazy val groupSearchArb: Arbitrary[GroupSearch] = Arbitrary {
     for {
-      nid <- arbitrary[NID]
-      content <- arbitrary[String]
-    } yield GroupMessage(nid, content)
+      pattern <- arbitrary[String]
+    } yield GroupSearch(pattern)
   }
 
-  implicit lazy val groupMessageResArb: Arbitrary[GroupMessageRes] = Arbitrary {
+  implicit lazy val groupSearchResArb: Arbitrary[GroupSearchRes] = Arbitrary {
     for {
-      datetime <- arbitrary[OffsetDateTime]
-    } yield GroupMessageRes(datetime)
-  }
-
-  implicit lazy val groupHistoryArb: Arbitrary[GroupHistory] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      datetime <- arbitrary[OffsetDateTime]
-      count <- arbitrary[Int]
-    } yield GroupHistory(nid, datetime, count)
-  }
-
-  implicit lazy val groupHistoryResArb: Arbitrary[GroupHistoryRes] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      nodes <- arbitrary[List[FeedContent]]
-    } yield GroupHistoryRes(nid, nodes)
+      res <- arbitrary[Seq[(NID, String)]]
+    } yield GroupSearchRes(res)
   }
 
 }

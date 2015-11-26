@@ -2,7 +2,7 @@ package yields.server.actions.groups
 
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Group, Blob, NID}
+import yields.server.dbi.models.{Blob, Group, NID}
 import yields.server.mpi.Metadata
 
 /**

@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.Date;
 import java.util.List;
 
 import yields.client.R;
@@ -92,7 +93,7 @@ public class YieldService extends Service {
                 synchronized (serviceControllerLock) {
                     while (mServiceRequestController == null) {
                         try {
-                            this.wait();
+                            serviceControllerLock.wait();
                         } catch (InterruptedException e) {
                             Log.d("Y:" + this.getClass().getName(),
                                     "Stopped waiting for request controller" + e.getMessage());
@@ -223,6 +224,21 @@ public class YieldService extends Service {
     }
 
     /**
+     * Updates a Message that is already in the Group bound to the service.
+     *
+     * @param group   The group to which the Message was sent.
+     * @param message The message's updated version.
+     * @param oldDate The original date of the Message before it's update.
+     */
+    synchronized public void updateMessage(Group group, Message message, Date oldDate) {
+        if (mCurrentNotifiableActivity != null || mCurrentGroup.getId() == group.getId()) {
+            mCurrentGroup.addMessage(message);
+            mCurrentNotifiableActivity.notifyChange();
+        }
+    }
+
+
+    /**
      * Called when multiple message is received from the server
      *
      * @param groupId  The group the messages are from
@@ -306,7 +322,7 @@ public class YieldService extends Service {
             synchronized (serviceControllerLock) {
                 while (mServiceRequestController == null) {
                     try {
-                        this.wait();
+                        serviceControllerLock.wait();
                     } catch (InterruptedException e) {
                         Log.d("Y:" + this.getClass().getName(), "Stopped waiting for request controller" + e.getMessage());
                     }

@@ -1,9 +1,11 @@
 package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
+import spray.json.JsonFormat
 import yields.server._
 import yields.server.actions.GroupsGenerators
 import yields.server.actions.groups._
+import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory, NodeMessageRes, NodeMessage}
 
 object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") with GroupsGenerators {
 
@@ -25,19 +27,11 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x) == x
   }
 
-  property("GroupMessage") = forAll { (x: GroupMessage) =>
+  property("GroupSearch") = forAll { (x: GroupSearch) =>
     toAndFromJson(x) == x
   }
 
-  property("GroupMessageRes") = forAll { (x: GroupMessageRes) =>
-    toAndFromJson(x) == x
-  }
-
-  property("GroupHistory") = forAll { (x: GroupHistory) =>
-    toAndFromJson(x) == x
-  }
-
-  property("GroupHistoryRes") = forAll { (x: GroupHistoryRes) =>
+  property("GroupSearchRes") = forAll { (x: GroupSearchRes) =>
     toAndFromJson(x) == x
   }
 

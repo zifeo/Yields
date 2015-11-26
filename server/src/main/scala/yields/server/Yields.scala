@@ -1,40 +1,80 @@
 package yields.server
 
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.Tcp
-import akka.stream.scaladsl.Tcp.IncomingConnection
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
-import yields.server.pipeline.Pipeline
-import yields.server.utils.Config
+import java.util.logging.LogManager
 
-import scala.io.StdIn
+import akka.actor._
+import akka.stream._
+import yields.server.actions.Result
+import yields.server.dbi.models.UID
+import yields.server.pipeline.Pipeline
+import yields.server.router.{Dispatcher, Router}
+
 import scala.util.control.NonFatal
 
 /**
- * Yields server daemon.
- */
-object Yields extends App {
+  * Yields server daemon.
+  */
+object Yields {
 
-  // Starts system and enable flow errors logging
-  implicit val system = ActorSystem("Yields-server")
-  implicit val materializer = {
-    val decider: Supervision.Decider = { case NonFatal(e) =>
-      val exception = e.getStackTrace.toList.headOption.getOrElse("error when getting the stacktrace")
-      val message = e.getMessage
-      system.log.error(s"$exception: $message")
-      Supervision.stop
+  { // Configure logging with LogBack
+    val manager = LogManager.getLogManager
+    manager.readConfiguration()
+  }
+
+  private implicit lazy val system = ActorSystem("Yields-server")
+  private implicit lazy val materializer = {
+    val decider: Supervision.Decider = {
+      case NonFatal(e) =>
+        val exception = e.getStackTrace.toList.headOption.getOrElse("error when getting the stacktrace")
+        val message = e.getMessage
+        system.log.error(s"$exception: $message")
+        Supervision.stop
     }
     ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
   }
 
-  // Setups components
-  val connections = Tcp().bind(Config.getString("addr"), Config.getInt("port"))
-  val pipeline = Pipeline()
+  private lazy val dispatcher = system.actorOf(Dispatcher.props, "Yields-dispatcher")
+  private lazy val router = system.actorOf(Router.props(Pipeline(), dispatcher), "Yields-router")
 
-  // Handle connections
-  connections runForeach { case IncomingConnection(_, remoteAddress, flow) =>
-    system.log.info(s"connection from $remoteAddress")
-    flow.join(pipeline).run()
+  /**
+    * Launches the Yields app.
+    * @param args no args
+    */
+  def main(args: Array[String]): Unit = {
+    start()
+  }
+
+  /**
+    * Broadcast given result to all uid using the dispatcher.
+    * @param uids uid to receive the broadcast
+    * @param result result to be broacasted
+    * @return result broadcasted
+    */
+  def broadcast(uids: Seq[UID])(result: Result): Result = {
+    import Dispatcher._
+    Yields.dispatcher ! Notify(uids, result)
+    result
+  }
+
+  /**
+    * Starts the server.
+    * @return empty future representing server liveness
+    */
+  private[server] def start(): Unit = {
+    system.log.info("Server starting.")
+    dispatcher
+    router
+    system.log.info("Server started.")
+  }
+
+  /**
+    * Closes the server (cannot be restart without full restart).
+    * This include the actor system and the database.
+    */
+  private[server] def close(): Unit = {
+    system.log.info("Server closing.")
+    system.terminate()
+    system.log.info("Server closed.")
   }
 
 }

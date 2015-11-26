@@ -4,7 +4,9 @@ object Dependencies {
 
   val meta = Seq(
     "com.typesafe" % "config" % "1.3.0",
-    "ch.qos.logback" % "logback-classic" % "1.1.3"
+    "ch.qos.logback" % "logback-classic" % "1.1.3",
+    "ch.qos.logback" % "logback-access" % "1.1.3",
+    "net.logstash.logback" % "logstash-logback-encoder" % "4.5.1"
   )
 
   val akka = {
@@ -17,10 +19,11 @@ object Dependencies {
   }
 
   val akkaExp = {
-    val version = "1.0"
+    val version = "2.0-M1"
     Seq(
       "com.typesafe.akka" %% "akka-stream-experimental" % version,
-      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % version
+      "com.typesafe.akka" %% "akka-http-spray-json-experimental" % version,
+      "com.typesafe.akka" %% "akka-stream-testkit-experimental" % version % "test"
     )
   }
 

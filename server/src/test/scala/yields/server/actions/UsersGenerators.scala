@@ -48,4 +48,19 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield UserGroupListRes(groups)
   }
 
+  implicit lazy val userInfoArb: Arbitrary[UserInfo] = Arbitrary {
+    for {
+      uid <- arbitrary[UID]
+    } yield UserInfo(uid)
+  }
+
+  implicit lazy val userInfoResArb: Arbitrary[UserInfoRes] = Arbitrary {
+    for {
+      uid <- arbitrary[UID]
+      name <- arbitrary[String]
+      email <- arbitrary[String]
+      entourage <- arbitrary[Seq[UID]]
+    } yield UserInfoRes(uid, name, email, entourage)
+  }
+
 }
