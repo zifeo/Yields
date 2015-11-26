@@ -59,4 +59,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="connectIcon">Connect Icon</string>
     <string name="noConnectionText">You aren\'t connected</string>
+    <string name="addGroup">Add group</string>
 </resources>

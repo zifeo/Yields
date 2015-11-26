@@ -52,7 +52,7 @@ public class SearchGroupActivity extends NotifiableActivity{
     private ListView mListView;
     private ProgressBar mProgressBar;
 
-    private Mode mode;
+    private Mode mMode;
 
      /*Used to not launch requests each time the user types a new character
      but rather waits a second before doing it */
@@ -76,6 +76,22 @@ public class SearchGroupActivity extends NotifiableActivity{
         mActionBar.setTitle(null);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
+        Intent intent = getIntent();
+        if (!intent.hasExtra(MODE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Mode extra is missing from intent in SearchGroupActivity");
+        }
+
+        int indexMode = intent.getIntExtra(MODE_KEY, 0);
+
+        if (indexMode < 0 || indexMode >= Mode.values().length){
+            throw new IllegalIntentExtraException(
+                    "Mode extra must be between 0 and "
+                            + (Mode.values().length - 1) +  " in SearchGroupActivity");
+        }
+
+        mMode = Mode.values()[indexMode];
+
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
 
         createFakeGroups();
@@ -91,28 +107,13 @@ public class SearchGroupActivity extends NotifiableActivity{
                 YieldsApplication.setGroup(mCurrentGroups.get(position));
 
                 Intent intent = new Intent(SearchGroupActivity.this, GroupInfoActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY, mMode.ordinal());
                 startActivity(intent);
             }
         });
 
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSearch);
-
-        Intent intent = getIntent();
-        if (!intent.hasExtra(MODE_KEY)) {
-            throw new MissingIntentExtraException(
-                    "Mode extra is missing from intent in SearchGroupActivity");
-        }
-
-        int indexMode = intent.getIntExtra(MODE_KEY, 0);
-
-        if (indexMode < 0 || indexMode >= Mode.values().length){
-            throw new IllegalIntentExtraException(
-                    "Mode extra must be between 0 and "
-                            + (Mode.values().length - 1) +  " in SearchGroupActivity");
-        }
-
-        mode = Mode.values()[indexMode];
 
         setStartingState();
     }

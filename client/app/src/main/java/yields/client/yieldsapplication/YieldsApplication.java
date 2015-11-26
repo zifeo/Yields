@@ -21,7 +21,10 @@ public class YieldsApplication {
     private static User mUserSearched;
     private static List<User> mUserList;
     private static Group mGroup;
+
     private static List<Group> mGroupsSearched;
+    private static Group mGroupAdded;
+    private static boolean mGroupAddedValid;
 
     private static Context mApplicationContext;
     private static Resources mResources;
@@ -61,6 +64,24 @@ public class YieldsApplication {
      */
     public static List<Group> getGroupsSearched() {
         return mGroupsSearched;
+    }
+
+    /**
+     * Getter for the group which will be added in the new group.
+     *
+     * @return The group which will be added in the new group.
+     */
+    public static Group getGroupAdded() {
+        return mGroupAdded;
+    }
+
+    /**
+     * Getter for indicating if the group which will be added is valid.
+     *
+     * @return True iff the group in getGroupAdded is valid.
+     */
+    public static boolean getGroupAddedValid() {
+        return mGroupAddedValid;
     }
 
     /**
@@ -128,9 +149,9 @@ public class YieldsApplication {
     }
 
     /**
-     * Setter for the ressources of the app.
+     * Setter for the resource of the app.
      *
-     * @param r The ressources to use.
+     * @param r The resources to use.
      */
 
     public static void setResources(Resources r) {
@@ -169,6 +190,24 @@ public class YieldsApplication {
     public static void setGroupsSearched(List<Group> groups) {
         Objects.requireNonNull(groups);
         mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
+    }
+
+    /**
+     * Setter for the group to be added in the newly created group.
+     *
+     * @param g The group to be added.
+     */
+    public static void setGroupAdded(Group g) {
+        mGroupAdded = Objects.requireNonNull(g);
+    }
+
+    /**
+     * Setter indicating if the group to be added is valid.
+     *
+     * @param b Iff the added group is valid.
+     */
+    public static void setGroupAddedValid(boolean b) {
+        mGroupAddedValid = b;
     }
 
     /**
