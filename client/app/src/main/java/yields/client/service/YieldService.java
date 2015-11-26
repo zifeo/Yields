@@ -68,6 +68,10 @@ public class YieldService extends Service {
         //TODO : to be defined what to do when starting a connection
         if (intent != null) {
             String email = intent.getStringExtra("email");
+            if (email == null) {
+                throw new IllegalArgumentException("Intent didn't start the service with an email");
+            }
+
             ClientUser user = YieldsApplication.getUser();
 
             if (user == null || user.getEmail() != email) {

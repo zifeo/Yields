@@ -46,6 +46,8 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
 
+//TODO : Do database calls for response handling
+
 /**
  * Controller for ServiceRequests.
  */
