@@ -4,11 +4,14 @@ import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +26,7 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
@@ -30,6 +34,7 @@ import static java.lang.Thread.sleep;
 public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>{
 
     private static final int MOCK_MESSAGE_COUNT = 20;
+    private JSONArray jsonGroup;
     private Group mG;
 
     public GroupTest(){
@@ -41,6 +46,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
      */
     @Before
     public void setUp() throws Exception {
+        jsonGroup = new JSONArray("[0, \"sweng\", \"2015-11-23T13:25:51.157+01:00\"]");
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(getInstrumentation().getTargetContext
@@ -51,6 +57,25 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
 
         mG = new FakeGroup("Group", new Id(32), new ArrayList<User>());
         YieldsApplication.setGroup(mG);
+    }
+
+    @Test
+    public void testGroupIdParsingFromResponse() throws JSONException, ParseException{
+        Group g = new Group(jsonGroup);
+        assertEquals(g.getId().getId(), new Long(0));
+    }
+
+    @Test
+    public void testGroupDateParsingFromResponse() throws JSONException, ParseException{
+        Group g = new Group(jsonGroup);
+        assertEquals(g.getLastUpdate(),
+                DateSerialization.dateSerializer.toDate("2015-11-23T13:25:51.157+01:00"));
+    }
+
+    @Test
+    public void testGroupNameParsingFromResponse() throws JSONException, ParseException{
+        Group g = new Group(jsonGroup);
+        assertEquals(g.getName(), "sweng");
     }
 
     @Test

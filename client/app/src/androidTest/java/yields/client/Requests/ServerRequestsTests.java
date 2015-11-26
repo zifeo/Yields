@@ -150,10 +150,10 @@ public class ServerRequestsTests {
                     ServiceRequest.RequestKind.GROUP_CREATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME.getValue()),
-                    groupName);
-            assertEquals(json.getJSONObject("message").getJSONArray(RequestBuilder.Fields.NODES.getValue()),
-                    new JSONArray(nodeIdsAsString.toString()));
+            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME
+                            .getValue()), groupName);
+            assertEquals(json.getJSONObject("message").getJSONArray(RequestBuilder.Fields.USERS
+                            .getValue()).toString(), new JSONArray(nodeIdsAsString).toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -206,7 +206,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
-                    Group.GroupVisibility.PRIVATE.getValue());
+                    Group.GroupVisibility.PRIVATE.getValue().toLowerCase());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
 
@@ -219,7 +219,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
-                    Group.GroupVisibility.PUBLIC.getValue());
+                    Group.GroupVisibility.PUBLIC.getValue().toLowerCase());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
         } catch (JSONException e) {
