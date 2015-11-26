@@ -23,6 +23,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import yields.client.R;
+import yields.client.exceptions.IllegalIntentExtraException;
+import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSearchedGroups;
 import yields.client.node.Group;
@@ -34,6 +36,10 @@ import yields.client.yieldsapplication.YieldsApplication;
  * on their name or tags.
  */
 public class SearchGroupActivity extends NotifiableActivity{
+    public enum Mode {SEARCH, ADD_NODE};
+
+    public final static String MODE_KEY = "MODE";
+
     private MenuItem mMenuSearch;
     private MenuItem mMenuClose;
     private EditText mEditTextSearch;
@@ -45,6 +51,8 @@ public class SearchGroupActivity extends NotifiableActivity{
     private TextView mTextViewInfo;
     private ListView mListView;
     private ProgressBar mProgressBar;
+
+    private Mode mode;
 
      /*Used to not launch requests each time the user types a new character
      but rather waits a second before doing it */
@@ -89,6 +97,22 @@ public class SearchGroupActivity extends NotifiableActivity{
 
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSearch);
+
+        Intent intent = getIntent();
+        if (!intent.hasExtra(MODE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Mode extra is missing from intent in SearchGroupActivity");
+        }
+
+        int indexMode = intent.getIntExtra(MODE_KEY, 0);
+
+        if (indexMode < 0 || indexMode >= Mode.values().length){
+            throw new IllegalIntentExtraException(
+                    "Mode extra must be between 0 and "
+                            + (Mode.values().length - 1) +  " in SearchGroupActivity");
+        }
+
+        mode = Mode.values()[indexMode];
 
         setStartingState();
     }
