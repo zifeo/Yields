@@ -1,21 +1,16 @@
 package yields.client.listadapter;
 
 import android.content.Context;
-import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
 import yields.client.gui.GraphicTransforms;
@@ -64,21 +59,23 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (position < mUsers.size()){
-            return getUserView(mUsers.get(position), parent);
+            return getUserView(position, parent);
         }
         else {
-            return getGroupView(mGroups.get(position - mUsers.size()), parent);
+            return getGroupView(position - mUsers.size(), parent);
         }
     }
 
     /**
      * Gets the view for the specified user
-     * @param user The user we want to have a view for
+     * @param pos The pos of the user we want to have a view for
      * @return The view associated with the user
      */
-    private View getUserView(User user, ViewGroup parent){
+    private View getUserView(final int pos, ViewGroup parent){
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View userView = inflater.inflate(R.layout.add_user_layout, parent, false);
+
+        User user = mUsers.get(pos);
 
         TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
         ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
@@ -91,17 +88,33 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
         checkBox.setChecked(true);
 
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                // Cannot remove the first user
+                if (pos != 0) {
+                    mUsers.remove(pos);
+                    ListAdapterUsersGroupsCheckBox.this.notifyDataSetChanged();
+                }
+                else {
+                    buttonView.setChecked(true);
+                }
+            }
+        });
+
         return userView;
     }
 
     /**
      * Gets the view for the specified group
-     * @param group The group we want to have a view for
+     * @param  pos The pos of the group we want to have a view for
      * @return The view associated with the group
      */
-    private View getGroupView(Group group, ViewGroup parent){
+    private View getGroupView(final int pos, ViewGroup parent){
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View groupView = inflater.inflate(R.layout.add_group_layout, parent, false);
+
+        Group group = mGroups.get(pos);
 
         TextView textViewGroupName = (TextView) groupView.findViewById(R.id.textViewGroupName);
         ImageView imageGroup = (ImageView) groupView.findViewById(R.id.imageGroup);
@@ -113,6 +126,14 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
         checkBox.setChecked(true);
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                mGroups.remove(pos);
+                ListAdapterUsersGroupsCheckBox.this.notifyDataSetChanged();
+            }
+        });
 
         return groupView;
     }
