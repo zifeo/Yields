@@ -609,6 +609,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 }
             }
             cursor.close();
+            // TODO : Rimbaud13 don't forget to deal with this correclty.
             return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility,
                     groupValidated, new Date());
         }
