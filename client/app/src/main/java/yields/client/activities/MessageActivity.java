@@ -232,8 +232,6 @@ public class MessageActivity extends NotifiableActivity {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(),
                         uri);
                 if (mImage != null) {
-                    String message = "Image added to message";
-                    YieldsApplication.showToast(getApplicationContext(), message);
                     Log.d("MessageActivity", "Update Thumbnail");
                     mImageThumbnail.setPadding(THUMBNAIL_PADDING, THUMBNAIL_PADDING,
                             THUMBNAIL_PADDING, THUMBNAIL_PADDING);
@@ -371,6 +369,8 @@ public class MessageActivity extends NotifiableActivity {
      * @param v The view clicked on.
      */
     public void cancelImageSending(View v){
+        String message = "Image removed from message";
+        YieldsApplication.showToast(YieldsApplication.getApplicationContext(), message);
         mImageThumbnail.setPadding(0, 0, 0, 0);
         mSendImage = false;
         mImageThumbnail.setImageBitmap(null);
