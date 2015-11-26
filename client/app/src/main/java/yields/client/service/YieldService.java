@@ -6,6 +6,8 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
@@ -20,10 +22,15 @@ import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.serverconnection.RequestBuilder;
+import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.ServiceRequest;
+import yields.client.servicerequest.UserConnectRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
@@ -59,11 +66,21 @@ public class YieldService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO : to be defined what to do when starting a connection
-        /*if (intent != null && intent.getBooleanExtra("newUser", false)) {
+        if (intent != null) {
             String email = intent.getStringExtra("email");
-            ServerRequest connectReq = RequestBuilder.userConnectRequest(new Id(0), email);
+            if (email == null) {
+                throw new IllegalArgumentException("Intent didn't start the service with an email");
+            }
+
+            ClientUser user = YieldsApplication.getUser();
+
+            if (user == null || user.getEmail() != email) {
+                YieldsApplication.setUser(new ClientUser(email));
+            }
+
+            ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
             sendRequest(connectReq);
-        }*/
+        }
 
         Log.d("Y:" + this.getClass().getName(), "Starting yield service");
 
@@ -95,6 +112,15 @@ public class YieldService extends Service {
                 }
             }
         }).start();
+    }
+
+    public void notifyChange() {
+        if (mCurrentNotifiableActivity != null) {
+            Log.d("Y:" + this.getClass().getName(), "notified activity");
+            mCurrentNotifiableActivity.notifyChange();
+        } else {
+            Log.d("Y:" + this.getClass().getName(), "not notified activity");
+        }
     }
 
     /**
@@ -180,15 +206,21 @@ public class YieldService extends Service {
     }
 
     /**
-     * Called when a message is received from the server
+     * Called when a message is received from the server.
      *
-     * @param group   The group the message s from
-     * @param message The message in question
+     * @param groupId The id of the group the message is from.
+     * @param message The message in question.
      */
-    synchronized public void receiveMessage(Group group, Message message) {
+    synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null ||
-                mCurrentGroup.getId() != group.getId()) {
-            sendMessageNotification(group, message);
+                !mCurrentGroup.getId().getId().equals(groupId.getId())) {
+            List<Group> groups = YieldsApplication.getUser().getUserGroups();
+            for (Group group : groups) {
+                if (group.getId().getId().equals(groupId.getId())) {
+                    group.addMessage(message);
+                    sendMessageNotification(group, message);
+                }
+            }
         } else {
             mCurrentGroup.addMessage(message);
             mCurrentNotifiableActivity.notifyChange();
@@ -217,11 +249,17 @@ public class YieldService extends Service {
      * @param messages The message in question
      */
     synchronized public void receiveMessages(Id groupId, List<Message> messages) {
-        //TODO: To be refactor !
-        if (mCurrentNotifiableActivity != null &&
+        if (mCurrentNotifiableActivity != null && mCurrentGroup != null &&
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
             mCurrentNotifiableActivity.notifyChange();
+        } else {
+            List<Group> groups = YieldsApplication.getUser().getUserGroups();
+            for (Group group : groups) {
+                if (group.getId().getId().equals(groupId.getId())) {
+                    group.addMessages(messages);
+                }
+            }
         }
     }
 
@@ -303,7 +341,7 @@ public class YieldService extends Service {
     }
 
     /**
-     * Connects to server // TODO: If not try again later
+     * Connects to server
      */
     private class ConnectControllerTask extends AsyncTask<Void, Void, Void> {
 
@@ -315,7 +353,7 @@ public class YieldService extends Service {
                         YieldService.this);
             }
 
-            Log.d("D:" + this.getClass().getName(), "done");
+            Log.d("Y:" + this.getClass().getName(), "done");
 
             return null;
         }

@@ -60,8 +60,6 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
      */
     @Override
     public void subscribeToConnection(ConnectionSubscriber subscriber) {
-        //TODO connect to controller (not created yet)
-
         BufferedReader receiver = null;
 
         try {
