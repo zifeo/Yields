@@ -40,6 +40,7 @@ import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserUpdateRequest;
+import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
 
@@ -59,6 +60,11 @@ public class ServiceRequestController {
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
         mCacheHelper.clearDatabase();
+        try {
+            mCacheHelper.addUser(YieldsApplication.getUser());
+        } catch (CacheDatabaseException e) {
+            Log.d(TAG, "User couldn't be added to the database");
+        }
         mService = service;
         isConnecting = new AtomicBoolean(true);
         connectToServer();
