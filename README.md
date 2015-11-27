@@ -57,7 +57,7 @@ A `Request` will answer with a `Response` or an `Error` on bad operations (such 
 ```
 UserConnect
 	input 	mail: String
-	output	uid: UID, new: Boolean
+	output	uid: UID, returning: Boolean
 UserUpdate
 	input 	mail: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
 	output	()
