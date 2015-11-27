@@ -235,34 +235,34 @@ public class ServiceRequestController {
                 break;
 
             case NODE_MESSAGE_BCAST:
-
+                handleNodeMessageBroadcast(serverResponse);
                 break;
             case USER_UPDATE_BCAST:
-
+                handleUserUpdateBroadcast(serverResponse);
                 break;
             case GROUP_CREATE_BCAST:
-
+                handleGroupCreateBroadcast(serverResponse);
                 break;
             case GROUP_UPDATE_BCAST:
-
+                handleGroupUpdateBroadcast(serverResponse);
                 break;
             case GROUP_MESSAGE_BCAST:
-
+                handleGroupMessageBroadcast(serverResponse);
                 break;
             case PUBLISHER_CREATE_BCAST:
-
+                handlePublisherCreateBroadcast(serverResponse);
                 break;
             case PUBLISHER_UPDATE_BCAST:
-
+                handlePublisherUpdateBroadcast(serverResponse);
                 break;
             case PUBLISHER_MESSAGE_BCAST:
-
+                handlePublisherMessageBroadcast(serverResponse);
                 break;
             case RSS_CREATE_BCAST:
-
+                handleRSSCreateBroadcast(serverResponse);
                 break;
             case RSS_MESSAGE_BCAST:
-
+                handleRSSMessageBroadcast(serverResponse);
                 break;
         }
     }
@@ -401,6 +401,46 @@ public class ServiceRequestController {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
+    }
+
+    private void handleNodeMessageBroadcast(Response serverResponse){
+
+    }
+
+    private void handleUserUpdateBroadcast(Response serverResponse){
+
+    }
+
+    private void handleGroupCreateBroadcast(Response serverResponse){
+
+    }
+
+    private void handleGroupUpdateBroadcast(Response serverResponse){
+
+    }
+
+    private void handleGroupMessageBroadcast(Response serverResponse){
+
+    }
+
+    private void handlePublisherCreateBroadcast(Response serverResponse){
+
+    }
+
+    private void handlePublisherUpdateBroadcast(Response serverResponse){
+
+    }
+
+    private void handlePublisherMessageBroadcast(Response serverResponse){
+
+    }
+
+    private void handleRSSCreateBroadcast(Response serverResponse){
+
+    }
+
+    private void handleRSSMessageBroadcast(Response serverResponse){
+
     }
 
     private void handleGroupCreateResponse(Response serverResponse) {
