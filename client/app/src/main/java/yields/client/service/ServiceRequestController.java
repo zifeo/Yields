@@ -286,11 +286,24 @@ public class ServiceRequestController {
     }
 
     private void handleGroupUpdateResponse(Response serverResponse){
-        // TODO
+        // No output.
     }
 
     private void handleGroupInfoResponse(Response serverResponse){
-        // TODO
+        try{
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nid");
+            String name = response.getString("name");
+            Byte[] pic = (Byte[]) response.get("pic");
+            JSONArray users = response.getJSONArray("users");
+            JSONArray nodes = response.getJSONArray("nodes");
+
+            // TODO : What to to now ? Which Object should I create ?
+            // TODO : (Nico) Notify activity.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleGroupMessageResponse(Response serverResponse){
