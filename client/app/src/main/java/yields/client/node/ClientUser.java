@@ -57,6 +57,7 @@ public class ClientUser extends User {
     }
 
     public void update(JSONObject response) throws JSONException{
+        // TODO : change profil pic
         this.setName(response.getString("name"));
         this.setEmail(response.getString("email"));
     }
