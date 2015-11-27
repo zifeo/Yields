@@ -8,6 +8,21 @@
 
 ## Protocol
 
+### Comprehension Hierarchy 
+
+```
+Node
+ |--active
+ |     |--Group (private)
+ |     |--PublishNode
+ |     |--RSSNode
+ |
+ |--passive
+       |--MediaNode
+       |--LinkNode 
+
+```
+
 ### Types
 
 ```
@@ -21,7 +36,7 @@ Suffix actions with `Res` for corresponding results.
 
 ### Messages
 
-Request, response, error, notification.
+Request, response, error, notification (bcast).
 
 ```
 Messages
@@ -65,10 +80,29 @@ UserSearch
 NodeMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 	output	nid: NID, datetime: OffsetDateTime
-	rules	nid in nodes
+	rules	nid in nodes & authorization depends on nid "type"
 	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 NodeHistory
 	input	nid: NID, datetime: OffsetDateTime, count: Int
 	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[Option[String]], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
-	rules	count > 0 & nid in nodes
+	rules	count > 0 & nid in nodes & senders in entourage
+NodeSearch
+	input	pattern: String
+	output	nodes: Seq[NID], names: Seq[String], pic: Seq[Array[Blob]]
+	rules	nodes "public"
+```
+
+### Groups actions
+
+```
+GroupCreate
+	input	name: String, users: Seq[UID], nodes: Seq[NID]
+	output	nid: NID
+	rules	users in entourage & (nodes "public" | nodes in groups)
+	bcast	nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]
+GroupUpdate
+	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]
+	output	()
+	rules	nid in groups
+	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 ```
