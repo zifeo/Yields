@@ -2,6 +2,7 @@ package yields.client.service;
 
 import android.content.res.Resources;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +22,7 @@ import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
@@ -261,7 +263,26 @@ public class ServiceRequestController {
     }
 
     private void handleNodeSearchResponse(Response serverResponse){
-        // TODO
+        try {
+            JSONObject response = serverResponse.getMessage();
+            JSONArray nodes = response.getJSONArray("nodes");
+            JSONArray names = response.getJSONArray("names");
+            JSONArray pic = response.getJSONArray("pic");
+
+            assert (nodes.length() == names.length() && nodes.length() == pic.length());
+            int nodeCount = nodes.length();
+            ArrayList<Node> nodeList = new ArrayList<>();
+            for (int i = 0 ; i < nodeCount ; i ++){
+                // TODO : Make the fucking class representing nodes having an image.
+                // nodeList add new Node (id image)
+
+                // TODO : parse pics.
+            }
+
+            // TODO : (Nico) Notify activity.
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleGroupUpdateResponse(Response serverResponse){
