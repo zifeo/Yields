@@ -188,10 +188,11 @@ public class ServiceRequestController {
                 handleUserGroupListResponse(serverResponse); /* DONE */
                 break;
             case USER_INFO_RESPONSE:
-                handleUserInfoResponse(serverResponse);
+                handleUserInfoResponse(serverResponse); /* DONE */
                 break;
             case GROUP_CREATE_RESPONSE:
-                handleGroupCreateResponse(serverResponse);
+                handleGroupCreateResponse(serverResponse); /* DONE */
+
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
