@@ -517,7 +517,18 @@ public class ServiceRequestController {
     }
 
     private void handleRSSCreateBroadcast(Response serverResponse){
+        try{
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nid");
+            String name = response.getString("name");
+            String url = response.getString("url");
 
+            // TODO : Create instance of RSS.
+            // TODO : (Nico) Notify activity.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleRSSMessageBroadcast(Response serverResponse){
