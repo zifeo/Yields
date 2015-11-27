@@ -11,42 +11,46 @@
 ### Comprehension Hierarchy 
 
 ```
+User
+
 Node
- |--active
- |     |--Group (private)
- |     |--Publish
- |     |--RSS
+ |-—active
+ |     |——Group (private)
+ |     |——Publish
+ |     |——RSS
  |
- |--passive
-       |--Media
+ |——passive
+       |——Media
 ```
 
 ### Types
 
 ```
-UID: Long
-NID: Long
+UID
+NID
 Action
 Result
 ```
 
-Suffix actions with `Res` for corresponding results.
+Suffix action names with `Res` for corresponding result names.
+`UID` and `NID` are backed by the same identifier on serverside and represented by `Long`.
 
 ### Messages
 
-Request, response, error, notification (bcast).
-
 ```
-Messages
+Message
 	input	kind: String, message: Action, metadata: Metadata
 	output	(1) kind: String, message: Result, metadata: Metadata
 	output	(2) message: String, metadata: Metadata
 	rules	success (1) | error (2)
+	bcast	kind: String, message: Result, metadata: Metadata
 Metadata
-	input	client: UID, datetime: OffsetDateTime, ref: OffsetDateTime
-	output	client: UID, datetime: OffsetDateTime, ref: OffsetDateTime
+	input	client: UID, ref: OffsetDateTime, datetime: OffsetDateTime
+	output	client: UID, ref: OffsetDateTime, datetime: OffsetDateTime
 	rules	client & ref unchanged
 ```
+
+A `Request` will answer with a `Response` or an `Error` on bad operations (such as unauthorized actions). Push notifications will sometimes be broadcasted broadcasted.
 
 ### Users actions
 
@@ -63,7 +67,7 @@ UserInfo
 	input	uid: UID
 	output	(1) uid: UID, mail: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
 	output	(2) uid: UID, mail: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
-	rules	uid == m.uid (1) | uid in entourage (2)
+	rules	uid == client (1) | uid in entourage (2)
 UserGroupList
 	input	()
 	output	groups: Seq[NID], names: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
