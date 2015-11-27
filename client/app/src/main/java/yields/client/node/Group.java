@@ -139,6 +139,17 @@ public class Group extends Node {
     }
 
     /**
+     * Construct a Group from the Id and the name recieved from the server.
+     * @param groupId The Id of the group in String format.
+     * @param name The name of the group.
+     * @param refreshedAt Last date the group has been refreshed.
+     */
+    public Group(String groupId, String name, String refreshedAt) throws ParseException {
+        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), DateSerialization
+                .dateSerializer.toDate(refreshedAt));
+    }
+
+    /**
      * Get the last time the group was updated.
      * @return The sus-mentioned date.
      */
