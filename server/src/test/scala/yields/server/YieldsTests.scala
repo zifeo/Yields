@@ -26,7 +26,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   override def beforeAll(): Unit = {
     logger.info("Starting local server on background")
     server.start()
-    Thread.sleep(1000)
+    Thread.sleep(2500) // ensure server is active and bounded before networking with it
   }
 
   override def afterAll(): Unit = {
