@@ -8,13 +8,13 @@
 
 ## Protocol
 
-### Comprehension Hierarchy 
+### Abstract hierarchy 
 
 ```
 User
 
 Node
- |-—active
+ |——active
  |     |——Group (private)
  |     |——Publish
  |     |——RSS
@@ -56,24 +56,24 @@ A `Request` will answer with a `Response` or an `Error` on bad operations (such 
 
 ```
 UserConnect
-	input 	mail: String
-	output	uid: UID, new: Boolean
+	input 	email: String
+	output	uid: UID, returning: Boolean
 UserUpdate
-	input 	mail: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
+	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
 	output	()
 	bcast	uid: UID, name: String, pic: Array[Byte]
-	notice	no mail for now
+	notice	no email for now
 UserInfo
 	input	uid: UID
-	output	(1) uid: UID, mail: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
-	output	(2) uid: UID, mail: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
+	output	(1) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
+	output	(2) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
 	rules	uid == client (1) | uid in entourage (2)
 UserGroupList
 	input	()
 	output	groups: Seq[NID], names: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
-	input	mail: String
-	output	uid: UID, name: String, pic: Array[Blob]
+	input	email: String
+	output	uid: UID, name: String, pic: Array[Byte]
 ```
 
 ### Nodes actions
@@ -85,7 +85,7 @@ NodeHistory
 	rules	count > 0 & nid in nodes & senders in entourage
 NodeSearch
 	input	pattern: String
-	output	nodes: Seq[NID], names: Seq[String], pic: Seq[Array[Blob]]
+	output	nodes: Seq[NID], names: Seq[String], pic: Seq[Array[Byte]]
 	rules	nodes "public"
 ```
 
