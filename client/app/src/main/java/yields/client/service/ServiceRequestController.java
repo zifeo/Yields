@@ -185,7 +185,7 @@ public class ServiceRequestController {
                 handleUserConnectResponse(serverResponse); /* DONE */
                 break;
             case USER_GROUP_LIST_RESPONSE:
-                handleUserGroupListResponse(serverResponse);
+                handleUserGroupListResponse(serverResponse); /* DONE */
                 break;
             case USER_INFO_RESPONSE:
                 handleUserInfoResponse(serverResponse);
@@ -236,7 +236,7 @@ public class ServiceRequestController {
     }
 
     private void handleUserGroupListResponse(Response serverResponse) {
-        try {
+        /*try {
             JSONArray groupSeq = serverResponse.getMessage().getJSONArray("groups");
             for (int i = 0; i < groupSeq.length(); i++) {
                 JSONArray jsonGroup = groupSeq.getJSONArray(i);
@@ -249,6 +249,29 @@ public class ServiceRequestController {
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
+        }*/
+
+        try {
+            JSONObject response = serverResponse.getMessage();
+            JSONArray groups = response.getJSONArray("groups");
+            JSONArray names = response.getJSONArray("names");
+            JSONArray updatedAt = response.getJSONArray("updatedAt");
+            JSONArray refreshedAt = response.getJSONArray("refreshedAt");
+
+            int groupCount = groups.length();
+            assert (groupCount == names.length() && groupCount == updatedAt.length() &&
+                    groupCount == refreshedAt.length());
+
+            for (int i = 0 ; i < groupCount ; i ++){
+                Group group = new Group(groups.getString(i), names.getString(i), refreshedAt
+                        .getString(i));
+                YieldsApplication.getUser().addGroup(group);
+                ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
+                mService.sendRequest(historyRequest);
+            }
+            mService.notifyChange();
+        } catch (JSONException | ParseException e) {
+            e.printStackTrace();
         }
 
     }
