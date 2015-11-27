@@ -42,6 +42,9 @@ object Yields {
     */
   def main(args: Array[String]): Unit = {
     start()
+    system.registerOnTermination {
+      dbi.close()
+    }
   }
 
   /**
