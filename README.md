@@ -56,23 +56,23 @@ A `Request` will answer with a `Response` or an `Error` on bad operations (such 
 
 ```
 UserConnect
-	input 	mail: String
+	input 	email: String
 	output	uid: UID, returning: Boolean
 UserUpdate
-	input 	mail: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
+	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
 	output	()
 	bcast	uid: UID, name: String, pic: Array[Byte]
-	notice	no mail for now
+	notice	no email for now
 UserInfo
 	input	uid: UID
-	output	(1) uid: UID, mail: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
-	output	(2) uid: UID, mail: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
+	output	(1) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
+	output	(2) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
 	rules	uid == client (1) | uid in entourage (2)
 UserGroupList
 	input	()
 	output	groups: Seq[NID], names: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
-	input	mail: String
+	input	email: String
 	output	uid: UID, name: String, pic: Array[Byte]
 ```
 
