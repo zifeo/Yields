@@ -157,13 +157,19 @@ public class GroupActivity extends NotifiableActivity {
      * data set has changed
      */
     @Override
-    public void notifyChange(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mAdapterGroups.notifyDataSetChanged();
-            }
-        });
+    public void notifyChange(Change change){
+        switch (change) {
+            case GROUP_LIST:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapterGroups.notifyDataSetChanged();
+                    }
+                });
+                break;
+            default:
+                Log.d("Y:" + this.getClass().getName(), "useless notify change...");
+        }
     }
 
     /**

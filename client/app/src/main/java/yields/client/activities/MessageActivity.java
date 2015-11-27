@@ -252,17 +252,24 @@ public class MessageActivity extends NotifiableActivity {
      * data set has changed.
      */
     @Override
-    public void notifyChange() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mType == ContentType.GROUP_MESSAGES) {
-                    retrieveGroupMessages();
-                } else {
-                    retrieveCommentMessages();
-                }
-            }
-        });
+    public void notifyChange(Change change) {
+        switch (change) {
+            case MESSAGES_RECEIVE:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mType == ContentType.GROUP_MESSAGES) {
+                            retrieveGroupMessages();
+                        } else {
+                            retrieveCommentMessages();
+                        }
+                    }
+                });
+                break;
+            default:
+                Log.d("Y:" + this.getClass().getName(), "useless notify change...");
+        }
+
     }
 
     @Override

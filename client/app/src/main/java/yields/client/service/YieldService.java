@@ -114,10 +114,10 @@ public class YieldService extends Service {
         }).start();
     }
 
-    public void notifyChange() {
+    public void notifyChange(NotifiableActivity.Change change) {
         if (mCurrentNotifiableActivity != null) {
             Log.d("Y:" + this.getClass().getName(), "notified activity");
-            mCurrentNotifiableActivity.notifyChange();
+            mCurrentNotifiableActivity.notifyChange(change);
         } else {
             Log.d("Y:" + this.getClass().getName(), "not notified activity");
         }
@@ -223,24 +223,9 @@ public class YieldService extends Service {
             }
         } else {
             mCurrentGroup.addMessage(message);
-            mCurrentNotifiableActivity.notifyChange();
+            mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         }
     }
-
-    /**
-     * Updates a Message that is already in the Group bound to the service.
-     *
-     * @param group   The group to which the Message was sent.
-     * @param message The message's updated version.
-     * @param oldDate The original date of the Message before it's update.
-     */
-    synchronized public void updateMessage(Group group, Message message, Date oldDate) {
-        if (mCurrentNotifiableActivity != null || mCurrentGroup.getId() == group.getId()) {
-            mCurrentGroup.addMessage(message);
-            mCurrentNotifiableActivity.notifyChange();
-        }
-    }
-
 
     /**
      * Called when multiple message is received from the server
@@ -252,7 +237,7 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity != null && mCurrentGroup != null &&
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
-            mCurrentNotifiableActivity.notifyChange();
+            mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } else {
             List<Group> groups = YieldsApplication.getUser().getUserGroups();
             for (Group group : groups) {
