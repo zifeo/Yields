@@ -8,13 +8,13 @@
 
 ## Protocol
 
-### Comprehension Hierarchy 
+### Abstract hierarchy 
 
 ```
 User
 
 Node
- |-—active
+ |——active
  |     |——Group (private)
  |     |——Publish
  |     |——RSS
@@ -73,7 +73,7 @@ UserGroupList
 	output	groups: Seq[NID], names: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	mail: String
-	output	uid: UID, name: String, pic: Array[Blob]
+	output	uid: UID, name: String, pic: Array[Byte]
 ```
 
 ### Nodes actions
@@ -85,7 +85,7 @@ NodeHistory
 	rules	count > 0 & nid in nodes & senders in entourage
 NodeSearch
 	input	pattern: String
-	output	nodes: Seq[NID], names: Seq[String], pic: Seq[Array[Blob]]
+	output	nodes: Seq[NID], names: Seq[String], pic: Seq[Array[Byte]]
 	rules	nodes "public"
 ```
 
