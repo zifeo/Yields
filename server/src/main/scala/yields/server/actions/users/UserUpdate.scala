@@ -57,4 +57,4 @@ case class UserUpdateRes() extends Result
   * @param name new or current user name
   * @param pic new or current user pic
   */
-case class UserUpdateBrd(uid: UID, email: String, name: String, pic: Blob) extends Broadcast
+case class UserUpdateBrd(uid: UID, email: Email, name: String, pic: Blob) extends Broadcast

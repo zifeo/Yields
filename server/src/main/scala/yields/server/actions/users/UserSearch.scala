@@ -1,14 +1,14 @@
 package yields.server.actions.users
 
 import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{User, UID}
+import yields.server.dbi.models.{Email, User, UID}
 import yields.server.mpi.Metadata
 
 /**
   * Looks if there is a corresponding user email and returns its information.
   * @param email lookup email
   */
-case class UserSearch(email: String) extends Action {
+case class UserSearch(email: Email) extends Action {
 
   /**
     * Run the action given the sender.

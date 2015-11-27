@@ -2,14 +2,14 @@ package yields.server.actions.users
 
 import yields.server.actions._
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.dbi.models.{UID, User}
+import yields.server.dbi.models.{Email, UID, User}
 import yields.server.mpi.Metadata
 
 /**
   * Connects an user to the server.
   * @param email user mail
   */
-case class UserConnect(email: String) extends Action {
+case class UserConnect(email: Email) extends Action {
 
   /**
     * Run the action given the sender.

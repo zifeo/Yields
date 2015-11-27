@@ -1,11 +1,8 @@
 package yields.server.dbi.tags
 
-import yields.server.dbi.exceptions.UnincrementableIdentifierException
 import yields.server.dbi.models.{TID, NID}
 import yields.server.dbi._
-import yields.server.utils.Temporal
 import com.redis.serialization.Parse.Implicits._
-
 
 /**
   * Class representing tags and actions on tag
@@ -42,6 +39,7 @@ final class Tag private(val tid: TID) {
 
 }
 
+/** [[Tag]] companion object. */
 object Tag {
 
   object StaticKey {
@@ -51,8 +49,7 @@ object Tag {
 
   /** add a tag */
   def createTag(newTag: String): Tag = {
-    val tid = redis.withClient(_.incr(StaticKey.tid))
-      .getOrElse(throw new UnincrementableIdentifierException("tag identifier incrementation fails"))
+    val tid = valueOrException(redis.withClient(_.incr(StaticKey.tid)))
     val tag = Tag(tid)
     tag.text = newTag
     redis.withClient(_.hset(StaticKey.index, newTag, tid))

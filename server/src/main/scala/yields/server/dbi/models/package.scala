@@ -9,11 +9,13 @@ import com.redis.serialization.{Format, Parse}
   */
 package object models {
 
+  private type Identity = Long
+
   /** Represents an user identifier. */
-  type UID = Long
+  type UID = Identity
 
   /** Represents a node identifier. */
-  type NID = Long
+  type NID = Identity
 
   /** Represent a tag identifier */
   type TID = Long

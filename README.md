@@ -50,7 +50,7 @@ Metadata
 	rules	client & ref unchanged
 ```
 
-A `Request` will answer with a `Response` or an `Error` on bad operations (such as unauthorized actions). Push notifications will sometimes be broadcasted broadcasted.
+A `Request` will answer with a `Response` or an `Error` on bad operations (such as unauthorized actions). Push notifications will sometimes be broadcasted.
 
 ### Users actions
 

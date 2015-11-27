@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import com.redis.serialization.Parse.Implicits._
 import yields.server.actions.exceptions.{NewUserExistException, UnauthorizedActionException}
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
+import yields.server.dbi.exceptions.IllegalValueException
 import yields.server.utils.Temporal
 
 /**
@@ -16,7 +16,6 @@ import yields.server.utils.Temporal
   * Attributes new values are saved on respective setters.
   *
   * Database structure:
-  * users:uid Long - last user id created
   * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at / connected_at
   * users:[uid]:groups Zset[NID] with score datetime
   * users:[uid]:entourage Zset[UID] with score datetime
@@ -207,8 +206,7 @@ object User {
     */
   def create(email: String): User = {
     if (!redis.withClient(_.hexists(StaticKey.emailIndex, email))) {
-      val uid = redis.withClient(_.incr(StaticKey.uid))
-        .getOrElse(throw new UnincrementableIdentifierException("new user identifier (uid) fails"))
+      val uid = newIdentity()
       val user = User(uid)
       redis.withClient { r =>
         import user.Key

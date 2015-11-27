@@ -122,7 +122,7 @@ object Media {
     */
   def createMedia(contentType: String, content: Blob, creator: UID): Media = {
     // Create hash
-    val media = Media(Node.newNID())
+    val media = Media(newIdentity())
 
     // set values
     media.hash = createHash(content)
