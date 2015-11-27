@@ -1,5 +1,6 @@
 package yields.client.service;
 
+import android.content.res.Resources;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -192,12 +193,101 @@ public class ServiceRequestController {
                 break;
             case GROUP_CREATE_RESPONSE:
                 handleGroupCreateResponse(serverResponse); /* DONE */
+                break;
 
+            case USER_UPDATE_RESPONSE:
+                handleUserUpdateResponse(serverResponse);
+                break;
+            case USER_SEARCH_RESPONSE:
+                handleUserSearchResponse(serverResponse);
+                break;
+            case NODE_SEARCH_RESPONSE:
+                handleNodeSearchResponse(serverResponse);
+                break;
+            case GROUP_UPDATE_RESPONSE:
+                handleGroupUpdateResponse(serverResponse);
+                break;
+            case GROUP_INFO_RESPONSE:
+                handleGroupInfoResponse(serverResponse);
+                break;
+            case GROUP_MESSAGE_RESPONSE:
+                handleGroupMessageResponse(serverResponse);
+                break;
+            case PUBLISHER_CREATE_RESPONSE:
+                handlePublisherCreateResponse(serverResponse);
+                break;
+
+            case PUBLISHER_UPDATE_RESPONSE:
+                handlePublisherUpdateResponse(serverResponse);
+                break;
+
+            case PUBLISHER_INFO_RESPONSE:
+                handlePublisherInfoResponse(serverResponse);
+                break;
+
+            case PUBLISHER_MESSAGE_RESPONSE:
+                handleGroupMessageResponse(serverResponse);
+                break;
+
+            case RSS_CREATE_RESPONSE:
+                handleRSSCreateResponse(serverResponse);
+                break;
+
+            case RSS_MESSAGE_RESPONSE:
+                handleRSSMessageResponse(serverResponse);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceResponse type !");
                 //TODO: In need of another exception ?
         }
+    }
+
+    private void handleUserUpdateResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleUserSearchResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleNodeSearchResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleGroupUpdateResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleGroupInfoResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleGroupMessageResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handlePublisherCreateResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handlePublisherUpdateResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handlePublisherInfoResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handlePublisherMessageResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleRSSCreateResponse(Response serverResponse){
+        // TODO
+    }
+
+    private void handleRSSMessageResponse(Response serverResponse){
+        // TODO
     }
 
     private void handleGroupCreateResponse(Response serverResponse) {
