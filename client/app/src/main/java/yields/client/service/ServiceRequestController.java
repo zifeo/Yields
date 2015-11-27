@@ -228,7 +228,7 @@ public class ServiceRequestController {
                 break;
 
             case PUBLISHER_MESSAGE_RESPONSE:
-                handleGroupMessageResponse(serverResponse);
+                handlePublisherMessageResponse(serverResponse);
                 break;
 
             case RSS_CREATE_RESPONSE:
@@ -357,11 +357,20 @@ public class ServiceRequestController {
     }
 
     private void handlePublisherMessageResponse(Response serverResponse){
-        // TODO
+        try{
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nid");
+            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
+
+            // TODO : (Nico) Notify Activtiy .
+        } catch (JSONException | ParseException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleRSSCreateResponse(Response serverResponse){
-        // TODO
+
     }
 
     private void handleRSSMessageResponse(Response serverResponse){
