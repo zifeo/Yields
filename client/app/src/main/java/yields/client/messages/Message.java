@@ -126,14 +126,11 @@ public class Message extends Node {
             contentType = "text";
         }
 
-        switch (contentType){
-            case "text":
-                this.mContent = new TextContent(text);
-
-            case "image":
-                // TODO : implements images.
-                throw new UnsupportedOperationException("Error image not supported in message " +
-                        "response");
+        if (contentType.equals("text")){
+            this.mContent = new TextContent(text);
+        }
+        else{
+            throw new UnsupportedOperationException();
         }
 
         this.mDate = DateSerialization.dateSerializer.toDate(dateTime);
