@@ -8,21 +8,32 @@
 
 ## Protocol
 
-### Messages
+### Types
 
 ```
-Request
+UID: Long
+NID: Long
+Action
+Result
+```
+
+Suffix actions with `Res` for corresponding results.
+
+### Messages
+
+Request, response, error, notification.
+
+```
+Messages
 	input	kind: String, message: Action, metadata: Metadata
 	output	(1) kind: String, message: Result, metadata: Metadata
 	output	(2) message: String, metadata: Metadata
-	rule	success (1) | error (2)
+	rules	success (1) | error (2)
 Metadata
 	input	client: UID, datetime: OffsetDateTime, ref: OffsetDateTime
 	output	client: UID, datetime: OffsetDateTime, ref: OffsetDateTime
 	rules	client & ref unchanged
 ```
-
-Suffix actions with `Res` for results.
 
 ### Users actions
 
@@ -48,3 +59,16 @@ UserSearch
 	output	uid: UID, name: String, pic: Array[Blob]
 ```
 
+### Nodes actions
+
+```
+NodeMessage
+	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	output	nid: NID, datetime: OffsetDateTime
+	rules	nid in nodes
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+NodeHistory
+	input	nid: NID, datetime: OffsetDateTime, count: Int
+	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[Option[String]], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
+	rules	count > 0 & nid in nodes
+```
