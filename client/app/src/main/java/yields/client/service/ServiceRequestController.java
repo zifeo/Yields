@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ServiceRequestException;
@@ -635,7 +636,7 @@ public class ServiceRequestController {
         try {
             YieldsApplication.getUser().activateGroup(
                     new Id(serverResponse.getMessage().getLong("nid")));
-            mService.notifyChange();
+            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -681,7 +682,7 @@ public class ServiceRequestController {
                 ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
                 mService.sendRequest(historyRequest);
             }
-            mService.notifyChange();
+            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -771,7 +772,7 @@ public class ServiceRequestController {
                     DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
                     Message.MessageStatus.SENT);
             mCacheHelper.addMessage(updatedMessage, group.getId());
-            mService.updateMessage(group, updatedMessage, date);
+            mService.receiveMessage(group.getId(), updatedMessage);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
             Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
         }
