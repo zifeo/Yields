@@ -196,7 +196,6 @@ public class ServiceRequestController {
             case GROUP_CREATE_RESPONSE:
                 handleGroupCreateResponse(serverResponse); /* DONE */
                 break;
-
             case USER_UPDATE_RESPONSE:
                 handleUserUpdateResponse(serverResponse);
                 break;
@@ -235,12 +234,36 @@ public class ServiceRequestController {
                 handleRSSCreateResponse(serverResponse);
                 break;
 
-            case RSS_MESSAGE_RESPONSE:
-                handleRSSMessageResponse(serverResponse);
+            case NODE_MESSAGE_BCAST:
+
                 break;
-            default:
-                throw new ServiceRequestException("No such ServiceResponse type !");
-                //TODO: In need of another exception ?
+            case USER_UPDATE_BCAST:
+
+                break;
+            case GROUP_CREATE_BCAST:
+
+                break;
+            case GROUP_UPDATE_BCAST:
+
+                break;
+            case GROUP_MESSAGE_BCAST:
+
+                break;
+            case PUBLISHER_CREATE_BCAST:
+
+                break;
+            case PUBLISHER_UPDATE_BCAST:
+
+                break;
+            case PUBLISHER_MESSAGE_BCAST:
+
+                break;
+            case RSS_CREATE_BCAST:
+
+                break;
+            case RSS_MESSAGE_BCAST:
+
+                break;
         }
     }
 
@@ -370,11 +393,14 @@ public class ServiceRequestController {
     }
 
     private void handleRSSCreateResponse(Response serverResponse){
-
-    }
-
-    private void handleRSSMessageResponse(Response serverResponse){
-        // TODO
+        try{
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nid");
+            // TODO (Nico) : Notify activity.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleGroupCreateResponse(Response serverResponse) {
