@@ -9,9 +9,8 @@ import yields.server.mpi.Metadata
 
 /**
   * Lists the groups of the user.
-  * @param uid user id
   */
-case class UserGroupList(uid: UID) extends Action {
+case class UserGroupList() extends Action {
 
   /**
     * Run the action given the sender.
@@ -19,15 +18,10 @@ case class UserGroupList(uid: UID) extends Action {
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    if (uid > 0) {
-      val user = User(uid)
-      val groups = user.groups.toSeq
-      val list = groups.map(x => (x, Group(x).name, Group(x).updated_at))
-      UserGroupListRes(list)
-    } else {
-      val errorMessage = getClass.getSimpleName
-      throw new ActionArgumentException(s"Bad uid in : $errorMessage")
-    }
+
+      val user = User(metadata.client)
+      val (groups, updates, refreshes) = user.groupsWithUpdates
+      UserGroupListRes(groups, updates, refreshes)
 
   }
 
@@ -37,4 +31,6 @@ case class UserGroupList(uid: UID) extends Action {
   * [[UserGroupList]] result.
   * @param groups sequence of nid, name and last activity
   */
-case class UserGroupListRes(groups: Seq[(NID, String, OffsetDateTime)]) extends Result
+case class UserGroupListRes(groups: Seq[NID],
+                            updatedAt: Seq[OffsetDateTime],
+                            refreshedAt: Seq[OffsetDateTime]) extends Result

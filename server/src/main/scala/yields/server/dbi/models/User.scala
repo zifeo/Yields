@@ -3,7 +3,7 @@ package yields.server.dbi.models
 import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.{NewUserExistException, UnauthorizeActionException}
+import yields.server.actions.exceptions.{NewUserExistException, UnauthorizedActionException}
 import yields.server.dbi._
 import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
 import yields.server.utils.Temporal
@@ -29,7 +29,7 @@ import yields.server.utils.Temporal
   *
   * @param uid user id
   */
-final class User private(val uid: UID) {
+final class User private (val uid: UID) {
 
   object Key {
     val user = s"users:$uid"
@@ -108,14 +108,32 @@ final class User private(val uid: UID) {
     valueOrException(_connected_at)
   }
 
-  /** Connected datetime getter. */
-  def connected_at_=(offsetDateTime: OffsetDateTime): Unit =
-    _connected_at = update(Key.connected_at, offsetDateTime)
+  /** Updates connection datetime. */
+  def connected(): Unit =
+    _connected_at = update(Key.connected_at, Temporal.now)
 
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {
     _groups = redis.withClient(_.zrange[NID](Key.groups, 0, -1))
     valueOrDefault(_groups, List.empty)
+  }
+
+  /** Groups with updates getter. */
+  def groupsWithUpdates: List[(NID, OffsetDateTime, OffsetDateTime)] = {
+    val query = redisPipeline { p =>
+      groups.map { nid =>
+        val group = Group(nid)
+        val key = group.NodeKey
+        val result = p.hmget[String, OffsetDateTime](key.node, key.updated_at, key.refreshed_at)
+        result.map { values =>
+          (uid, values(key.updated_at), values(key.refreshed_at))
+        }
+      }
+    }
+    query match {
+      case Some(result: List[(NID, OffsetDateTime, OffsetDateTime)]) => result
+      case _ => throw new IllegalValueException(s"entourage failed with updates: $query")
+    }
   }
 
   /** Adds a group and returns whether this group has been added. */
@@ -126,10 +144,24 @@ final class User private(val uid: UID) {
   def removeGroups(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(Key.groups, nid)))
 
-  /** entourage getter. */
+  /** Entourage getter. */
   def entourage: List[UID] = _entourage.getOrElse {
     _entourage = redis.withClient(_.zrange[UID](Key.entourage, 0, -1))
     valueOrException(_entourage)
+  }
+
+  /** Entourage with updates getter. */
+  def entourageWithUpdates: List[(UID, OffsetDateTime)] = {
+    val query = redisPipeline { p =>
+      entourage.map { id =>
+        val user = User(id)
+        uid -> p.hget[OffsetDateTime](user.Key.user, Key.updated_at)
+      }
+    }
+    query match {
+      case Some(result: List[(UID, OffsetDateTime)]) => result
+      case _ => throw new IllegalValueException(s"entourage failed with updates: $query")
+    }
   }
 
   /** Adds a user and returns whether this user has been added. */
@@ -193,9 +225,9 @@ object User {
 
     import yields.server.actions._
 
-    if (checkValidEmail(email)) {
+    if (validEmail(email)) {
       redis.withClient(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
-    } else throw new UnauthorizeActionException(s"invalid email in fromEmail method")
+    } else throw new UnauthorizedActionException(s"invalid email in fromEmail method")
   }
 
   /** Prepares user model for retrieving data given an user id. */

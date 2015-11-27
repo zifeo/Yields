@@ -20,7 +20,8 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
   implicit lazy val userConnectResArb: Arbitrary[UserConnectRes] = Arbitrary {
     for {
       uid <- arbitrary[UID]
-    } yield UserConnectRes(uid)
+      returning <- arbitrary[Boolean]
+    } yield UserConnectRes(uid, returning)
   }
 
   implicit lazy val userUpdateArb: Arbitrary[UserUpdate] = Arbitrary {

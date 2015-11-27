@@ -1,21 +1,19 @@
 package yields.server.actions.users
 
+import yields.server.Yields
+import yields.server.actions._
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.actions.{Action, Result, _}
 import yields.server.dbi.models.{Blob, Email, UID, User}
 import yields.server.mpi.Metadata
 
 /**
   * Update an user given optional fields.
-  * @param uid user id
   * @param email new email address
   * @param name new name
   * @param image new profile image
-  *
-  *              TODO: Check for valid email
-  *              TODO: Set image
+  * TODO: set picture
   */
-case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], image: Option[Blob]) extends Action {
+case class UserUpdate(email: Option[Email], name: Option[String], image: Option[Blob]) extends Action {
 
   /**
     * Run the action given the sender.
@@ -23,30 +21,40 @@ case class UserUpdate(uid: UID, email: Option[Email], name: Option[String], imag
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    if (uid > 0) {
-      val user = User(uid)
 
-      if (email.isDefined) {
-        if (checkValidEmail(email.get)) {
-          user.email = email.get
-        } else {
-          val errorMessage = getClass.getSimpleName
-          throw new ActionArgumentException(s"Invalid email in : $errorMessage")
-        }
-      }
-      if (name.isDefined) {
-        user.name = name.get
-      }
+    val user = User(metadata.client)
 
-      UserUpdateRes()
+    for (newEmail <- email) {
+      if (! validEmail(newEmail))
+        throw new ActionArgumentException(s"invalid email: $email")
 
-    } else {
-      val errorMessage = getClass.getSimpleName
-      throw new ActionArgumentException(s"Invalid uid in : $errorMessage")
+      // TODO: allow email change (unneeded with Google login)
+      // user.email = newEmail
     }
 
+    for (newName <- name) {
+      user.name = newName
+    }
+
+    Yields.broadcast(user.entourage) {
+      UserUpdateBrd(user.uid, user.email, user.name, user.picture)
+    }
+
+    UserUpdateRes()
   }
+
 }
 
-/** [[UserUpdate]] result. */
+/**
+  * [[UserUpdate]] result.
+  */
 case class UserUpdateRes() extends Result
+
+/**
+  * [[UserUpdate]] broadcast.
+  * @param uid user updated
+  * @param email new or current user email
+  * @param name new or current user name
+  * @param pic new or current user pic
+  */
+case class UserUpdateBrd(uid: UID, email: String, name: String, pic: Blob) extends Broadcast

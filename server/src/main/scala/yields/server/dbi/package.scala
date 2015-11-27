@@ -31,7 +31,16 @@ package object dbi {
     * @tparam T return type of the query
     * @return values or status of redis query
     */
-  def redis[T](query: RedisClient => T): T = redis.withClient(query)
+  def redis[T](query: RedisClient => T): T =
+    redis.withClient(query)
+
+  /**
+    * Public accessor to pipelined database via local redis object.
+    * @param queries queries to be run on in block
+    * @return list of values or status of redis queries
+    */
+  def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
+    redis.withClient(_.pipeline(queries))
 
   /** Terminates database connection. */
   def close(): Unit = {
