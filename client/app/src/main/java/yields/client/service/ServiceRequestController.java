@@ -430,7 +430,19 @@ public class ServiceRequestController {
     }
 
     private void handleGroupUpdateBroadcast(Response serverResponse){
+        try{
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nid");
+            String name = response.getString("name");
+            Byte[] pic = (Byte[]) response.get("pic");
+            JSONArray users = response.getJSONArray("users");
+            JSONArray nodes = response.getJSONArray("nodes");
 
+            // TODO : (Nico) Notify app.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleGroupMessageBroadcast(Response serverResponse){
