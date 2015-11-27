@@ -1,6 +1,7 @@
 package yields.client.service;
 
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
@@ -9,8 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,6 +26,7 @@ import yields.client.messages.Message;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.Node;
+import yields.client.node.User;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
@@ -266,14 +270,31 @@ public class ServiceRequestController {
         // TODO : decide what to do.
     }
 
+    /**
+     * Seriously fuck Java.
+     * @param array The array to downgrade.
+     * @return The converted array.
+     */
+    private byte[] convertToPrimitiveByteArray(Byte[] array){
+        byte[] convertedArray  = new byte[array.length];
+        for (int i = 0 ; i < convertedArray.length ; i ++){
+            convertedArray[i] = array[i];
+        }
+        return convertedArray;
+    }
+
     private void handleUserSearchResponse(Response serverResponse){
         try {
             JSONObject response = serverResponse.getMessage();
             long uid = response.getLong("uid");
             String name = response.getString("name");
-            // TODO : Parse pic, Array[Blob] ???
+            Byte[] pic = (Byte[]) response.get("pic");
+            byte[] primitivePic = convertToPrimitiveByteArray(pic);
+            // TODO : Retrieve email.
+            User user = new User(name, new Id(uid), "", BitmapFactory.decodeByteArray
+                    (primitivePic, 0, primitivePic.length));
 
-            // TODO : (Nico) Update right Activity.
+            // TODO : (Nico) Notify Activity.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -285,16 +306,17 @@ public class ServiceRequestController {
             JSONObject response = serverResponse.getMessage();
             JSONArray nodes = response.getJSONArray("nodes");
             JSONArray names = response.getJSONArray("names");
-            JSONArray pic = response.getJSONArray("pic");
+            JSONArray pics = response.getJSONArray("pic");
 
-            assert (nodes.length() == names.length() && nodes.length() == pic.length());
+            assert (nodes.length() == names.length() && nodes.length() == pics.length());
             int nodeCount = nodes.length();
             ArrayList<Node> nodeList = new ArrayList<>();
             for (int i = 0 ; i < nodeCount ; i ++){
-                // TODO : Make the fucking class representing nodes having an image.
-                // nodeList add new Node (id image)
+                long nid = nodes.getLong(i);
+                String nodeName = names.getString(i);
+                byte[] pic = convertToPrimitiveByteArray((Byte[]) pics.get(i));
 
-                // TODO : parse pics.
+                // TODO : Make the fucking class representing nodes having an image.
             }
 
             // TODO : (Nico) Notify activity.
@@ -318,7 +340,15 @@ public class ServiceRequestController {
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
-            // TODO : What to to now ? Which Object should I create ?
+            ArrayList<User> userList = new ArrayList<>();
+            for (int i = 0 ; i < users.length() ; i ++){
+                // TODO : retrieve email and name of the users.
+                userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
+                        .getDefaultUserImage()));
+            }
+
+            // _KetzA : I'm not really sure what to do here ...
+            Group groupInfo = new Group(name, new Id(nid), userList);
             // TODO : (Nico) Notify activity.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -342,7 +372,7 @@ public class ServiceRequestController {
     private void handlePublisherCreateResponse(Response serverResponse){
         try {
             JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nod");
+            long nid = response.getLong("nid");
 
             // TODO : (Nico) notify activity.
         } catch (JSONException e) {
@@ -404,8 +434,12 @@ public class ServiceRequestController {
     private void handleUserUpdateBroadcast(Response serverResponse){
         try{
             JSONObject response = serverResponse.getMessage();
+            long uid = response.getLong("uid");
             String name = response.getString("name");
-            Byte[] pic = (Byte[]) response.get("pic");
+            byte[] pic = convertToPrimitiveByteArray((Byte[]) response.get("pic"));
+
+            User updatedUser = new User(name, new Id(uid), "", BitmapFactory.decodeByteArray(pic,
+                    0, pic.length));
 
             // TODO : (Nico) Notify activity.
         } catch (JSONException e) {
@@ -422,6 +456,15 @@ public class ServiceRequestController {
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
+            ArrayList<User> userList = new ArrayList<>();
+            for (int i = 0 ; i < users.length() ; i ++){
+                // TODO : retrieve email and name of the users ???
+                userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
+                        .getDefaultUserImage()));
+            }
+
+            Group newGroup = new Group(name, new Id(nid), userList);
+
             // TODO : (Nico) Notify app.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -434,9 +477,20 @@ public class ServiceRequestController {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             String name = response.getString("name");
-            Byte[] pic = (Byte[]) response.get("pic");
+            byte[] pic = convertToPrimitiveByteArray((Byte[]) response.get("pic"));
             JSONArray users = response.getJSONArray("users");
+            // TODO: Dafuq id nodes ?
             JSONArray nodes = response.getJSONArray("nodes");
+
+            ArrayList<User> userList = new ArrayList<>();
+            for (int i = 0 ; i < users.length() ; i ++){
+                // TODO : retrieve email and name of the users ???
+                userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
+                        .getDefaultUserImage()));
+            }
+
+            Group updatedGroup = new Group(name, new Id(nid), userList, BitmapFactory
+                    .decodeByteArray(pic, 0, pic.length));
 
             // TODO : (Nico) Notify app.
         } catch (JSONException e) {
@@ -456,7 +510,8 @@ public class ServiceRequestController {
             String contentType = response.getString("contentType");
             Byte[] content = (Byte[]) response.get("content");
 
-            // TODO : Create Message.
+            Message message = new Message(datetime.toString(), String.valueOf(senderId), text,
+                    contentType, content);
             // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -509,6 +564,8 @@ public class ServiceRequestController {
             Byte[] content = (Byte[]) response.get("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
+            Message message = new Message(datetime.toString(), String.valueOf(senderId), text,
+                    contentType, content);
             // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -543,6 +600,8 @@ public class ServiceRequestController {
             Byte[] content = (Byte[]) response.get("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
+            Message message = new Message(datetime.toString(), String.valueOf(senderId), text,
+                    contentType, content);
             // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
