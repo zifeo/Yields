@@ -179,10 +179,10 @@ public class ServiceRequestController {
                 handleNodeHistoryResponse(serverResponse); /* Done */
                 break;
             case NODE_MESSAGE_RESPONSE:
-                handleNodeMessageResponse(serverResponse);
+                handleNodeMessageResponse(serverResponse); /* DONE */
                 break;
             case USER_CONNECT_RESPONSE:
-                handleUserConnectResponse(serverResponse);
+                handleUserConnectResponse(serverResponse); /* DONE */
                 break;
             case USER_GROUP_LIST_RESPONSE:
                 handleUserGroupListResponse(serverResponse);
@@ -254,6 +254,7 @@ public class ServiceRequestController {
     }
 
     private void handleUserConnectResponse(Response serverResponse) {
+        // TODO : Parse the new field.
         ClientUser user = YieldsApplication.getUser();
         try {
             user.setId(new Id(serverResponse.getMessage().getLong("uid")));
