@@ -320,7 +320,14 @@ public class ServiceRequestController {
     }
 
     private void handlePublisherCreateResponse(Response serverResponse){
-        // TODO
+        try {
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nod");
+
+            // TODO : (Nico) notify activity.
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void handlePublisherUpdateResponse(Response serverResponse){
