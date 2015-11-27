@@ -176,7 +176,7 @@ public class ServiceRequestController {
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
             case NODE_HISTORY_RESPONSE:
-                handleNodeHistoryResponse(serverResponse);
+                handleNodeHistoryResponse(serverResponse); /* Done */
                 break;
             case NODE_MESSAGE_RESPONSE:
                 handleNodeMessageResponse(serverResponse);
@@ -299,14 +299,11 @@ public class ServiceRequestController {
      */
     private void handleNodeMessageResponse(Response serverResponse) {
         try {
-            //FOR DEMO
-            sleep(3000);
-            //FOR DEMO
             JSONObject responseMessage = serverResponse.getMessage();
             JSONObject metadata = serverResponse.getMetadata();
             String time = metadata.getString("ref");
             Date date = DateSerialization.dateSerializer.toDate(time);
-            Group group = mCacheHelper.getGroup(new Id(Long.valueOf(responseMessage.getString("nid"))));
+            Group group = mCacheHelper.getGroup(new Id(Long.valueOf(metadata.getString("client"))));
             Message message = mCacheHelper.getMessagesForGroup(group, date, 1).get(0);
             mCacheHelper.deleteMessage(message, group.getId());
             Message updatedMessage = new Message("", new Id(-1), message.getSender(), message.getContent(),
@@ -316,8 +313,6 @@ public class ServiceRequestController {
             mService.updateMessage(group, updatedMessage, date);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
             Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -327,7 +322,7 @@ public class ServiceRequestController {
      * @param serverResponse The response received from the server.
      */
     private void handleNodeHistoryResponse(Response serverResponse) {
-        try {
+        /*try {
             JSONArray array = serverResponse.getMessage().getJSONArray("nodes");
             if (array.length() > 0) {
                 ArrayList<Message> list = new ArrayList<>();
@@ -342,6 +337,32 @@ public class ServiceRequestController {
             }
         } catch (JSONException | ParseException | CacheDatabaseException e) {
             Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
+        }*/
+
+        try {
+            long nid = serverResponse.getMessage().getLong("nid");
+            JSONArray datetimes = serverResponse.getMessage().getJSONArray("datetimes");
+            JSONArray senders = serverResponse.getMessage().getJSONArray("senders");
+            JSONArray texts = serverResponse.getMessage().getJSONArray("texts");
+            JSONArray contentTypes = serverResponse.getMessage().getJSONArray("contentTypes");
+            JSONArray contents = serverResponse.getMessage().getJSONArray("contents");
+
+            int count = datetimes.length();
+            assert (count == senders.length() && count == texts.length() && count == contentTypes
+                    .length() && count == contents.length());
+
+            Id groupId = new Id(nid);
+            ArrayList<Message> messageList = new ArrayList<>();
+            for (int i = 0 ; i < count ; i ++){
+                Message message = new Message(datetimes.getString(i), senders.getString(i), texts
+                        .getString(i), contentTypes.getString(i), (Byte[]) contents.get(i));
+                messageList.add(message);
+                mCacheHelper.addMessage(message, groupId);
+            }
+
+            mService.receiveMessages(groupId, messageList);
+        } catch (JSONException | ParseException | CacheDatabaseException e) {
+            e.printStackTrace();
         }
     }
 

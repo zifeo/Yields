@@ -110,6 +110,36 @@ public class Message extends Node {
         mStatus = MessageStatus.SENT;
     }
 
+    public Message(String dateTime, String senderID, String text, String contentType, Byte[]
+            contents)
+            throws ParseException {
+        super("message", new Id(DateSerialization.dateSerializer.toDate(dateTime).getTime()));
+
+        // TODO : Sender image.
+        User sender = new User(senderID, new Id(Long.parseLong(senderID)), "",
+                BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
+                        R.drawable.userpicture));
+
+        this.mSender = sender;
+
+        if (text != null){
+            contentType = "text";
+        }
+
+        switch (contentType){
+            case "text":
+                this.mContent = new TextContent(text);
+
+            case "image":
+                // TODO : implements images.
+                throw new UnsupportedOperationException("Error image not supported in message " +
+                        "response");
+        }
+
+        this.mDate = DateSerialization.dateSerializer.toDate(dateTime);
+        mStatus = MessageStatus.SENT;
+    }
+
     /**
      * Returns the sender of the message.
      *
