@@ -247,7 +247,17 @@ public class ServiceRequestController {
     }
 
     private void handleUserSearchResponse(Response serverResponse){
-        // TODO
+        try {
+            JSONObject response = serverResponse.getMessage();
+            long uid = response.getLong("uid");
+            String name = response.getString("name");
+            // TODO : Parse pic, Array[Blob] ???
+
+            // TODO : (Nico) Update right Activity.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleNodeSearchResponse(Response serverResponse){
