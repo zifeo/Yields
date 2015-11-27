@@ -11,6 +11,10 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public abstract class NotifiableActivity extends AppCompatActivity{
 
+    public enum Change {
+        GROUP_SEARCH, MESSAGES_RECEIVE, GROUP_LIST, GROUP_LEAVE, GROUP_JOIN
+    }
+
     /**
      * Automatically called when the activity is resumed after another
      * activity  was displayed
@@ -35,7 +39,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
      * Method that tells the activity
      * that the data set it holds has changed
      */
-    abstract public void notifyChange();
+    abstract public void notifyChange(Change changed);
 
     /**
      * Method called when the server is connected
