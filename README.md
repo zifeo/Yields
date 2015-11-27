@@ -33,7 +33,7 @@ Result
 ```
 
 Suffix action names with `Res` for corresponding result names.
-`UID` and `NID` are backed by the same identifier on serverside and represented by `Long`.
+`UID` and `NID` are backed by the same identifier on serverside and represented by `Long`. Identifier `0` is consider as nothing.
 
 ### Messages
 
@@ -61,7 +61,7 @@ UserConnect
 UserUpdate
 	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
 	output	()
-	bcast	uid: UID, name: String, pic: Array[Byte]
+	bcast	uid: UID, email: String, name: String, pic: Array[Byte]
 	notice	no email for now
 UserInfo
 	input	uid: UID
@@ -70,10 +70,10 @@ UserInfo
 	rules	uid == client (1) | uid in entourage (2)
 UserGroupList
 	input	()
-	output	groups: Seq[NID], names: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
+	output	groups: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	email: String
-	output	uid: UID, name: String, pic: Array[Byte]
+	output	uid: UID
 ```
 
 ### Nodes actions
