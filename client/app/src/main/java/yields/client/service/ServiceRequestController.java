@@ -243,7 +243,7 @@ public class ServiceRequestController {
     }
 
     private void handleUserUpdateResponse(Response serverResponse){
-        // TODO
+        // Nothing to parse.
     }
 
     private void handleUserSearchResponse(Response serverResponse){
