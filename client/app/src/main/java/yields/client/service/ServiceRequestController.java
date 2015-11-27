@@ -498,7 +498,22 @@ public class ServiceRequestController {
     }
 
     private void handlePublisherMessageBroadcast(Response serverResponse){
+        try{
+            JSONObject response = serverResponse.getMessage();
 
+            long nid = response.getLong("nid");
+            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
+            long senderId = response.getLong("sender");
+            String text = response.getString("text");
+            String contentType = response.getString("contentType");
+            Byte[] content = (Byte[]) response.get("content");
+
+            // TODO : Create Message and add it to where the f*ck it need to be added.
+            // TODO : (Nico) Notify activity.
+        } catch (JSONException | ParseException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleRSSCreateBroadcast(Response serverResponse){
