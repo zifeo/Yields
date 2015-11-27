@@ -23,7 +23,6 @@ import yields.client.messages.Message;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.Node;
-import yields.client.node.User;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
@@ -217,23 +216,18 @@ public class ServiceRequestController {
             case PUBLISHER_CREATE_RESPONSE:
                 handlePublisherCreateResponse(serverResponse);
                 break;
-
             case PUBLISHER_UPDATE_RESPONSE:
                 handlePublisherUpdateResponse(serverResponse);
                 break;
-
             case PUBLISHER_INFO_RESPONSE:
                 handlePublisherInfoResponse(serverResponse);
                 break;
-
             case PUBLISHER_MESSAGE_RESPONSE:
                 handlePublisherMessageResponse(serverResponse);
                 break;
-
             case RSS_CREATE_RESPONSE:
                 handleRSSCreateResponse(serverResponse);
                 break;
-
             case NODE_MESSAGE_BCAST:
                 handleNodeMessageBroadcast(serverResponse);
                 break;
@@ -404,11 +398,20 @@ public class ServiceRequestController {
     }
 
     private void handleNodeMessageBroadcast(Response serverResponse){
-
+        // TODO : Not very clear on how to use this. See later.
     }
 
     private void handleUserUpdateBroadcast(Response serverResponse){
+        try{
+            JSONObject response = serverResponse.getMessage();
+            String name = response.getString("name");
+            Byte[] pic = (Byte[]) response.get("pic");
 
+            // TODO : (Nico) Notify activity.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleGroupCreateBroadcast(Response serverResponse){
