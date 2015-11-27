@@ -50,6 +50,6 @@ case class UserInfo(uid: UID) extends Action {
   */
 case class UserInfoRes(uid: UID,
                        name: String,
-                       email: String,
+                       email: Email,
                        entourage: Seq[UID],
                        entourageUpdatedAt: Seq[OffsetDateTime]) extends Result

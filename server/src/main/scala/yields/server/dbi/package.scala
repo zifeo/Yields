@@ -8,8 +8,15 @@ import scala.language.implicitConversions
 
 /**
   * All Redis database interface related values and functions.
+  *
+  * Redis scheme:
+  * identity Long - last user id created
   */
 package object dbi {
+
+  object Key {
+    val identity = "identity"
+  }
 
   private[dbi] lazy val redis = {
     val pool = new RedisClientPool(
@@ -41,6 +48,14 @@ package object dbi {
     */
   def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
     redis.withClient(_.pipeline(queries))
+
+  /**
+    * Gets new global identifier.
+    * @return identity as a number
+    */
+  def newIdentity(): Long = {
+    valueOrException(redis.withClient(_.incr(Key.identity)))
+  }
 
   /** Terminates database connection. */
   def close(): Unit = {

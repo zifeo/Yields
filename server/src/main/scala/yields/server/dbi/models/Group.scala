@@ -89,7 +89,7 @@ object Group {
     * @return the newly created group
     */
   def createGroup(name: String, creator: UID): Group = {
-    val group = Group(Node.newNID())
+    val group = Group(newIdentity())
     redis.withClient { r =>
       import group.NodeKey
       val infos = List(

@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import com.redis.RedisClient.DESC
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
-import yields.server.dbi.exceptions.{IllegalValueException, UnincrementableIdentifierException}
+import yields.server.dbi.exceptions.IllegalValueException
 import yields.server.utils.Temporal
 
 /**
@@ -14,7 +14,6 @@ import yields.server.utils.Temporal
   * Node is abstract superclass of every possible kind of nodes like Group, Image etc
   *
   * Database structure :
-  * nodes:nid Long - last node id created
   * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
   * nodes:[nid]:users Zset[UID] with score datetime
   * nodes:[nid]:nodes Zset[NID] with score datetime
@@ -183,20 +182,6 @@ abstract class Node {
     _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(NodeKey.updated_at).map(OffsetDateTime.parse)
     _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
-  }
-
-}
-
-/** [[Node]] companion. */
-object Node {
-
-  /** Creates a new node by reserving a node identifier. */
-  def newNID(): NID =
-    redis.withClient(_.incr(StaticKey.nid)
-      .getOrElse(throw new UnincrementableIdentifierException("new node identifier (nid) fails")))
-
-  object StaticKey {
-    val nid = "nodes:nid"
   }
 
 }
