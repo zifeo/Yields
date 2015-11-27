@@ -23,7 +23,12 @@ public class Response {
         PUBLISHER_CREATE_RESPONSE("PublisherCreateRes"), PUBLISHER_UPDATE_RESPONSE
                 ("PublisherUpdateRes"), PUBLISHER_INFO_RESPONSE("PublisherInfoRes"),
         PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"), RSS_CREATE_RESPONSE("RssCreateRes"),
-        RSS_MESSAGE_RESPONSE("RssMessageRes");
+        NODE_MESSAGE_BCAST("NodeMessageBcast"), USER_UPDATE_BCAST("UserUpdateBcast"),
+        GROUP_CREATE_BCAST("GroupCreateBcast"), GROUP_UPDATE_BCAST("GroupUpdateBcast"),
+        GROUP_MESSAGE_BCAST("GroupMessageBcast"), PUBLISHER_CREATE_BCAST("PublisherCreateBcast"),
+        PUBLISHER_UPDATE_BCAST("PublisherUpdateBcast"), PUBLISHER_MESSAGE_BCAST("PublisherMessageBcast"),
+        RSS_CREATE_BCAST("RssCreateBcast"), RSS_MESSAGE_BCAST("RssMessageCast");
+
 
         private final String name;
 
