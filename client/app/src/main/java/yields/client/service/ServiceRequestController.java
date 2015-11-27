@@ -246,6 +246,7 @@ public class ServiceRequestController {
 
     private void handleUserUpdateResponse(Response serverResponse){
         // Nothing to parse.
+        // TODO : decide what to do.
     }
 
     private void handleUserSearchResponse(Response serverResponse){
@@ -281,12 +282,14 @@ public class ServiceRequestController {
 
             // TODO : (Nico) Notify activity.
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
         }
     }
 
     private void handleGroupUpdateResponse(Response serverResponse){
         // No output.
+        // TODO : decide what to do.
     }
 
     private void handleGroupInfoResponse(Response serverResponse){
@@ -326,16 +329,31 @@ public class ServiceRequestController {
 
             // TODO : (Nico) notify activity.
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
         }
     }
 
     private void handlePublisherUpdateResponse(Response serverResponse){
-        // TODO
+        // Nothing to parse.
+        // TODO : decide what to do.
     }
 
     private void handlePublisherInfoResponse(Response serverResponse){
-        // TODO
+        try {
+            JSONObject response = serverResponse.getMessage();
+            long nid = response.getLong("nid");
+            String name = response.getString("name");
+            Byte[] pic = (Byte[]) response.get("pic");
+            JSONArray users = response.getJSONArray("users");
+            JSONArray nodes = response.getJSONArray("nodes");
+
+            // TODO : Create the instance when declared.
+            // TODO : (Nico) Notifiy activity.
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handlePublisherMessageResponse(Response serverResponse){
