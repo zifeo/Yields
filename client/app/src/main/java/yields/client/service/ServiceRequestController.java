@@ -211,7 +211,7 @@ public class ServiceRequestController {
     }
 
     private void handleUserInfoResponse(Response serverResponse) {
-        try {
+        /*try {
             if (YieldsApplication.getUser().getId().getId().equals(-1)){
                 YieldsApplication.getUser().update(serverResponse.getMessage());
                 JSONArray array = serverResponse.getMessage().getJSONArray("entourage");
@@ -223,13 +223,40 @@ public class ServiceRequestController {
                 }
             } else {
                 // TODO: uncomment when server improve response
-                /*
-                YieldsApplication.getUser()
-                    .addUserToEntourage(new User(serverResponse.getMessage()));
-                */
+                //
+                //YieldsApplication.getUser()
+                //    .addUserToEntourage(new User(serverResponse.getMessage()));
+                //
             }
 
         } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }*/
+
+        try {
+            JSONObject response = serverResponse.getMessage();
+            if (YieldsApplication.getUser().getId().getId().equals(-1)){
+                YieldsApplication.getUser().update(response);
+                JSONArray entourage = response.getJSONArray("entourage");
+                JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
+
+                if (entourage != null && entourageRefreshedAt != null){
+                    for (int i = 0; i < entourage.length(); i++) {
+                        // TODO : Improve this, add field in user  ?
+                        if (DateSerialization.dateSerializer.toDate(entourageRefreshedAt.getString(i)
+                        ).compareTo(new Date()) == -1){
+                            ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
+                                    new Id(entourage.getLong(i)));
+                            mService.sendRequest(userInfoRequest);
+                        }
+                    }
+                }
+            }
+            else {
+                // TODO
+            }
+        } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
@@ -322,6 +349,7 @@ public class ServiceRequestController {
      * @param serverResponse The Response received from the server.
      */
     private void handleNodeMessageResponse(Response serverResponse) {
+        // TODO : Handle errors JSONs
         try {
             JSONObject responseMessage = serverResponse.getMessage();
             JSONObject metadata = serverResponse.getMetadata();
