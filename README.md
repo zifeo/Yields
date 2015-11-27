@@ -14,13 +14,11 @@
 Node
  |--active
  |     |--Group (private)
- |     |--PublishNode
- |     |--RSSNode
+ |     |--Publish
+ |     |--RSS
  |
  |--passive
-       |--MediaNode
-       |--LinkNode 
-
+       |--Media
 ```
 
 ### Types
@@ -77,11 +75,6 @@ UserSearch
 ### Nodes actions
 
 ```
-NodeMessage
-	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
-	output	nid: NID, datetime: OffsetDateTime
-	rules	nid in nodes & authorization depends on nid "type"
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 NodeHistory
 	input	nid: NID, datetime: OffsetDateTime, count: Int
 	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[Option[String]], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
@@ -105,4 +98,48 @@ GroupUpdate
 	output	()
 	rules	nid in groups
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
+GroupInfo
+	input	nid: NID
+	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
+	rules	nid in nodes
+GroupMessage
+	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	output	nid: NID, datetime: OffsetDateTime
+	rules	nid in nodes
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+```
+
+### Publisher actions
+
+```
+PublisherCreate
+	input	name: String, users: Seq[UID], nodes: Seq[NID]
+	output	nid: NID
+	rules	users in entourage & (nodes "public" | nodes in groups)
+	bcast	nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]
+PublisherUpdate
+	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]
+	output	()
+	rules	nid in groups
+	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
+PublisherInfo
+	input	nid: NID
+	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
+	rules	nid in nodes
+PublisherMessage
+	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	output	nid: NID, datetime: OffsetDateTime
+	rules	nid in nodes
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+```
+
+### RSS actions
+
+```
+RSSCreate
+	input	name: String, url: String
+	output	nid: NID
+	bcast	nid: NID, name: String, url: String
+RSSMessage
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 ```
