@@ -2,9 +2,9 @@ package yields.server.router
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.ByteString
-import yields.server.actions.Result
+import yields.server.actions.{Broadcast, Result}
 import yields.server.dbi.models.UID
-import yields.server.mpi.{Metadata, Response}
+import yields.server.mpi.{Notification, Metadata, Response}
 import yields.server.pipeline.blocks.SerializationModule
 
 /**
@@ -54,7 +54,7 @@ final class Dispatcher() extends Actor with ActorLogging {
     case Notify(uids, result) =>
       log.debug(s"notify $uids with $result")
       val metadata = Metadata.now(0)
-      val push = OnPush(SerializationModule.serialize(Response(result, metadata)))
+      val push = OnPush(SerializationModule.serialize(Notification(result, metadata)))
       uids.flatMap(pool.get).foreach(_ ! push)
 
     case x =>
@@ -74,7 +74,7 @@ object Dispatcher {
   private[router] case class TerminateConnection()
 
   /** Sent each time a push notification is requested. */
-  private[server] case class Notify(uids: Seq[UID], result: Result)
+  private[server] case class Notify(uids: Seq[UID], result: Broadcast)
 
   /** Creates a dispatcher props . */
   def props: Props =

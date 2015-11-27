@@ -1,6 +1,6 @@
 package yields.server.actions
 
 /**
- * Every result yield by an action in the pipeline.
- */
+  * Every result yielded by an action.
+  */
 trait Result
