@@ -30,6 +30,7 @@ abstract class Node {
     val created_at = "created_at"
     val updated_at = "updated_at"
     val creator = "creator"
+    val node_pic = "pic_nid"
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
@@ -45,6 +46,7 @@ abstract class Node {
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[IncomingFeedContent]] = None
+  private var _pic: Option[NID] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -126,6 +128,17 @@ abstract class Node {
   /** Remove node */
   def removeNode(nid: NID): Boolean =
     hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
+
+  /** profile picture getter */
+  def pic: NID = _pic.getOrElse {
+    _pic = redis.withClient(_.hget[NID](NodeKey.node, NodeKey.node_pic))
+    valueOrException(_pic)
+  }
+
+  /** profile picture setter */
+  def pic_=(content: NID) = {
+    _pic = update(NodeKey.node_pic, content)
+  }
 
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
