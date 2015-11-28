@@ -7,6 +7,7 @@ import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.models.Media._
 import yields.server.utils.Config
+import scala.io._
 
 /**
   * Represent a media ressource
@@ -32,7 +33,6 @@ class Media private(nid: NID) extends Node(nid) {
 
   /** Media content getter */
   def content: Blob = {
-    import scala.io._
     // hydrate hash
     if (_hash.isEmpty) {
       hash
@@ -42,7 +42,7 @@ class Media private(nid: NID) extends Node(nid) {
       val p = _path.get
       val source = Source.fromFile(s"$p")
       val lines = try source.mkString finally source.close()
-      lines
+      lines.toCharArray.map(_.toByte)
     } else {
       throw new Exception("Content doesnt exist on disk")
     }
@@ -65,7 +65,7 @@ class Media private(nid: NID) extends Node(nid) {
 
       if (checkFileExist(_hash.get)) {
         val pw = new PrintWriter(new File(p))
-        pw.write(content)
+        pw.write(content.toCharArray)
         pw.close()
       } else {
         throw new Exception("Error creating the file on disk")

@@ -30,7 +30,7 @@ case class GroupCreate(name: String, users: List[UID], nodes: List[NID]) extends
 
     // TODO: check public node
 
-    val group = Group.createGroup(name, sender)
+    val group = Group.create(name, sender)
     group.addUser(users)
 
     if (nodes.nonEmpty) {

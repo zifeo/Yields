@@ -2,65 +2,53 @@ package yields.server.actions.groups
 
 import org.scalatest.Matchers
 import yields.server._
-import yields.server.actions.exceptions.ActionArgumentException
+import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.dbi._
-import yields.server.dbi.models.{Group, Node, User}
+import yields.server.dbi.models._
 import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
 
-/**
-  * Test if GroupCreate action performed well
-  * TODO test GroupCreate without users
-  */
 class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = sample[Metadata]
+  "GroupCreate" should "create a group" in {
 
-  it should "create a group" in {
-    val u = User.create("email@email.com")
-    val meta = new Metadata(u.uid, Temporal.now, Temporal.now)
-    val users: List[User] = List(
-      User.create("e1@epfl.ch"),
-      User.create("e2@epfl.ch"),
-      User.create("e3@epfl.ch"),
-      User.create("e4@epfl.ch")
-    )
-    val nodes: List[Node] = List(
-      Group.createGroup("g1", m.client),
-      Group.createGroup("g2", m.client),
-      Group.createGroup("g3", m.client)
-    )
-    Tag.createTag("sport")
-    val tags: List[String] = List("tennis", "sport", "fun")
-    val action = GroupCreate("GroupName", nodes.map(_.nid), users.map(_.uid), tags, "private")
+    val user = User.create("email@email.com")
+    val meta = Metadata.now(user.uid)
+
+    val users = sample[List[UID]]
+    val nodes = sample[List[NID]]
+    user.addEntourage(users)
+
+    val action = GroupCreate("GroupName", users, nodes)
 
     action.run(meta) match {
       case GroupCreateRes(nid) =>
-        val g = Group(nid)
-        g.users.toSet should be (users.map(_.uid).toSet + u.uid)
-        g.name should be ("GroupName")
-        //g.nodes.toSet should be(nodes.map(_.nid).toSet)
-        val tids = tags.flatMap((x: String) => Tag.getIdFromText(x))
-        Tag.getIdFromText("tennis").isDefined should be (true)
-        Tag.getIdFromText("fun").isDefined should be (true)
-        Tag.getIdFromText("sport").isDefined should be (true)
-        val creator = User(u.uid)
-        creator.groups should contain (nid)
+        val group = Group(nid)
+        group.name should be ("GroupName")
+        group.users should contain theSameElementsAs users.distinct
+        group.nodes should contain theSameElementsAs nodes.distinct
+        group.creator should be (user.uid)
+        user.groups should contain only nid
     }
   }
 
-  "running groupCreate without name" should "throw an exception" in {
-    val users: List[User] = List(
-      User.create("e12@email.com"),
-      User.create("e22@email.com"),
-      User.create("e32@email.com"),
-      User.create("e42@email.com"))
-    val nodes: List[Node] = List(Group.createGroup("g1", m.client), Group.createGroup("g2", m.client), Group.createGroup("g3", m.client))
-    val tags: List[String] = List("music", "acdc")
-    val action = new GroupCreate("", nodes.map(_.nid), users.map(_.uid), tags, "private")
-    an[ActionArgumentException] should be thrownBy action.run(m)
+  it should "not accept adding users out of entourage" in {
+
+    val user = User.create("email@email.com")
+    val meta = Metadata.now(user.uid)
+
+    val users = sample[List[UID]]
+    val action = new GroupCreate("GroupName", users, List.empty)
+
+    val thrown = the [UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include (user.uid.toString)
+
   }
 
+  it should "not accept adding private node" in {
+
+  }
 
 }
+

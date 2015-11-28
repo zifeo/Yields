@@ -23,7 +23,7 @@ class TestNodeHistory extends DBFlatSpec with Matchers with AllGenerators {
 
     val number = 20
     val user = 0
-    val group = Group.createGroup("name",user)
+    val group = Group.create("name",user)
     val messages = sendMessage(group.nid, number)
 
     val kept = messages.sortBy(_._1).takeRight(number / 2)
@@ -47,7 +47,7 @@ class TestNodeHistory extends DBFlatSpec with Matchers with AllGenerators {
   it should "not accept if user does not belong to the node" in {
 
     val meta = Metadata.now(0)
-    val group = Group.createGroup("name", meta.client)
+    val group = Group.create("name", meta.client)
     val action =  NodeHistory(group.nid, Temporal.now, 1)
     val otherMeta = Metadata.now(meta.client + 1)
 

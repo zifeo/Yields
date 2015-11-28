@@ -87,7 +87,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
     clientB.send(UserConnect("clientB@yields.im"))
     await(clientB.receive()).result should be (UserConnectRes(2, returning = false))
 
-    clientA.send(GroupCreate("clients", List.empty, List(1, 2), List.empty, "private"))
+    //clientA.send(GroupCreate("clients", List.empty, List(1, 2), List.empty, "private"))
     //await(clientA.receive()).result should be (GroupCreateRes(3))
 
     //val ref = clientB.send(NodeMessage(1, Some("hello"), None, None))

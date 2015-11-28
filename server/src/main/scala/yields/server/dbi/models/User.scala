@@ -75,11 +75,11 @@ final class User private (val uid: UID) {
   /** Picture getter. TODO: format to be determined. */
   def pic: Blob = _pic.getOrElse {
     _pic = redis(_.hget[Blob](Key.user, StaticKey.pic))
-    valueOrDefault(_pic, "")
+    valueOrDefault(_pic, Array.empty)
   }
 
   /** Picture setter. */
-  def pic_=(newPic: String): Unit =
+  def pic_=(newPic: Blob): Unit =
     _pic = update(StaticKey.pic, newPic)
 
   /** Creation datetime getter. */
@@ -179,7 +179,6 @@ final class User private (val uid: UID) {
       .getOrElse(throw new IllegalValueException("node should have some data"))
     _name = values.get(StaticKey.name)
     _email = values.get(StaticKey.email)
-    _pic = values.get(StaticKey.pic)
     _created_at = values.get(StaticKey.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(StaticKey.updated_at).map(OffsetDateTime.parse)
   }

@@ -19,6 +19,10 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x) == x
   }
 
+  property("GroupCreateBrd") = forAll { (x: GroupCreateBrd) =>
+    toAndFromJson(x) == x
+  }
+
   property("GroupUpdate") = forAll { (x: GroupUpdate) =>
     toAndFromJson(x) == x
   }
@@ -27,15 +31,28 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x) == x
   }
 
-  /*
-   property("NodeMessage") = forAll { (x: NodeMessage) =>
+  property("GroupUpdateBrd") = forAll { (x: GroupUpdateBrd) =>
     toAndFromJson(x) == x
   }
 
-  property("NodeMessageRes") = forAll { (x: NodeMessageRes) =>
+  property("GroupInfo") = forAll { (x: GroupInfo) =>
     toAndFromJson(x) == x
   }
 
-   */
+  property("GroupInfoRes") = forAll { (x: GroupInfoRes) =>
+    toAndFromJson(x) == x
+  }
+
+  property("GroupMessage") = forAll { (x: GroupMessage) =>
+    toAndFromJson(x) == x
+  }
+
+  property("GroupMessageRes") = forAll { (x: GroupMessageRes) =>
+    toAndFromJson(x) == x
+  }
+
+  property("GroupMessageBrd") = forAll { (x: GroupMessageBrd) =>
+    toAndFromJson(x) == x
+  }
 
 }
