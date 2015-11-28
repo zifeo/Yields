@@ -54,7 +54,7 @@ case class UserUpdate(email: Option[Email],
       user.removeEntourage(removeEntourage)
     }
 
-    Yields.broadcast(user.entourage) {
+    Yields.broadcast(user.entourage.filter(_ != user.uid)) {
       UserUpdateBrd(user.uid, user.email, user.name, user.pic)
     }
 

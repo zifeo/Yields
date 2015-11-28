@@ -48,7 +48,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
 
     assert(node.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse(""))))
 
-    Yields.broadcast(node.users) {
+    Yields.broadcast(node.users.filter(_ != sender)) {
       broadcast(datetime, sender)
     }
 

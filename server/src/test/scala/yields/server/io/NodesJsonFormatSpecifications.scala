@@ -10,19 +10,19 @@ object NodesJsonFormatSpecifications extends Properties("NodesJsonFormat") with 
   import Prop.forAll
 
   property("NodeHistory") = forAll { (x: NodeHistory) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("NodeHistoryRes") = forAll { (x: NodeHistoryRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("NodeSearch") = forAll { (x: NodeSearch) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("NodeSearchRes") = forAll { (x: NodeSearchRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
 }

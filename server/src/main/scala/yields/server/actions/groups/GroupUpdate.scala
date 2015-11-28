@@ -58,7 +58,7 @@ case class GroupUpdate(nid: NID,
       group.removeNode(removeNodes)
     }
 
-    Yields.broadcast(group.users) {
+    Yields.broadcast(group.users.filter(_ != sender)) {
       GroupUpdateBrd(group.nid, group.name, Array.empty, group.users, group.nodes)
     }
 

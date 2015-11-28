@@ -35,7 +35,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case x: UserGroupListRes => packWithKind(x)
       case x: UserInfoRes => packWithKind(x)
 
-      case _ => serializationError(s"unregistered action kind: $kind")
+      case _ => serializationError(s"unregistered result kind: $kind")
     }
   }
 
@@ -67,9 +67,9 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "UserGroupListRes" => message.convertTo[UserGroupListRes]
           case "UserInfoRes" => message.convertTo[UserInfoRes]
 
-          case _ => deserializationError(s"unregistered action kind: $kind")
+          case _ => deserializationError(s"unregistered result kind: $kind")
         }
-      case _ => deserializationError(s"bad action format: $json")
+      case _ => deserializationError(s"bad result format: $json")
     }
 
 }
