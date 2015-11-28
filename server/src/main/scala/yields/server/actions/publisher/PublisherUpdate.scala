@@ -20,7 +20,7 @@ import yields.server.mpi.Metadata
   *
   * TODO update picture
   */
-case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID],
+case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], addUsers: Seq[UID],
                       removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]) extends Action {
   /**
     * Run the action given the sender.
