@@ -10,47 +10,47 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
   import Prop.forAll
 
   property("UserConnect") = forAll { (x: UserConnect) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserConnectRes") = forAll { (x: UserConnectRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserUpdate") = forAll { (x: UserUpdate) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserUpdateRes") = forAll { (x: UserUpdateRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserUpdateBrd") = forAll { (x: UserUpdateBrd) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserGroupList") = forAll { (x: UserGroupList) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserGroupListRes") = forAll { (x: UserGroupListRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserInfo") = forAll { (x: UserGroupListRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserInfoRes") = forAll { (x: UserGroupListRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserSearch") = forAll { (x: UserSearch) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("UserSearchRes") = forAll { (x: UserSearchRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
 }

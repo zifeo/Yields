@@ -22,9 +22,13 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
   override def write(obj: Broadcast): JsValue = {
     val kind = obj.getClass.getSimpleName
     obj match {
+      case x: GroupCreateBrd => packWithKind(x)
+      case x: GroupUpdateBrd => packWithKind(x)
+      case x: GroupMessageBrd => packWithKind(x)
+
       case x: UserUpdateBrd => packWithKind(x)
 
-      case _ => serializationError(s"unregistered action kind: $kind")
+      case _ => serializationError(s"unregistered broadcast kind: $kind")
     }
   }
 
@@ -43,11 +47,15 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
     json.asJsObject.getFields(kindFld, messageFld) match {
       case Seq(JsString(kind), message) =>
         kind match {
+          case "GroupCreateBrd" => message.convertTo[GroupCreateBrd]
+          case "GroupUpdateBrd" => message.convertTo[GroupUpdateBrd]
+          case "GroupMessageBrd" => message.convertTo[GroupMessageBrd]
+
           case "UserUpdateBrd" => message.convertTo[UserUpdateBrd]
 
-          case _ => deserializationError(s"unregistered action kind: $kind")
+          case _ => deserializationError(s"unregistered broadcast kind: $kind")
         }
-      case _ => deserializationError(s"bad action format: $json")
+      case _ => deserializationError(s"bad broadcast format: $json")
     }
 
 }

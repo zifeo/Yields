@@ -12,47 +12,47 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
   import Prop.forAll
 
   property("GroupCreate") = forAll { (x: GroupCreate) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupCreateRes") = forAll { (x: GroupCreateRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupCreateBrd") = forAll { (x: GroupCreateBrd) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupUpdate") = forAll { (x: GroupUpdate) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupUpdateRes") = forAll { (x: GroupUpdateRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupUpdateBrd") = forAll { (x: GroupUpdateBrd) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupInfo") = forAll { (x: GroupInfo) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupInfoRes") = forAll { (x: GroupInfoRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupMessage") = forAll { (x: GroupMessage) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupMessageRes") = forAll { (x: GroupMessageRes) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("GroupMessageBrd") = forAll { (x: GroupMessageBrd) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
 }
