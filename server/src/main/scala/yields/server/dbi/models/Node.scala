@@ -38,6 +38,7 @@ class Node protected (val nid: NID) {
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
+  private var _pic: Option[NID] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -140,6 +141,17 @@ class Node protected (val nid: NID) {
   def removeNode(oldNode: List[NID]): Boolean =
     remWithTime(NodeKey.nodes, oldNode)
 
+  /** profile picture getter */
+  def pic: NID = _pic.getOrElse {
+    _pic = redis.withClient(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
+    valueOrException(_pic)
+  }
+
+  /** profile picture setter */
+  def pic_=(content: NID) = {
+    _pic = update(StaticNodeKey.node_pic, content)
+  }
+
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
     _feed = redis(_.zrangebyscore[FeedContent](
@@ -180,6 +192,7 @@ object Node {
     val created_at = "created_at"
     val updated_at = "updated_at"
     val creator = "creator"
+    val node_pic = "pic_nid"
   }
 
   /** Node constructor. */
