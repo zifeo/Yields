@@ -2,7 +2,7 @@ package yields.server.actions.nodes
 
 import org.scalatest.Matchers
 import yields.server.AllGenerators
-import yields.server.actions.groups.{GroupCreate, GroupCreateRes}
+import yields.server.actions.groups.{NodeMessage, GroupCreate, GroupCreateRes}
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata

@@ -20,7 +20,7 @@ import yields.server.utils.Temporal
   * nodes:[nid]:nodes Map[NID, OffsetDateTIme] with score datetime
   * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
   */
-abstract class Node {
+class Node protected (val nid: NID) {
 
   object NodeKey {
     val node = s"nodes:$nid"
@@ -28,8 +28,6 @@ abstract class Node {
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
   }
-
-  val nid: NID
 
   private var _name: Option[String] = None
   private var _kind: Option[String] = None
@@ -39,7 +37,7 @@ abstract class Node {
   private var _creator: Option[UID] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
-  private var _feed: Option[List[IncomingFeedContent]] = None
+  private var _feed: Option[List[FeedContent]] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -143,8 +141,8 @@ abstract class Node {
     remWithTime(NodeKey.nodes, oldNode)
 
   /** Get n messages starting from some point */
-  def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
-    _feed = redis(_.zrangebyscore[IncomingFeedContent](
+  def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
+    _feed = redis(_.zrangebyscore[FeedContent](
       NodeKey.feed,
       min = Temporal.minimum.toEpochSecond,
       max = datetime.toEpochSecond,
@@ -155,7 +153,7 @@ abstract class Node {
   }
 
   /** Add message */
-  def addMessage(content: IncomingFeedContent): Boolean = {
+  def addMessage(content: FeedContent): Boolean = {
     valueOrException(redis(_.zadd(NodeKey.feed, content._1.toEpochSecond, content))) == 1
   }
 
@@ -182,6 +180,11 @@ object Node {
     val created_at = "created_at"
     val updated_at = "updated_at"
     val creator = "creator"
+  }
+
+  /** Node constructor. */
+  def apply(nid: NID): Node = {
+    new Node(nid)
   }
 
 }

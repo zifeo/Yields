@@ -4,7 +4,8 @@ import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
 import yields.server.DefaultsGenerators
-import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes, NodeMessage, NodeMessageRes}
+import yields.server.actions.groups.{NodeMessageRes, NodeMessage}
+import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes}
 import yields.server.dbi.models._
 
 trait NodesGenerators extends DefaultsGenerators {
@@ -31,8 +32,12 @@ trait NodesGenerators extends DefaultsGenerators {
   implicit lazy val nodeHistoryResArb: Arbitrary[NodeHistoryRes] = Arbitrary {
     for {
       nid <- arbitrary[NID]
-      nodes <- arbitrary[List[ResponseFeedContent]]
-    } yield NodeHistoryRes(nid, nodes)
+      datetimes <- arbitrary[List[OffsetDateTime]]
+      senders <- arbitrary[List[UID]]
+      texts <- arbitrary[List[String]]
+      contentTypes <- arbitrary[List[Option[String]]]
+      content <- arbitrary[List[Option[Blob]]]
+    } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
   }
 
   implicit lazy val nodeMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {

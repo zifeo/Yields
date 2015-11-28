@@ -4,7 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
-import yields.server.actions.nodes.{NodeHistoryRes, NodeMessageRes}
+import yields.server.actions.nodes.NodeHistoryRes
 import yields.server.actions.users._
 import yields.server.io._
 

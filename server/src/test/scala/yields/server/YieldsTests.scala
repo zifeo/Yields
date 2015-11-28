@@ -6,7 +6,6 @@ import org.scalatest.{BeforeAndAfterAll, Matchers}
 import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.actions.groups._
-import yields.server.actions.nodes.NodeMessage
 import yields.server.actions.users.{UserConnect, UserConnectRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._

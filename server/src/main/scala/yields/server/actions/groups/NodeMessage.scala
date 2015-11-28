@@ -1,8 +1,7 @@
-package yields.server.actions.nodes
+package yields.server.actions.groups
 
 import java.time.OffsetDateTime
 
-import yields.server.Yields
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._

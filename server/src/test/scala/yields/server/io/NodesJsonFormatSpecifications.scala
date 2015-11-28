@@ -4,7 +4,7 @@ import org.scalacheck.{Prop, Properties}
 import yields.server._
 import yields.server.actions.{NodesGenerators, GroupsGenerators}
 import yields.server.actions.groups._
-import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes, NodeMessage, NodeMessageRes}
+import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes}
 
 object NodesJsonFormatSpecifications extends Properties("NodesJsonFormat") with NodesGenerators {
 

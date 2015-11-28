@@ -4,7 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
-import yields.server.actions.nodes.{NodeHistoryRes, NodeMessageRes}
+import yields.server.actions.nodes.{NodeSearchRes, NodeHistoryRes}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -24,7 +24,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
     obj match {
       case x: GroupCreateRes => packWithKind(x)
       case x: GroupUpdateRes => packWithKind(x)
-      case x: GroupSearchRes => packWithKind(x)
+      case x: NodeSearchRes => packWithKind(x)
       case x: GroupManageRes => packWithKind(x)
       case x: NodeMessageRes => packWithKind(x)
       case x: NodeHistoryRes => packWithKind(x)
@@ -55,7 +55,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
         kind match {
           case "GroupCreateRes" => message.convertTo[GroupCreateRes]
           case "GroupUpdateRes" => message.convertTo[GroupUpdateRes]
-          case "GroupSearchRes" => message.convertTo[GroupSearchRes]
+          case "GroupSearchRes" => message.convertTo[NodeSearchRes]
           case "GroupManageRes" => message.convertTo[GroupManageRes]
           case "NodeMessageRes" => message.convertTo[NodeMessageRes]
           case "NodeHistoryRes" => message.convertTo[NodeHistoryRes]
