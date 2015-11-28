@@ -148,7 +148,7 @@ class Node protected (val nid: NID) {
       max = datetime.toEpochSecond,
       limit = Some((0, count)),
       sortAs = DESC
-    ))
+    )).map(_.reverse)
     valueOrException(_feed)
   }
 

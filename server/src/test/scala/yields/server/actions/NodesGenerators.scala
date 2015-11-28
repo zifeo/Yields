@@ -4,8 +4,7 @@ import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
 import yields.server.DefaultsGenerators
-import yields.server.actions.groups.{NodeMessageRes, NodeMessage}
-import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes}
+import yields.server.actions.nodes._
 import yields.server.dbi.models._
 
 trait NodesGenerators extends DefaultsGenerators {
@@ -20,15 +19,6 @@ trait NodesGenerators extends DefaultsGenerators {
     } yield NodeHistory(nid, date, count)
   }
 
-  implicit lazy val nodeMessageArb: Arbitrary[NodeMessage] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      text <- arbitrary[Option[String]]
-      contentType <- arbitrary[Option[String]]
-      content <- arbitrary[Option[Blob]]
-    } yield NodeMessage(nid, text, contentType, content)
-  }
-
   implicit lazy val nodeHistoryResArb: Arbitrary[NodeHistoryRes] = Arbitrary {
     for {
       nid <- arbitrary[NID]
@@ -40,11 +30,18 @@ trait NodesGenerators extends DefaultsGenerators {
     } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
   }
 
-  implicit lazy val nodeMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
+  implicit lazy val groupSearchArb: Arbitrary[NodeSearch] = Arbitrary {
     for {
-      nid <- arbitrary[NID]
-      datetime <- arbitrary[OffsetDateTime]
-    } yield NodeMessageRes(nid, datetime)
+      pattern <- arbitrary[String]
+    } yield NodeSearch(pattern)
+  }
+
+  implicit lazy val groupSearchResArb: Arbitrary[NodeSearchRes] = Arbitrary {
+    for {
+      nodes <- arbitrary[List[NID]]
+      names <- arbitrary[List[String]]
+      pics <- arbitrary[List[Blob]]
+    } yield NodeSearchRes(nodes, names, pics)
   }
 
 }

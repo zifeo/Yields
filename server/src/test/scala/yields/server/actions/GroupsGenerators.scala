@@ -40,16 +40,22 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     GroupUpdateRes()
   }
 
-  implicit lazy val groupSearchArb: Arbitrary[NodeSearch] = Arbitrary {
+  /*
+  implicit lazy val nodeMessageArb: Arbitrary[NodeMessage] = Arbitrary {
     for {
-      pattern <- arbitrary[String]
-    } yield NodeSearch(pattern)
+      nid <- arbitrary[NID]
+      text <- arbitrary[Option[String]]
+      contentType <- arbitrary[Option[String]]
+      content <- arbitrary[Option[Blob]]
+    } yield NodeMessage(nid, text, contentType, content)
   }
 
-  implicit lazy val groupSearchResArb: Arbitrary[NodeSearchRes] = Arbitrary {
+  implicit lazy val nodeMessageResArb: Arbitrary[NodeMessageRes] = Arbitrary {
     for {
-      res <- arbitrary[Seq[(NID, String)]]
-    } yield NodeSearchRes(res)
+      nid <- arbitrary[NID]
+      datetime <- arbitrary[OffsetDateTime]
+    } yield NodeMessageRes(nid, datetime)
   }
+   */
 
 }
