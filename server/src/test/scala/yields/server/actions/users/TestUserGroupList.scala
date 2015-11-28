@@ -6,7 +6,7 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
-class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
+class TestUserGroupList extends DBFlatSpec with Matchers {
 
   "UserGroupList" should "return empty list when the group list is empty" in {
 
