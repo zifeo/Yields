@@ -1,19 +1,18 @@
 package yields.server.actions.groups
 
-import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.actions.{Action, Result}
+import yields.server.Yields
+import yields.server.actions.exceptions.UnauthorizedActionException
+import yields.server.actions.{Action, Broadcast, Result}
 import yields.server.dbi.models._
-import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
 
 /**
   * Creation of a named group including some nodes
   * @param name group name
-  * @param nodes grouped nodes
   * @param users users to put in the group
-  * @param visibility private or public
+  * @param nodes grouped nodes
   */
-case class GroupCreate(name: String, nodes: List[NID], users: List[UID], tags: List[String], visibility: String) extends Action {
+case class GroupCreate(name: String, users: List[UID], nodes: List[NID]) extends Action {
 
   /**
     * Run the action given the sender.
@@ -21,30 +20,31 @@ case class GroupCreate(name: String, nodes: List[NID], users: List[UID], tags: L
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    if (!name.isEmpty) {
-      if (visibility == "private" || visibility == "public") {
 
-        val group = Group.createGroup(name, metadata.client)
-        //group.addNode(nodes)
-        group.addUser(metadata.client +: users)
+    val user = User(metadata.client)
+    val entourage = user.entourage
+    val sender = metadata.client
 
-        /** Create or get tags id */
-        val tids  = tags.map { text =>
-          Tag.getIdFromText(text).getOrElse(Tag.createTag(text).tid)
-        }
+    if (! users.forall(entourage.contains))
+      throw new UnauthorizedActionException(s"not all users are $sender entourage: $users")
 
-        val user = User(metadata.client)
-        user.addGroup(group.nid)
+    // TODO: check public node
 
-        GroupCreateRes(group.nid)
-      } else {
-        val errorMessage = getClass.getSimpleName
-        throw new ActionArgumentException(s"Bad visibility : $visibility in : $errorMessage")
-      }
-    } else {
-      val errorMessage = getClass.getSimpleName
-      throw new ActionArgumentException(s"Empty name : $errorMessage")
+    val group = Group.createGroup(name, sender)
+    group.addUser(users)
+
+    if (nodes.nonEmpty) {
+      group.addNode(nodes)
     }
+
+    user.addGroup(group.nid)
+
+    Yields.broadcast(group.users) {
+      GroupCreateBrd(group.nid, name, users, nodes)
+    }
+
+    GroupCreateRes(group.nid)
+
   }
 
 }
@@ -54,3 +54,12 @@ case class GroupCreate(name: String, nodes: List[NID], users: List[UID], tags: L
   * @param nid the nid of newly created group
   */
 case class GroupCreateRes(nid: NID) extends Result
+
+/**
+  * [[GroupCreate]] broadcast.
+  * @param nid new group id
+  * @param name new group name
+  * @param users new group users
+  * @param nodes new group nodes
+  */
+case class GroupCreateBrd(nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]) extends Broadcast
