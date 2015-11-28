@@ -81,7 +81,7 @@ UserSearch
 ```
 NodeHistory
 	input	nid: NID, datetime: OffsetDateTime, count: Int
-	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[Option[String]], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
+	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[String], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
 	rules	count > 0 & nid in nodes & senders in entourage
 NodeSearch
 	input	pattern: String

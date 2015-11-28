@@ -18,7 +18,7 @@ import yields.server.utils.Config
   *            nodes:[nid]   -> hash  hash / path / contentType
   *
   */
-class Media private(override val nid: NID) extends Node {
+class Media private(nid: NID) extends Node(nid) {
 
   object MediaKey {
     val hash = "hash"

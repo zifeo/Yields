@@ -5,6 +5,7 @@ import java.time.OffsetDateTime
 import org.scalacheck._
 import yields.server._
 import yields.server.actions.groups._
+import yields.server.actions.nodes.{NodeSearchRes, NodeSearch}
 import yields.server.dbi.models._
 
 trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
@@ -39,16 +40,16 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     GroupUpdateRes()
   }
 
-  implicit lazy val groupSearchArb: Arbitrary[GroupSearch] = Arbitrary {
+  implicit lazy val groupSearchArb: Arbitrary[NodeSearch] = Arbitrary {
     for {
       pattern <- arbitrary[String]
-    } yield GroupSearch(pattern)
+    } yield NodeSearch(pattern)
   }
 
-  implicit lazy val groupSearchResArb: Arbitrary[GroupSearchRes] = Arbitrary {
+  implicit lazy val groupSearchResArb: Arbitrary[NodeSearchRes] = Arbitrary {
     for {
       res <- arbitrary[Seq[(NID, String)]]
-    } yield GroupSearchRes(res)
+    } yield NodeSearchRes(res)
   }
 
 }

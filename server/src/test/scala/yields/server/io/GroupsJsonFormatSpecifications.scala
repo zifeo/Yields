@@ -5,7 +5,7 @@ import spray.json.JsonFormat
 import yields.server._
 import yields.server.actions.GroupsGenerators
 import yields.server.actions.groups._
-import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory, NodeMessageRes, NodeMessage}
+import yields.server.actions.nodes.{NodeSearchRes, NodeSearch, NodeHistoryRes, NodeHistory}
 
 object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") with GroupsGenerators {
 
@@ -27,11 +27,11 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x) == x
   }
 
-  property("GroupSearch") = forAll { (x: GroupSearch) =>
+  property("GroupSearch") = forAll { (x: NodeSearch) =>
     toAndFromJson(x) == x
   }
 
-  property("GroupSearchRes") = forAll { (x: GroupSearchRes) =>
+  property("GroupSearchRes") = forAll { (x: NodeSearchRes) =>
     toAndFromJson(x) == x
   }
 

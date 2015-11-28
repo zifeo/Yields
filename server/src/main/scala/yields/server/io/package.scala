@@ -14,7 +14,6 @@ import yields.server.mpi.Metadata
   */
 package object io {
 
-  // TODO: verify laziness utility
   implicit lazy val offsetDateTimeJF = OffsetDateTimeJsonFormat
 
   /** *** Models *****/
@@ -37,8 +36,8 @@ package object io {
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
 
-  implicit lazy val groupSearchJF = jsonFormat1(GroupSearch)
-  implicit lazy val groupSearchResJF = jsonFormat1(GroupSearchRes)
+  implicit lazy val groupSearchJF = jsonFormat1(NodeSearch)
+  implicit lazy val groupSearchResJF = jsonFormat1(NodeSearchRes)
 
   implicit lazy val groupManageJF = jsonFormat5(GroupManage)
   implicit lazy val groupManageResJF = jsonFormat0(GroupManageRes)
@@ -49,7 +48,7 @@ package object io {
   implicit lazy val nodeMessageResJF = jsonFormat2(NodeMessageRes)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
-  implicit lazy val nodeHistoryResJF = jsonFormat2(NodeHistoryRes)
+  implicit lazy val nodeHistoryResJF = jsonFormat6(NodeHistoryRes)
 
   // Users
 

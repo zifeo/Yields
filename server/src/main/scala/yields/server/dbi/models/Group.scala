@@ -11,7 +11,7 @@ import com.redis.serialization.Parse.Implicits._
   *
   * @param nid Node id to build
   */
-final class Group private (override val nid: NID) extends Node
+final class Group private (nid: NID) extends Node(nid)
 
 /**
   * Companion object for Group
