@@ -76,35 +76,35 @@ class Media private(override val nid: NID) extends Node {
   }
 
   def hash: String = _hash.getOrElse {
-    _hash = redis.withClient(_.hget[String](NodeKey.node, MediaKey.hash))
+    _hash = redis(_.hget[String](NodeKey.node, MediaKey.hash))
     valueOrException(_hash)
   }
 
   /** Store the hash in the database to easily retrieve the content from the disk */
   private def hash_=(hash: String): Unit = {
-    redis.withClient(_.hset(NodeKey.node, MediaKey.hash, hash))
+    redis(_.hset(NodeKey.node, MediaKey.hash, hash))
     _hash = Some(hash)
     path = _hash.get
   }
 
   private def contentType_=(contentType: String): Unit = {
-    redis.withClient(_.hset(NodeKey.node, MediaKey.contentType, contentType))
+    redis(_.hset(NodeKey.node, MediaKey.contentType, contentType))
     _contentType = Some(contentType)
   }
 
   def contentType: String = _contentType.getOrElse {
-    _contentType = redis.withClient(_.hget[String](NodeKey.node, MediaKey.contentType))
+    _contentType = redis(_.hget[String](NodeKey.node, MediaKey.contentType))
     valueOrException(_contentType)
   }
 
   def path: String = _path.getOrElse {
-    _path = redis.withClient(_.hget[String](NodeKey.node, MediaKey.path))
+    _path = redis(_.hget[String](NodeKey.node, MediaKey.path))
     valueOrException(_path)
   }
 
   private def path_=(hash: String): Unit = {
     val path = buildPathFromName(hash)
-    redis.withClient(_.hset(NodeKey.node, MediaKey.path, path))
+    redis(_.hset(NodeKey.node, MediaKey.path, path))
     _path = Some(path)
   }
 

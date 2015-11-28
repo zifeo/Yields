@@ -42,7 +42,7 @@ abstract class Node {
 
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.withClient(_.hget[String](NodeKey.node, StaticNodeKey.name))
+    _name = redis(_.hget[String](NodeKey.node, StaticNodeKey.name))
     valueOrDefault(_name, "")
   }
 
@@ -53,13 +53,13 @@ abstract class Node {
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
     val updates = List((field, value), (StaticNodeKey.updated_at, Temporal.now))
-    redis.withClient(_.hmset(NodeKey.node, updates))
+    redis(_.hmset(NodeKey.node, updates))
     Some(value)
   }
 
   /** Kind getter. */
   def kind: String = _kind.getOrElse {
-    _kind = redis.withClient(_.hget[String](NodeKey.node, StaticNodeKey.kind))
+    _kind = redis(_.hget[String](NodeKey.node, StaticNodeKey.kind))
     valueOrException(_kind)
   }
 
@@ -70,25 +70,25 @@ abstract class Node {
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.created_at))
+    _created_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.created_at))
     valueOrException(_created_at)
   }
 
   /** Update datetime getter. */
   def updated_at: OffsetDateTime = _updated_at.getOrElse {
-    _updated_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.updated_at))
+    _updated_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.updated_at))
     valueOrException(_updated_at)
   }
 
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
-    _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.refreshed_at))
+    _refreshed_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.refreshed_at))
     valueOrDefault(_refreshed_at, Temporal.minimum)
   }
 
   /** creator getter */
   def creator: UID = {
-    _creator = redis.withClient(_.hget[UID](NodeKey.node, StaticNodeKey.creator))
+    _creator = redis(_.hget[UID](NodeKey.node, StaticNodeKey.creator))
     valueOrDefault(_creator, 0)
   }
 
@@ -99,62 +99,51 @@ abstract class Node {
 
   /** Users getter */
   def users: List[UID] = _users.getOrElse {
-    _users = redis.withClient(_.zrange[UID](NodeKey.users, 0, -1))
+    _users = redis(_.zrange[UID](NodeKey.users, 0, -1))
     valueOrDefault(_users, List.empty)
   }
 
-  /** Remove user */
-  def removeUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.users, id)))
+  /** Add user. */
+  def addUser(newUser: UID): Boolean =
+    zaddWithTime(NodeKey.users, newUser)
 
-  /** Nodes getter */
+  /** Add multiple users. */
+  def addUser(newUsers: List[UID]): Boolean =
+    zaddWithTime(NodeKey.users, newUsers)
+
+  /** Remove user. */
+  def removeUser(oldUser: UID): Boolean =
+    zremWithTime(NodeKey.users, oldUser)
+
+  /** Remove multiple users. */
+  def removeUser(oldUsers: List[UID]): Boolean =
+    zremWithTime(NodeKey.users, oldUsers)
+
+  /** Nodes getter. */
   def nodes: List[NID] = _nodes.getOrElse {
-    _nodes = redis.withClient(_.zrange[NID](NodeKey.nodes, 0, -1))
+    _nodes = redis(_.zrange[NID](NodeKey.nodes, 0, -1))
     valueOrDefault(_nodes, List.empty)
   }
 
-  /** Add node */
-  def addNode(nid: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.nodes, Temporal.now.toEpochSecond, nid)))
+  /** Add node. */
+  def addNode(newNode: NID): Boolean =
+    zaddWithTime(NodeKey.nodes, newNode)
 
-  /** Add user */
-  def addUser(id: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.users, Temporal.now.toEpochSecond, id)))
+  /** Add multiple nodes. */
+  def addNode(newNodes: List[NID]): Boolean =
+    zaddWithTime(NodeKey.nodes, newNodes)
 
-  /** Add multiple users to the group */
-  def addUser(newUsers: Seq[UID]): Long = {
-    if (newUsers.isEmpty) 0
-    else {
-      val dateTime = Temporal.now.toEpochSecond.toDouble
-      val pairs = newUsers.zipWithIndex.map { case (u, i) =>
-        dateTime + i -> u
-      }
-      valueOrException(redis.withClient(_.zadd(NodeKey.users, pairs.head._1, pairs.head._2, pairs.tail: _*)))
-    }
-  }
-
-  /** Add multiple nodes to the group. */
-  def addNode(newNodes: Seq[NID]): Unit = {
-    if (newNodes.nonEmpty) {
-      val dateTime = Temporal.now.toEpochSecond.toDouble
-      val pairs = newNodes.zipWithIndex.map { case (u, i) =>
-        dateTime + i -> u
-      }
-      redis.withClient(_.zadd(NodeKey.nodes, pairs.head._1, pairs.head._2, pairs.tail: _*))
-    }
-  }
-
-  /** Remove node */
+  /** Remove node. */
   def removeNode(oldNode: NID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(NodeKey.nodes, Temporal.now.toEpochSecond, oldNode)))
+    zremWithTime(NodeKey.nodes, oldNode)
 
-  /** Remove multiple nodes */
-  def removeNode(oldNodes: Seq[NID]): Unit =
-    redis.withClient(_.zrem(NodeKey.nodes, oldNodes))
+  /** Remove multiple nodes. */
+  def removeNode(oldNode: List[NID]): Boolean =
+    zremWithTime(NodeKey.nodes, oldNode)
 
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
-    _feed = redis.withClient(_.zrangebyscore[IncomingFeedContent](
+    _feed = redis(_.zrangebyscore[IncomingFeedContent](
       NodeKey.feed,
       min = Temporal.minimum.toEpochSecond,
       max = datetime.toEpochSecond,
@@ -166,12 +155,12 @@ abstract class Node {
 
   /** Add message */
   def addMessage(content: IncomingFeedContent): Boolean = {
-    hasChangeOneEntry(redis.withClient(_.zadd(NodeKey.feed, content._1.toEpochSecond, content)))
+    valueOrException(redis(_.zadd(NodeKey.feed, content._1.toEpochSecond, content))) == 1
   }
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {
-    val values = redis.withClient(_.hgetall[String, String](NodeKey.node))
+    val values = redis(_.hgetall[String, String](NodeKey.node))
       .getOrElse(throw new IllegalValueException("user should have some data"))
     _name = values.get(StaticNodeKey.name)
     _kind = values.get(StaticNodeKey.kind)
