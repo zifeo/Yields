@@ -2,42 +2,65 @@ package yields.server.actions.users
 
 import org.scalatest.Matchers
 import yields.server._
+import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
-/**
-  * Test class for UserGetEntourage action
-  */
 class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = sample[Metadata]
+  "UserInfo" should "get client infos" in {
 
-  it should "get some infos" in {
-    val u1 = User.create("e1@email.com")
+    val user = User.create("e1@email.com")
     val u2 = User.create("e2@email.com")
     val u3 = User.create("e3@email.com")
     val u4 = User.create("e4@email.com")
+    val users = List(u2.uid, u3.uid, u4.uid)
 
-    u1.name = "name"
+    user.name = "name"
+    user.addMultipleUser(users)
+    val action = UserInfo(user.uid)
+    val meta = Metadata.now(user.uid)
 
-    u1.addEntourage(u2.uid)
-    u1.addEntourage(u3.uid)
-    u1.addEntourage(u4.uid)
-
-    val action = UserInfo(u1.uid)
-    val res = action.run(m)
-
-    res match {
+    action.run(meta) match {
       case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
-        uid should be (u1.uid)
-        name should be ("name")
-        email should be ("e1@email.com")
-        entourage.toSet should contain(u2.uid)
-        entourage.toSet should contain(u3.uid)
-        entourage.toSet should contain(u4.uid)
+        uid should be (user.uid)
+        name should be (user.name)
+        email should be (user.email)
+        entourage should contain theSameElementsAs users
     }
   }
 
+  it should "get entourage infos only if the contact added him" in {
+
+    val user = User.create("e1@email.com")
+    val contact = User.create("e2@email.com")
+    contact.name = "name"
+    contact.addEntourage(user.uid)
+
+    val action = UserInfo(contact.uid)
+    val meta = Metadata.now(user.uid)
+
+    action.run(meta) match {
+      case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
+        uid should be (contact.uid)
+        name should be (contact.name)
+        email should be (contact.email)
+        entourage should be (empty)
+        entourageUpdates should be (empty)
+    }
+  }
+
+  it should "not access infos if the contact did not add him" in {
+
+    val user = User.create("e1@email.com")
+    val otherUid = user.uid + 1
+    val action = UserInfo(otherUid)
+    val meta = Metadata.now(user.uid)
+
+    val thrown = the [UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include (otherUid.toString)
+
+  }
 
 }

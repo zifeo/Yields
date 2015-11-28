@@ -22,11 +22,11 @@ case class GroupManage(nid: NID, addedUser: Option[UID], removedUser: Option[UID
     }
 
     if (addedNodes.isDefined) {
-      group.addMultipleNodes(addedNodes.get)
+      group.addNode(addedNodes.get)
     }
 
     if (removedNodes.isDefined) {
-      group.remMultipleNodes(removedNodes.get)
+      group.removeNode(removedNodes.get)
     }
     GroupManageRes()
   }

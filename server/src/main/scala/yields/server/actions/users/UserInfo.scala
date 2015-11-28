@@ -29,7 +29,7 @@ case class UserInfo(uid: UID) extends Action {
         val (entourage, entourageUpdates) = user.entourageWithUpdates.unzip
         UserInfoRes(user.uid, user.name, user.email, entourage, entourageUpdates)
 
-      case sender if user.entourage.contains(uid) =>
+      case sender if user.entourage.contains(sender) =>
         UserInfoRes(user.uid, user.name, user.email, Seq.empty, Seq.empty)
 
       case _ =>

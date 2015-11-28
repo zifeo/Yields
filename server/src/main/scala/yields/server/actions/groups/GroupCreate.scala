@@ -25,8 +25,8 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq
       if (visibility == "private" || visibility == "public") {
 
         val group = Group.createGroup(name, metadata.client)
-        group.addMultipleNodes(nodes)
-        group.addMultipleUser(metadata.client +: users)
+        group.addNode(nodes)
+        group.addUser(metadata.client +: users)
 
         /** Create or get tags id */
         val tids  = tags.map { text =>

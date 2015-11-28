@@ -13,7 +13,11 @@ import yields.server.mpi.Metadata
   * @param image new profile image
   * TODO: set picture
   */
-case class UserUpdate(email: Option[Email], name: Option[String], image: Option[Blob]) extends Action {
+case class UserUpdate(email: Option[Email],
+                      name: Option[String],
+                      image: Option[Blob],
+                      addEntourage: Seq[UID],
+                      removeEntourage: Seq[UID]) extends Action {
 
   /**
     * Run the action given the sender.
@@ -35,6 +39,8 @@ case class UserUpdate(email: Option[Email], name: Option[String], image: Option[
     for (newName <- name) {
       user.name = newName
     }
+
+
 
     Yields.broadcast(user.entourage) {
       UserUpdateBrd(user.uid, user.email, user.name, user.picture)
