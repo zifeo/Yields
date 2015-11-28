@@ -22,7 +22,7 @@ package object models {
   type Email = String
 
   /** Represents a byte array. */
-  type Blob = String
+  type Blob = Array[Byte]
 
   /** Feed content coming from client */
   type IncomingFeedContent = (OffsetDateTime, UID, Option[NID], String)
