@@ -84,56 +84,54 @@ package object dbi {
     value.getOrElse(default)
 
   /**
-    * Add a value to a redis zset.
-    * @param key zset key
+    * Add a value to a redis hash map.
+    * @param key hash map key
     * @param element value to add
     * @tparam T type of the value
     * @return true if addition done
     */
-  private[dbi] def zaddWithTime[T](key: String, element: T): Boolean =
-    valueOrException(redis(_.zadd(key, Temporal.now.toEpochSecond, element))) == 1
+  private[dbi] def addWithTime[T](key: String, element: T): Boolean =
+    redis(_.hset(key, element, Temporal.now.toEpochSecond))
 
   /**
-    * Add values to a redis zset.
-    * @param key zset key
+    * Add values to a redis hash map.
+    * @param key hash map key
     * @param elements values to add
     * @tparam T type of values
     * @throws IllegalArgumentException if no element given
     * @return true if all additions were done
     */
-  private[dbi] def zaddWithTime[T](key: String, elements: List[T]): Boolean = elements match {
+  private[dbi] def addWithTime[T](key: String, elements: List[T]): Boolean = elements match {
     case Nil => throw new IllegalArgumentException("elements cannot be empty")
-    case e :: Nil => zaddWithTime(key, e)
-    case e :: es =>
+    case e :: Nil => addWithTime(key, e)
+    case _ =>
       val now = Temporal.now.toEpochSecond.toDouble
-      val others = es.zipWithIndex.map { case (u, i) =>
-        now + 1 + i -> u
-      }
-      valueOrException(redis(_.zadd(key, now, e, others: _*))) == elements.size
+      val pairs = elements.map(_ -> now).toMap
+      redis(_.hmset(key, pairs))
   }
 
   /**
-    * Remove a value from a redis zset.
-    * @param key zset key
+    * Remove a value from a redis hash map.
+    * @param key hash map key
     * @param element value to be removed
     * @tparam T type of value
     * @return true if removing done
     */
-  private[dbi] def zremWithTime[T](key: String, element: T): Boolean =
-    valueOrException(redis(_.zrem(key, element))) == 1
+  private[dbi] def remWithTime[T](key: String, element: T): Boolean =
+    valueOrException(redis(_.hdel(key, element))) == 1
 
   /**
-    * Remove values from a redis zset.
-    * @param key zset key
+    * Remove values from a redis hash map.
+    * @param key hash map key
     * @param elements values to be removed
     * @tparam T types of values
     * @throws IllegalArgumentException if no element given
     * @return true if all removings were done
     */
-  private[dbi] def zremWithTime[T](key: String, elements: List[T]): Boolean = elements match {
+  private[dbi] def remWithTime[T](key: String, elements: List[T]): Boolean = elements match {
     case Nil => throw new IllegalArgumentException("elements cannot be empty")
-    case e :: Nil => zremWithTime(key, e)
-    case e :: es => valueOrException(redis(_.zrem(key, e, es: _*))) == elements.size
+    case e :: Nil => remWithTime(key, e)
+    case e :: es => valueOrException(redis(_.hdel(key, e, es: _*))) == elements.size
   }
 
 }

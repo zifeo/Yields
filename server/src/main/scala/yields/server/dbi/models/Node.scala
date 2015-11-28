@@ -15,9 +15,9 @@ import yields.server.utils.Temporal
   * Node is abstract superclass of every possible kind of nodes like Group, Image etc
   *
   * Database structure :
-  * nodes:[nid] Map[attributes -> value] - name, kind, refreshed_at, created_at, updated_at
-  * nodes:[nid]:users Zset[UID] with score datetime
-  * nodes:[nid]:nodes Zset[NID] with score datetime
+  * nodes:[nid] Map[String, String] - name, kind, refreshed_at, created_at, updated_at
+  * nodes:[nid]:users Map[UID, OffsetDateTIme] with score datetime
+  * nodes:[nid]:nodes Map[NID, OffsetDateTIme] with score datetime
   * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
   */
 abstract class Node {
@@ -30,6 +30,7 @@ abstract class Node {
   }
 
   val nid: NID
+
   private var _name: Option[String] = None
   private var _kind: Option[String] = None
   private var _created_at: Option[OffsetDateTime] = None
@@ -99,47 +100,47 @@ abstract class Node {
 
   /** Users getter */
   def users: List[UID] = _users.getOrElse {
-    _users = redis(_.zrange[UID](NodeKey.users, 0, -1))
+    _users = redis(_.hkeys[UID](NodeKey.users))
     valueOrDefault(_users, List.empty)
   }
 
   /** Add user. */
   def addUser(newUser: UID): Boolean =
-    zaddWithTime(NodeKey.users, newUser)
+    addWithTime(NodeKey.users, newUser)
 
   /** Add multiple users. */
   def addUser(newUsers: List[UID]): Boolean =
-    zaddWithTime(NodeKey.users, newUsers)
+    addWithTime(NodeKey.users, newUsers)
 
   /** Remove user. */
   def removeUser(oldUser: UID): Boolean =
-    zremWithTime(NodeKey.users, oldUser)
+    remWithTime(NodeKey.users, oldUser)
 
   /** Remove multiple users. */
   def removeUser(oldUsers: List[UID]): Boolean =
-    zremWithTime(NodeKey.users, oldUsers)
+    remWithTime(NodeKey.users, oldUsers)
 
   /** Nodes getter. */
   def nodes: List[NID] = _nodes.getOrElse {
-    _nodes = redis(_.zrange[NID](NodeKey.nodes, 0, -1))
+    _nodes = redis(_.hkeys[NID](NodeKey.nodes))
     valueOrDefault(_nodes, List.empty)
   }
 
   /** Add node. */
   def addNode(newNode: NID): Boolean =
-    zaddWithTime(NodeKey.nodes, newNode)
+    addWithTime(NodeKey.nodes, newNode)
 
   /** Add multiple nodes. */
   def addNode(newNodes: List[NID]): Boolean =
-    zaddWithTime(NodeKey.nodes, newNodes)
+    addWithTime(NodeKey.nodes, newNodes)
 
   /** Remove node. */
   def removeNode(oldNode: NID): Boolean =
-    zremWithTime(NodeKey.nodes, oldNode)
+    remWithTime(NodeKey.nodes, oldNode)
 
   /** Remove multiple nodes. */
   def removeNode(oldNode: List[NID]): Boolean =
-    zremWithTime(NodeKey.nodes, oldNode)
+    remWithTime(NodeKey.nodes, oldNode)
 
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[IncomingFeedContent] = {
