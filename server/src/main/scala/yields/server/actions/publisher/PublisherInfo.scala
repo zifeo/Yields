@@ -8,6 +8,8 @@ import yields.server.mpi.Metadata
 /**
   * Get infos about a publisher
   * @param nid nid of the publisher
+  *
+  *            TODO get pic
   */
 case class PublisherInfo(nid: NID) extends Action {
   /**
