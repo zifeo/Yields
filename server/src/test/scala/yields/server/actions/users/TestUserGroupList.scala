@@ -6,10 +6,6 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
-/**
-  * Test class User group list
-  * TODO implement user group list correctly
-  */
 class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
 
   "UserGroupList" should "return empty list when the group list is empty" in {
@@ -23,7 +19,6 @@ class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
         updates should be (empty)
         refreshes should be (empty)
     }
-
   }
 
   it should "return the group list when it is not empty" in {
@@ -43,7 +38,6 @@ class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
         refreshes should have size 2
         groups should contain theSameElementsAs List(group1.nid, group2.nid)
     }
-
   }
 
 }

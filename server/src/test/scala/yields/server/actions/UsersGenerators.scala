@@ -29,7 +29,9 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
       email <- arbitrary[Option[String]]
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
-    } yield UserUpdate(email, name, image)
+      addEntourage <- arbitrary[Seq[UID]]
+      removeEntourage <- arbitrary[Seq[UID]]
+    } yield UserUpdate(email, name, image, addEntourage, removeEntourage)
   }
 
   implicit lazy val userUpdateResArb: Arbitrary[UserUpdateRes] = Arbitrary {

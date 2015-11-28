@@ -156,18 +156,42 @@ final class User private (val uid: UID) {
         p.hget[OffsetDateTime](userKey, Key.updated_at)
       }
     }
-    val res = valueOrException(query).asInstanceOf[List[Option[OffsetDateTime]]]
-    currentEntourage.zip(res.flatten)
+    val res = valueOrException(query).asInstanceOf[List[Option[OffsetDateTime]]].flatten
+    assert(res.size == currentEntourage.size)
+    currentEntourage.zip(res)
   }
 
   /** Adds a user and returns whether this user has been added. */
-  def addEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.now.toEpochSecond, uid)))
+  def addEntourage(newUser: UID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zadd(Key.entourage, Temporal.now.toEpochSecond, newUser)))
 
+  /** Add multiple users. */
+  def addEntourage(newUsers: List[UID]): Long = {
+    if (newUsers.isEmpty) 0
+    else {
+      val dateTime = Temporal.now.toEpochSecond.toDouble
+      val pairs = newUsers.zipWithIndex.map { case (u, i) =>
+        dateTime + i -> u
+      }
+      valueOrException(redis.withClient(_.zadd(Key.entourage, pairs.head._1, pairs.head._2, pairs.tail: _*)))
+    }
+  }
 
   /** Remove a user and returns whether this user has been removed. */
-  def removeEntourage(uid: UID): Boolean =
-    hasChangeOneEntry(redis.withClient(_.zrem(Key.entourage, uid)))
+  def removeEntourage(oldUser: UID): Boolean =
+    hasChangeOneEntry(redis.withClient(_.zrem(Key.entourage, oldUser)))
+
+  /** Add multiple users. */
+  def removeEntourage(oldUsers: List[UID]): Long = {
+    if (oldUsers.isEmpty) 0
+    else {
+      val dateTime = Temporal.now.toEpochSecond.toDouble
+      val pairs = oldUsers.zipWithIndex.map { case (u, i) =>
+        dateTime + i -> u
+      }
+      valueOrException(redis.withClient(_.zadd(Key.entourage, pairs.head._1, pairs.head._2, pairs.tail: _*)))
+    }
+  }
 
   /**
     * Loads the entire model for intensive usage (except entourage and groups).
@@ -207,7 +231,12 @@ object User {
       val user = User(uid)
       redis.withClient { r =>
         import user.Key
-        val infos = List((Key.created_at, Temporal.now), (Key.email, email))
+        val now = Temporal.now
+        val infos = List(
+          (Key.email, email),
+          (Key.created_at, now),
+          (Key.updated_at, now)
+        )
         r.hmset(user.Key.user, infos)
         r.hset(StaticKey.emailIndex, email, uid)
       }

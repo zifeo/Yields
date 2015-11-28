@@ -59,7 +59,7 @@ UserConnect
 	input 	email: String
 	output	uid: UID, returning: Boolean
 UserUpdate
-	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
+	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage: Seq[UID]
 	output	()
 	bcast	uid: UID, email: String, name: String, pic: Array[Byte]
 	notice	no email for now
