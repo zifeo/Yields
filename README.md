@@ -104,7 +104,7 @@ GroupUpdate
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 GroupInfo
 	input	nid: NID
-	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
+	output	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 	rules	nid in nodes
 GroupMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]

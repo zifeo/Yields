@@ -30,7 +30,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     val sender = metadata.client
 
     if (! node.users.contains(sender))
-      throw new UnauthorizedActionException(s"$sender cannot send a message in $nid")
+      throw new UnauthorizedActionException(s"$sender does not belong to $nid")
 
     if (contentType.isDefined != content.isDefined)
       throw new ActionArgumentException(s"content must a corresponding content type")
@@ -48,7 +48,9 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
 
     assert(node.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse(""))))
 
-    Yields.broadcast(node.users)(broadcast(datetime))
+    Yields.broadcast(node.users) {
+      broadcast(datetime, sender)
+    }
 
     result(datetime)
   }
@@ -64,7 +66,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
   def result(datetime: OffsetDateTime): Result
 
   /** Format the broadcast. */
-  def broadcast(datetime: OffsetDateTime): Broadcast
+  def broadcast(datetime: OffsetDateTime, uid: UID): Broadcast
 
 }
 
