@@ -16,7 +16,7 @@ class TestUserUpdate extends DBFlatSpec with Matchers with AllGenerators {
   it should "update everything in database" in {
     val u = User.create("email12344321@email.com")
     u.name = "name"
-    val action = new UserUpdate(u.uid, Some("newemail@email.com"), Some("new name"), None)
+    val action = UserUpdate(Some("newemail@email.com"), Some("new name"), None)
     action.run(m)
     val u2 = User(u.uid)
     u2.email should be("newemail@email.com")

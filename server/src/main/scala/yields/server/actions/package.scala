@@ -2,7 +2,7 @@ package yields.server
 
 package object actions {
 
-  private lazy val mailPattern = "(?=[^\\s]+)(?=(\\w+)@([\\w\\.]+))".r
+  private lazy val mailPattern = """\S+@\S+\.\S+""".r
 
   /**
     * Check whether an email is valid.

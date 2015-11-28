@@ -15,13 +15,9 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
   private val messageFld = "message"
 
   /**
-    * Serializes the result of an action in a json format
-    * Format :
-    * kind: ...               // Performed action e.g GroupCreateRes, UserConnectRes, etc
-    * message: ...            // Result of the action e.g a group, an user, list of groups, etc
-    *
+    * Serializes the result of an action in a json format.
     * @param obj the result of an action
-    * @return the json object corresponding
+    * @return corresponding json object
     */
   override def write(obj: Result): JsValue = {
     val kind = obj.getClass.getSimpleName
@@ -63,7 +59,6 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "GroupManageRes" => message.convertTo[GroupManageRes]
           case "NodeMessageRes" => message.convertTo[NodeMessageRes]
           case "NodeHistoryRes" => message.convertTo[NodeHistoryRes]
-
 
           case "UserConnectRes" => message.convertTo[UserConnectRes]
           case "UserUpdateRes" => message.convertTo[UserUpdateRes]

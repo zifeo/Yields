@@ -1,6 +1,6 @@
 package yields.server.actions.users
 
-import org.scalatest.Matchers
+import org.scalatest._
 import yields.server._
 import yields.server.dbi._
 import yields.server.dbi.models._
@@ -12,36 +12,38 @@ import yields.server.mpi.Metadata
   */
 class TestUserGroupList extends DBFlatSpec with Matchers with AllGenerators {
 
-  lazy val m = sample[Metadata]
+  "UserGroupList" should "return empty list when the group list is empty" in {
 
-  it should "return empty list when the group list is empty" in {
-    val u = User.create("an@SAs678email.com")
-    val action = new UserGroupList(u.uid)
-    val res = action.run(m)
-    res match {
-      case UserGroupListRes(x) =>
-        x.length should be(0)
+    val meta = Metadata.now(0)
+    val action = UserGroupList()
+
+    action.run(meta) match {
+      case UserGroupListRes(groups, updates, refreshes) =>
+        groups should be (empty)
+        updates should be (empty)
+        refreshes should be (empty)
     }
+
   }
 
   it should "return the group list when it is not empty" in {
-    val u = User.create("an@email.com")
-    val g1 = Group.createGroup("g1", m.client)
-    g1.name = "n1"
-    val g2 = Group.createGroup("g2", m.client)
-    g2.name = "n2"
-    u.addGroup(g1.nid)
-    u.addGroup(g2.nid)
-    val action = new UserGroupList(u.uid)
-    val res = action.run(m)
-    res match {
-      case UserGroupListRes(x) =>
-        x.length should be(2)
-        x.map(_._1).toSet should contain(g1.nid)
-        x.map(_._1).toSet should contain(g2.nid)
-        x.map(_._2).toSet should contain(g1.name)
-        x.map(_._2).toSet should contain(g2.name)
+
+    val user = User.create("an@email.com")
+    val meta = Metadata.now(user.uid)
+    val group1 = Group.createGroup("g1", user.uid)
+    val group2 = Group.createGroup("g2", user.uid)
+    user.addGroup(group1.nid)
+    user.addGroup(group2.nid)
+    val action = UserGroupList()
+
+    action.run(meta) match {
+      case UserGroupListRes(groups, updates, refreshes) =>
+        groups should have size 2
+        updates should have size 2
+        refreshes should have size 2
+        groups should contain theSameElementsAs List(group1.nid, group2.nid)
     }
+
   }
 
 }

@@ -6,6 +6,7 @@ import com.redis.RedisClient.DESC
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.IllegalValueException
+import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.Temporal
 
 /**
@@ -23,12 +24,6 @@ abstract class Node {
 
   object NodeKey {
     val node = s"nodes:$nid"
-    val name = "name"
-    val kind = "kind"
-    val refreshed_at = "refreshed_at"
-    val created_at = "created_at"
-    val updated_at = "updated_at"
-    val creator = "creator"
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
@@ -47,59 +42,59 @@ abstract class Node {
 
   /** Name getter. */
   def name: String = _name.getOrElse {
-    _name = redis.withClient(_.hget[String](NodeKey.node, NodeKey.name))
+    _name = redis.withClient(_.hget[String](NodeKey.node, StaticNodeKey.name))
     valueOrDefault(_name, "")
   }
 
   /** Name setter. */
   def name_=(n: String): Unit =
-    _name = update(NodeKey.name, n)
+    _name = update(StaticNodeKey.name, n)
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (NodeKey.updated_at, Temporal.now))
+    val updates = List((field, value), (StaticNodeKey.updated_at, Temporal.now))
     redis.withClient(_.hmset(NodeKey.node, updates))
     Some(value)
   }
 
   /** Kind getter. */
   def kind: String = _kind.getOrElse {
-    _kind = redis.withClient(_.hget[String](NodeKey.node, NodeKey.kind))
+    _kind = redis.withClient(_.hget[String](NodeKey.node, StaticNodeKey.kind))
     valueOrException(_kind)
   }
 
   /** kind setter */
   def kind_=(newKind: String): Unit = {
-    _kind = update(NodeKey.kind, newKind)
+    _kind = update(StaticNodeKey.kind, newKind)
   }
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.created_at))
+    _created_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.created_at))
     valueOrException(_created_at)
   }
 
   /** Update datetime getter. */
   def updated_at: OffsetDateTime = _updated_at.getOrElse {
-    _updated_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.updated_at))
+    _updated_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.updated_at))
     valueOrException(_updated_at)
   }
 
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
-    _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, NodeKey.refreshed_at))
+    _refreshed_at = redis.withClient(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.refreshed_at))
     valueOrDefault(_refreshed_at, Temporal.minimum)
   }
 
   /** creator getter */
   def creator: UID = {
-    _creator = redis.withClient(_.hget[UID](NodeKey.node, NodeKey.creator))
+    _creator = redis.withClient(_.hget[UID](NodeKey.node, StaticNodeKey.creator))
     valueOrDefault(_creator, 0)
   }
 
   /** creator setter */
   def creator_=(uid: UID): Unit = {
-    _creator = update(NodeKey.creator, uid)
+    _creator = update(StaticNodeKey.creator, uid)
   }
 
   /** Users getter */
@@ -177,11 +172,25 @@ abstract class Node {
   def hydrate(): Unit = {
     val values = redis.withClient(_.hgetall[String, String](NodeKey.node))
       .getOrElse(throw new IllegalValueException("user should have some data"))
-    _name = values.get(NodeKey.name)
-    _kind = values.get(NodeKey.kind)
-    _created_at = values.get(NodeKey.created_at).map(OffsetDateTime.parse)
-    _updated_at = values.get(NodeKey.updated_at).map(OffsetDateTime.parse)
-    _refreshed_at = values.get(NodeKey.refreshed_at).map(OffsetDateTime.parse)
+    _name = values.get(StaticNodeKey.name)
+    _kind = values.get(StaticNodeKey.kind)
+    _created_at = values.get(StaticNodeKey.created_at).map(OffsetDateTime.parse)
+    _updated_at = values.get(StaticNodeKey.updated_at).map(OffsetDateTime.parse)
+    _refreshed_at = values.get(StaticNodeKey.refreshed_at).map(OffsetDateTime.parse)
+  }
+
+}
+
+/** [[Node]] companion object. */
+object Node {
+
+  object StaticNodeKey {
+    val name = "name"
+    val kind = "kind"
+    val refreshed_at = "refreshed_at"
+    val created_at = "created_at"
+    val updated_at = "updated_at"
+    val creator = "creator"
   }
 
 }
