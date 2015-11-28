@@ -71,7 +71,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
 
   implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
-  "A client with a socket" should "be able to connect to the server" in {
+  /*"A client with a socket" should "be able to connect to the server" in {
     val client = new FakeClient(1)
     client.send(UserConnect("client@yields.im"))
     await(client.receive()).result should be (UserConnectRes(1))
@@ -93,6 +93,6 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
     val ref = clientB.send(NodeMessage(1, Some("hello"), None, None))
     await(clientB.receive()).metadata.ref should be (ref)
     await(clientA.receive()).metadata.ref should be (ref)
-  }
+  }*/
 
 }

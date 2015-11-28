@@ -25,11 +25,11 @@ class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
     u1.addEntourage(u3.uid)
     u1.addEntourage(u4.uid)
 
-    val action = new UserInfo(u1.uid)
+    val action = UserInfo(u1.uid)
     val res = action.run(m)
 
     res match {
-      case UserInfoRes(uid, name, email, entourage) =>
+      case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
         uid should be (u1.uid)
         name should be ("name")
         email should be ("e1@email.com")

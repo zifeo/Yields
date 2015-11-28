@@ -36,9 +36,7 @@ case class NodeMessage(nid: NID, text: Option[String], contentType: Option[Strin
         case None => group.addMessage((datetime, metadata.client, None, text.getOrElse("")))
       }
 
-      Yields.broadcast(group.users) {
-        NodeMessageRes(group.nid, datetime)
-      }
+      NodeMessageRes(group.nid, datetime)
     } else {
       val errorMessage = getClass.getSimpleName
       throw new ActionArgumentException(s"Bad nid value in : $errorMessage")

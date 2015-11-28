@@ -6,6 +6,7 @@ import com.redis.serialization.Parse.Implicits._
 import yields.server.actions.exceptions.{NewUserExistException, UnauthorizedActionException}
 import yields.server.dbi._
 import yields.server.dbi.exceptions.IllegalValueException
+import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.Temporal
 
 /**
@@ -119,19 +120,16 @@ final class User private (val uid: UID) {
 
   /** Groups with updates getter. */
   def groupsWithUpdates: List[(NID, OffsetDateTime, OffsetDateTime)] = {
+    val currentGroup = groups // need to be computed before pipeline
     val query = redisPipeline { p =>
-      groups.map { nid =>
-        val group = Group(nid)
-        val key = group.NodeKey
-        val result = p.hmget[String, OffsetDateTime](key.node, key.updated_at, key.refreshed_at)
-        result.map { values =>
-          (uid, values(key.updated_at), values(key.refreshed_at))
-        }
+      currentGroup.map { nid =>
+        val nodeKey = Group(nid).NodeKey.node
+        p.hmget[String, OffsetDateTime](nodeKey, StaticNodeKey.updated_at, StaticNodeKey.refreshed_at)
       }
     }
-    query match {
-      case Some(result: List[(NID, OffsetDateTime, OffsetDateTime)]) => result
-      case _ => throw new IllegalValueException(s"entourage failed with updates: $query")
+    val res = valueOrException(query).asInstanceOf[List[Option[Map[String, OffsetDateTime]]]]
+    currentGroup.zip(res.flatten).map { case (nid, values) =>
+      (nid, values(StaticNodeKey.updated_at), values(StaticNodeKey.refreshed_at))
     }
   }
 
@@ -151,16 +149,15 @@ final class User private (val uid: UID) {
 
   /** Entourage with updates getter. */
   def entourageWithUpdates: List[(UID, OffsetDateTime)] = {
+    val currentEntourage = entourage // need to be computed before pipeline
     val query = redisPipeline { p =>
-      entourage.map { id =>
-        val user = User(id)
-        uid -> p.hget[OffsetDateTime](user.Key.user, Key.updated_at)
+        currentEntourage.map { id =>
+        val userKey = User(id).Key.user
+        p.hget[OffsetDateTime](userKey, Key.updated_at)
       }
     }
-    query match {
-      case Some(result: List[(UID, OffsetDateTime)]) => result
-      case _ => throw new IllegalValueException(s"entourage failed with updates: $query")
-    }
+    val res = valueOrException(query).asInstanceOf[List[Option[OffsetDateTime]]]
+    currentEntourage.zip(res.flatten)
   }
 
   /** Adds a user and returns whether this user has been added. */
@@ -214,6 +211,7 @@ object User {
         r.hmset(user.Key.user, infos)
         r.hset(StaticKey.emailIndex, email, uid)
       }
+      user._email = Some(email)
       user
     } else throw new NewUserExistException("email already registered")
   }

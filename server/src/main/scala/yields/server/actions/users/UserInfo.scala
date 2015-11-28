@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{UID, User}
+import yields.server.dbi.models.{Email, UID, User}
 import yields.server.mpi.Metadata
 
 /**

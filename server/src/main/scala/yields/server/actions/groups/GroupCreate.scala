@@ -32,7 +32,6 @@ case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq
         val tids  = tags.map { text =>
           Tag.getIdFromText(text).getOrElse(Tag.createTag(text).tid)
         }
-        group.addTags(tids)
 
         val user = User(metadata.client)
         user.addGroup(group.nid)

@@ -42,7 +42,6 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
         g.name should be ("GroupName")
         g.nodes.toSet should be(nodes.map(_.nid).toSet)
         val tids = tags.flatMap((x: String) => Tag.getIdFromText(x))
-        g.tags should be (tids.toSet)
         Tag.getIdFromText("tennis").isDefined should be (true)
         Tag.getIdFromText("fun").isDefined should be (true)
         Tag.getIdFromText("sport").isDefined should be (true)

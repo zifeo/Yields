@@ -20,7 +20,7 @@ case class UserGroupList() extends Action {
   override def run(metadata: Metadata): Result = {
 
       val user = User(metadata.client)
-      val (groups, updates, refreshes) = user.groupsWithUpdates
+      val (groups, updates, refreshes) = user.groupsWithUpdates.unzip3
       UserGroupListRes(groups, updates, refreshes)
 
   }
