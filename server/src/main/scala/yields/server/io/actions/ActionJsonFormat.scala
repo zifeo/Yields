@@ -28,7 +28,8 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
   override def write(obj: Action): JsValue = obj match {
     case x: GroupCreate => packWithKind(x)
     case x: GroupUpdate => packWithKind(x)
-    case x: GroupManage => packWithKind(x)
+    case x: GroupInfo => packWithKind(x)
+    case x: GroupMessage => packWithKind(x)
 
     case x: NodeSearch => packWithKind(x)
     case x: NodeHistory => packWithKind(x)
@@ -49,7 +50,8 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
         kind match {
           case "GroupCreate" => message.convertTo[GroupCreate]
           case "GroupUpdate" => message.convertTo[GroupUpdate]
-          case "GroupManage" => message.convertTo[GroupManage]
+          case "GroupInfo" => message.convertTo[GroupInfo]
+          case "GroupMessage" => message.convertTo[GroupMessage]
 
           case "NodeSearch" => message.convertTo[NodeSearch]
           case "NodeHistory" => message.convertTo[NodeHistory]

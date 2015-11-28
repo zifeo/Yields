@@ -24,7 +24,7 @@ object Group {
     * @param creator group creator
     * @return the newly created group
     */
-  def createGroup(name: String, creator: UID): Group = {
+  def create(name: String, creator: UID): Group = {
     val group = Group(newIdentity())
     redis { r =>
       val now = Temporal.now

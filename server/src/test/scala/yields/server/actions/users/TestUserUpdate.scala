@@ -31,9 +31,9 @@ class TestUserUpdate extends DBFlatSpec with Matchers {
 
     val start = User.create("email12344321@email.com")
     val meta = Metadata.now(start.uid)
-    start.pic = "photo"
+    start.pic = Array[Byte](2, 1)
 
-    val newPic = "gif"
+    val newPic = Array[Byte](1, 2)
     val action = UserUpdate(None, None, Some(newPic), List.empty, List.empty)
     action.run(meta)
 
@@ -60,15 +60,15 @@ class TestUserUpdate extends DBFlatSpec with Matchers {
     middle.pic should be (start.pic)
     middle.entourage should be (newUsers)
 
-    val oldUser = List[UID](3)
-    val removeAction = UserUpdate(None, None, None, List.empty, oldUser)
+    val oldUsers = List[UID](3)
+    val removeAction = UserUpdate(None, None, None, List.empty, oldUsers)
     removeAction.run(meta)
 
     val end = User(start.uid)
     end.email should be (start.email)
     middle.name should be (start.name)
     end.pic should be (start.pic)
-    end.entourage should be (newUsers.diff(oldUser))
+    end.entourage should be (newUsers.diff(oldUsers))
 
   }
 

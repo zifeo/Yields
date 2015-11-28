@@ -30,14 +30,20 @@ package object io {
 
   // Groups
 
-  implicit lazy val groupCreateJF = jsonFormat5(GroupCreate)
+  implicit lazy val groupCreateJF = jsonFormat3(GroupCreate)
   implicit lazy val groupCreateResJF = jsonFormat1(GroupCreateRes)
+  implicit lazy val groupCreateBrdJF = jsonFormat4(GroupCreateBrd)
 
-  implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
+  implicit lazy val groupUpdateJF = jsonFormat7(GroupUpdate)
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
+  implicit lazy val groupUpdateBrdF = jsonFormat5(GroupUpdateBrd)
 
-  implicit lazy val groupManageJF = jsonFormat5(GroupManage)
-  implicit lazy val groupManageResJF = jsonFormat0(GroupManageRes)
+  implicit lazy val groupInfoJF = jsonFormat1(GroupInfo)
+  implicit lazy val groupInfoResJF = jsonFormat5(GroupInfoRes)
+
+  implicit lazy val groupMessageJF = jsonFormat4(GroupMessage)
+  implicit lazy val groupMessageResJF = jsonFormat2(GroupMessageRes)
+  implicit lazy val groupMessageBrdJF = jsonFormat6(GroupMessageBrd)
 
   // Nodes
 

@@ -36,7 +36,7 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
 
       case (date, uid, Some(mediaRef), text) =>
         val media = Media(mediaRef)
-        (date, uid, text, Some(media.content), Some(media.contentType))
+        (date, uid, text, Some(media.contentType), Some(media.content))
 
       case (date, uid, None, text) =>
         (date, uid, text, None, None)

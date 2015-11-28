@@ -9,7 +9,7 @@ import yields.server.mpi.Metadata
 
 class TestUserInfo extends DBFlatSpec with Matchers {
 
-  "UserInfo" should "get client infos" in {
+  "UserInfo" should "get client info" in {
 
     val user = User.create("e1@email.com")
     val u2 = User.create("e2@email.com")
@@ -27,11 +27,11 @@ class TestUserInfo extends DBFlatSpec with Matchers {
         uid should be (user.uid)
         name should be (user.name)
         email should be (user.email)
-        entourage should contain theSameElementsAs users
+        entourage should contain theSameElementsAs user.entourage
     }
   }
 
-  it should "get entourage infos only if the contact added him" in {
+  it should "get entourage info only if the contact added him" in {
 
     val user = User.create("e1@email.com")
     val contact = User.create("e2@email.com")
@@ -51,7 +51,7 @@ class TestUserInfo extends DBFlatSpec with Matchers {
     }
   }
 
-  it should "not access infos if the contact did not add him" in {
+  it should "not access info if the contact did not add him" in {
 
     val user = User.create("e1@email.com")
     val otherUid = user.uid + 1
