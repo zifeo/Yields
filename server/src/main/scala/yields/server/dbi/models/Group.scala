@@ -26,7 +26,7 @@ object Group {
     */
   def createGroup(name: String, creator: UID): Group = {
     val group = Group(newIdentity())
-    redis.withClient { r =>
+    redis { r =>
       val now = Temporal.now
       val infos = List(
         (StaticNodeKey.name, name),

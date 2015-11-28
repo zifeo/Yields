@@ -13,7 +13,7 @@ import yields.server.mpi.Metadata
   * @param users users to put in the group
   * @param visibility private or public
   */
-case class GroupCreate(name: String, nodes: Seq[NID], users: Seq[UID], tags: Seq[String], visibility: String) extends Action {
+case class GroupCreate(name: String, nodes: List[NID], users: List[UID], tags: List[String], visibility: String) extends Action {
 
   /**
     * Run the action given the sender.

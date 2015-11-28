@@ -16,8 +16,8 @@ import yields.server.mpi.Metadata
 case class UserUpdate(email: Option[Email],
                       name: Option[String],
                       image: Option[Blob],
-                      addEntourage: Seq[UID],
-                      removeEntourage: Seq[UID]) extends Action {
+                      addEntourage: List[UID],
+                      removeEntourage: List[UID]) extends Action {
 
   /**
     * Run the action given the sender.

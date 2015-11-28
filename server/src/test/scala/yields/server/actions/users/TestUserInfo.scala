@@ -18,7 +18,7 @@ class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
     val users = List(u2.uid, u3.uid, u4.uid)
 
     user.name = "name"
-    user.addMultipleUser(users)
+    user.addEntourage(users)
     val action = UserInfo(user.uid)
     val meta = Metadata.now(user.uid)
 

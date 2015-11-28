@@ -5,7 +5,7 @@ import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 case class GroupManage(nid: NID, addedUser: Option[UID], removedUser: Option[UID],
-                       addedNodes: Option[Seq[NID]], removedNodes: Option[Seq[NID]]) extends Action {
+                       addedNodes: Option[List[NID]], removedNodes: Option[List[NID]]) extends Action {
   /**
     * Run the action given the sender.
     * @param metadata action requester
