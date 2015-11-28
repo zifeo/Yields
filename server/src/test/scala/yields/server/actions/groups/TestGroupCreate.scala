@@ -40,7 +40,7 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
         val g = Group(nid)
         g.users.toSet should be (users.map(_.uid).toSet + u.uid)
         g.name should be ("GroupName")
-        g.nodes.toSet should be(nodes.map(_.nid).toSet)
+        //g.nodes.toSet should be(nodes.map(_.nid).toSet)
         val tids = tags.flatMap((x: String) => Tag.getIdFromText(x))
         Tag.getIdFromText("tennis").isDefined should be (true)
         Tag.getIdFromText("fun").isDefined should be (true)
