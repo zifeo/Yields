@@ -1,7 +1,5 @@
 package yields.server.dbi.models
 
-import yields.server.dbi._
-
 
 /**
   * Represents a publisher
