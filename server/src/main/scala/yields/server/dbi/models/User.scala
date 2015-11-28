@@ -19,14 +19,11 @@ import yields.server.utils.Temporal
   *
   * Database structure:
   * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at / connected_at
-  * users:[uid]:groups Zset[NID] with score datetime
-  * users:[uid]:entourage Zset[UID] with score datetime
+  * users:[uid]:groups Map[NID, OffsetDateTime]
+  * users:[uid]:entourage Map[UID, OffsetDateTime]
   * users:indexes:email Map[Email, UID] - email
   *
-  * TODO : improve setters by only settings if the value is different.
-  * TODO : what about a `save()` method? are there any use cases?
-  * TODO : check for groups/users existance before adding/removing to groups/entourage
-  * TODO : check if uid exists before trying to get an user with apply
+  * TODO: improve setters by only settings if the value is different.
   *
   * @param uid user id
   */
@@ -130,15 +127,15 @@ final class User private (val uid: UID) {
 
   /** Adds a group and returns whether this group has been added. */
   def addGroup(newGroup: NID): Boolean =
-    zaddWithTime(Key.groups, newGroup)
+    addWithTime(Key.groups, newGroup)
 
   /** Remove a group and returns whether this group has been removed. */
   def removeGroups(oldGroups: NID): Boolean =
-    zremWithTime(Key.groups, oldGroups)
+    remWithTime(Key.groups, oldGroups)
 
   /** Entourage getter. */
   def entourage: List[UID] = _entourage.getOrElse {
-    _entourage = redis(_.zrange[UID](Key.entourage, 0, -1))
+    _entourage = redis(_.hkeys[UID](Key.entourage))
     valueOrException(_entourage)
   }
 
@@ -158,19 +155,19 @@ final class User private (val uid: UID) {
 
   /** Adds a user and returns whether this user has been added. */
   def addEntourage(newUser: UID): Boolean =
-    zaddWithTime(Key.entourage, newUser)
+    addWithTime(Key.entourage, newUser)
 
   /** Add multiple users. */
   def addEntourage(newUsers: List[UID]): Boolean =
-    zaddWithTime(Key.entourage, newUsers)
+    addWithTime(Key.entourage, newUsers)
 
   /** Remove a user and returns whether this user has been removed. */
   def removeEntourage(oldUser: UID): Boolean =
-    zremWithTime(Key.entourage, oldUser)
+    remWithTime(Key.entourage, oldUser)
 
   /** Add multiple users. */
   def removeEntourage(oldUsers: List[UID]): Boolean =
-    zremWithTime(Key.entourage, oldUsers)
+    remWithTime(Key.entourage, oldUsers)
 
     /**
     * Loads the entire model for intensive usage (except entourage and groups).
