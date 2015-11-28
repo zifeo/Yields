@@ -8,7 +8,7 @@ trait ActionsGenerators extends GroupsGenerators with UsersGenerators with Nodes
 
   implicit lazy val actionArb: Arbitrary[Action] = Arbitrary {
     val arbs = Seq(
-      groupCreateArb, groupUpdateArb, nodeMessageArb, nodeHistoryArb, groupSearchArb,
+      groupCreateArb, groupUpdateArb, nodeHistoryArb, groupSearchArb,
       userConnectArb, userUpdateArb, userGroupListArb, userInfoArb)
     assert(arbs.size >= 2)
     val gens = arbs.map(_.arbitrary)
@@ -17,7 +17,7 @@ trait ActionsGenerators extends GroupsGenerators with UsersGenerators with Nodes
 
   implicit lazy val resultArb: Arbitrary[Result] = Arbitrary {
     val arbs = Seq(
-      groupCreateResArb, groupUpdateResArb, nodeMessageResArb, nodeHistoryResArb, groupSearchResArb,
+      groupCreateResArb, groupUpdateResArb, nodeHistoryResArb, groupSearchResArb,
       userConnectResArb, userUpdateResArb, userGroupListResArb, userInfoResArb)
     assert(arbs.size >= 2)
     val gens = arbs.map(_.arbitrary)

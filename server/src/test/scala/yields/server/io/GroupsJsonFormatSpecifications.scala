@@ -27,12 +27,15 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x) == x
   }
 
-  property("GroupSearch") = forAll { (x: NodeSearch) =>
+  /*
+   property("NodeMessage") = forAll { (x: NodeMessage) =>
     toAndFromJson(x) == x
   }
 
-  property("GroupSearchRes") = forAll { (x: NodeSearchRes) =>
+  property("NodeMessageRes") = forAll { (x: NodeMessageRes) =>
     toAndFromJson(x) == x
   }
+
+   */
 
 }

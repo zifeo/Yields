@@ -18,7 +18,7 @@ case class NodeSearch(pattern: String) extends Action {
     */
   override def run(metadata: Metadata): Result = {
 
-    // TODO: look for publishers through tags and names
+    // TODO: look for publishers through tags and names with tests
 
     NodeSearchRes(List.empty, List.empty, List.empty)
   }

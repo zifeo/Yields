@@ -36,16 +36,13 @@ package object io {
   implicit lazy val groupUpdateJF = jsonFormat3(GroupUpdate)
   implicit lazy val groupUpdateResJF = jsonFormat0(GroupUpdateRes)
 
-  implicit lazy val groupSearchJF = jsonFormat1(NodeSearch)
-  implicit lazy val groupSearchResJF = jsonFormat1(NodeSearchRes)
-
   implicit lazy val groupManageJF = jsonFormat5(GroupManage)
   implicit lazy val groupManageResJF = jsonFormat0(GroupManageRes)
 
   // Nodes
 
-  implicit lazy val nodeMessageJF = jsonFormat4(NodeMessage)
-  implicit lazy val nodeMessageResJF = jsonFormat2(NodeMessageRes)
+  implicit lazy val groupSearchJF = jsonFormat1(NodeSearch)
+  implicit lazy val groupSearchResJF = jsonFormat3(NodeSearchRes)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
   implicit lazy val nodeHistoryResJF = jsonFormat6(NodeHistoryRes)

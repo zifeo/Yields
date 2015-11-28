@@ -2,7 +2,7 @@ package yields.server.actions.nodes
 
 import java.time.OffsetDateTime
 
-import yields.server.actions.exceptions.ActionArgumentException
+import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
@@ -27,9 +27,12 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
       throw new ActionArgumentException(s"negative count: $count")
 
     val node = Node(nid)
-    val feed = node.getMessagesInRange(datetime, count)
+    val sender = metadata.client
 
-    val patchedFeed = feed.map {
+    if (! node.users.contains(sender))
+      throw new UnauthorizedActionException(s"$sender cannot get a message in $nid")
+
+    val feed = node.getMessagesInRange(datetime, count).map {
 
       case (date, uid, Some(mediaRef), text) =>
         val media = Media(mediaRef)
@@ -40,7 +43,7 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
 
     }
 
-    val (datetimes, senders, texts, contentTypes, content) = patchedFeed.unzip5
+    val (datetimes, senders, texts, contentTypes, content) = feed.unzip5
     NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
   }
 

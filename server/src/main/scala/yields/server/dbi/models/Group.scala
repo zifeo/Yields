@@ -38,6 +38,7 @@ object Group {
       )
       r.hmset(group.NodeKey.node, infos)
     }
+    group.addUser(creator)
     group
   }
 

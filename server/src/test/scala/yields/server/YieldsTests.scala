@@ -6,6 +6,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers}
 import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.actions.groups._
+import yields.server.actions.nodes.NodeMessage
 import yields.server.actions.users.{UserConnect, UserConnectRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
@@ -89,7 +90,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
     clientA.send(GroupCreate("clients", List.empty, List(1, 2), List.empty, "private"))
     //await(clientA.receive()).result should be (GroupCreateRes(3))
 
-    val ref = clientB.send(NodeMessage(1, Some("hello"), None, None))
+    //val ref = clientB.send(NodeMessage(1, Some("hello"), None, None))
     //await(clientB.receive()).metadata.ref should be (ref)
     //await(clientA.receive()).metadata.ref should be (ref)
   }
