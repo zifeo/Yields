@@ -75,4 +75,16 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield UserInfoRes(uid, name, email, entourage, entourageUpdates)
   }
 
+  implicit lazy val userSearchArb: Arbitrary[UserSearch] = Arbitrary {
+    for {
+      email <- arbitrary[Email]
+    } yield UserSearch(email)
+  }
+
+  implicit lazy val userSearchResArb: Arbitrary[UserSearchRes] = Arbitrary {
+    for {
+      uid <- arbitrary[UID]
+    } yield UserSearchRes(uid)
+  }
+
 }

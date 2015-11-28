@@ -66,6 +66,8 @@ package object io {
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
   implicit lazy val userInfoResJF = jsonFormat5(UserInfoRes)
 
+  implicit lazy val userSearchJF = jsonFormat1(UserSearch)
+  implicit lazy val userSearchResJF = jsonFormat1(UserSearchRes)
 
   /** *** Message passing interface *****/
 

@@ -7,7 +7,7 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
-class TestUserInfo extends DBFlatSpec with Matchers with AllGenerators {
+class TestUserInfo extends DBFlatSpec with Matchers {
 
   "UserInfo" should "get client infos" in {
 

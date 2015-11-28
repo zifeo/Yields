@@ -10,12 +10,14 @@ import yields.server.mpi.Metadata
   * Update an user given optional fields.
   * @param email new email address
   * @param name new name
-  * @param image new profile image
+  * @param pic new profile image
+  * @param addEntourage new uid to be added to entourage
+  * @param removeEntourage new uid to be removed to entourage
   * TODO: set picture
   */
 case class UserUpdate(email: Option[Email],
                       name: Option[String],
-                      image: Option[Blob],
+                      pic: Option[Blob],
                       addEntourage: List[UID],
                       removeEntourage: List[UID]) extends Action {
 
@@ -32,7 +34,7 @@ case class UserUpdate(email: Option[Email],
       if (! validEmail(newEmail))
         throw new ActionArgumentException(s"invalid email: $email")
 
-      // TODO: allow email change (unneeded with Google login)
+      // TODO: allow email change (unneeded with Google login) and write test
       // user.email = newEmail
     }
 
@@ -40,10 +42,20 @@ case class UserUpdate(email: Option[Email],
       user.name = newName
     }
 
+    for (newPic <- pic) {
+      user.pic = newPic
+    }
 
+    if (addEntourage.nonEmpty) {
+      user.addEntourage(addEntourage)
+    }
+
+    if (removeEntourage.nonEmpty) {
+      user.removeEntourage(removeEntourage)
+    }
 
     Yields.broadcast(user.entourage) {
-      UserUpdateBrd(user.uid, user.email, user.name, user.picture)
+      UserUpdateBrd(user.uid, user.email, user.name, user.pic)
     }
 
     UserUpdateRes()

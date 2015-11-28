@@ -18,7 +18,7 @@ import yields.server.utils.Temporal
   * Attributes new values are saved on respective setters.
   *
   * Database structure:
-  * users:[uid] Map[String, String] - name / email / picture / created_at / updated_at / connected_at
+  * users:[uid] Map[String, String] - name / email / pic / created_at / updated_at / connected_at
   * users:[uid]:groups Map[NID, OffsetDateTime]
   * users:[uid]:entourage Map[UID, OffsetDateTime]
   * users:indexes:email Map[Email, UID] - email
@@ -37,7 +37,7 @@ final class User private (val uid: UID) {
 
   private var _name: Option[String] = None
   private var _email: Option[Email] = None
-  private var _picture: Option[Blob] = None
+  private var _pic: Option[Blob] = None
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
   private var _connected_at: Option[OffsetDateTime] = None
@@ -73,14 +73,14 @@ final class User private (val uid: UID) {
     _email = update(StaticKey.email, newEmail)
 
   /** Picture getter. TODO: format to be determined. */
-  def picture: Blob = _picture.getOrElse {
-    _picture = redis(_.hget[Blob](Key.user, StaticKey.picture))
-    valueOrDefault(_picture, "")
+  def pic: Blob = _pic.getOrElse {
+    _pic = redis(_.hget[Blob](Key.user, StaticKey.pic))
+    valueOrDefault(_pic, "")
   }
 
   /** Picture setter. */
-  def picture_=(newPic: String): Unit =
-    _picture = update(StaticKey.picture, newPic)
+  def pic_=(newPic: String): Unit =
+    _pic = update(StaticKey.pic, newPic)
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
@@ -106,7 +106,7 @@ final class User private (val uid: UID) {
 
   /** Groups getter. */
   def groups: List[NID] = _groups.getOrElse {
-    _groups = redis(_.zrange[NID](Key.groups, 0, -1))
+    _groups = redis(_.hkeys[NID](Key.groups))
     valueOrDefault(_groups, List.empty)
   }
 
@@ -179,7 +179,7 @@ final class User private (val uid: UID) {
       .getOrElse(throw new IllegalValueException("node should have some data"))
     _name = values.get(StaticKey.name)
     _email = values.get(StaticKey.email)
-    _picture = values.get(StaticKey.picture)
+    _pic = values.get(StaticKey.pic)
     _created_at = values.get(StaticKey.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(StaticKey.updated_at).map(OffsetDateTime.parse)
   }
@@ -194,7 +194,7 @@ object User {
     val emailIndex = "users:indexes:email"
     val name = "name"
     val email = "email"
-    val picture = "picture"
+    val pic = "pic"
     val created_at = "created_at"
     val updated_at = "updated_at"
     val connected_at = "connected_at"

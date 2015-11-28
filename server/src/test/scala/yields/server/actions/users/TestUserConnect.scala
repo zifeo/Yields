@@ -7,7 +7,7 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
-class TestUserConnect extends DBFlatSpec with Matchers with AllGenerators {
+class TestUserConnect extends DBFlatSpec with Matchers {
 
   val meta = Metadata.now(0) // uid is not important at this point
 

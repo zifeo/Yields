@@ -25,7 +25,7 @@ case class GroupCreate(name: String, nodes: List[NID], users: List[UID], tags: L
       if (visibility == "private" || visibility == "public") {
 
         val group = Group.createGroup(name, metadata.client)
-        group.addNode(nodes)
+        //group.addNode(nodes)
         group.addUser(metadata.client +: users)
 
         /** Create or get tags id */
