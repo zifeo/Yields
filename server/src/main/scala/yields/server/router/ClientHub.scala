@@ -31,13 +31,11 @@ final class ClientHub(private val socket: ActorRef,
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
       val message = nonfatal.getMessage
-      val trace = nonfatal.getStackTrace.mkString("\n")
-      log.error(nonfatal, s"$address non fatal:\n$message\n$trace")
+      log.error(nonfatal, s"$address non fatal: $message")
       Resume
     case fatal =>
       val message = fatal.getMessage
-      val trace = fatal.getStackTrace.mkString("\n")
-      log.error(fatal, s"$address fatal:\n$message\n$trace")
+      log.error(fatal, s"$address fatal: $message")
       Escalate
   }
 
@@ -77,7 +75,7 @@ final class ClientHub(private val socket: ActorRef,
     case Request(n: Long) => // Stream subscriber requests more elements.
 
     case Cancel => // Stream subscriber cancels the subscription.
-      log.error(s"$address pipeline error")
+      log.error(s"$address hub detected pipeline error")
       dispatcher ! TerminateConnection
       context stop self
 
@@ -94,8 +92,7 @@ final class ClientHub(private val socket: ActorRef,
 
     case OnError(cause: Throwable) =>
       val message = cause.getMessage
-      val trace = cause.getStackTrace.mkString("\n")
-      log.error(cause, s"$address error letter:\n$message\n$trace")
+      log.error(cause, s"$address error letter: $message")
       socket ! Write(ByteString("""{"kind":"error"}"""))
 
     // ----- ClientHub letters -----
