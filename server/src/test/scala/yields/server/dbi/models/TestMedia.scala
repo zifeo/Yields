@@ -14,7 +14,12 @@ import yields.server.utils.Config
 class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
 
   val contentTypeTest = "Image"
-  val contentTest = "this is an impossible content for a normal image so it can be used for testing and it can be deleted after each test"
+  val contentTest =
+    """
+      |this is an impossible content for a normal image so it can be used for testing and
+      |it can be deleted after each test
+    """.stripMargin.toCharArray.map(_.toByte)
+
   val pathForContentTest = Media.buildPathFromName(Media.createHash(contentTest))
 
   before {

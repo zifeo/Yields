@@ -9,11 +9,11 @@ object ActionsJsonFormatSpecifications extends Properties("ActionsJsonFormat") w
   import Prop.forAll
 
   property("Action") = forAll { (x: Action) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("Result") = forAll { (x: Result) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
 }

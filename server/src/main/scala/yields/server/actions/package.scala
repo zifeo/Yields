@@ -2,17 +2,14 @@ package yields.server
 
 package object actions {
 
+  private lazy val mailPattern = """\S+@\S+\.\S+""".r
+
   /**
-    * Check if an email is valid
-    * @param email email to test
-    * @return boolean
+    * Check whether an email is valid.
+    * @param mail email to test
+    * @return true if valid
     */
-  def checkValidEmail(email: String): Boolean = {
-    lazy val validEmail = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}".r
-    email match {
-      case validEmail() => true
-      case _ => false
-    }
-  }
+  def validEmail(mail: String): Boolean =
+    mailPattern.unapplySeq(mail).nonEmpty
 
 }

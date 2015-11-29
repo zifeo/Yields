@@ -68,7 +68,8 @@ final class ClientHub(private val socket: ActorRef, private val name: String, pr
       debug("[OUT]", "completed letter /!\\")
 
     case OnError(cause) =>
-      debug("[OUT]", s"error letter /!\\: $cause")
+      val trace = cause.getStackTrace.mkString("\n")
+      debug("[OUT]", s"error letter /!\\: $cause \n $trace")
       socket ! Write(ByteString("server error"))
     // TODO : improve error handling taking into account the supervisor too
 

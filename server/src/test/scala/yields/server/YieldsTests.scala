@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.NodeMessage
-import yields.server.actions.users.{UserConnect, UserConnectRes}
+import yields.server.actions.users.{UserUpdateRes, UserUpdate, UserConnect, UserConnectRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
 import yields.server.io._
@@ -24,14 +24,14 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   private val server = Yields
 
   override def beforeAll(): Unit = {
-    logger.info("Starting local server on background")
+    logger.info("Starting local server")
     server.start()
     Thread.sleep(5000) // ensure server is active and bounded before networking with it
   }
 
   override def afterAll(): Unit = {
     server.close()
-    logger.info("Stopping local server on background")
+    logger.info("Stopping local server")
   }
 
   /**
@@ -72,27 +72,36 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
   "A client with a socket" should "be able to connect to the server" in {
+
     val client = new FakeClient(1)
     client.send(UserConnect("client@yields.im"))
-    await(client.receive()).result should be (UserConnectRes(1))
+    await(client.receive()).result should be (UserConnectRes(1, returning = false))
+
   }
 
   it should "receive pushes from the server" in {
+
     val clientA = new FakeClient(1)
     val clientB = new FakeClient(2)
 
     clientA.send(UserConnect("clientA@yields.im"))
-    await(clientA.receive()).result should be (UserConnectRes(1))
+    await(clientA.receive()).result should be (UserConnectRes(clientA.uid, returning = false))
 
     clientB.send(UserConnect("clientB@yields.im"))
-    await(clientB.receive()).result should be (UserConnectRes(2))
+    await(clientB.receive()).result should be (UserConnectRes(clientB.uid, returning = false))
 
-    clientA.send(GroupCreate("clients", Seq.empty, Seq(1, 2), Seq.empty, "private"))
-    await(clientA.receive()).result should be (GroupCreateRes(1))
+    val refUpdate = clientA.send(UserUpdate(None, None, None, List(clientB.uid), List.empty))
+    await(clientA.receive()).result should be (UserUpdateRes())
+    await(clientB.listen()).metadata.ref should be (refUpdate)
 
-    val ref = clientB.send(NodeMessage(1, Some("hello"), None, None))
-    await(clientB.receive()).metadata.ref should be (ref)
-    await(clientA.receive()).metadata.ref should be (ref)
+    val refCreate = clientA.send(GroupCreate("clients", List(clientA.uid, clientB.uid), List.empty))
+    await(clientB.listen()).metadata.ref should be (refCreate)
+    await(clientA.receive()).result should be (GroupCreateRes(3))
+
+    val refMessage = clientB.send(GroupMessage(3, Some("hello"), None, None))
+    await(clientA.listen()).metadata.ref should be (refMessage)
+    await(clientB.receive()).metadata.ref should be (refMessage)
+
   }
 
 }
