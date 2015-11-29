@@ -135,7 +135,7 @@ public class Group extends Node {
      * @throws JSONException
      */
     public Group(JSONArray jsonGroup) throws JSONException, ParseException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(), true,
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(), false,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
@@ -146,8 +146,8 @@ public class Group extends Node {
      * @param refreshedAt Last date the group has been refreshed.
      */
     public Group(String groupId, String name, String refreshedAt) throws ParseException {
-        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), DateSerialization
-                .dateSerializer.toDate(refreshedAt));
+        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), false,
+                DateSerialization.dateSerializer.toDate(refreshedAt));
     }
 
     /**

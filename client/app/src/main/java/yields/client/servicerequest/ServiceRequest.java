@@ -11,13 +11,13 @@ public abstract class ServiceRequest {
      * The Kind of request possible
      */
     public enum RequestKind {
-        PING("PING"), USER_CONNECT("UserConnect"), USER_UPDATE("UserUpdateRequest"),
+        PING("PING"), USER_CONNECT("UserConnect"), USER_UPDATE("UserUpdate"),
         USER_GROUP_LIST("UserGroupList"), USER_ENTOURAGE_ADD("UserEntourageAdd"),
         USER_ENTOURAGE_REMOVE("UserEntourageRemove"), USER_INFO("UserInfo"),
         GROUP_CREATE("GroupCreate"), GROUP_UPDATE("GroupUpdate"), GROUP_UPDATE_NAME("GroupUpdateName"),
         GROUP_UPDATE_VISIBILITY("GroupUpdateVisibility"), GROUP_UPDATE_IMAGE("GroupUpdateImage"),
         GROUP_ADD("GroupAdd"), GROUP_REMOVE("GroupRemove"),
-        NODE_MESSAGE("NodeMessage"), NODE_HISTORY("NodeHistory");
+        NODE_MESSAGE("GroupMessage"), NODE_HISTORY("NodeHistory");
 
         private final String mName;
 
