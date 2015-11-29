@@ -116,19 +116,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
     }
 
     /**
-     * Test that clicks on the 'add users' item
-     * @throws InterruptedException
-     */
-    public void testAddUsers() throws InterruptedException {
-        getActivity();
-        onView(withText(R.string.addUsers)).perform(click());
-        onView(withId(R.id.actionDoneSelectUser)).perform(click());
-
-        onView(withText("0 user(s) added to group")).inRoot(withDecorView(not(is(getActivity().
-                getWindow().getDecorView())))).check(matches(isDisplayed()));
-    }
-
-    /**
      * Test that tries to add a short tag
      */
     public void testAddTagTooShort() {
