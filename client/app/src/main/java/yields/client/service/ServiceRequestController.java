@@ -37,6 +37,7 @@ import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
@@ -153,6 +154,9 @@ public class ServiceRequestController {
             case GROUP_CREATE:
                 handleGroupCreateRequest((GroupCreateRequest) serviceRequest);
                 break;
+            case GROUP_INFO:
+                handleGroupInfoRequest((GroupInfoRequest) serviceRequest);
+                break;
             case GROUP_UPDATE_NAME:
                 handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
                 break;
@@ -262,6 +266,8 @@ public class ServiceRequestController {
             case RSS_MESSAGE_BCAST:
                 handleRSSMessageBroadcast(serverResponse);
                 break;
+            default:
+                Log.d("Y:" + this.getClass().getName(),"");
         }
     }
 
@@ -333,25 +339,27 @@ public class ServiceRequestController {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             String name = response.getString("name");
-            Byte[] pic = (Byte[]) response.get("pic");
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<User> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
-                User user =  new User("", new Id(users.getLong(i)), "", YieldsApplication
-                        .getDefaultUserImage());
-                userList.add(user);
-                ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-                        new Id(users.getLong(i)));
-                mService.sendRequest(userInfoRequest);
+            for (int i = 0 ; i < users.length() ; i ++) {
+                if (!(new Id(users.getLong(i))).equals(YieldsApplication.getUser().getId())) {
+                    User user = new User("", new Id(users.getLong(i)), "", YieldsApplication
+                                .getDefaultUserImage());
+                    userList.add(user);
+                    ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
+                            new Id(users.getLong(i)));
+                    mService.sendRequest(userInfoRequest);
+                }
 
                 //TODO : Add nodes field to group.
             }
 
             // _KetzA : I'm not really sure what to do here ...
-            Group groupInfo = new Group(name, new Id(nid), userList);
-            // TODO : (Nico) Notify activity.
+            Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
+            group.setName(name);
+            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -362,10 +370,14 @@ public class ServiceRequestController {
         try{
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
+            Date prevDatetime = DateSerialization.dateSerializer
+                    .toDate(serverResponse.getMetadata().getString("ref"));
+            Date serverDatetime = DateSerialization.dateSerializer
+                    .toDate(response.getString("datetime"));
             Id id = new Id(nid);
 
-            // TODO : (Nico) notify Activity.
+            YieldsApplication.getUser().modifyGroup(id).validateMessage(prevDatetime, serverDatetime);
+            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -530,7 +542,7 @@ public class ServiceRequestController {
             String contentType = response.getString("contentType");
             Byte[] content = (Byte[]) response.get("content");
 
-            Message message = new Message(datetime.toString(), String.valueOf(senderId), text,
+            Message message = new Message(datetime.toString(), senderId, text,
                     contentType, content);
             // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
@@ -584,7 +596,7 @@ public class ServiceRequestController {
             Byte[] content = (Byte[]) response.get("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
-            Message message = new Message(datetime.toString(), String.valueOf(senderId), text,
+            Message message = new Message(datetime.toString(), senderId, text,
                     contentType, content);
             // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
@@ -620,7 +632,7 @@ public class ServiceRequestController {
             Byte[] content = (Byte[]) response.get("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
-            Message message = new Message(datetime.toString(), String.valueOf(senderId), text,
+            Message message = new Message(datetime.toString(), senderId, text,
                     contentType, content);
             // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
@@ -672,19 +684,21 @@ public class ServiceRequestController {
     private void handleUserGroupListResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            JSONArray groups = response.getJSONArray("groups");
-            JSONArray names = response.getJSONArray("names");
+            JSONArray groupsId = response.getJSONArray("groups");
             JSONArray updatedAt = response.getJSONArray("updatedAt");
             JSONArray refreshedAt = response.getJSONArray("refreshedAt");
 
-            int groupCount = groups.length();
-            assert (groupCount == names.length() && groupCount == updatedAt.length() &&
+            int groupCount = groupsId.length();
+            assert (groupCount == updatedAt.length() &&
                     groupCount == refreshedAt.length());
 
             for (int i = 0 ; i < groupCount ; i ++){
-                Group group = new Group(groups.getString(i), names.getString(i), refreshedAt
+                Group group = new Group(groupsId.getString(i), "placeholder", refreshedAt
                         .getString(i));
                 YieldsApplication.getUser().addGroup(group);
+                ServiceRequest groupInfo =
+                        new GroupInfoRequest(YieldsApplication.getUser().getId(),group.getId());
+                mService.sendRequest(groupInfo);
                 ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
                 mService.sendRequest(historyRequest);
             }
@@ -771,23 +785,6 @@ public class ServiceRequestController {
      * @param serverResponse The response received from the server.
      */
     private void handleNodeHistoryResponse(Response serverResponse) {
-        /*try {
-            JSONArray array = serverResponse.getMessage().getJSONArray("nodes");
-            if (array.length() > 0) {
-                ArrayList<Message> list = new ArrayList<>();
-                Message message;
-                Id groupId = new Id(serverResponse.getMessage().getLong("nid"));
-                for (int i = 0; i < array.length(); i++) {
-                    message = new Message(array.getJSONArray(i));
-                    list.add(message);
-                    mCacheHelper.addMessage(message, groupId);
-                }
-                mService.receiveMessages(groupId, list);
-            }
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        }*/
-
         try {
             long nid = serverResponse.getMessage().getLong("nid");
             JSONArray datetimes = serverResponse.getMessage().getJSONArray("datetimes");
@@ -803,11 +800,14 @@ public class ServiceRequestController {
             Id groupId = new Id(nid);
             ArrayList<Message> messageList = new ArrayList<>();
             for (int i = 0 ; i < count ; i ++){
-                Message message = new Message(datetimes.getString(i), senders.getString(i), texts
-                        .getString(i), contentTypes.getString(i), (Byte[]) contents.get(i));
+                //TODO images
+                Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
+                        .getString(i), contentTypes.getString(i), null);
                 messageList.add(message);
                 mCacheHelper.addMessage(message, groupId);
             }
+
+            Log.d("Y:" + this.getClass().getName(), "put in cache");
 
             mService.receiveMessages(groupId, messageList);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
@@ -1058,6 +1058,18 @@ public class ServiceRequestController {
             }
         }
     }
+
+    /**
+     * Handles a group info request
+     */
+    private void handleGroupInfoRequest(GroupInfoRequest serviceRequest) {
+        try {
+            mCommunicationChannel.sendRequest(serviceRequest.parseRequestForServer());
+        } catch (IOException e) {
+            mService.receiveError("No connection available : " + e.getMessage());
+        }
+    }
+
 
     /**
      * Listener for the Server.

@@ -175,7 +175,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
-        addUser(message.getSender());
+        addUser(YieldsApplication.getUser(message.getSender()));
 
         try {
             deleteMessage(message, groupId);
@@ -943,7 +943,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_MESSAGE_NODE_ID, message.getId().getId());
-        values.put(KEY_MESSAGE_SENDER_ID, message.getSender().getId().getId());
+        values.put(KEY_MESSAGE_SENDER_ID, message.getSender().getId());
         values.put(KEY_MESSAGE_GROUP_ID, groupId.getId());
         values.put(KEY_MESSAGE_TEXT, message.getContent().getTextForRequest());
         values.put(KEY_MESSAGE_CONTENT_TYPE, message.getContent().getType().toString());

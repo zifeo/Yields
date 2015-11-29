@@ -78,7 +78,9 @@ public class MockFactory {
 
     public static User generateFakeUser(String name, Id id, String email) {
         Bitmap image1 = YieldsApplication.getDefaultUserImage();
-        return new User(name, id, email, image1);
+        User user = new User(name, id, email, image1);
+        YieldsApplication.getUser().addUserToEntourage(user);
+        return user;
     }
 
     public static FakeClientUser generateFakeClientUser(String name, Id id, String email, Bitmap img) {

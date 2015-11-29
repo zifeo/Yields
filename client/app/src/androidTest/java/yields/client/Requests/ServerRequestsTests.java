@@ -345,7 +345,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    textContent.getType().getType());
+                    textContent.getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
 
@@ -360,7 +360,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    imageContent.getType().getType());
+                    imageContent.getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
@@ -382,7 +382,7 @@ public class ServerRequestsTests {
             String text = "Apple pie is best pie !";
             TextContent textContent = new TextContent(text);
 
-            ServerRequest serverRequest = RequestBuilder.nodeTextMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -393,7 +393,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    textContent.getType().getType());
+                    textContent.getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
         } catch (JSONException e) {
@@ -416,7 +416,7 @@ public class ServerRequestsTests {
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
             ImageContent imageContent = new ImageContent(newImage, text);
 
-            ServerRequest serverRequest = RequestBuilder.nodeImageMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     imageContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -427,7 +427,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    imageContent.getType().getType());
+                    imageContent.getType());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
