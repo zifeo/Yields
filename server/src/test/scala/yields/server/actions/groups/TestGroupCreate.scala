@@ -25,10 +25,10 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
     action.run(meta) match {
       case GroupCreateRes(nid) =>
         val group = Group(nid)
-        group.name should be ("GroupName")
-        group.users should contain theSameElementsAs users.distinct
+        group.name should be("GroupName")
+        group.users should contain theSameElementsAs (user.uid :: users).distinct
         group.nodes should contain theSameElementsAs nodes.distinct
-        group.creator should be (user.uid)
+        group.creator should be(user.uid)
         user.groups should contain only nid
     }
   }
@@ -41,8 +41,8 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
     val users = sample[List[UID]]
     val action = new GroupCreate("GroupName", users, List.empty)
 
-    val thrown = the [UnauthorizedActionException] thrownBy action.run(meta)
-    thrown.getMessage should include (user.uid.toString)
+    val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include(user.uid.toString)
 
   }
 

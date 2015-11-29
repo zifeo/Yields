@@ -27,8 +27,10 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
   override def run(metadata: Metadata): Result = {
     val publisher = Publisher(nid)
     val datetime = Temporal.now
-    if (!publisher.users.contains(metadata.client))
-      throw new UnauthorizedActionException(s"evil user ${metadata.client} can't publish in publisher $nid")
+    if (!publisher.users.contains(metadata.client)) {
+      val client = metadata.client
+      throw new UnauthorizedActionException(s"evil user $client can't publish in publisher $nid")
+    }
 
     val media = for {
       cntType <- contentType
