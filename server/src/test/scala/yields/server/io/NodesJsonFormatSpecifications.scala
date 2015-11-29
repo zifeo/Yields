@@ -17,6 +17,8 @@ object NodesJsonFormatSpecifications extends Properties("NodesJsonFormat") with 
     toAndFromJson(x)
   }
 
+  //
+
   property("NodeSearch") = forAll { (x: NodeSearch) =>
     toAndFromJson(x)
   }

@@ -2,7 +2,7 @@ package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
 import yields.server._
-import yields.server.actions.{Result, Action, ActionsGenerators}
+import yields.server.actions.{Broadcast, Result, Action, ActionsGenerators}
 
 object ActionsJsonFormatSpecifications extends Properties("ActionsJsonFormat") with ActionsGenerators {
 
@@ -13,6 +13,10 @@ object ActionsJsonFormatSpecifications extends Properties("ActionsJsonFormat") w
   }
 
   property("Result") = forAll { (x: Result) =>
+    toAndFromJson(x)
+  }
+
+  property("Broadcast") = forAll { (x: Broadcast) =>
     toAndFromJson(x)
   }
 
