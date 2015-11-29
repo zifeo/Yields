@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.{Broadcast, Result, Action}
-import yields.server.dbi.models.Media.createMedia
+import yields.server.dbi.models.Media.create
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
@@ -28,17 +28,14 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
     val publisher = Publisher(nid)
     val datetime = Temporal.now
     if (!publisher.users.contains(metadata.client))
-      throw new UnauthorizedActionException("only registered user can publish in a publisher")
+      throw new UnauthorizedActionException(s"evil user ${metadata.client} can't publish in publisher $nid")
 
     val media = for {
       cntType <- contentType
       cnt <- content
-    } yield createMedia(cntType, cnt, metadata.client)
+    } yield create(cntType, cnt, metadata.client)
 
-    media match {
-      case Some(x) => publisher.addMessage((datetime, metadata.client, Some(x.nid), text.getOrElse("")))
-      case None => publisher.addMessage((datetime, metadata.client, None, text.getOrElse("")))
-    }
+    publisher.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse("")))
 
     Yields.broadcast(publisher.users.filter(_ != metadata.client)) {
       PublisherMessageBrd(nid, datetime, metadata.client, text, contentType, content)
@@ -49,6 +46,20 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
 
 }
 
+/**
+  * [[PublisherMessage]] Result
+  * @param nid nid of publisher
+  * @param datetime time when action was executed
+  */
 case class PublisherMessageRes(nid: NID, datetime: OffsetDateTime) extends Result
 
+/**
+  * [[PublisherMessage]] broadcast
+  * @param nid nid of publisher
+  * @param datetime time when action was executed
+  * @param sender message sender
+  * @param text text sent
+  * @param contentType content type if content is specified
+  * @param content content if a media was specified
+  */
 case class PublisherMessageBrd(nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Blob]) extends Broadcast

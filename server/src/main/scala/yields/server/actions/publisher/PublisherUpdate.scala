@@ -17,8 +17,8 @@ import yields.server.mpi.Metadata
   * @param removeNodes nodes to remove
   *
   */
-case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], addUsers: Seq[UID],
-                           removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]) extends Action {
+case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], addUsers: List[UID],
+                           removeUsers: List[UID], addNodes: List[NID], removeNodes: List[NID]) extends Action {
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -30,7 +30,7 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
     val publisher = Publisher(nid)
 
     if (!publisher.users.contains(metadata.client))
-      throw new UnauthorizedActionException("the publisher can only be updated by a user who can publish")
+      throw new UnauthorizedActionException(s"evil user ${sender.uid} can't update publisher $nid")
 
     for (newName <- name) {
       publisher.name = newName
@@ -41,19 +41,19 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
     }
 
     if (addUsers.nonEmpty) {
-      publisher.addUser(addUsers.toList)
+      publisher.addUser(addUsers)
     }
 
     if (removeUsers.nonEmpty) {
-      publisher.removeUser(removeUsers.toList)
+      publisher.removeUser(removeUsers)
     }
 
     if (addNodes.nonEmpty) {
-      publisher.addNode(addNodes.toList)
+      publisher.addNode(addNodes)
     }
 
     if (removeNodes.nonEmpty) {
-      publisher.removeNode(removeNodes.toList)
+      publisher.removeNode(removeNodes)
     }
 
     Yields.broadcast(publisher.users.filter(_ != sender)) {
@@ -64,6 +64,15 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
   }
 }
 
+/** [[PublisherUpdate]] Result */
 case class PublisherUpdateRes() extends Result
 
+/**
+  * [[PublisherUpdate]] broadcast
+  * @param nid nid of updated publisher
+  * @param name name of publisher
+  * @param pic picture of publisher
+  * @param users list of user after addition and deletion
+  * @param nodes list of user after addition and deletion
+  */
 case class PublisherUpdateBrd(nid: NID, name: String, pic: Blob, users: Seq[UID], nodes: Seq[NID]) extends Broadcast

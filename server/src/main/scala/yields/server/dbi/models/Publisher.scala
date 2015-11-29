@@ -9,7 +9,7 @@ final class Publisher private(nid: NID) extends AbstractPublisher(nid) {
 
 object Publisher {
 
-  def createPublisher(name: String, creator: UID): Publisher = {
+  def create(name: String, creator: UID): Publisher = {
     val publisher = Publisher(newIdentity())
 
     redis.withClient { r =>

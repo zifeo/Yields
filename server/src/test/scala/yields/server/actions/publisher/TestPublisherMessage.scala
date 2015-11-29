@@ -18,7 +18,7 @@ class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
     val user1 = User.create("email1@email.com")
     val user2 = User.create("email2@email.com")
     val userPublisher = User.create("email3@email.com")
-    val publisher = Publisher.createPublisher("9gag", userPublisher.uid)
+    val publisher = Publisher.create("9gag", userPublisher.uid)
 
     val group = Group.create("let's talk about 9gag", user1.uid)
     group.addUser(user2.uid)
