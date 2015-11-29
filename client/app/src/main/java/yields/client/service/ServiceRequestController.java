@@ -723,6 +723,7 @@ public class ServiceRequestController {
             mService.sendRequest(groupListRequest);
             ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
             mService.sendRequest(userInfoRequest);
+            mService.notifyChange(NotifiableActivity.Change.CONNECTED);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());

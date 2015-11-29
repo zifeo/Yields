@@ -78,8 +78,10 @@ public class YieldService extends Service {
                 YieldsApplication.setUser(new ClientUser(email));
             }
 
-            ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
-            sendRequest(connectReq);
+            /*if (mServiceRequestController.isConnected()) {
+                ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
+                sendRequest(connectReq);
+            }*/
         }
 
         Log.d("Y:" + this.getClass().getName(), "Starting yield service");

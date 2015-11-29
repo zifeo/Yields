@@ -12,7 +12,8 @@ import yields.client.yieldsapplication.YieldsApplication;
 public abstract class NotifiableActivity extends AppCompatActivity{
 
     public enum Change {
-        GROUP_SEARCH, MESSAGES_RECEIVE, GROUP_LIST, GROUP_LEAVE, GROUP_JOIN
+        GROUP_SEARCH, MESSAGES_RECEIVE, GROUP_LIST, GROUP_LEAVE, GROUP_JOIN,
+        CONNECTED, NEW_USER
     }
 
     /**
@@ -22,8 +23,10 @@ public abstract class NotifiableActivity extends AppCompatActivity{
     @Override
     public void onResume(){
         super.onResume();
-        YieldsApplication.getBinder().attachActivity(this);
-        YieldsApplication.getBinder().connectionStatus();
+        if (YieldsApplication.getBinder() != null) {
+            YieldsApplication.getBinder().attachActivity(this);
+            YieldsApplication.getBinder().connectionStatus();
+        }
     }
 
     /**
@@ -32,7 +35,9 @@ public abstract class NotifiableActivity extends AppCompatActivity{
     @Override
     public void onPause(){
         super.onPause();
-        YieldsApplication.getBinder().unsetMessageActivity();
+        if (YieldsApplication.getBinder() != null) {
+            YieldsApplication.getBinder().unsetMessageActivity();
+        }
     }
 
     /**
