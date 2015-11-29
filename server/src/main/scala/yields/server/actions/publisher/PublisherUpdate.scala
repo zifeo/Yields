@@ -3,7 +3,7 @@ package yields.server.actions.publisher
 import java.sql.Blob
 import javax.sound.sampled.UnsupportedAudioFileException
 
-import yields.server.actions.exceptions.UnauthorizeActionException
+import yields.server.actions.exceptions.{UnauthorizedActionException}
 import yields.server.actions.{Result, Action}
 import yields.server.dbi.models.{Publisher, User, UID, NID}
 import yields.server.mpi.Metadata
@@ -18,10 +18,10 @@ import yields.server.mpi.Metadata
   * @param addNodes nodes to add
   * @param removeNodes nodes to remove
   *
-  * TODO update picture
+  *                    TODO update picture
   */
 case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], addUsers: Seq[UID],
-                      removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]) extends Action {
+                           removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]) extends Action {
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -29,24 +29,24 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
     */
   override def run(metadata: Metadata): Result = {
     val sender = User(metadata.client)
-    if (sender.groups.contains(nid)) {
-      val publisher = Publisher(nid)
-      if (publisher.users.contains(metadata.client)) {
-        if (name.isDefined) {
-          if (name.get.nonEmpty) {
-            publisher.name = name.get
-          }
-        }
-        if (pic.isDefined) {
+    if (sender.groups.contains(nid))
+      throw new UnauthorizedActionException("the sender must have the publisher in his groups")
 
-        }
-        PublisherUpdateRes()
-      } else {
-        throw new UnauthorizeActionException("the publisher can only be updated by a user who can publish")
+    val publisher = Publisher(nid)
+
+    if (publisher.users.contains(metadata.client))
+      throw new UnauthorizedActionException("the publisher can only be updated by a user who can publish")
+
+    if (name.isDefined) {
+      if (name.get.nonEmpty) {
+        publisher.name = name.get
       }
-    } else {
-      throw new UnauthorizeActionException("the sender must have the publisher in his groups")
     }
+    if (pic.isDefined) {
+
+    }
+    PublisherUpdateRes()
+
   }
 }
 

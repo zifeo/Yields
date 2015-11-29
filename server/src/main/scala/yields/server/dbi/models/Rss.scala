@@ -1,6 +1,7 @@
 package yields.server.dbi.models
 
 import yields.server.dbi._
+import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.Temporal
 
 case class Rss private(override val nid: NID) extends AbstractPublisher {
@@ -19,11 +20,11 @@ case class Rss private(override val nid: NID) extends AbstractPublisher {
 
   /** url setter. */
   def url_=(u: String): Unit =
-    _url = update(NodeKey.name, u)
+    _url = update(StaticNodeKey.name, u)
 
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (NodeKey.updated_at, Temporal.now))
+    val updates = List((field, value), (StaticNodeKey.updated_at, Temporal.now))
     redis.withClient(_.hmset(NodeKey.node, updates))
     Some(value)
   }
@@ -32,13 +33,12 @@ case class Rss private(override val nid: NID) extends AbstractPublisher {
 
 object Rss {
   def createRss(name: String, url: String): Rss = {
-    val rss = Rss(Node.newNID())
+    val rss = Rss(newIdentity())
     redis.withClient { r =>
-      import rss.NodeKey
       val infos = List(
-        (NodeKey.created_at, Temporal.now),
-        (NodeKey.name, name),
-        (NodeKey.kind, classOf[Group].getSimpleName)
+        (StaticNodeKey.created_at, Temporal.now),
+        (StaticNodeKey.name, name),
+        (StaticNodeKey.kind, classOf[Group].getSimpleName)
       )
       r.hmset(rss.NodeKey.node, infos)
     }

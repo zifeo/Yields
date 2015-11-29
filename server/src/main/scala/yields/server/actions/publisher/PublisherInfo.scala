@@ -1,6 +1,6 @@
 package yields.server.actions.publisher
 
-import yields.server.actions.exceptions.UnauthorizeActionException
+import yields.server.actions.exceptions.{UnauthorizedActionException}
 import yields.server.actions.{Result, Action}
 import yields.server.dbi.models.{Publisher, User, UID, NID}
 import yields.server.mpi.Metadata
@@ -19,13 +19,12 @@ case class PublisherInfo(nid: NID) extends Action {
     */
   override def run(metadata: Metadata): Result = {
     val sender = User(metadata.client)
-    if (sender.groups.contains(nid)) {
-      val publisher = Publisher(nid)
+    if (!sender.groups.contains(nid))
+      throw new UnauthorizedActionException("client who wants the infos must be a subscriber")
 
-      PublisherInfoRes(nid, publisher.name, None, publisher.users, publisher.nodes)
-    } else {
-      throw new UnauthorizeActionException("client who wants the infos must be a subscriber")
-    }
+    val publisher = Publisher(nid)
+    PublisherInfoRes(nid, publisher.name, None, publisher.users, publisher.nodes)
+
   }
 }
 
