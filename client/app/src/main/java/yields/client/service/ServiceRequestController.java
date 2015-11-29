@@ -4,17 +4,14 @@ import android.app.DownloadManager;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,7 +47,7 @@ import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
-import yields.client.servicerequest.UserUpdateRequest;
+import yields.client.servicerequest.UserUpdateNameRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
@@ -139,7 +136,7 @@ public class ServiceRequestController {
                 handleUserConnectRequest(serviceRequest);
                 break;
             case USER_UPDATE:
-                handleUserUpdateRequest((UserUpdateRequest) serviceRequest);
+                handleUserUpdateRequest((UserUpdateNameRequest) serviceRequest);
                 break;
             case USER_GROUP_LIST:
                 handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
@@ -673,21 +670,6 @@ public class ServiceRequestController {
     }
 
     private void handleUserGroupListResponse(Response serverResponse) {
-        /*try {
-            JSONArray groupSeq = serverResponse.getMessage().getJSONArray("groups");
-            for (int i = 0; i < groupSeq.length(); i++) {
-                JSONArray jsonGroup = groupSeq.getJSONArray(i);
-                Group group = new Group(jsonGroup);
-                YieldsApplication.getUser().addGroup(group);
-                ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
-                mService.sendRequest(historyRequest);
-            }
-            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }*/
-
         try {
             JSONObject response = serverResponse.getMessage();
             JSONArray groups = response.getJSONArray("groups");
@@ -706,7 +688,8 @@ public class ServiceRequestController {
                 ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
                 mService.sendRequest(historyRequest);
             }
-            mService.notifyChange();
+
+            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
@@ -718,12 +701,15 @@ public class ServiceRequestController {
         ClientUser user = YieldsApplication.getUser();
         try {
             user.setId(new Id(serverResponse.getMessage().getLong("uid")));
-            YieldsApplication.setUser(user);
-            ServiceRequest groupListRequest = new UserGroupListRequest(user);
-            mService.sendRequest(groupListRequest);
-            ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
-            mService.sendRequest(userInfoRequest);
-            mService.notifyChange(NotifiableActivity.Change.CONNECTED);
+            if (serverResponse.getMessage().getBoolean("returning")) {
+                ServiceRequest groupListRequest = new UserGroupListRequest(user);
+                mService.sendRequest(groupListRequest);
+                ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
+                mService.sendRequest(userInfoRequest);
+                mService.notifyChange(NotifiableActivity.Change.CONNECTED);
+            } else {
+                mService.notifyChange(NotifiableActivity.Change.NEW_USER);
+            }
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -993,13 +979,13 @@ public class ServiceRequestController {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    private void handleUserUpdateRequest(UserUpdateRequest serviceRequest) {
+    private void handleUserUpdateRequest(UserUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             mCacheHelper.updateUser(serviceRequest.getUser());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserUpdateRequest correctly !");
+            Log.d(TAG, "Couldn't handle UserUpdateNameRequest correctly !");
         }
         try {
             mCommunicationChannel.sendRequest(serverRequest);
