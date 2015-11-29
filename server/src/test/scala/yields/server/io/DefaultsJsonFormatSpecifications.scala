@@ -10,7 +10,7 @@ object DefaultsJsonFormatSpecifications extends Properties("DefaultsJsonFormat")
   import Prop.forAll
 
   property("OffsetDateTime") = forAll { (x: OffsetDateTime) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
 }

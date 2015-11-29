@@ -4,13 +4,10 @@ import yields.server.actions._
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.dbi.models.{Email, UID, User}
 import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Connects an user to the server.
   * @param email user mail
-  *
-  *              TODO Update timestamp
   */
 case class UserConnect(email: Email) extends Action {
 
@@ -20,20 +17,16 @@ case class UserConnect(email: Email) extends Action {
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    if (checkValidEmail(email)) {
-      User.fromEmail(email) match {
-        case Some(user) =>
-          user.connected_at = Temporal.now
-          UserConnectRes(user.uid)
-        case None =>
-          val newUser = User.create(email)
-          newUser.connected_at = Temporal.now
-          UserConnectRes(newUser.uid)
-      }
-    } else {
-      val errorMessage = this.getClass.getSimpleName
-      throw new ActionArgumentException(s"invalid email in : $errorMessage")
-    }
+
+    if (! validEmail(email))
+      throw new ActionArgumentException(s"invalid email: $email")
+
+    val userLookup = User.fromEmail(email)
+    val user = userLookup.getOrElse(User.create(email))
+    user.connected()
+
+    UserConnectRes(user.uid, userLookup.nonEmpty)
+
   }
 
 }
@@ -41,5 +34,6 @@ case class UserConnect(email: Email) extends Action {
 /**
   * [[UserConnect]] result.
   * @param uid users uid
+  * @param returning whether the user is returining or new one
   */
-case class UserConnectRes(uid: UID) extends Result
+case class UserConnectRes(uid: UID, returning: Boolean) extends Result

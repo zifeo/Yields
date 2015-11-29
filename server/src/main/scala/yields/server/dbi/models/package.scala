@@ -9,11 +9,13 @@ import com.redis.serialization.{Format, Parse}
   */
 package object models {
 
+  private type Identity = Long
+
   /** Represents an user identifier. */
-  type UID = Long
+  type UID = Identity
 
   /** Represents a node identifier. */
-  type NID = Long
+  type NID = Identity
 
   /** Represent a tag identifier */
   type TID = Long
@@ -22,32 +24,32 @@ package object models {
   type Email = String
 
   /** Represents a byte array. */
-  type Blob = String
+  type Blob = Array[Byte]
 
-  /** Feed content coming from client */
-  type IncomingFeedContent = (OffsetDateTime, UID, Option[NID], String)
-
-  /** Feed content answering the client */
-  type ResponseFeedContent = (OffsetDateTime, UID, Option[Blob], String)
+  /** Represents a feed content (or so called message). */
+  type FeedContent = (OffsetDateTime, UID, Option[NID], String)
 
   import Parse.Implicits._
+
+  /** Redis format for [[FeedContent]], [[OffsetDateTime]].  */
+  implicit val formatFeedContent = Format {
+    case (datetime, uid, Some(nid), text) => s"$datetime,$uid,$nid,$text"
+    case (datetime, uid, None, text) => s"$datetime,$uid,,$text"
+    case datetime: OffsetDateTime => datetime.toString
+  }
 
   /** [[OffsetDateTime]] Redis parser. */
   implicit val parseOffsetDateTime = Parse[OffsetDateTime](byteArray => OffsetDateTime.parse(byteArray))
 
-  /** [[IncomingFeedContent]] Redis parser. */
-  implicit val parseFeedContent = Parse[IncomingFeedContent] { byteArray =>
-    val (datetime, uidNidText) = byteArray.span(_ != ',')
-    val (uid, nidText) = uidNidText.drop(1).span(_ != ',')
-    val (nidOption, text) = nidText.drop(1).span(_ != ',')
-    val nid: Option[NID] = if (nidOption.nonEmpty) Some(nidOption) else None
-    (datetime, uid, nid, text.drop(1))
-  }
+  /** [[FeedContent]] Redis parser. */
+  implicit val parseFeedContent = Parse[FeedContent] { byteArray =>
+    byteArray.split(",", 4) match {
+      case Array(datetime, uid, "", text) =>
+        (OffsetDateTime.parse(datetime), uid.toLong, None, text)
 
-  /** [[IncomingFeedContent]] Redis format. */
-  implicit val formatFeedContent = Format {
-    case (datetime, uid, Some(nid), text) => s"$datetime,$uid,$nid,$text"
-    case (datetime, uid, None, text) => s"$datetime,$uid,,$text"
+      case Array(datetime, uid, nid, text) =>
+        (OffsetDateTime.parse(datetime), uid.toLong, Some(nid.toLong), text)
+    }
   }
 
 }

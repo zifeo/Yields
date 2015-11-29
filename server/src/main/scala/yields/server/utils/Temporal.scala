@@ -20,4 +20,7 @@ object Temporal {
   /** Returns a date not yet set. */
   def minimum: OffsetDateTime = OffsetDateTime.MIN
 
+  /** Returns a date not yet set. */
+  def maximum: OffsetDateTime = OffsetDateTime.MAX
+
 }
