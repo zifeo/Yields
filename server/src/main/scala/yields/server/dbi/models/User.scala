@@ -119,8 +119,9 @@ final class User private (val uid: UID) {
         p.hmget[String, OffsetDateTime](nodeKey, StaticNodeKey.updated_at, StaticNodeKey.refreshed_at)
       }
     }
-    val res = valueOrException(query).asInstanceOf[List[Option[Map[String, OffsetDateTime]]]]
-    currentGroup.zip(res.flatten).map { case (nid, values) =>
+    val res = valueOrException(query).asInstanceOf[List[Option[Map[String, OffsetDateTime]]]].flatten
+    assert(res.size == currentGroup.size, "groupsWithUpdates returns incoherent results")
+    currentGroup.zip(res).map { case (nid, values) =>
       (nid, values(StaticNodeKey.updated_at), values(StaticNodeKey.refreshed_at))
     }
   }
@@ -149,7 +150,7 @@ final class User private (val uid: UID) {
       }
     }
     val res = valueOrException(query).asInstanceOf[List[Option[OffsetDateTime]]].flatten
-    assert(res.size == currentEntourage.size)
+    assert(res.size == currentEntourage.size, "entourageWithUpdates returns incoherent results")
     currentEntourage.zip(res)
   }
 

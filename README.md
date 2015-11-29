@@ -74,6 +74,7 @@ UserGroupList
 UserSearch
 	input	email: String
 	output	uid: UID
+	rules	uid == 0 if not found
 ```
 
 ### Nodes actions

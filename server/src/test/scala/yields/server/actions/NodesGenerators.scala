@@ -30,13 +30,15 @@ trait NodesGenerators extends DefaultsGenerators {
     } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
   }
 
-  implicit lazy val groupSearchArb: Arbitrary[NodeSearch] = Arbitrary {
+  //
+
+  implicit lazy val nodeSearchArb: Arbitrary[NodeSearch] = Arbitrary {
     for {
       pattern <- arbitrary[String]
     } yield NodeSearch(pattern)
   }
 
-  implicit lazy val groupSearchResArb: Arbitrary[NodeSearchRes] = Arbitrary {
+  implicit lazy val nodeSearchResArb: Arbitrary[NodeSearchRes] = Arbitrary {
     for {
       nodes <- arbitrary[List[NID]]
       names <- arbitrary[List[String]]

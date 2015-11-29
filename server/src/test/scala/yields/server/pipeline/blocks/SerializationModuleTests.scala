@@ -19,13 +19,11 @@ class SerializationModuleTests extends FlatSpec with MessagesGenerators {
 
     val zipGen = requestArb.arbitrary.map(request => request -> responseArb.arbitrary.sample.get)
     val (source, generated) = generateSource(zipGen, cases)
-    val correspondence = generated.toMap
 
-    // Array of byte make some correspondence fail as they do not have a good equality, in this case take the fallback
-    val mapping = Flow[Request].map { req =>
-      lazy val fallback = correspondence.find(_._1.metadata == req.metadata).getOrElse(throw new Exception("no luck"))
-      correspondence.getOrElse(req, fallback._2)
+    val correspondence = generated.toMap.map { case (req, res) =>
+      req.toJson.toString -> res
     }
+    val mapping = Flow[Request].map(req => correspondence(req.toJson.toString))
 
     source
       .map { case (request, _) =>

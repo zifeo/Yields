@@ -16,6 +16,10 @@ object MessagesJsonFormatSpecifications extends Properties("MessagesJsonFormat")
     toAndFromJson(x)
   }
 
+  property("Notification") = forAll { (x: Notification) =>
+    toAndFromJson(x)
+  }
+
   property("Metadata") = forAll { (x: Metadata) =>
     toAndFromJson(x)
   }
