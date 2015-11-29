@@ -68,6 +68,10 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
                 idDrawable = R.drawable.ic_group_black_24dp;
                 break;
 
+            case ADD_NODE:
+                idDrawable = R.drawable.ic_group_black_24dp;
+                break;
+
             default:
                 idDrawable = R.drawable.ic_short_text_black_24dp;
                 break;

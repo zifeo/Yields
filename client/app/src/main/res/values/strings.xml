@@ -63,4 +63,5 @@
     <string name="changeUserName">Change username</string>
     <string name="changeUserImage">Change your picture</string>
     <string name="logout">Logout</string>
+    <string name="addNode">Add node</string>
 </resources>

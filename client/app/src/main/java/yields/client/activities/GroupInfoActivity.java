@@ -216,11 +216,20 @@ public class GroupInfoActivity extends NotifiableActivity {
                     YieldsApplication.setGroupAdded(mGroup);
                     YieldsApplication.setGroupAddedValid(true);
 
-                    Intent intent = new Intent(GroupInfoActivity.this, CreateGroupActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    if (mMode == SearchGroupActivity.Mode.ADD_NODE_NEW_GROUP){
+                        Intent intent = new Intent(GroupInfoActivity.this, CreateGroupActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-                    startActivity(intent);
+                        startActivity(intent);
+                    }
+                    else {
+                        Intent intent = new Intent(GroupInfoActivity.this, GroupSettingsActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                        startActivity(intent);
+                    }
                 }
             });
         }

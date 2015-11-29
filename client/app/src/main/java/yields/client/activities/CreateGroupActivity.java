@@ -88,23 +88,12 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         mListView.setAdapter(mAdapterUsersGroupsCheckBox);
 
-        /*mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkboxUser);
-
-                boolean b = mUsers.get(position).getValue();
-
-                checkBox.setChecked(!b);
-                mUsers.get(position).setValue(!b);
-            }
-        });
-
-        mListView.setItemsCanFocus(false);*/
-
         YieldsApplication.setGroupAddedValid(false);
     }
 
+    /**
+     * Method called when this activity is resumed
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -163,7 +152,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             case R.id.actionAddNodeToGroup:
                 Intent intent = new Intent(this, SearchGroupActivity.class);
                 intent.putExtra(SearchGroupActivity.MODE_KEY,
-                        SearchGroupActivity.Mode.ADD_NODE.ordinal());
+                        SearchGroupActivity.Mode.ADD_NODE_NEW_GROUP.ordinal());
 
                 startActivity(intent);
                 break;
