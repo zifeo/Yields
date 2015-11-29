@@ -59,4 +59,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="connectIcon">Connect Icon</string>
     <string name="noConnectionText">You aren\'t connected</string>
+    <string name="saveImageToGalleryDialog">Save image to Gallery ?</string>
+    <string name="saveImageAcceptButton">Save</string>
+    <string name="saveImageDeclineButton">Cancel</string>
 </resources>
