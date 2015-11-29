@@ -13,6 +13,9 @@ import yields.client.R;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Simple dialog box that appears
+ */
 public class SaveImageToGalleryFragment extends DialogFragment {
 
     @Override
@@ -30,9 +33,9 @@ public class SaveImageToGalleryFragment extends DialogFragment {
                 })
                 .setNegativeButton(R.string.saveImageDeclineButton, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        //Just close the dialog
                     }
                 });
-        // Create the AlertDialog object and return it
         return builder.create();
     }
 }
