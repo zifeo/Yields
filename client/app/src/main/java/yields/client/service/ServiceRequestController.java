@@ -266,6 +266,7 @@ public class ServiceRequestController {
     }
 
     private void handleUserUpdateResponse(Response serverResponse){
+        Log.d("ServiceRequestCtrllr", "Response for UserUpdate");
         // Nothing to parse.
         // TODO : decide what to do.
     }
@@ -287,13 +288,13 @@ public class ServiceRequestController {
         try {
             JSONObject response = serverResponse.getMessage();
             long uid = response.getLong("uid");
-            String name = response.getString("name");
+            /*String name = response.getString("name");
             Byte[] pic = (Byte[]) response.get("pic");
             byte[] primitivePic = convertToPrimitiveByteArray(pic);
-            // TODO : Retrieve email.
             User user = new User(name, new Id(uid), "", BitmapFactory.decodeByteArray
-                    (primitivePic, 0, primitivePic.length));
+                    (primitivePic, 0, primitivePic.length));*/
 
+            // Send uid.
             // TODO : (Nico) Notify Activity.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -318,7 +319,6 @@ public class ServiceRequestController {
 
                 // TODO : Make the fucking class representing nodes having an image.
             }
-
             // TODO : (Nico) Notify activity.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -345,6 +345,8 @@ public class ServiceRequestController {
                 // TODO : retrieve email and name of the users.
                 userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
                         .getDefaultUserImage()));
+
+                //TODO : Add nodes to group.
             }
 
             // _KetzA : I'm not really sure what to do here ...
@@ -382,6 +384,7 @@ public class ServiceRequestController {
     }
 
     private void handlePublisherUpdateResponse(Response serverResponse){
+        Log.d("ServiceRequestCtrllr", "Response for Publisher Update.");
         // Nothing to parse.
         // TODO : decide what to do.
     }
@@ -429,6 +432,15 @@ public class ServiceRequestController {
 
     private void handleNodeMessageBroadcast(Response serverResponse){
         // TODO : Not very clear on how to use this. See later.
+        try{
+            JSONObject response = serverResponse.getMessage();
+            String kind = response.getString("kind");
+            JSONObject message = response.getJSONObject("message");
+             // TODO : What to do with message ?
+        } catch (JSONException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
     }
 
     private void handleUserUpdateBroadcast(Response serverResponse){
