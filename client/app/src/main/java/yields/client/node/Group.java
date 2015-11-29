@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -122,9 +123,9 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users, Date lastUpdate) {
+    public Group(String name, Id id, List<User> users, Boolean validated, Date lastUpdate) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
-                false, lastUpdate);
+                validated, lastUpdate);
     }
 
     /**
@@ -134,7 +135,7 @@ public class Group extends Node {
      * @throws JSONException
      */
     public Group(JSONArray jsonGroup) throws JSONException, ParseException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(),
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(), true,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
@@ -230,6 +231,7 @@ public class Group extends Node {
      */
     synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
+            Log.d("Y:" + this.getClass().getName(), newMessage.getId().getId().toString());
             mMessages.put(newMessage.getDate(), newMessage);
         }
     }
