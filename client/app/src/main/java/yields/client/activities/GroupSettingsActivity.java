@@ -98,7 +98,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK) {
             Objects.requireNonNull(data);
             Objects.requireNonNull(data.getData());
@@ -111,6 +110,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
                     String message = "Group image changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
+
+                    int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
+                    mGroup.setImage(Bitmap.createScaledBitmap(image, diameter, diameter, false));
 
                     ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(), image);
                     YieldsApplication.getBinder().sendRequest(request);
