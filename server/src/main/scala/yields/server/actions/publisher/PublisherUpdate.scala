@@ -1,7 +1,6 @@
 package yields.server.actions.publisher
 
 import java.sql.Blob
-import javax.sound.sampled.UnsupportedAudioFileException
 
 import yields.server.actions.exceptions.{UnauthorizedActionException}
 import yields.server.actions.{Result, Action}
@@ -18,7 +17,6 @@ import yields.server.mpi.Metadata
   * @param addNodes nodes to add
   * @param removeNodes nodes to remove
   *
-  *                    TODO update picture
   */
 case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], addUsers: Seq[UID],
                            removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]) extends Action {
@@ -29,12 +27,12 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
     */
   override def run(metadata: Metadata): Result = {
     val sender = User(metadata.client)
-    if (sender.groups.contains(nid))
+    if (!sender.groups.contains(nid))
       throw new UnauthorizedActionException("the sender must have the publisher in his groups")
 
     val publisher = Publisher(nid)
 
-    if (publisher.users.contains(metadata.client))
+    if (!publisher.users.contains(metadata.client))
       throw new UnauthorizedActionException("the publisher can only be updated by a user who can publish")
 
     if (name.isDefined) {
@@ -46,7 +44,6 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
 
     }
     PublisherUpdateRes()
-
   }
 }
 

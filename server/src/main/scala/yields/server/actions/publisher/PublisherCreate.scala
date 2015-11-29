@@ -20,21 +20,20 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    if (name.nonEmpty) {
-      val sender = User(metadata.client)
-      val entourage = sender.entourage
-      // Rules
-      if (users.forall(entourage.contains)) {
-        val publisher = Publisher.createPublisher(name)
-        publisher.addUser(users.toList)
-        publisher.addNode(nodes.toList)
-        PublisherCreateRes(publisher.nid)
-      } else {
-        throw new ActionArgumentException("users must be in sender's entourage")
-      }
-    } else {
+    if (name.isEmpty)
       throw new ActionArgumentException("publisher name cannot be empty")
-    }
+
+    val sender = User(metadata.client)
+    val entourage = sender.entourage
+    // Rules
+    if (!users.forall(entourage.contains))
+      throw new ActionArgumentException("users must be in sender's entourage")
+
+    val publisher = Publisher.createPublisher(name)
+    publisher.addUser(users.toList)
+    publisher.addNode(nodes.toList)
+    PublisherCreateRes(publisher.nid)
+
   }
 }
 
