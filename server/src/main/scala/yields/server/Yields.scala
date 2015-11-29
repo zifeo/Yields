@@ -53,7 +53,7 @@ object Yields {
     * @param bcast result to be broacasted
     * @return result broadcasted
     */
-  def broadcast(uids: Seq[UID])(bcast: Broadcast): Unit = {
+  def broadcast(uids: List[UID])(bcast: Broadcast): Unit = {
     import Dispatcher._
     Yields.dispatcher ! Notify(uids, bcast)
   }
