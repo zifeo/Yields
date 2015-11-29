@@ -11,7 +11,7 @@ class ActionsTest extends FlatSpec with Matchers {
       "test.test@test.ch",
       "100@100.ch"
     )
-    emails.forall(validEmail) should be (true)
+    emails.forall(validEmail) should be(true)
 
   }
 
@@ -23,7 +23,25 @@ class ActionsTest extends FlatSpec with Matchers {
       "test@ test.ch",
       "test@test. ch"
     )
-    emails.forall(validEmail) should be (false)
+    emails.forall(validEmail) should be(false)
+  }
+
+  "validURL" should "accept basic urls" in {
+    val urls = List(
+      "https://www.google.com",
+      "https://somethingis.cooking"
+    )
+    urls.forall(validURL) should be(true)
+  }
+
+  it should "reject malformed urls" in {
+    val urls = List(
+      "hello.com",
+      "www.google.com",
+      "www .google.com",
+      "https://www.google .com"
+    )
+    urls.forall(validURL) should be(false)
   }
 
 }

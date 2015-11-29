@@ -29,8 +29,10 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
 
     val publisher = Publisher(nid)
 
-    if (!publisher.users.contains(metadata.client))
-      throw new UnauthorizedActionException(s"evil user ${sender.uid} can't update publisher $nid")
+    if (!publisher.users.contains(metadata.client)) {
+      val uid = metadata.client
+      throw new UnauthorizedActionException(s"evil user $uid can't update publisher $nid")
+    }
 
     for (newName <- name) {
       publisher.name = newName

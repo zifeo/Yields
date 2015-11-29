@@ -3,7 +3,7 @@ package yields.server
 package object actions {
 
   private lazy val mailPattern = """\S+@\S+\.\S+""".r
-  private lazy val urlPattern = """[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)""".r
+  private lazy val urlPattern = """https?://\S+.\S+?""".r
 
   /**
     * Check whether an email is valid.
