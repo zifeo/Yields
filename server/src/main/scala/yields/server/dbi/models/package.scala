@@ -13,7 +13,7 @@ import scala.io.Source
   */
 package object models {
 
-  private type Identity = Long
+  type Identity = Long
 
   /** Represents an user identifier. */
   type UID = Identity
@@ -31,7 +31,7 @@ package object models {
   type Blob = Array[Byte]
 
   /** Represents a feed content (or so called message). */
-  type FeedContent = (OffsetDateTime, UID, Option[NID], String)
+  type FeedContent = (OffsetDateTime, Identity, Option[NID], String)
 
   import Parse.Implicits._
 
