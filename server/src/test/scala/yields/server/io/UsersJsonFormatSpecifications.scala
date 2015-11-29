@@ -17,6 +17,8 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
     toAndFromJson(x)
   }
 
+  //
+
   property("UserUpdate") = forAll { (x: UserUpdate) =>
     toAndFromJson(x)
   }
@@ -29,6 +31,8 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
     toAndFromJson(x)
   }
 
+  //
+
   property("UserGroupList") = forAll { (x: UserGroupList) =>
     toAndFromJson(x)
   }
@@ -37,6 +41,8 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
     toAndFromJson(x)
   }
 
+  //
+
   property("UserInfo") = forAll { (x: UserGroupListRes) =>
     toAndFromJson(x)
   }
@@ -44,6 +50,8 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
   property("UserInfoRes") = forAll { (x: UserGroupListRes) =>
     toAndFromJson(x)
   }
+
+  //
 
   property("UserSearch") = forAll { (x: UserSearch) =>
     toAndFromJson(x)
