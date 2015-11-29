@@ -36,7 +36,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * on their name or tags.
  */
 public class SearchGroupActivity extends NotifiableActivity{
-    public enum Mode {SEARCH, ADD_NODE};
+    public enum Mode {SEARCH, ADD_NODE_NEW_GROUP, ADD_NODE_EXISTING_GROUP};
 
     public final static String MODE_KEY = "MODE";
 

@@ -45,7 +45,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE = 1;
     private static final int REQUEST_ADD_USERS = 2;
-    private static final int REQUEST_ADD_NODE = 3;
 
     private static final String TAG = "GroupSettingsActivity";
 
@@ -89,6 +88,25 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
         assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
         assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created";
+    }
+
+    /**
+     * Method called when this activity is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (YieldsApplication.getGroupAddedValid()){
+            Group group = YieldsApplication.getGroupAdded();
+
+            // TODO Send the request to add the new group
+
+            String text = "Group \"" + group.getName() + "\" added";
+            YieldsApplication.showToast(getApplicationContext(), text);
+
+            YieldsApplication.setGroupAddedValid(false);
+        }
     }
 
     /**
@@ -199,6 +217,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
                 case ADD_TAG:
                     changeTagListener();
+                    break;
+
+                case ADD_NODE:
+                    addNodeListener();
                     break;
 
                 default:
@@ -326,6 +348,17 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     EMAIL_LIST_INPUT_KEY, emailList);
 
             startActivityForResult(intentSelectUsers, REQUEST_ADD_USERS);
+        }
+
+        /**
+         * Listener for the "Add node" item.
+         */
+        private void addNodeListener() {
+            Intent intent = new Intent(GroupSettingsActivity.this, SearchGroupActivity.class);
+            intent.putExtra(SearchGroupActivity.MODE_KEY,
+                    SearchGroupActivity.Mode.ADD_NODE_EXISTING_GROUP.ordinal());
+
+            startActivity(intent);
         }
 
         /**
