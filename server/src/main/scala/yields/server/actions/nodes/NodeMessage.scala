@@ -33,7 +33,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
       throw new UnauthorizedActionException(s"$sender does not belong to $nid")
 
     if (contentType.isDefined != content.isDefined)
-      throw new ActionArgumentException(s"content must a corresponding content type")
+      throw new ActionArgumentException(s"content must have a corresponding content type")
 
     if (text.isEmpty && content.isEmpty)
       throw new ActionArgumentException(s"at least text or content must be defined")
@@ -46,7 +46,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     } yield Media.create(cntType, cnt, sender)
     val datetime = Temporal.now
 
-    assert(node.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse(""))))
+    node.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse("")))
 
     Yields.broadcast(node.users.filter(_ != sender)) {
       broadcast(datetime, sender)
