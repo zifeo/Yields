@@ -4,7 +4,7 @@ import yields.server.dbi._
 import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.Temporal
 
-case class Rss private(override val nid: NID) extends AbstractPublisher {
+final class Rss private (nid: NID) extends AbstractPublisher(nid) {
 
   object RSSKey {
     val url = "rss_url"

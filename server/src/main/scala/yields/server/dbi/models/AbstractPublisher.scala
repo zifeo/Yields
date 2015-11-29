@@ -12,7 +12,7 @@ package yields.server.dbi.models
   * List[UID]     -> List of user that can publish in it
   * List[NID]     -> List of nodes that registered it
   */
-abstract class AbstractPublisher private(override val nid: NID) extends Node(nid) {
+abstract class AbstractPublisher protected (nid: NID) extends Node(nid) {
 
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {
@@ -28,4 +28,5 @@ abstract class AbstractPublisher private(override val nid: NID) extends Node(nid
       group = Group(nid)
     } yield group.addMessage(content)
   }
+
 }
