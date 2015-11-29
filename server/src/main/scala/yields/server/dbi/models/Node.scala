@@ -143,12 +143,12 @@ class Node protected(val nid: NID) {
 
   /** Picture getter. */
   def pic: Blob = {
-    _pic.getOrElse(redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic)))
+    _pic = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
     if (_pic.isDefined) {
       val m = Media(_pic.get)
       m.content
     } else {
-      throw new Exception("Node picture undefined")
+      Array()
     }
   }
 
