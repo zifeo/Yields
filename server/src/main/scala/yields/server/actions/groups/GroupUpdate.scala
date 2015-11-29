@@ -31,7 +31,7 @@ case class GroupUpdate(nid: NID,
     val group = Group(nid)
     val sender = metadata.client
 
-    if (! group.users.contains(sender))
+    if (!group.users.contains(sender))
       throw new UnauthorizedActionException(s"$sender does not belong to $nid")
 
     for (newName <- name) {
@@ -39,7 +39,7 @@ case class GroupUpdate(nid: NID,
     }
 
     for (newPic <- pic) {
-      //group.pic = newPic
+      group.picSetter(newPic, metadata.client)
     }
 
     if (addUsers.nonEmpty) {

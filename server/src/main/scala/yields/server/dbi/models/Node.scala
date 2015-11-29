@@ -20,7 +20,7 @@ import yields.server.utils.Temporal
   * nodes:[nid]:nodes Map[NID, OffsetDateTIme] with score datetime
   * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
   */
-class Node protected (val nid: NID) {
+class Node protected(val nid: NID) {
 
   object NodeKey {
     val node = s"nodes:$nid"
@@ -38,6 +38,7 @@ class Node protected (val nid: NID) {
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
+  private var _pic: Option[NID] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -140,6 +141,29 @@ class Node protected (val nid: NID) {
   def removeNode(oldNode: List[NID]): Boolean =
     remWithTime(NodeKey.nodes, oldNode)
 
+  /** Picture getter. */
+  def pic: Blob = {
+    _pic = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
+    if (_pic.isDefined) {
+      val m = Media(_pic.get)
+      m.content
+    } else {
+      Array.empty
+    }
+  }
+
+  /**
+    * Picture setter.
+    * Delete old picture if there is one and create new media on disk
+    */
+  def picSetter(content: Blob, creator: UID): Unit = {
+    if (_pic.isDefined) {
+      Media.deleteContentOnDisk(_pic.get)
+    }
+    val newPic = Media.create("image", content, creator)
+    _pic = update(StaticNodeKey.node_pic, newPic.nid)
+  }
+
   /** Get n messages starting from some point */
   def getMessagesInRange(datetime: OffsetDateTime, count: Int): List[FeedContent] = {
     _feed = redis(_.zrangebyscore[FeedContent](
@@ -180,6 +204,7 @@ object Node {
     val created_at = "created_at"
     val updated_at = "updated_at"
     val creator = "creator"
+    val node_pic = "pic_nid"
   }
 
   /** Node constructor. */

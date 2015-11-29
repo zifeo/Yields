@@ -37,20 +37,20 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   it should "exists on disk" in {
-    val img = Media.createMedia(contentTypeTest, contentTest, 1)
+    val img = Media.create(contentTypeTest, contentTest, 1)
     val exists = Media.checkFileExist(img.hash)
     exists should be(true)
   }
 
   "file path" should "respect pattern storage/media/hash.bin" in {
-    val img = Media.createMedia(contentTypeTest, contentTest, 1)
+    val img = Media.create(contentTypeTest, contentTest, 1)
     val hash = img.hash
     val path = Media.buildPathFromName(hash)
     path should be(img.path)
   }
 
   it should "return the image with the same content" in {
-    val img = Media.createMedia(contentTypeTest, contentTest, 1)
+    val img = Media.create(contentTypeTest, contentTest, 1)
     val img2 = Media(img.nid)
 
     img2.content should be(img.content)

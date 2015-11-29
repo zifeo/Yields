@@ -43,7 +43,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     val media = for {
       cntType <- contentType
       cnt <- content
-    } yield Media.createMedia(cntType, cnt, sender)
+    } yield Media.create(cntType, cnt, sender)
     val datetime = Temporal.now
 
     node.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse("")))
