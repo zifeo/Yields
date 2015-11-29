@@ -146,7 +146,7 @@ public class Group extends Node {
      * @param refreshedAt Last date the group has been refreshed.
      */
     public Group(String groupId, String name, String refreshedAt) throws ParseException {
-        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), false,
+        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), true,
                 DateSerialization.dateSerializer.toDate(refreshedAt));
     }
 
@@ -175,6 +175,19 @@ public class Group extends Node {
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
         return new Group("message comment", messageComment.getId(), group.getUsers());
+    }
+
+    /**
+     *
+     */
+    public void validateMessage(Date date, Date newDate){
+        Message message = mMessages.remove(date);
+        if (message != null){
+            message.setStatus(Message.MessageStatus.SENT, newDate);
+            mMessages.put(newDate, message);
+        } else {
+            Log.d("Y:" + this.getClass().getName(), mMessages.keySet().toString());
+        }
     }
 
     /**
@@ -231,7 +244,6 @@ public class Group extends Node {
      */
     synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
-            Log.d("Y:" + this.getClass().getName(), newMessage.getId().getId().toString());
             mMessages.put(newMessage.getDate(), newMessage);
         }
     }
@@ -334,7 +346,7 @@ public class Group extends Node {
      * @return The last message.
      */
     private Message getLastMessage() {
-        return mMessages.firstEntry().getValue();
+        return mMessages.lastEntry().getValue();
     }
 
     /**

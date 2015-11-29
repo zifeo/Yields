@@ -14,12 +14,12 @@ public class Response {
      * The Kind of possible Responses.
      */
     public enum ResKind {
-        NODE_HISTORY_RESPONSE("GroupHistoryRes"), NODE_MESSAGE_RESPONSE("GroupMessageRes"),
+        NODE_HISTORY_RESPONSE("NodeHistoryRes"), NODE_MESSAGE_RESPONSE("NodeMessageRes"),
         USER_CONNECT_RESPONSE("UserConnectRes"), USER_GROUP_LIST_RESPONSE("UserGroupListRes"),
         USER_INFO_RESPONSE("UserInfoRes"), GROUP_CREATE_RESPONSE("GroupCreateRes"),
         USER_UPDATE_RESPONSE("UserUpdateres"), USER_SEARCH_RESPONSE("UserSearchRes"),
         NODE_SEARCH_RESPONSE("NodeSearchRes"), GROUP_UPDATE_RESPONSE("GroupUpdateRes"),
-        GROUP_INFO_RESPONSE("GroupsInfoRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes"),
+        GROUP_INFO_RESPONSE("GroupInfoRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes"),
         PUBLISHER_CREATE_RESPONSE("PublisherCreateRes"), PUBLISHER_UPDATE_RESPONSE
                 ("PublisherUpdateRes"), PUBLISHER_INFO_RESPONSE("PublisherInfoRes"),
         PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"), RSS_CREATE_RESPONSE("RssCreateRes"),

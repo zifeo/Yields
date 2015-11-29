@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -287,5 +288,20 @@ public class YieldsApplication {
      */
     public static Bitmap getShownImage() {
         return mShownImage;
+    }
+
+    public static User getUser(Id userId) {
+        if (userId.equals(mUser.getId())) {
+            return mUser;
+        }
+
+        User user = mUser.modifyEntourage(userId);
+
+        if (user == null) {
+            throw new IllegalArgumentException(
+                    "request information about a user you aren't suppose to ask");
+        }
+
+        return user;
     }
 }

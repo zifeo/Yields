@@ -87,4 +87,24 @@ public class ClientUser extends User {
             }
         }
     }
+
+    public Group modifyGroup(Id groupId) {
+        for (Group group :
+                mGroups) {
+            if (group.getId().equals(groupId)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    public User modifyEntourage(Id userId) {
+        for (User user : mEntourage) {
+            if (userId.equals(user.getId())) {
+                return user;
+            }
+        }
+
+        return null;
+    }
 }

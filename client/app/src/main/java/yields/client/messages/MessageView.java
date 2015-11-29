@@ -19,6 +19,7 @@ import yields.client.R;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.gui.GraphicTransforms;
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -59,7 +60,8 @@ public class MessageView extends LinearLayout {
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
-        String senderEmail = mMessage.getSender().getEmail();
+        User sender = YieldsApplication.getUser(mMessage.getSender());
+        String senderEmail = sender.getEmail();
         String currentUserEmail = YieldsApplication.getUser().getEmail();
         boolean userIsSender = senderEmail.equals(currentUserEmail);
         Context applicationContext = YieldsApplication.getApplicationContext();
@@ -76,7 +78,7 @@ public class MessageView extends LinearLayout {
         ImageView imageViewProfilPicture;
         imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
 
-        Bitmap image = mMessage.getSender().getImg();
+        Bitmap image = sender.getImg();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
 
@@ -86,7 +88,7 @@ public class MessageView extends LinearLayout {
         TextView nameTextView = (TextView) v.findViewById(R.id.nametextview);
         TextView dateTextView = (TextView) v.findViewById(R.id.datetextview);
 
-        nameTextView.setText(mMessage.getSender().getName());
+        nameTextView.setText(sender.getName());
         nameTextView.setTextSize(10);
         nameTextView.setTextColor(Color.rgb(39, 89, 196));
 

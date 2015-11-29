@@ -87,15 +87,15 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessageHasCorrectStatus() {
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Content content = MockFactory.generateFakeTextContent(1);
-        Message message = new Message("message", new Id(-4), user, content, new Date(),
+        Message message = new Message("message", new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.NOT_SENT);
         assertEquals(Message.MessageStatus.NOT_SENT, message.getStatus());
 
-        message = new Message("message", new Id(-4), user, content, new Date(),
+        message = new Message("message", new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.SENT);
         assertEquals(Message.MessageStatus.SENT, message.getStatus());
 
-        message = new Message("message", new Id(-4), user, content, new Date(),
+        message = new Message("message", new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.SEEN);
         assertEquals(Message.MessageStatus.SEEN, message.getStatus());
     }
@@ -181,27 +181,5 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         //TODO : find a way to check that layout image is correct
     }
 
-    /**
-     * Tests Message's constructor that takes a String (JSON format).
-     */
-    @Test
-    public void testMessagesFromJSONAreCorrectlyParsedForSender() throws JSONException, ParseException {
-        Message m = new Message(new JSONArray(JSON_MESSAGE));
-        User u = m.getSender();
-        assertEquals((new Id(117)).getId(), u.getId().getId());
-    }
-
-    @Test
-    public void testMessagesFromJSONAreCorrectlyParserForDate() throws JSONException, ParseException {
-        Message m = new Message(new JSONArray(JSON_MESSAGE));
-        Date date = m.getDate();
-        assertEquals(DateSerialization.dateSerializer.toDate("2015-11-17T00:30:16.276+01:00").toString(), date.toString());
-    }
-
-    @Test
-    public void testMessagesFromJSONAreCorrectlyParserForContent() throws JSONException, ParseException {
-        Message m = new Message(new JSONArray(JSON_MESSAGE));
-        TextContent content = (TextContent) m.getContent();
-        assertEquals("MESSAGE_TEXT", content.getText());
-    }
+    // Test no Longer of use as we changed parsing method
 }

@@ -91,6 +91,19 @@ public class RequestBuilder {
         return userUpdateRequest(sender, name, null, null, new ArrayList<Id>(), new ArrayList<Id>());
     }
 
+    /**
+     *
+     */
+    public static ServerRequest groupInfoRequest(Id sender, Id groupId) {
+        Objects.requireNonNull(sender);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_INFO, sender);
+
+        builder.addField(Fields.NID, groupId);
+
+        return builder.request();
+    }
+
 
     /**
      * ServerRequest to receive the group list.

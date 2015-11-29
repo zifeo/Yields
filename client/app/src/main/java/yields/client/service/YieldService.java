@@ -216,12 +216,11 @@ public class YieldService extends Service {
     synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
-            List<Group> groups = YieldsApplication.getUser().getUserGroups();
-            for (Group group : groups) {
-                if (group.getId().getId().equals(groupId.getId())) {
-                    group.addMessage(message);
-                    sendMessageNotification(group, message);
-                }
+            Group group = YieldsApplication.getUser().modifyGroup(groupId);
+            group.addMessage(message);
+            sendMessageNotification(group, message);
+            if (mCurrentNotifiableActivity != null) {
+                mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
         } else {
             mCurrentGroup.addMessage(message);
@@ -241,12 +240,11 @@ public class YieldService extends Service {
             mCurrentGroup.addMessages(messages);
             mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } else {
-            List<Group> groups = YieldsApplication.getUser().getUserGroups();
-            for (Group group : groups) {
-                if (group.getId().getId().equals(groupId.getId())) {
-                    group.addMessages(messages);
-                }
+            if (mCurrentNotifiableActivity != null) {
+                mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
+
+            YieldsApplication.getUser().modifyGroup(groupId).addMessages(messages);
         }
     }
 
@@ -270,7 +268,8 @@ public class YieldService extends Service {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.send_icon)
-                        .setContentTitle("Message from " + message.getSender().getName())
+                        .setContentTitle("Message from " + YieldsApplication
+                                .getUser(message.getSender()).getName())
                         .setContentText(message.getContent().toString().substring(0, 50));
 
         // Creates an explicit intent for an Activity in your app

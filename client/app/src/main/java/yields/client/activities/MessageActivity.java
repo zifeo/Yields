@@ -73,8 +73,8 @@ public class MessageActivity extends NotifiableActivity {
     private static FragmentManager mFragmentManager;
     private static Fragment mCurrentFragment;
 
-    private static ListAdapterMessages mGroupMessageAdapter;
-    private static ListAdapterMessages mCommentAdapter;
+    private ListAdapterMessages mGroupMessageAdapter;
+    private ListAdapterMessages mCommentAdapter;
 
 
     /**
@@ -180,6 +180,8 @@ public class MessageActivity extends NotifiableActivity {
             NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
             YieldsApplication.getBinder().sendRequest(request);
         }
+
+        YieldsApplication.getGroup().addMessage(message);
     }
 
     /**
@@ -353,7 +355,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mActionBar.setTitle("Message from " + mCommentMessage.getSender()
+        mActionBar.setTitle("Message from " + YieldsApplication.getUser(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
@@ -450,10 +452,12 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
+        mGroupMessageAdapter.clear();
+
         for(Message message : messagesTree.values()){
-            mGroupMessageAdapter.remove(message);
             mGroupMessageAdapter.add(message);
         }
+
         mGroupMessageAdapter.notifyDataSetChanged();
     }
 
@@ -464,10 +468,12 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveCommentMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
+        mCommentAdapter.clear();
+
         for(Message message : messagesTree.values()){
-            mCommentAdapter.remove(message);
             mCommentAdapter.add(message);
         }
+
         mCommentAdapter.notifyDataSetChanged();
     }
 

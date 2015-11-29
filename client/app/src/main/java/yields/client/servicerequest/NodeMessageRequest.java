@@ -50,7 +50,7 @@ public class NodeMessageRequest extends ServiceRequest {
         Node group = getReceivingNode();
         Message message = getMessage();
 
-        return RequestBuilder.nodeMessageRequest(message.getSender().getId(), group.getId(),
+        return RequestBuilder.nodeMessageRequest(message.getSender(), group.getId(),
                 message.getContent(), message.getDate());
     }
 
