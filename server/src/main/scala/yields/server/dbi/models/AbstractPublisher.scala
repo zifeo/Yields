@@ -17,8 +17,9 @@ abstract class AbstractPublisher protected(nid: NID) extends Node(nid) {
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {
     val done = super.addMessage(content)
-    if (done)
-      broadcast(content)
+    if (done) {
+      broadcast((content._1, nid, content._3, content._4))
+    }
     done
   }
 
