@@ -29,8 +29,10 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
       throw new UnauthorizedActionException("users must be in sender's entourage")
 
     val publisher = Publisher.createPublisher(name, metadata.client)
-    publisher.addUser(users.toList)
-    publisher.addNode(nodes.toList)
+    publisher.addUser(metadata.client :: users.toList)
+    if (nodes.nonEmpty) {
+      publisher.addNode(nodes.toList)
+    }
     PublisherCreateRes(publisher.nid)
 
   }

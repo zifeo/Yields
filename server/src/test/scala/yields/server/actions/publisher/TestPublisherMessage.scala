@@ -4,6 +4,7 @@ import java.time.OffsetDateTime
 
 import org.scalatest.Matchers
 import yields.server.AllGenerators
+import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupMessage
 import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory}
 import yields.server.dbi.DBFlatSpec
@@ -49,6 +50,17 @@ class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
         (senders(1), texts(1)) should be((publisher.nid, "Welcome in 9gag's feed"))
         (senders(2), texts(2)) should be((meta3.client, "Received 9gag's message ?"))
     }
+  }
+
+  it should "not be allowed to a non-registered user to publish in a publisher" in {
+    val user1 = User.create("email@email.com")
+    val user2 = User.create("email2@email.com")
+    PublisherCreate("name", List(), List()).run(Metadata.now(user1.uid)) match {
+      case PublisherCreateRes(nid) =>
+        val action = PublisherMessage(nid, Some("some text"), None, None)
+        an[UnauthorizedActionException] should be thrownBy action.run(Metadata.now(user2.uid))
+    }
+
   }
 
 }
