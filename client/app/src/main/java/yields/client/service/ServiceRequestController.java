@@ -64,11 +64,6 @@ public class ServiceRequestController {
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
         mCacheHelper.clearDatabase();
-        try {
-            mCacheHelper.addUser(YieldsApplication.getUser());
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "User couldn't be added to the database");
-        }
         mService = service;
         isConnecting = new AtomicBoolean(true);
         connectToServer();

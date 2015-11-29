@@ -13,6 +13,7 @@ import java.util.List;
 
 import yields.client.R;
 import yields.client.activities.GroupSettingsActivity;
+import yields.client.activities.UserSettingsActivity;
 
 /**
  * Class used to represent the list of settings of a user, in a listview
@@ -50,14 +51,18 @@ public class ListAdapterUserSettings extends ArrayAdapter<String> {
         ImageView imageSetting = (ImageView) setting.findViewById(R.id.imageSetting);
 
         int idDrawable;
-        GroupSettingsActivity.Settings[] settings = GroupSettingsActivity.Settings.values();
+        UserSettingsActivity.Settings[] settings = UserSettingsActivity.Settings.values();
         switch(settings[position]){
             case NAME:
                 idDrawable = R.drawable.ic_mode_edit_black_24dp;
                 break;
 
-            default:
+            case IMAGE:
                 idDrawable = R.drawable.ic_photo_camera_black_24dp;
+                break;
+
+            default:
+                idDrawable = R.drawable.ic_exit_to_app_black_24dp;
                 break;
         }
 
