@@ -2,7 +2,6 @@ package yields.server.actions.publisher
 
 import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.actions.groups.GroupCreateBrd
 import yields.server.actions.{Broadcast, Result, Action}
 import yields.server.dbi.models.{User, Publisher, UID, NID}
 import yields.server.mpi.Metadata
