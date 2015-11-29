@@ -4,13 +4,17 @@ import yields.server.dbi._
 import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.Temporal
 
+/**
+  * Rss publisher node class
+  * @param nid nid of publisher
+  */
 final class Rss private(nid: NID) extends AbstractPublisher(nid) {
 
   object RSSKey {
     val url = "rss_url"
   }
 
-  var _url: Option[String] = None
+  private var _url: Option[String] = None
 
   /** url getter. */
   def url: String = _url.getOrElse {
@@ -31,8 +35,15 @@ final class Rss private(nid: NID) extends AbstractPublisher(nid) {
 
 }
 
+/** Companion object for [[Rss]] */
 object Rss {
-  def createRss(name: String, url: String): Rss = {
+  /**
+    * Create a new rss in db
+    * @param name rss name to create
+    * @param url rss url
+    * @return rss obeject
+    */
+  def create(name: String, url: String): Rss = {
     val rss = Rss(newIdentity())
     redis.withClient { r =>
       val infos = List(

@@ -5,6 +5,7 @@ import java.nio.file.{Paths, Files}
 import java.time.OffsetDateTime
 
 import com.redis.serialization.{Format, Parse}
+import yields.server.dbi.exceptions.MediaException
 
 import scala.io.Source
 
@@ -71,7 +72,7 @@ package object models {
     }
 
     if (!checkFileExist(path))
-      throw new Exception("Error creating the file on disk")
+      throw new MediaException("Error creating the file on disk")
 
     val pw = new PrintWriter(new File(path))
     pw.write(content.toCharArray)
@@ -96,6 +97,11 @@ package object models {
     }
   }
 
+  /**
+    * Checks if a file exists on the disk
+    * @param path path to file
+    * @return true if exists false otherwise
+    */
   def checkFileExist(path: String): Boolean = {
     Files.exists(Paths.get(path))
   }

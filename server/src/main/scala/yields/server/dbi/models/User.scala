@@ -92,7 +92,7 @@ final class User private(val uid: UID) {
     if (_pic.isDefined) {
       Media.deleteContentOnDisk(_pic.get)
     }
-    val newPic = Media.createMedia("image", content, uid)
+    val newPic = Media.create("image", content, uid)
     _pic = update(StaticKey.pic, newPic.nid)
   }
 

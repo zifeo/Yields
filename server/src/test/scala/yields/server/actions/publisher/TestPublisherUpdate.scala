@@ -11,10 +11,8 @@ import yields.server.mpi.Metadata
 class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
   it should "change only the name" in {
-
-
     val meta = Metadata.now(0)
-    val start = Publisher.createPublisher("name1", meta.client)
+    val start = Publisher.create("name1", meta.client)
 
     val newName = "newName"
     val action = new PublisherUpdate(start.nid, Some(newName), None, List.empty, List.empty, List.empty, List.empty)
@@ -22,7 +20,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(newName)
-    end.pic should be (start.pic)
+    end.pic should be(start.pic)
     end.users should be(start.users)
     end.nodes should be(start.nodes)
 
@@ -31,7 +29,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
   it should "change only the pic" in {
 
     val meta = Metadata.now(0)
-    val start = Publisher.createPublisher("name1", meta.client)
+    val start = Publisher.create("name1", meta.client)
     start.picSetter(Array[Byte](2, 1), meta.client)
 
     val newPic = Array[Byte](1, 2)
@@ -40,7 +38,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(start.name)
-    end.pic should be (start.pic)
+    end.pic should be(start.pic)
     end.users should be(start.users)
     end.nodes should be(start.nodes)
 
@@ -48,7 +46,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
   it should "only change users" in {
     val meta = Metadata.now(0)
-    val start = Publisher.createPublisher("name1", meta.client)
+    val start = Publisher.create("name1", meta.client)
 
     val newUsers = List[UID](2, 3, 4)
     val addAction = new PublisherUpdate(start.nid, None, None, newUsers, List.empty, List.empty, List.empty)
@@ -56,7 +54,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val middle = Publisher(start.nid)
     middle.name should be(start.name)
-    middle.pic should be (start.pic)
+    middle.pic should be(start.pic)
     middle.users should be(meta.client :: newUsers)
     middle.nodes should be(start.nodes)
 
@@ -66,7 +64,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(start.name)
-    end.pic should be (start.pic)
+    end.pic should be(start.pic)
     end.users should be(meta.client :: newUsers.diff(oldUsers))
     end.nodes should be(start.nodes)
 
@@ -74,7 +72,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
   it should "only change nodes" in {
     val meta = Metadata.now(0)
-    val start = Publisher.createPublisher("name1", meta.client)
+    val start = Publisher.create("name1", meta.client)
 
     val newNodes = List[NID](2, 3, 4)
     val addAction = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, newNodes, List.empty)
@@ -82,7 +80,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val middle = Publisher(start.nid)
     middle.name should be(start.name)
-    middle.pic should be (start.pic)
+    middle.pic should be(start.pic)
     middle.users should be(start.users)
     middle.nodes should be(newNodes)
 
@@ -92,7 +90,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(start.name)
-    end.pic should be (start.pic)
+    end.pic should be(start.pic)
     middle.users should be(start.users)
     end.nodes should be(newNodes.diff(oldNodes))
   }

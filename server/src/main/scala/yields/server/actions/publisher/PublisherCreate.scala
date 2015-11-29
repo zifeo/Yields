@@ -12,8 +12,6 @@ import yields.server.mpi.Metadata
   * @param name name of the publisher
   * @param users users that can publish
   * @param nodes subscribed nodes
-  *
-  *              TODO implement security rules for nodes
   */
 case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) extends Action {
   /**
@@ -31,7 +29,7 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
     if (!users.forall(entourage.contains))
       throw new UnauthorizedActionException("users must be in sender's entourage")
 
-    val publisher = Publisher.createPublisher(name, metadata.client)
+    val publisher = Publisher.create(name, metadata.client)
 
     publisher.addUser(metadata.client :: users.toList)
 
@@ -49,9 +47,16 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
 }
 
 /**
-  * PublisherCreate result
+  * [[PublisherCreate]] result
   * @param nid nid of new publisher
   */
 case class PublisherCreateRes(nid: NID) extends Result
 
+/**
+  * [[PublisherCreate]] broadcast
+  * @param nid nid of publisher broadcasting
+  * @param name publisher name
+  * @param users list of users
+  * @param nodes list of nodes
+  */
 case class PublisherCreateBrd(nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]) extends Broadcast
