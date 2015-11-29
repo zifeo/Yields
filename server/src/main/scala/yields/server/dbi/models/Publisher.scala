@@ -11,7 +11,7 @@ object Publisher {
 
   def createPublisher(name: String): Publisher = {
     val publisher = Publisher(Node.newNID())
-    
+
     redis.withClient { r =>
       import publisher.NodeKey
       val infos = List(
