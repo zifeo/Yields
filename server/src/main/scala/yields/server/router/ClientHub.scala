@@ -47,28 +47,10 @@ final class ClientHub(private val socket: ActorRef,
     log.info(s"disconnected $address.")
   }
 
-  /** This state aims to capture the first message in order to identify the user. */
-  def receive: Receive = {
+  def receive: Receive = state(false)
 
-    // ----- Publisher letters -----
-
-    case Request(n: Long) => // Stream subscriber requests more elements.
-
-    case Received(data) =>
-      val incoming = data.utf8String
-      log.debug(s"$address [INP] (not yet alive) $incoming")
-      onNext(data)
-      dispatcher ! InitConnection(data)
-      context.become(alive)
-
-    // ----- Default -----
-
-    case unexpected => log.warning(s"unexpected letter (not yet alive): $unexpected")
-
-  }
-
-  /** Casual state. */
-  def alive: Receive = {
+  /** Casual state. It is dispatched if dispatcher has been linked. */
+  def state(dispatched: Boolean): Receive = {
 
     // ----- Publisher letters -----
 
@@ -76,8 +58,7 @@ final class ClientHub(private val socket: ActorRef,
 
     case Cancel => // Stream subscriber cancels the subscription.
       log.error(s"$address hub detected pipeline error")
-      dispatcher ! TerminateConnection
-      context stop self
+      terminate()
 
     // ----- Subscriber letters -----
 
@@ -108,15 +89,17 @@ final class ClientHub(private val socket: ActorRef,
       val incoming = data.utf8String
       log.debug(s"$address [INP] $incoming")
       onNext(data)
+      if (! dispatched) {
+        dispatcher ! InitConnection(data)
+        context.become(state(true))
+      }
 
     case PeerClosed =>
-      dispatcher ! TerminateConnection
-      context stop self
+      terminate()
 
     case ErrorClosed(cause) =>
       log.error(cause, s"$address error closed letter: $cause")
-      dispatcher ! TerminateConnection
-      context stop self
+      terminate()
 
     // ----- Default -----
 
@@ -127,6 +110,12 @@ final class ClientHub(private val socket: ActorRef,
   /** Returns the number of received request at the moment of the latest result. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
     override def requestDemand(remainingRequested: Int): Int = 1
+  }
+
+  /** Close client hub and stop actor. */
+  private def terminate(): Unit = {
+    dispatcher ! TerminateConnection
+    context stop self
   }
 
 }
