@@ -23,13 +23,13 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
     */
   override def run(metadata: Metadata): Result = {
 
-    if (! (count > 0))
+    if (!(count > 0))
       throw new ActionArgumentException(s"negative count: $count")
 
     val node = Node(nid)
     val sender = metadata.client
 
-    if (! node.users.contains(sender))
+    if (!node.users.contains(sender))
       throw new UnauthorizedActionException(s"$sender cannot get a message in $nid")
 
     val feed = node.getMessagesInRange(datetime, count).map {
@@ -60,7 +60,7 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
   */
 case class NodeHistoryRes(nid: NID,
                           datetimes: List[OffsetDateTime],
-                          senders: List[UID],
+                          senders: List[Identity],
                           texts: List[String],
                           contentTypes: List[Option[String]],
                           contents: List[Option[Blob]]) extends Result
