@@ -1,36 +1,17 @@
 package yields.client.service;
 
-import android.app.DownloadManager;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
-import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ServiceRequestException;
-import yields.client.id.Id;
-import yields.client.messages.Message;
-import yields.client.node.ClientUser;
-import yields.client.node.Group;
-import yields.client.node.Node;
-import yields.client.node.User;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
-import yields.client.serverconnection.DateSerialization;
-import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
@@ -49,7 +30,6 @@ import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
-import yields.client.yieldsapplication.YieldsApplication;
 
 import static java.lang.Thread.sleep;
 
@@ -60,6 +40,8 @@ import static java.lang.Thread.sleep;
  */
 public class ServiceRequestController {
 
+    private final ResponseHandler mResponseHandler;
+    private final RequestHandler mRequestHandler;
     private final String TAG = "RequestController";
     private final CacheDatabaseHelper mCacheHelper;
     private final YieldService mService;
@@ -68,12 +50,20 @@ public class ServiceRequestController {
     private CommunicationChannel mCommunicationChannel;
     private Thread mConnector;
 
+    /**
+     * Constructs the requestController which will serve as a link to the server and database
+     *
+     * @param cacheDatabaseHelper
+     * @param service
+     */
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
         mCacheHelper.clearDatabase();
         mService = service;
         isConnecting = new AtomicBoolean(true);
         connectToServer();
+        mResponseHandler = new ResponseHandler(mCacheHelper, mService);
+        mRequestHandler = new RequestHandler(mCacheHelper, mService, this);
     }
 
     /**
@@ -81,7 +71,6 @@ public class ServiceRequestController {
      *
      * @param e the exception that was triggered the connection error
      */
-
     public void handleConnectionError(final IOException e) {
         if (!isConnecting.getAndSet(true)) {
             mService.onServerDisconnected();
@@ -118,7 +107,6 @@ public class ServiceRequestController {
      *
      * @return
      */
-
     public boolean isConnected() {
         return !isConnecting.get();
     }
@@ -131,52 +119,52 @@ public class ServiceRequestController {
     public void handleServiceRequest(ServiceRequest serviceRequest) {
         switch (serviceRequest.getType()) {
             case PING:
-                handlePingRequest(serviceRequest);
+                mRequestHandler.handlePingRequest(serviceRequest);
                 break;
             case USER_CONNECT:
-                handleUserConnectRequest(serviceRequest);
+                mRequestHandler.handleUserConnectRequest(serviceRequest);
                 break;
             case USER_UPDATE:
-                handleUserUpdateRequest((UserUpdateNameRequest) serviceRequest);
+                mRequestHandler.handleUserUpdateRequest((UserUpdateNameRequest) serviceRequest);
                 break;
             case USER_GROUP_LIST:
-                handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
+                mRequestHandler.handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
                 break;
             case USER_ENTOURAGE_ADD:
-                handleUserEntourageAddRequest((UserEntourageAddRequest) serviceRequest);
+                mRequestHandler.handleUserEntourageAddRequest((UserEntourageAddRequest) serviceRequest);
                 break;
             case USER_ENTOURAGE_REMOVE:
-                handleUserEntourageRemoveRequest((UserEntourageRemoveRequest) serviceRequest);
+                mRequestHandler.handleUserEntourageRemoveRequest((UserEntourageRemoveRequest) serviceRequest);
                 break;
             case USER_INFO:
-                handleUserInfoRequest((UserInfoRequest) serviceRequest);
+                mRequestHandler.handleUserInfoRequest((UserInfoRequest) serviceRequest);
                 break;
             case GROUP_CREATE:
-                handleGroupCreateRequest((GroupCreateRequest) serviceRequest);
+                mRequestHandler.handleGroupCreateRequest((GroupCreateRequest) serviceRequest);
                 break;
             case GROUP_INFO:
-                handleGroupInfoRequest((GroupInfoRequest) serviceRequest);
+                mRequestHandler.handleGroupInfoRequest((GroupInfoRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_NAME:
-                handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
+                mRequestHandler.handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_VISIBILITY:
-                handleGroupUpdateVisibilityRequest((GroupUpdateVisibilityRequest) serviceRequest);
+                mRequestHandler.handleGroupUpdateVisibilityRequest((GroupUpdateVisibilityRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_IMAGE:
-                handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
+                mRequestHandler.handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
                 break;
             case GROUP_ADD:
-                handleGroupAddRequest((GroupAddRequest) serviceRequest);
+                mRequestHandler.handleGroupAddRequest((GroupAddRequest) serviceRequest);
                 break;
             case GROUP_REMOVE:
-                handleGroupRemoveRequest((GroupRemoveRequest) serviceRequest);
+                mRequestHandler.handleGroupRemoveRequest((GroupRemoveRequest) serviceRequest);
                 break;
             case NODE_MESSAGE:
-                handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
+                mRequestHandler.handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
                 break;
             case NODE_HISTORY:
-                handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
+                mRequestHandler.handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceRequest type !");
@@ -186,547 +174,88 @@ public class ServiceRequestController {
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
             case NODE_HISTORY_RESPONSE:
-                handleNodeHistoryResponse(serverResponse); /* Done */
+                mResponseHandler.handleNodeHistoryResponse(serverResponse); /* Done */
                 break;
             case NODE_MESSAGE_RESPONSE:
-                handleNodeMessageResponse(serverResponse); /* DONE */
+                mResponseHandler.handleNodeMessageResponse(serverResponse); /* DONE */
                 break;
             case USER_CONNECT_RESPONSE:
-                handleUserConnectResponse(serverResponse); /* DONE */
+                mResponseHandler.handleUserConnectResponse(serverResponse); /* DONE */
                 break;
             case USER_GROUP_LIST_RESPONSE:
-                handleUserGroupListResponse(serverResponse); /* DONE */
+                mResponseHandler.handleUserGroupListResponse(serverResponse); /* DONE */
                 break;
             case USER_INFO_RESPONSE:
-                handleUserInfoResponse(serverResponse); /* DONE */
+                mResponseHandler.handleUserInfoResponse(serverResponse); /* DONE */
                 break;
             case GROUP_CREATE_RESPONSE:
-                handleGroupCreateResponse(serverResponse); /* DONE */
+                mResponseHandler.handleGroupCreateResponse(serverResponse); /* DONE */
                 break;
             case USER_UPDATE_RESPONSE:
-                handleUserUpdateResponse(serverResponse);
+                mResponseHandler.handleUserUpdateResponse(serverResponse);
                 break;
             case USER_SEARCH_RESPONSE:
-                handleUserSearchResponse(serverResponse);
+                mResponseHandler.handleUserSearchResponse(serverResponse);
                 break;
             case NODE_SEARCH_RESPONSE:
-                handleNodeSearchResponse(serverResponse);
+                mResponseHandler.handleNodeSearchResponse(serverResponse);
                 break;
             case GROUP_UPDATE_RESPONSE:
-                handleGroupUpdateResponse(serverResponse);
+                mResponseHandler.handleGroupUpdateResponse(serverResponse);
                 break;
             case GROUP_INFO_RESPONSE:
-                handleGroupInfoResponse(serverResponse);
+                mResponseHandler.handleGroupInfoResponse(serverResponse);
                 break;
             case GROUP_MESSAGE_RESPONSE:
-                handleGroupMessageResponse(serverResponse);
+                mResponseHandler.handleGroupMessageResponse(serverResponse);
                 break;
             case PUBLISHER_CREATE_RESPONSE:
-                handlePublisherCreateResponse(serverResponse);
+                mResponseHandler.handlePublisherCreateResponse(serverResponse);
                 break;
             case PUBLISHER_UPDATE_RESPONSE:
-                handlePublisherUpdateResponse(serverResponse);
+                mResponseHandler.handlePublisherUpdateResponse(serverResponse);
                 break;
             case PUBLISHER_INFO_RESPONSE:
-                handlePublisherInfoResponse(serverResponse);
+                mResponseHandler.handlePublisherInfoResponse(serverResponse);
                 break;
             case PUBLISHER_MESSAGE_RESPONSE:
-                handlePublisherMessageResponse(serverResponse);
+                mResponseHandler.handlePublisherMessageResponse(serverResponse);
                 break;
             case RSS_CREATE_RESPONSE:
-                handleRSSCreateResponse(serverResponse);
+                mResponseHandler.handleRSSCreateResponse(serverResponse);
                 break;
             case NODE_MESSAGE_BCAST:
-                handleNodeMessageBroadcast(serverResponse);
+                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
                 break;
             case USER_UPDATE_BCAST:
-                handleUserUpdateBroadcast(serverResponse);
+                mResponseHandler.handleUserUpdateBroadcast(serverResponse);
                 break;
             case GROUP_CREATE_BCAST:
-                handleGroupCreateBroadcast(serverResponse);
+                mResponseHandler.handleGroupCreateBroadcast(serverResponse);
                 break;
             case GROUP_UPDATE_BCAST:
-                handleGroupUpdateBroadcast(serverResponse);
+                mResponseHandler.handleGroupUpdateBroadcast(serverResponse);
                 break;
             case GROUP_MESSAGE_BCAST:
-                handleGroupMessageBroadcast(serverResponse);
+                mResponseHandler.handleGroupMessageBroadcast(serverResponse);
                 break;
             case PUBLISHER_CREATE_BCAST:
-                handlePublisherCreateBroadcast(serverResponse);
+                mResponseHandler.handlePublisherCreateBroadcast(serverResponse);
                 break;
             case PUBLISHER_UPDATE_BCAST:
-                handlePublisherUpdateBroadcast(serverResponse);
+                mResponseHandler.handlePublisherUpdateBroadcast(serverResponse);
                 break;
             case PUBLISHER_MESSAGE_BCAST:
-                handlePublisherMessageBroadcast(serverResponse);
+                mResponseHandler.handlePublisherMessageBroadcast(serverResponse);
                 break;
             case RSS_CREATE_BCAST:
-                handleRSSCreateBroadcast(serverResponse);
+                mResponseHandler.handleRSSCreateBroadcast(serverResponse);
                 break;
             case RSS_MESSAGE_BCAST:
-                handleRSSMessageBroadcast(serverResponse);
+                mResponseHandler.handleRSSMessageBroadcast(serverResponse);
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(),"");
-        }
-    }
-
-    private void handleUserUpdateResponse(Response serverResponse){
-        Log.d("ServiceRequestCtrllr", "Response for UserUpdate");
-        // Nothing to parse.
-        // TODO : decide what to do.
-    }
-
-    /**
-     * Seriously fuck Java.
-     * @param array The array to downgrade.
-     * @return The converted array.
-     */
-    private byte[] convertToPrimitiveByteArray(Byte[] array){
-        byte[] convertedArray  = new byte[array.length];
-        for (int i = 0 ; i < convertedArray.length ; i ++){
-            convertedArray[i] = array[i];
-        }
-        return convertedArray;
-    }
-
-    private void handleUserSearchResponse(Response serverResponse){
-        try {
-            JSONObject response = serverResponse.getMessage();
-            long uid = response.getLong("uid");
-            Id id = new Id(uid);
-            // Send uid.
-            // TODO : (Nico) Notify Activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleNodeSearchResponse(Response serverResponse){
-        try {
-            JSONObject response = serverResponse.getMessage();
-            JSONArray nodes = response.getJSONArray("nodes");
-            JSONArray names = response.getJSONArray("names");
-            JSONArray pics = response.getJSONArray("pic");
-
-            assert (nodes.length() == names.length() && nodes.length() == pics.length());
-            int nodeCount = nodes.length();
-            ArrayList<Node> nodeList = new ArrayList<>();
-            for (int i = 0 ; i < nodeCount ; i ++){
-                long nid = nodes.getLong(i);
-                Id id = new Id(nid);
-                String nodeName = names.getString(i);
-                byte[] pic = convertToPrimitiveByteArray((Byte[]) pics.get(i));
-
-                // TODO : Make the fucking class representing nodes having an image.
-            }
-            // TODO : (Nico) Notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleGroupUpdateResponse(Response serverResponse){
-        Log.d("ServiceRequestCtrll", "Response for Group Update.");
-        // No output.
-        // TODO : decide what to do.
-    }
-
-    private void handleGroupInfoResponse(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            JSONArray users = response.getJSONArray("users");
-            JSONArray nodes = response.getJSONArray("nodes");
-
-            ArrayList<User> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++) {
-                if (!(new Id(users.getLong(i))).equals(YieldsApplication.getUser().getId())) {
-                    User user = new User("", new Id(users.getLong(i)), "", YieldsApplication
-                                .getDefaultUserImage());
-                    userList.add(user);
-                    ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-                            new Id(users.getLong(i)));
-                    mService.sendRequest(userInfoRequest);
-                }
-
-                //TODO : Add nodes field to group.
-            }
-
-            // _KetzA : I'm not really sure what to do here ...
-            Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
-            group.setName(name);
-            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleGroupMessageResponse(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            Date prevDatetime = DateSerialization.dateSerializer
-                    .toDate(serverResponse.getMetadata().getString("ref"));
-            Date serverDatetime = DateSerialization.dateSerializer
-                    .toDate(response.getString("datetime"));
-            Id id = new Id(nid);
-
-            YieldsApplication.getUser().modifyGroup(id).validateMessage(prevDatetime, serverDatetime);
-            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handlePublisherCreateResponse(Response serverResponse){
-        try {
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            Id publisherId = new Id(nid);
-
-            // TODO : (Nico) notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handlePublisherUpdateResponse(Response serverResponse){
-        Log.d("ServiceRequestCtrllr", "Response for Publisher Update.");
-        // Nothing to parse.
-        // TODO : decide what to do.
-    }
-
-    private void handlePublisherInfoResponse(Response serverResponse){
-        try {
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            Id id = new Id(nid);
-            String name = response.getString("name");
-            Byte[] pic = (Byte[]) response.get("pic");
-            JSONArray users = response.getJSONArray("users");
-            JSONArray nodes = response.getJSONArray("nodes");
-
-            // TODO : Create the instance when declared.
-            // TODO : (Nico) Notifiy activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handlePublisherMessageResponse(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
-            Id id = new Id(nid);
-
-            // TODO : (Nico) Notify Activtiy .
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleRSSCreateResponse(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            Id id = new Id(nid);
-
-            // TODO (Nico) : Notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleNodeMessageBroadcast(Response serverResponse){
-        // TODO : Not very clear on how to use this. See later.
-        try{
-            JSONObject response = serverResponse.getMessage();
-            String kind = response.getString("kind");
-            JSONObject message = response.getJSONObject("message");
-             // TODO : What to do with message ?
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleUserUpdateBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long uid = response.getLong("uid");
-            String name = response.getString("name");
-            byte[] pic = convertToPrimitiveByteArray((Byte[]) response.get("pic"));
-
-            User updatedUser = new User(name, new Id(uid), "", BitmapFactory.decodeByteArray(pic,
-                    0, pic.length));
-
-            // TODO : (Nico) Notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleGroupCreateBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            JSONArray users = response.getJSONArray("users");
-            JSONArray nodes = response.getJSONArray("nodes");
-
-            ArrayList<User> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
-                userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
-                        .getDefaultUserImage()));
-                ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-                        new Id(users.getLong(i)));
-                mService.sendRequest(userInfoRequest);
-
-            }
-
-            Group newGroup = new Group(name, new Id(nid), userList);
-
-            // TODO : (Nico) Notify app.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleGroupUpdateBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            byte[] pic = convertToPrimitiveByteArray((Byte[]) response.get("pic"));
-            JSONArray users = response.getJSONArray("users");
-            JSONArray nodes = response.getJSONArray("nodes");
-
-            ArrayList<User> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
-                userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
-                        .getDefaultUserImage()));
-                // TODO : Send userInfos for each user ???
-            }
-
-            Group updatedGroup = new Group(name, new Id(nid), userList, BitmapFactory
-                    .decodeByteArray(pic, 0, pic.length));
-
-            // TODO : (Nico) Notify app.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleGroupMessageBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-
-            long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
-            long senderId = response.getLong("sender");
-            String text = response.getString("text");
-            String contentType = response.getString("contentType");
-            Byte[] content = (Byte[]) response.get("content");
-
-            Message message = new Message(datetime.toString(), senderId, text,
-                    contentType, content);
-            // TODO : (Nico) Notify activity.
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handlePublisherCreateBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            JSONArray users = response.getJSONArray("users");
-            JSONArray nodes = response.getJSONArray("nodes");
-
-            // TODO : Create instance (Not yet declared topkek)
-            // TODO : (Nico) notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handlePublisherUpdateBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            Byte[] pic = (Byte[]) response.get("pic");
-            JSONArray users = response.getJSONArray("users");
-            JSONArray nodes = response.getJSONArray("nodes");
-
-            // TODO : Update instance (Not yet declared topkek)
-            // TODO : (Nico) notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handlePublisherMessageBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-
-            long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
-            long senderId = response.getLong("sender");
-            String text = response.getString("text");
-            String contentType = response.getString("contentType");
-            Byte[] content = (Byte[]) response.get("content");
-
-            // TODO : Create Message and add it to where the f*ck it need to be added.
-            Message message = new Message(datetime.toString(), senderId, text,
-                    contentType, content);
-            // TODO : (Nico) Notify activity.
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleRSSCreateBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            String url = response.getString("url");
-
-            // TODO : Create instance of RSS.
-            // TODO : (Nico) Notify activity.
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleRSSMessageBroadcast(Response serverResponse){
-        try{
-            JSONObject response = serverResponse.getMessage();
-
-            long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
-            long senderId = response.getLong("sender");
-            String text = response.getString("text");
-            String contentType = response.getString("contentType");
-            Byte[] content = (Byte[]) response.get("content");
-
-            // TODO : Create Message and add it to where the f*ck it need to be added.
-            Message message = new Message(datetime.toString(), senderId, text,
-                    contentType, content);
-            // TODO : (Nico) Notify activity.
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleGroupCreateResponse(Response serverResponse) {
-        try {
-            YieldsApplication.getUser().activateGroup(
-                    new Id(serverResponse.getMessage().getLong("nid")));
-            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleUserInfoResponse(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-            if (YieldsApplication.getUser().getId().getId().equals(-1)){
-                YieldsApplication.getUser().update(response);
-                JSONArray entourage = response.getJSONArray("entourage");
-                JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
-
-                if (entourage != null && entourageRefreshedAt != null){
-                    for (int i = 0; i < entourage.length(); i++) {
-                        // TODO : Improve this, add field in user  ?
-                        if (DateSerialization.dateSerializer.toDate(entourageRefreshedAt.getString(i)
-                        ).compareTo(new Date()) == -1){
-                            ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-                                    new Id(entourage.getLong(i)));
-                            mService.sendRequest(userInfoRequest);
-                        }
-                    }
-                }
-            }
-            else {
-                // TODO
-            }
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleUserGroupListResponse(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-            JSONArray groupsId = response.getJSONArray("groups");
-            JSONArray updatedAt = response.getJSONArray("updatedAt");
-            JSONArray refreshedAt = response.getJSONArray("refreshedAt");
-
-            int groupCount = groupsId.length();
-            assert (groupCount == updatedAt.length() &&
-                    groupCount == refreshedAt.length());
-
-            for (int i = 0 ; i < groupCount ; i ++){
-                Group group = new Group(groupsId.getString(i), "placeholder", refreshedAt
-                        .getString(i));
-                YieldsApplication.getUser().addGroup(group);
-                ServiceRequest groupInfo =
-                        new GroupInfoRequest(YieldsApplication.getUser().getId(),group.getId());
-                mService.sendRequest(groupInfo);
-                ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
-                mService.sendRequest(historyRequest);
-            }
-
-            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
-        } catch (JSONException | ParseException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void handleUserConnectResponse(Response serverResponse) {
-        // TODO : Parse the new field.
-        ClientUser user = YieldsApplication.getUser();
-        try {
-            user.setId(new Id(serverResponse.getMessage().getLong("uid")));
-            if (serverResponse.getMessage().getBoolean("returning")) {
-                ServiceRequest groupListRequest = new UserGroupListRequest(user);
-                mService.sendRequest(groupListRequest);
-                ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
-                mService.sendRequest(userInfoRequest);
-                mService.notifyChange(NotifiableActivity.Change.CONNECTED);
-            } else {
-                mService.notifyChange(NotifiableActivity.Change.NEW_USER);
-            }
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
         }
     }
 
@@ -755,319 +284,15 @@ public class ServiceRequestController {
     }
 
     /**
-     * Handles NodeMessage responses.
      *
-     * @param serverResponse The Response received from the server.
      */
-    private void handleNodeMessageResponse(Response serverResponse) {
-        // TODO : Handle errors JSONs
-        try {
-            JSONObject responseMessage = serverResponse.getMessage();
-            JSONObject metadata = serverResponse.getMetadata();
-            String time = metadata.getString("ref");
-            Date date = DateSerialization.dateSerializer.toDate(time);
-            Group group = mCacheHelper.getGroup(new Id(Long.valueOf(metadata.getString("client"))));
-            Message message = mCacheHelper.getMessagesForGroup(group, date, 1).get(0);
-            mCacheHelper.deleteMessage(message, group.getId());
-            Message updatedMessage = new Message("", new Id(-1), message.getSender(), message.getContent(),
-                    DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
-                    Message.MessageStatus.SENT);
-            mCacheHelper.addMessage(updatedMessage, group.getId());
-            mService.receiveMessage(group.getId(), updatedMessage);
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        }
-    }
-
-    /**
-     * Handles NodeHistory responses.
-     *
-     * @param serverResponse The response received from the server.
-     */
-    private void handleNodeHistoryResponse(Response serverResponse) {
-        try {
-            long nid = serverResponse.getMessage().getLong("nid");
-            JSONArray datetimes = serverResponse.getMessage().getJSONArray("datetimes");
-            JSONArray senders = serverResponse.getMessage().getJSONArray("senders");
-            JSONArray texts = serverResponse.getMessage().getJSONArray("texts");
-            JSONArray contentTypes = serverResponse.getMessage().getJSONArray("contentTypes");
-            JSONArray contents = serverResponse.getMessage().getJSONArray("contents");
-
-            int count = datetimes.length();
-            assert (count == senders.length() && count == texts.length() && count == contentTypes
-                    .length() && count == contents.length());
-
-            Id groupId = new Id(nid);
-            ArrayList<Message> messageList = new ArrayList<>();
-            for (int i = 0 ; i < count ; i ++){
-                //TODO images
-                Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
-                        .getString(i), contentTypes.getString(i), null);
-                messageList.add(message);
-                mCacheHelper.addMessage(message, groupId);
-            }
-
-            mService.receiveMessages(groupId, messageList);
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserGroupListRequest(UserGroupListRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            List<Group> groups = mCacheHelper.getAllGroups();
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserGroupListRequest correctly !");
-        }
+    protected void sendToServer(ServerRequest serverRequest) {
         try {
             mCommunicationChannel.sendRequest(serverRequest);
         } catch (IOException e) {
             mService.receiveError("No connection available : " + e.getMessage());
         }
     }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserEntourageRemoveRequest(UserEntourageRemoveRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.updateUser(serviceRequest.getUserToRemove());
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserEntourageRemove correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserInfoRequest(UserInfoRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.getUser(serviceRequest.getUserInfoId());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupCreateRequest(GroupCreateRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addGroup(serviceRequest.getGroup());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle GroupCreateRequest correctly !");
-        }
-
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addUser(serviceRequest.getUserToAdd());
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserEntourageAddRequest correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupUpdateVisibilityRequest(GroupUpdateVisibilityRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupVisibility(serviceRequest.getGroupId(), serviceRequest.getNewGroupVisibility());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupUpdateImageRequest(GroupUpdateImageRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupUpdateNameRequest(GroupUpdateNameRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupName(serviceRequest.getGroupId(), serviceRequest.getNewGroupName());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupAddRequest(GroupAddRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addUserToGroup(serviceRequest.getGroupId(), serviceRequest.getUser());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle handleGroupAddRequest correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupRemoveRequest(GroupRemoveRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.removeUserFromGroup(serviceRequest.getGroupId(), serviceRequest.getUserToRemoveId());
-        //TODO : Notify app
-
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserUpdateRequest(UserUpdateNameRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.updateUser(serviceRequest.getUser());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserUpdateNameRequest correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserConnectRequest(ServiceRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handlePingRequest(ServiceRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleNodeMessageRequest(NodeMessageRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeMessageRequest correctly !");
-        }
-
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleNodeHistoryRequest(GroupHistoryRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
-                    serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
-            mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeHistoryRequest correctly !");
-        }
-
-        if (isConnected()) {
-            try {
-                mCommunicationChannel.sendRequest(serverRequest);
-            } catch (IOException e) {
-                mService.receiveError("No connection available : " + e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Handles a group info request
-     */
-    private void handleGroupInfoRequest(GroupInfoRequest serviceRequest) {
-        try {
-            mCommunicationChannel.sendRequest(serviceRequest.parseRequestForServer());
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
 
     /**
      * Listener for the Server.
