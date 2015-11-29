@@ -173,31 +173,46 @@ public class UserSettingsActivity extends AppCompatActivity {
          * Listener for the "Change username" item.
          */
         private void changeNameListener() {
-            final EditText editTextName = new EditText(UserSettingsActivity.this);
-            editTextName.setId(R.id.editText);
-            editTextName.setText(mUser.getName());
+            final EditText editTextUsername = new EditText(UserSettingsActivity.this);
+            editTextUsername.setId(R.id.editText);
 
-            new AlertDialog.Builder(UserSettingsActivity.this)
-                    .setTitle("Change username")
-                    .setMessage("Type your new name !")
-                    .setView(editTextName)
+            final AlertDialog dialog = new AlertDialog.Builder(UserSettingsActivity.this)
+                    .setTitle("Change your username")
+                    .setMessage("Your new username must be at least 3 character long.")
+                    .setView(editTextUsername)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String newName = editTextName.getText().toString();
-                            String message = "Username changed to \"" + newName + "\"";
-                            YieldsApplication.showToast(getApplicationContext(), message);
-
-                            mUser.setName(newName);
-
-                            ServiceRequest request = new UserUpdateRequest(mUser);
-                            YieldsApplication.getBinder().sendRequest(request);
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
                     })
-                    .show();
+                    .create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String newName = editTextUsername.getText().toString();
+
+                    if (newName.length() < 5) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The username is too short");
+                    } else {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "Username changed to \"" + newName + "\" !");
+
+                        mUser.setName(newName);
+
+                        ServiceRequest request = new UserUpdateRequest(mUser);
+                        YieldsApplication.getBinder().sendRequest(request);
+
+                        dialog.dismiss();
+                    }
+                }
+            });
         }
 
         /**
