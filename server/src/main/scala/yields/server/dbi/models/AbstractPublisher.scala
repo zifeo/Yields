@@ -28,4 +28,5 @@ abstract class AbstractPublisher protected(nid: NID) extends Node(nid) {
       group = Group(nid)
     } yield group.addMessage(content)
   }
+
 }
