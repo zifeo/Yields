@@ -54,8 +54,9 @@ final class Dispatcher() extends Actor with ActorLogging {
           val clientHub = sender()
           context.become(state(add(uid, clientHub, pool)))
 
-        case Failure(_) =>
-          log.warning(s"dispatch pool: init connection without uid")
+        case Failure(cause) =>
+          val message = cause.getMessage
+          log.warning(s"dispatch pool: init connection without uid: $message")
       }
 
     case TerminateConnection =>
@@ -88,7 +89,7 @@ final class Dispatcher() extends Actor with ActorLogging {
     if (pos >= 0) {
       val uid = message.drop(pos + uidPattern.length).takeWhile(_ != ',').trim
       Try(uid.toLong)
-    } else Failure(new NoSuchElementException(s"no uid found"))
+    } else Failure(new NoSuchElementException(s"no uid found: $message"))
   }
 
   /** Add uid - actor pair to pool. */
