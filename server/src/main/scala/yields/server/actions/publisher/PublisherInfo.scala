@@ -7,8 +7,6 @@ import yields.server.mpi.Metadata
 /**
   * Get infos about a publisher
   * @param nid nid of the publisher
-  *
-  *            TODO get pic
   */
 case class PublisherInfo(nid: NID) extends Action {
   /**
@@ -22,4 +20,12 @@ case class PublisherInfo(nid: NID) extends Action {
   }
 }
 
+/**
+  * Publisher Info broadcast
+  * @param nid nid of publisher broadcasting
+  * @param name name of publisher
+  * @param pic content of publisher's profile pic
+  * @param users list of users
+  * @param nodes list of nodes
+  */
 case class PublisherInfoRes(nid: NID, name: String, pic: Blob, users: Seq[UID], nodes: Seq[NID]) extends Result

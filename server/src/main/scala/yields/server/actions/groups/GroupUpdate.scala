@@ -11,7 +11,7 @@ import yields.server.mpi.Metadata
   * @param nid group id
   * @param name new name
   * @param pic new profile image
-  *            TODO: set picture
+  * TODO: set picture
   */
 case class GroupUpdate(nid: NID,
                        name: Option[String],

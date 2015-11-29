@@ -5,6 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
+import yields.server.dbi.exceptions.MediaException
 import yields.server.dbi.models.Media._
 import yields.server.utils.Config
 import scala.io._
@@ -39,10 +40,7 @@ class Media private(nid: NID) extends Node(nid) {
     }
     path = _hash.get
 
-    getContentFromDisk(path) match {
-      case Some(b) => b
-      case None => throw new Exception("Content doesn't exist on disk")
-    }
+    getContentFromDisk(path).getOrElse(throw new MediaException("Content doesn't exist on disk"))
   }
 
   /** Media content setter on disk */
@@ -54,7 +52,7 @@ class Media private(nid: NID) extends Node(nid) {
     path = _hash.get
 
     if (_path.isEmpty)
-      throw new Exception("Cannot write in non-existent path")
+      throw new MediaException("Cannot write in non-existent path")
 
     writeContentOnDisk(_path.get, content)
 
@@ -105,7 +103,7 @@ object Media {
     * @param content base64 media
     * @return media
     */
-  def createMedia(contentType: String, content: Blob, creator: UID): Media = {
+  def create(contentType: String, content: Blob, creator: UID): Media = {
     // Create hash
     val media = Media(newIdentity())
 
@@ -124,20 +122,39 @@ object Media {
     media
   }
 
+  /**
+    * Create hash from some content
+    * @param content content to hash
+    * @return hash
+    */
   def createHash(content: Blob): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
     val ha = new sun.misc.BASE64Encoder().encode(md.digest(content.getBytes))
     ha.filter(_ != '/')
   }
 
+  /**
+    * Check if a file exists on disk
+    * @param name name of the file to test
+    * @return
+    */
   def checkFileExist(name: String): Boolean = {
     Files.exists(Paths.get(buildPathFromName(name)))
   }
 
+  /**
+    * Build a path from a file name
+    * @param name filename
+    * @return path
+    */
   def buildPathFromName(name: String): String = {
     Config.getString("ressource.media.folder") + name + Config.getString("ressource.media.extension")
   }
 
+  /**
+    * Delete a file on disk
+    * @param nid
+    */
   def deleteContentOnDisk(nid: NID): Unit = {
     val media = Media(nid)
     val file = new File(media.path)
@@ -145,5 +162,4 @@ object Media {
       file.delete()
     }
   }
-
 }

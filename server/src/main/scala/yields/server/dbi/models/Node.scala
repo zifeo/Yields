@@ -160,7 +160,7 @@ class Node protected(val nid: NID) {
     if (_pic.isDefined) {
       Media.deleteContentOnDisk(_pic.get)
     }
-    val newPic = Media.createMedia("image", content, creator)
+    val newPic = Media.create("image", content, creator)
     _pic = update(StaticNodeKey.node_pic, newPic.nid)
   }
 
