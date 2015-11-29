@@ -19,8 +19,8 @@ case class PublisherInfo(nid: NID) extends Action {
     */
   override def run(metadata: Metadata): Result = {
     val sender = User(metadata.client)
-    if (!sender.groups.contains(nid))
-      throw new UnauthorizedActionException("client who wants the infos must be a subscriber")
+    // if (!sender.groups.contains(nid))
+    //   throw new UnauthorizedActionException("client who wants the infos must be a subscriber")
 
     val publisher = Publisher(nid)
     PublisherInfoRes(nid, publisher.name, None, publisher.users, publisher.nodes)

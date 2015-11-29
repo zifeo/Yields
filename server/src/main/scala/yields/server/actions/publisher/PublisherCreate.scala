@@ -1,6 +1,6 @@
 package yields.server.actions.publisher
 
-import yields.server.actions.exceptions.ActionArgumentException
+import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.{Result, Action}
 import yields.server.dbi.models.{User, Publisher, UID, NID}
 import yields.server.mpi.Metadata
@@ -25,11 +25,10 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
 
     val sender = User(metadata.client)
     val entourage = sender.entourage
-    // Rules
     if (!users.forall(entourage.contains))
-      throw new ActionArgumentException("users must be in sender's entourage")
+      throw new UnauthorizedActionException("users must be in sender's entourage")
 
-    val publisher = Publisher.createPublisher(name)
+    val publisher = Publisher.createPublisher(name, metadata.client)
     publisher.addUser(users.toList)
     publisher.addNode(nodes.toList)
     PublisherCreateRes(publisher.nid)

@@ -20,7 +20,7 @@ import yields.server.utils.Temporal
   * nodes:[nid]:nodes Map[NID, OffsetDateTIme] with score datetime
   * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
   */
-class Node protected (val nid: NID) {
+class Node protected(val nid: NID) {
 
   object NodeKey {
     val node = s"nodes:$nid"
@@ -141,15 +141,27 @@ class Node protected (val nid: NID) {
   def removeNode(oldNode: List[NID]): Boolean =
     remWithTime(NodeKey.nodes, oldNode)
 
-  /** profile picture getter */
-  def pic: NID = _pic.getOrElse {
-    _pic = redis.withClient(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
-    valueOrException(_pic)
+  /** Picture getter. */
+  def pic: Blob = {
+    _pic.getOrElse(redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic)))
+    if (_pic.isDefined) {
+      val m = Media(_pic.get)
+      m.content
+    } else {
+      throw new Exception("Node picture undefined")
+    }
   }
 
-  /** profile picture setter */
-  def pic_=(content: NID) = {
-    _pic = update(StaticNodeKey.node_pic, content)
+  /**
+    * Picture setter.
+    * Delete old picture if there is one and create new media on disk
+    */
+  def pic_=(content: Blob, creator: UID): Unit = {
+    if (_pic.isDefined) {
+      Media.deleteContentOnDisk(_pic.get)
+    }
+    val newPic = Media.createMedia("image", content, creator)
+    _pic = update(StaticNodeKey.node_pic, newPic.nid)
   }
 
   /** Get n messages starting from some point */
