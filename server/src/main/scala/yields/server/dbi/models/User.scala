@@ -74,13 +74,14 @@ final class User private(val uid: UID) {
 
   /** Picture getter. */
   def pic: Blob = {
-    _pic.getOrElse(redis(_.hget[NID](Key.user, StaticKey.pic)))
+    _pic = redis(_.hget[NID](Key.user, StaticKey.pic))
     if (_pic.isDefined) {
       val m = Media(_pic.get)
       m.content
     } else {
-      throw new Exception("User picture undefined")
+      Array()
     }
+
   }
 
   /**
