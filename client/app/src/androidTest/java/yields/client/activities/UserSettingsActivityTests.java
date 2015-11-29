@@ -14,6 +14,7 @@ import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -59,7 +60,7 @@ public class UserSettingsActivityTests extends ActivityInstrumentationTestCase2<
     public void testChangeUsername() {
         getActivity();
         onView(withText(R.string.changeUserName)).perform(click());
-        onView(withId(R.id.editText)).perform(typeText("Arnaud2"), closeSoftKeyboard());
+        onView(withId(R.id.editText)).perform(clearText(), typeText("Arnaud2"), closeSoftKeyboard());
 
         onView(withText("Ok")).perform(click());
 
@@ -70,10 +71,10 @@ public class UserSettingsActivityTests extends ActivityInstrumentationTestCase2<
     /**
      * Test that tries to change the username to a short one
      */
-    public void testAddUsernameTooShort() {
+    public void testUsernameTooShort() {
         getActivity();
         onView(withText(R.string.changeUserName)).perform(click());
-        onView(withId(R.id.editText)).perform(typeText("a"), closeSoftKeyboard());
+        onView(withId(R.id.editText)).perform(clearText(), typeText("a"), closeSoftKeyboard());
 
         onView(withText("Ok")).perform(click());
         onView(withText("Cancel")).perform(click());

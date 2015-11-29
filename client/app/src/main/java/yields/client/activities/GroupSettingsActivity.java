@@ -38,13 +38,14 @@ import yields.client.yieldsapplication.YieldsApplication;
  * where the admin can change its name, image, users...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_TAG}
+    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_NODE, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
 
     private static final int REQUEST_IMAGE = 1;
     private static final int REQUEST_ADD_USERS = 2;
+    private static final int REQUEST_ADD_NODE = 3;
 
     private static final String TAG = "GroupSettingsActivity";
 
@@ -71,6 +72,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
+        itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
         itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
@@ -213,25 +215,45 @@ public class GroupSettingsActivity extends AppCompatActivity {
             editTextName.setId(R.id.editText);
             editTextName.setText(mGroup.getName());
 
-            new AlertDialog.Builder(GroupSettingsActivity.this)
-                    .setTitle("Change group name")
-                    .setMessage("Type the new group's name !")
+            final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
+
+            final AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
+                    .setTitle("Change the group's name")
+                    .setMessage("Your new name must be at least " + minimumSize + " characters long.")
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String newName = editTextName.getText().toString();
-                            String message = "Group name changed to \"" + newName + "\"";
-                            YieldsApplication.showToast(getApplicationContext(), message);
-
-                            ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
-                            YieldsApplication.getBinder().sendRequest(request);
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
                     })
-                    .show();
+                    .create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String newName = editTextName.getText().toString();
+
+                    if (newName.length() < 2) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The new name is too short");
+                    } else {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "Group name changed to \"" + newName + "\" !");
+
+                        mUser.setName(newName);
+
+                        ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
+                        YieldsApplication.getBinder().sendRequest(request);
+
+                        dialog.dismiss();
+                    }
+                }
+            });
         }
 
         /**
