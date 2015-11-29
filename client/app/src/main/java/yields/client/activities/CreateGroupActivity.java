@@ -8,21 +8,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ListView;
 
-import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.id.Id;
-import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.listadapter.ListAdapterUsersGroupsCheckBox;
 import yields.client.node.Group;
 import yields.client.node.User;
