@@ -6,16 +6,16 @@ import java.time.OffsetDateTime
 
 import spray.json._
 import yields.server.io._
-import yields.server.actions.Action
+import yields.server.actions.{Broadcast, Action}
 import yields.server.dbi.models.UID
-import yields.server.mpi.{Metadata, Request, Response}
+import yields.server.mpi.{Notification, Metadata, Request, Response}
 import yields.server.utils.Config
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /** Fakes a client connection through a socket. */
-class FakeClient(uid: UID) {
+class FakeClient(val uid: UID) {
 
   private val socket = new Socket(Config.getString("addr"), Config.getInt("port"))
   private val receiver = new BufferedReader(new InputStreamReader(socket.getInputStream))
@@ -39,6 +39,12 @@ class FakeClient(uid: UID) {
   def receive(): Future[Response] = Future {
     val message = receiver.readLine()
     message.parseJson.convertTo[Response]
+  }
+
+  /** Gets next notification from the server. */
+  def listen(): Future[Notification] = Future {
+    val message = receiver.readLine()
+    message.parseJson.convertTo[Notification]
   }
 
   def close(): Unit = {

@@ -20,32 +20,43 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
   implicit lazy val userConnectResArb: Arbitrary[UserConnectRes] = Arbitrary {
     for {
       uid <- arbitrary[UID]
-    } yield UserConnectRes(uid)
+      returning <- arbitrary[Boolean]
+    } yield UserConnectRes(uid, returning)
   }
 
   implicit lazy val userUpdateArb: Arbitrary[UserUpdate] = Arbitrary {
     for {
-      uid <- arbitrary[UID]
-      email <- arbitrary[Option[String]]
+      email <- arbitrary[Option[Email]]
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
-    } yield UserUpdate(uid, email, name, image)
+      addEntourage <- arbitrary[List[UID]]
+      removeEntourage <- arbitrary[List[UID]]
+    } yield UserUpdate(email, name, image, addEntourage, removeEntourage)
   }
 
   implicit lazy val userUpdateResArb: Arbitrary[UserUpdateRes] = Arbitrary {
     UserUpdateRes()
   }
 
-  implicit lazy val userGroupListArb: Arbitrary[UserGroupList] = Arbitrary {
+  implicit lazy val userUpdateBrdArb: Arbitrary[UserUpdateBrd] = Arbitrary {
     for {
       uid <- arbitrary[UID]
-    } yield UserGroupList(uid)
+      email <- arbitrary[Email]
+      name <- arbitrary[String]
+      image <- arbitrary[Blob]
+    } yield UserUpdateBrd(uid, email, name, image)
+  }
+
+  implicit lazy val userGroupListArb: Arbitrary[UserGroupList] = Arbitrary {
+    UserGroupList()
   }
 
   implicit lazy val userGroupListResArb: Arbitrary[UserGroupListRes] = Arbitrary {
     for {
-      groups <- arbitrary[List[(NID, String, OffsetDateTime)]]
-    } yield UserGroupListRes(groups)
+      groups <- arbitrary[List[NID]]
+      updates <- arbitrary[List[OffsetDateTime]]
+      refreshes <- arbitrary[List[OffsetDateTime]]
+    } yield UserGroupListRes(groups, updates, refreshes)
   }
 
   implicit lazy val userInfoArb: Arbitrary[UserInfo] = Arbitrary {
@@ -59,8 +70,21 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
       uid <- arbitrary[UID]
       name <- arbitrary[String]
       email <- arbitrary[String]
-      entourage <- arbitrary[Seq[UID]]
-    } yield UserInfoRes(uid, name, email, entourage)
+      entourage <- arbitrary[List[UID]]
+      entourageUpdates <- arbitrary[List[OffsetDateTime]]
+    } yield UserInfoRes(uid, name, email, entourage, entourageUpdates)
+  }
+
+  implicit lazy val userSearchArb: Arbitrary[UserSearch] = Arbitrary {
+    for {
+      email <- arbitrary[Email]
+    } yield UserSearch(email)
+  }
+
+  implicit lazy val userSearchResArb: Arbitrary[UserSearchRes] = Arbitrary {
+    for {
+      uid <- arbitrary[UID]
+    } yield UserSearchRes(uid)
   }
 
 }

@@ -7,6 +7,7 @@ import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.models.Media._
 import yields.server.utils.Config
+import scala.io._
 
 /**
   * Represent a media ressource
@@ -18,7 +19,7 @@ import yields.server.utils.Config
   *            nodes:[nid]   -> hash  hash / path / contentType
   *
   */
-class Media private(override val nid: NID) extends Node {
+class Media private(nid: NID) extends Node(nid) {
 
   object MediaKey {
     val hash = "hash"
@@ -32,7 +33,6 @@ class Media private(override val nid: NID) extends Node {
 
   /** Media content getter */
   def content: Blob = {
-    import scala.io._
     // hydrate hash
     if (_hash.isEmpty) {
       hash
@@ -42,7 +42,7 @@ class Media private(override val nid: NID) extends Node {
       val p = _path.get
       val source = Source.fromFile(s"$p")
       val lines = try source.mkString finally source.close()
-      lines
+      lines.toCharArray.map(_.toByte)
     } else {
       throw new Exception("Content doesnt exist on disk")
     }
@@ -65,7 +65,7 @@ class Media private(override val nid: NID) extends Node {
 
       if (checkFileExist(_hash.get)) {
         val pw = new PrintWriter(new File(p))
-        pw.write(content)
+        pw.write(content.toCharArray)
         pw.close()
       } else {
         throw new Exception("Error creating the file on disk")
@@ -76,35 +76,35 @@ class Media private(override val nid: NID) extends Node {
   }
 
   def hash: String = _hash.getOrElse {
-    _hash = redis.withClient(_.hget[String](NodeKey.node, MediaKey.hash))
+    _hash = redis(_.hget[String](NodeKey.node, MediaKey.hash))
     valueOrException(_hash)
   }
 
   /** Store the hash in the database to easily retrieve the content from the disk */
   private def hash_=(hash: String): Unit = {
-    redis.withClient(_.hset(NodeKey.node, MediaKey.hash, hash))
+    redis(_.hset(NodeKey.node, MediaKey.hash, hash))
     _hash = Some(hash)
     path = _hash.get
   }
 
   private def contentType_=(contentType: String): Unit = {
-    redis.withClient(_.hset(NodeKey.node, MediaKey.contentType, contentType))
+    redis(_.hset(NodeKey.node, MediaKey.contentType, contentType))
     _contentType = Some(contentType)
   }
 
   def contentType: String = _contentType.getOrElse {
-    _contentType = redis.withClient(_.hget[String](NodeKey.node, MediaKey.contentType))
+    _contentType = redis(_.hget[String](NodeKey.node, MediaKey.contentType))
     valueOrException(_contentType)
   }
 
   def path: String = _path.getOrElse {
-    _path = redis.withClient(_.hget[String](NodeKey.node, MediaKey.path))
+    _path = redis(_.hget[String](NodeKey.node, MediaKey.path))
     valueOrException(_path)
   }
 
   private def path_=(hash: String): Unit = {
     val path = buildPathFromName(hash)
-    redis.withClient(_.hset(NodeKey.node, MediaKey.path, path))
+    redis(_.hset(NodeKey.node, MediaKey.path, path))
     _path = Some(path)
   }
 
@@ -122,7 +122,7 @@ object Media {
     */
   def createMedia(contentType: String, content: Blob, creator: UID): Media = {
     // Create hash
-    val media = Media(Node.newNID())
+    val media = Media(newIdentity())
 
     // set values
     media.hash = createHash(content)

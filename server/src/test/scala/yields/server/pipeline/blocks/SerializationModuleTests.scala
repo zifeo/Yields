@@ -7,7 +7,7 @@ import org.scalatest.FlatSpec
 import spray.json._
 import yields.server._
 import yields.server.io._
-import yields.server.mpi.{MessagesGenerators, Request}
+import yields.server.mpi.{Response, MessagesGenerators, Request}
 
 class SerializationModuleTests extends FlatSpec with MessagesGenerators {
 
@@ -21,16 +21,22 @@ class SerializationModuleTests extends FlatSpec with MessagesGenerators {
     val (source, generated) = generateSource(zipGen, cases)
     val correspondence = generated.toMap
 
+    // Array of byte make some correspondence fail as they do not have a good equality, in this case take the fallback
+    val mapping = Flow[Request].map { req =>
+      lazy val fallback = correspondence.find(_._1.metadata == req.metadata).getOrElse(throw new Exception("no luck"))
+      correspondence.getOrElse(req, fallback._2)
+    }
+
     source
       .map { case (request, _) =>
         ByteString(request.toJson.toString())
       }
-      .via(module.join(Flow[Request].map(correspondence)))
+      .via(module.join(mapping))
       .map(_.utf8String)
       .runWith(TestSink.probe[String])
       .request(cases)
       .expectNextN(generated.map { case (_, response) =>
-        val json = response.toJson.toString()
+        val json = response.toJson
         s"$json\n"
       })
       .expectComplete()
