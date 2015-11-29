@@ -807,8 +807,6 @@ public class ServiceRequestController {
                 mCacheHelper.addMessage(message, groupId);
             }
 
-            Log.d("Y:" + this.getClass().getName(), "put in cache");
-
             mService.receiveMessages(groupId, messageList);
         } catch (JSONException | ParseException | CacheDatabaseException e) {
             e.printStackTrace();
