@@ -4,7 +4,7 @@ import yields.server.dbi._
 import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.Temporal
 
-case class Publisher private(override val nid: NID) extends AbstractPublisher(nid) {
+final class Publisher private (nid: NID) extends AbstractPublisher(nid) {
 }
 
 object Publisher {
