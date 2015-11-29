@@ -69,7 +69,7 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
                 break;
 
             case ADD_NODE:
-                idDrawable = R.drawable.ic_group_black_24dp;
+                idDrawable = R.drawable.ic_group_work_black_24dp;
                 break;
 
             default:
