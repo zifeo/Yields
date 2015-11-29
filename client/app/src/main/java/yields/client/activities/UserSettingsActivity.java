@@ -175,10 +175,14 @@ public class UserSettingsActivity extends AppCompatActivity {
         private void changeNameListener() {
             final EditText editTextUsername = new EditText(UserSettingsActivity.this);
             editTextUsername.setId(R.id.editText);
+            editTextUsername.setText(mUser.getName());
+            editTextUsername.setSelection(editTextUsername.length());
+
+            final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
 
             final AlertDialog dialog = new AlertDialog.Builder(UserSettingsActivity.this)
                     .setTitle("Change your username")
-                    .setMessage("Your new username must be at least 3 character long.")
+                    .setMessage("Your new username must be at least " + minimumSize + " characters long.")
                     .setView(editTextUsername)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
@@ -197,7 +201,7 @@ public class UserSettingsActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     String newName = editTextUsername.getText().toString();
 
-                    if (newName.length() < 5) {
+                    if (newName.length() < minimumSize) {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "The username is too short");
                     } else {

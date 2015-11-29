@@ -14,6 +14,7 @@ import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -57,16 +58,30 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
     /**
      * Test that tries to change the name of the group
-     * @throws InterruptedException
      */
-    public void testChangeName() throws InterruptedException {
+    public void testChangeName() {
         getActivity();
         onView(withText(R.string.changeGroupName)).perform(click());
         onView(withId(R.id.editText)).perform(typeText(" SWENG"), closeSoftKeyboard());
 
         onView(withText("Ok")).perform(click());
 
-        onView(withText("Group name changed to \"Group SWENG\"")).inRoot(withDecorView(not(is(getActivity().
+        onView(withText("Group name changed to \"Group SWENG\" !")).inRoot(withDecorView(not(is(getActivity().
+                getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that tries to change the group's name to a short one
+     */
+    public void testNameTooShort() {
+        getActivity();
+        onView(withText(R.string.changeGroupName)).perform(click());
+        onView(withId(R.id.editText)).perform(clearText(), typeText("a"), closeSoftKeyboard());
+
+        onView(withText("Ok")).perform(click());
+        onView(withText("Cancel")).perform(click());
+
+        onView(withText("The new name is too short")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 

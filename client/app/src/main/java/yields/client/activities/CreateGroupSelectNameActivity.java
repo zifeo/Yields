@@ -65,7 +65,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String groupName = mEditText.getText().toString();
 
-        if (groupName.length() < 1){
+        if (groupName.length() < getResources().getInteger(R.integer.minimumNameSize)){
             String message = getString(R.string.messageGroupNameTooShort);
             YieldsApplication.showToast(getApplicationContext(), message);
         }
