@@ -1,7 +1,8 @@
 package yields.server.actions.publisher
 
+import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException}
-import yields.server.actions.{Result, Action}
+import yields.server.actions.{Broadcast, Result, Action}
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
@@ -36,7 +37,7 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
     }
 
     for (newPic <- pic) {
-      //group.pic = newPic
+      publisher.picSetter(newPic, metadata.client)
     }
 
     if (addUsers.nonEmpty) {
@@ -54,8 +55,15 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
     if (removeNodes.nonEmpty) {
       publisher.removeNode(removeNodes.toList)
     }
+
+    Yields.broadcast(publisher.users.filter(_ != sender)) {
+      PublisherUpdateBrd(publisher.nid, publisher.name, publisher.pic, publisher.users, publisher.nodes)
+    }
+
     PublisherUpdateRes()
   }
 }
 
 case class PublisherUpdateRes() extends Result
+
+case class PublisherUpdateBrd(nid: NID, name: String, pic: Blob, users: Seq[UID], nodes: Seq[NID]) extends Broadcast

@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.actions.{Result, Action}
+import yields.server.actions.{Broadcast, Result, Action}
 import yields.server.dbi.models.Media.createMedia
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
@@ -40,9 +40,15 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
       case None => publisher.addMessage((datetime, metadata.client, None, text.getOrElse("")))
     }
 
+    Yields.broadcast(publisher.users.filter(_ != metadata.client)) {
+      PublisherMessageBrd(nid, datetime, metadata.client, text, contentType, content)
+    }
+
     PublisherMessageRes(nid, datetime)
   }
 
 }
 
 case class PublisherMessageRes(nid: NID, datetime: OffsetDateTime) extends Result
+
+case class PublisherMessageBrd(nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Blob]) extends Broadcast

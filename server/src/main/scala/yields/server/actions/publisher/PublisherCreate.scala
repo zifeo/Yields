@@ -1,7 +1,9 @@
 package yields.server.actions.publisher
 
+import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.actions.{Result, Action}
+import yields.server.actions.groups.GroupCreateBrd
+import yields.server.actions.{Broadcast, Result, Action}
 import yields.server.dbi.models.{User, Publisher, UID, NID}
 import yields.server.mpi.Metadata
 
@@ -25,17 +27,31 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
 
     val sender = User(metadata.client)
     val entourage = sender.entourage
+
     if (!users.forall(entourage.contains))
       throw new UnauthorizedActionException("users must be in sender's entourage")
 
     val publisher = Publisher.createPublisher(name, metadata.client)
+
     publisher.addUser(metadata.client :: users.toList)
+
     if (nodes.nonEmpty) {
       publisher.addNode(nodes.toList)
     }
+
+    Yields.broadcast(publisher.users.filter(_ != sender)) {
+      PublisherCreateBrd(publisher.nid, name, users, nodes)
+    }
+
     PublisherCreateRes(publisher.nid)
 
   }
 }
 
+/**
+  * PublisherCreate result
+  * @param nid nid of new publisher
+  */
 case class PublisherCreateRes(nid: NID) extends Result
+
+case class PublisherCreateBrd(nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]) extends Broadcast
