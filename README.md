@@ -33,7 +33,7 @@ Result
 ```
 
 Suffix action names with `Res` for corresponding result names.
-`UID` and `NID` are backed by the same identifier on serverside and represented by `Long`.
+`UID` and `NID` are backed by the same identifier on serverside and represented by `Long`. Identifier `0` is consider as nothing.
 
 ### Messages
 
@@ -50,7 +50,7 @@ Metadata
 	rules	client & ref unchanged
 ```
 
-A `Request` will answer with a `Response` or an `Error` on bad operations (such as unauthorized actions). Push notifications will sometimes be broadcasted broadcasted.
+A `Request` will answer with a `Response` or an `Error` on bad operations (such as unauthorized actions). Push notifications will sometimes be broadcasted.
 
 ### Users actions
 
@@ -59,9 +59,9 @@ UserConnect
 	input 	email: String
 	output	uid: UID, returning: Boolean
 UserUpdate
-	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage[UID]
+	input 	email: Option[String], name: Option[String], pic: Option[Array[Byte]], addEntourage: Seq[UID], removeEntourage: Seq[UID]
 	output	()
-	bcast	uid: UID, name: String, pic: Array[Byte]
+	bcast	uid: UID, email: String, name: String, pic: Array[Byte]
 	notice	no email for now
 UserInfo
 	input	uid: UID
@@ -70,10 +70,10 @@ UserInfo
 	rules	uid == client (1) | uid in entourage (2)
 UserGroupList
 	input	()
-	output	groups: Seq[NID], names: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
+	output	groups: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	email: String
-	output	uid: UID, name: String, pic: Array[Byte]
+	output	uid: UID
 ```
 
 ### Nodes actions
@@ -81,7 +81,7 @@ UserSearch
 ```
 NodeHistory
 	input	nid: NID, datetime: OffsetDateTime, count: Int
-	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[Option[String]], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
+	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[String], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
 	rules	count > 0 & nid in nodes & senders in entourage
 NodeSearch
 	input	pattern: String
@@ -104,7 +104,7 @@ GroupUpdate
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 GroupInfo
 	input	nid: NID
-	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
+	output	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 	rules	nid in nodes
 GroupMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]

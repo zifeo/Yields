@@ -4,7 +4,7 @@ import java.util.logging.LogManager
 
 import akka.actor._
 import akka.stream._
-import yields.server.actions.Result
+import yields.server.actions.{Broadcast, Result}
 import yields.server.dbi.models.UID
 import yields.server.pipeline.Pipeline
 import yields.server.router.{Dispatcher, Router}
@@ -50,13 +50,12 @@ object Yields {
   /**
     * Broadcast given result to all uid using the dispatcher.
     * @param uids uid to receive the broadcast
-    * @param result result to be broacasted
+    * @param bcast result to be broacasted
     * @return result broadcasted
     */
-  def broadcast(uids: Seq[UID])(result: Result): Result = {
+  def broadcast(uids: Seq[UID])(bcast: Broadcast): Unit = {
     import Dispatcher._
-    Yields.dispatcher ! Notify(uids, result)
-    result
+    Yields.dispatcher ! Notify(uids, bcast)
   }
 
   /**
