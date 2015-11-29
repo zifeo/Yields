@@ -174,20 +174,18 @@ public class UserSettingsActivity extends AppCompatActivity {
 
             final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
 
+            DialogInterface.OnClickListener emptyListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            };
+
             final AlertDialog dialog = new AlertDialog.Builder(UserSettingsActivity.this)
                     .setTitle("Change your username")
                     .setMessage("Your new username must be at least " + minimumSize + " characters long.")
                     .setView(editTextUsername)
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
+                    .setPositiveButton("Ok", emptyListener)
+                    .setNegativeButton("Cancel", emptyListener)
                     .create();
             dialog.show();
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
