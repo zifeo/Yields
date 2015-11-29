@@ -1,5 +1,6 @@
 package yields.client.activities;
 
+import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.TextView;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import yields.client.R;
+import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -25,6 +27,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<GroupInfoActivity> {
     public GroupInfoActivityTests() {
         super(GroupInfoActivity.class);
+
+        ServiceTestConnection.connectActivityToService();
     }
 
     /**
@@ -37,6 +41,10 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
 
         YieldsApplication.setUser(MockFactory.generateFakeClientUser("Arnaud", new Id(1), "aa",
                 YieldsApplication.getDefaultUserImage()));
+
+        Intent intent = new Intent();
+        intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+        setActivityIntent(intent);
     }
 
     /**
@@ -45,8 +53,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
     public void testCorrectName(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
         YieldsApplication.setGroup(g);
-        getActivity();
 
+        getActivity();
         onView(withId(R.id.textViewGroupName)).check(matches(withText("Kapoue")));
     }
 
