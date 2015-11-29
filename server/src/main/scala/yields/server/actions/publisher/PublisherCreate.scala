@@ -26,8 +26,8 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
       // Rules
       if (users.forall(entourage.contains)) {
         val publisher = Publisher.createPublisher(name)
-        publisher.addMultipleUser(users)
-        publisher.addMultipleNodes(nodes)
+        publisher.addUser(users.toList)
+        publisher.addNode(nodes.toList)
         PublisherCreateRes(publisher.nid)
       } else {
         throw new ActionArgumentException("users must be in sender's entourage")
