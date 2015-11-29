@@ -23,6 +23,8 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x)
   }
 
+  //
+
   property("GroupUpdate") = forAll { (x: GroupUpdate) =>
     toAndFromJson(x)
   }
@@ -35,6 +37,8 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
     toAndFromJson(x)
   }
 
+  //
+
   property("GroupInfo") = forAll { (x: GroupInfo) =>
     toAndFromJson(x)
   }
@@ -42,6 +46,8 @@ object GroupsJsonFormatSpecifications extends Properties("GroupsJsonFormat") wit
   property("GroupInfoRes") = forAll { (x: GroupInfoRes) =>
     toAndFromJson(x)
   }
+
+  //
 
   property("GroupMessage") = forAll { (x: GroupMessage) =>
     toAndFromJson(x)

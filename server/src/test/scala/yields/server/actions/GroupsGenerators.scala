@@ -35,6 +35,8 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield GroupCreateBrd(nid, name, users, nodes)
   }
 
+  //
+
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
     for {
       nid <- arbitrary[NID]
@@ -61,6 +63,8 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield GroupUpdateBrd(nid, name, image, users, nodes)
   }
 
+  //
+
   implicit lazy val groupInfoArb: Arbitrary[GroupInfo] = Arbitrary {
     for {
       nid <- arbitrary[NID]
@@ -76,6 +80,8 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
       nodes <- arbitrary[List[NID]]
     } yield GroupInfoRes(nid, name, image, users, nodes)
   }
+
+  //
 
   implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
     for {
