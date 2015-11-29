@@ -18,20 +18,17 @@ import scala.language.implicitConversions
 
 class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
 
-  val logger = LoggerFactory.getLogger(getClass)
   val connection = Tcp().outgoingConnection(Config.getString("addr"), Config.getInt("port"))
 
   private val server = Yields
 
   override def beforeAll(): Unit = {
-    logger.info("Starting local server")
     server.start()
     Thread.sleep(4000) // ensure server is active and bounded before networking with it
   }
 
   override def afterAll(): Unit = {
     server.close()
-    logger.info("Stopping local server")
   }
 
   /**
