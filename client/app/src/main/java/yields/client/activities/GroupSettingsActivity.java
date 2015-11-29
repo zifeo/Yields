@@ -35,7 +35,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the user can change some parameters for the group, leave it and
- * where the admin can change its name, image, users...
+ * where the admin can change its name, image, add users and nodes ...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
     public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_NODE, ADD_TAG}
@@ -97,7 +97,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        if (YieldsApplication.getGroupAddedValid()){
+        if (YieldsApplication.isGroupAddedValid()){
             Group group = YieldsApplication.getGroupAdded();
 
             // TODO Send the request to add the new group

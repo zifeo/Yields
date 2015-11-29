@@ -31,6 +31,7 @@ public class GroupInfoActivity extends NotifiableActivity {
 
     private static final int MAX_TAGS = 10;
 
+    // Indicates if the user is currently viewing this group or adding it to another group
     private SearchGroupActivity.Mode mMode;
 
     /**

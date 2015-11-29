@@ -76,11 +76,11 @@ public class YieldsApplication {
     }
 
     /**
-     * Getter for indicating if the group which will be added is valid.
+     * Getter indicating if the group which will be added is valid.
      *
      * @return True iff the group in getGroupAdded is valid.
      */
-    public static boolean getGroupAddedValid() {
+    public static boolean isGroupAddedValid() {
         return mGroupAddedValid;
     }
 
