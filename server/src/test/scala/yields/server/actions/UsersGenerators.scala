@@ -24,6 +24,8 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield UserConnectRes(uid, returning)
   }
 
+  //
+
   implicit lazy val userUpdateArb: Arbitrary[UserUpdate] = Arbitrary {
     for {
       email <- arbitrary[Option[Email]]
@@ -47,6 +49,8 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield UserUpdateBrd(uid, email, name, image)
   }
 
+  //
+
   implicit lazy val userGroupListArb: Arbitrary[UserGroupList] = Arbitrary {
     UserGroupList()
   }
@@ -58,6 +62,8 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
       refreshes <- arbitrary[List[OffsetDateTime]]
     } yield UserGroupListRes(groups, updates, refreshes)
   }
+
+  //
 
   implicit lazy val userInfoArb: Arbitrary[UserInfo] = Arbitrary {
     for {
@@ -74,6 +80,8 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
       entourageUpdates <- arbitrary[List[OffsetDateTime]]
     } yield UserInfoRes(uid, name, email, entourage, entourageUpdates)
   }
+
+  //
 
   implicit lazy val userSearchArb: Arbitrary[UserSearch] = Arbitrary {
     for {

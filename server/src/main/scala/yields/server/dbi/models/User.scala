@@ -163,7 +163,7 @@ final class User private(val uid: UID) {
         }
       }
     val res = valueOrException(query).asInstanceOf[List[Option[OffsetDateTime]]].flatten
-    assert(res.size == currentEntourage.size)
+    assert(res.size == currentEntourage.size, "entourageWithUpdates returns incoherent results")
     currentEntourage.zip(res)
   }
 
