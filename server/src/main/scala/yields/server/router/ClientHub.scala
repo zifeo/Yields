@@ -47,7 +47,7 @@ final class ClientHub(private val socket: ActorRef,
     log.info(s"disconnected $address.")
   }
 
-  def receive: Receive = state(false)
+  def receive: Receive = state(dispatched = false)
 
   /** Casual state. It is dispatched if dispatcher has been linked. */
   def state(dispatched: Boolean): Receive = {
@@ -91,7 +91,7 @@ final class ClientHub(private val socket: ActorRef,
       onNext(data)
       if (! dispatched) {
         dispatcher ! InitConnection(data)
-        context.become(state(true))
+        context.become(state(dispatched = true))
       }
 
     case PeerClosed =>
