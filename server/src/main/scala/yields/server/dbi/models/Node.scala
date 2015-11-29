@@ -148,7 +148,7 @@ class Node protected(val nid: NID) {
       val m = Media(_pic.get)
       m.content
     } else {
-      Array()
+      Array.empty
     }
   }
 
@@ -156,7 +156,7 @@ class Node protected(val nid: NID) {
     * Picture setter.
     * Delete old picture if there is one and create new media on disk
     */
-  def pic_=(content: Blob, creator: UID): Unit = {
+  def picSetter(content: Blob, creator: UID): Unit = {
     if (_pic.isDefined) {
       Media.deleteContentOnDisk(_pic.get)
     }

@@ -22,7 +22,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(newName)
-    //end.pic should be (start.pic)
+    end.pic should be (start.pic)
     end.users should be(start.users)
     end.nodes should be(start.nodes)
 
@@ -32,7 +32,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val start = Publisher.createPublisher("name1", meta.client)
-    //start.pic = Array[Byte](2, 1)
+    start.picSetter(Array[Byte](2, 1), meta.client)
 
     val newPic = Array[Byte](1, 2)
     val action = new PublisherUpdate(start.nid, None, Some(newPic), List.empty, List.empty, List.empty, List.empty)
@@ -40,7 +40,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(start.name)
-    //end.pic should be (start.pic)
+    end.pic should be (start.pic)
     end.users should be(start.users)
     end.nodes should be(start.nodes)
 
@@ -56,7 +56,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val middle = Publisher(start.nid)
     middle.name should be(start.name)
-    //middle.pic should be (start.pic)
+    middle.pic should be (start.pic)
     middle.users should be(meta.client :: newUsers)
     middle.nodes should be(start.nodes)
 
@@ -66,7 +66,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(start.name)
-    //end.pic should be (start.pic)
+    end.pic should be (start.pic)
     end.users should be(meta.client :: newUsers.diff(oldUsers))
     end.nodes should be(start.nodes)
 
@@ -82,7 +82,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val middle = Publisher(start.nid)
     middle.name should be(start.name)
-    //middle.pic should be (start.pic)
+    middle.pic should be (start.pic)
     middle.users should be(start.users)
     middle.nodes should be(newNodes)
 
@@ -92,7 +92,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val end = Publisher(start.nid)
     end.name should be(start.name)
-    //end.pic should be (start.pic)
+    end.pic should be (start.pic)
     middle.users should be(start.users)
     end.nodes should be(newNodes.diff(oldNodes))
   }
