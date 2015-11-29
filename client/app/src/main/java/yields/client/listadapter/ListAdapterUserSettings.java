@@ -12,7 +12,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import yields.client.R;
-import yields.client.activities.GroupSettingsActivity;
 import yields.client.activities.UserSettingsActivity;
 
 /**

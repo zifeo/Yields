@@ -88,6 +88,8 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         mListView.setAdapter(mAdapterUsersGroupsCheckBox);
 
+        /* This indicates the app that we don't want to add the group
+        currently in YieldsApplication.getGroupAdded() */
         YieldsApplication.setGroupAddedValid(false);
     }
 
@@ -98,7 +100,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        if (YieldsApplication.getGroupAddedValid()){
+        if (YieldsApplication.isGroupAddedValid()){
             Group group = YieldsApplication.getGroupAdded();
 
             if (!mGroups.contains(group)) {
@@ -220,5 +222,4 @@ public class CreateGroupActivity extends AppCompatActivity {
             mAdapterUsersGroupsCheckBox.notifyDataSetChanged();
         }
     }
-
 }

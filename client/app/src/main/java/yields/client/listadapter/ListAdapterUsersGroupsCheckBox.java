@@ -64,7 +64,7 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
      * Returns the View of the adapter.
      * @param position Position of the element.
      * @param convertView The View to convert.
-     * @param parent The parent of the view to be conveted.
+     * @param parent The parent of the view to be converted.
      * @return The new View respecting the layout.
      */
     @Override
@@ -140,7 +140,6 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                 mGroups.remove(pos);
                 ListAdapterUsersGroupsCheckBox.this.notifyDataSetChanged();
             }
