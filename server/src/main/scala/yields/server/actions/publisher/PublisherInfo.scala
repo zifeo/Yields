@@ -24,7 +24,6 @@ case class PublisherInfo(nid: NID) extends Action {
 
     val publisher = Publisher(nid)
     PublisherInfoRes(nid, publisher.name, None, publisher.users, publisher.nodes)
-
   }
 }
 
