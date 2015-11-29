@@ -1,5 +1,6 @@
 package yields.client.service;
 
+import android.app.DownloadManager;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -31,6 +32,7 @@ import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
 import yields.client.serverconnection.DateSerialization;
+import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
@@ -288,12 +290,7 @@ public class ServiceRequestController {
         try {
             JSONObject response = serverResponse.getMessage();
             long uid = response.getLong("uid");
-            /*String name = response.getString("name");
-            Byte[] pic = (Byte[]) response.get("pic");
-            byte[] primitivePic = convertToPrimitiveByteArray(pic);
-            User user = new User(name, new Id(uid), "", BitmapFactory.decodeByteArray
-                    (primitivePic, 0, primitivePic.length));*/
-
+            Id id = new Id(uid);
             // Send uid.
             // TODO : (Nico) Notify Activity.
         } catch (JSONException e) {
@@ -314,6 +311,7 @@ public class ServiceRequestController {
             ArrayList<Node> nodeList = new ArrayList<>();
             for (int i = 0 ; i < nodeCount ; i ++){
                 long nid = nodes.getLong(i);
+                Id id = new Id(nid);
                 String nodeName = names.getString(i);
                 byte[] pic = convertToPrimitiveByteArray((Byte[]) pics.get(i));
 
@@ -327,6 +325,7 @@ public class ServiceRequestController {
     }
 
     private void handleGroupUpdateResponse(Response serverResponse){
+        Log.d("ServiceRequestCtrll", "Response for Group Update.");
         // No output.
         // TODO : decide what to do.
     }
@@ -342,11 +341,14 @@ public class ServiceRequestController {
 
             ArrayList<User> userList = new ArrayList<>();
             for (int i = 0 ; i < users.length() ; i ++){
-                // TODO : retrieve email and name of the users.
-                userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
-                        .getDefaultUserImage()));
+                User user =  new User("", new Id(users.getLong(i)), "", YieldsApplication
+                        .getDefaultUserImage());
+                userList.add(user);
+                ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
+                        new Id(users.getLong(i)));
+                mService.sendRequest(userInfoRequest);
 
-                //TODO : Add nodes to group.
+                //TODO : Add nodes field to group.
             }
 
             // _KetzA : I'm not really sure what to do here ...
@@ -363,6 +365,7 @@ public class ServiceRequestController {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
+            Id id = new Id(nid);
 
             // TODO : (Nico) notify Activity.
         } catch (JSONException | ParseException e) {
@@ -375,6 +378,7 @@ public class ServiceRequestController {
         try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
+            Id publisherId = new Id(nid);
 
             // TODO : (Nico) notify activity.
         } catch (JSONException e) {
@@ -393,6 +397,7 @@ public class ServiceRequestController {
         try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
+            Id id = new Id(nid);
             String name = response.getString("name");
             Byte[] pic = (Byte[]) response.get("pic");
             JSONArray users = response.getJSONArray("users");
@@ -411,6 +416,7 @@ public class ServiceRequestController {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
+            Id id = new Id(nid);
 
             // TODO : (Nico) Notify Activtiy .
         } catch (JSONException | ParseException e) {
@@ -423,6 +429,8 @@ public class ServiceRequestController {
         try{
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
+            Id id = new Id(nid);
+
             // TODO (Nico) : Notify activity.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -470,9 +478,12 @@ public class ServiceRequestController {
 
             ArrayList<User> userList = new ArrayList<>();
             for (int i = 0 ; i < users.length() ; i ++){
-                // TODO : retrieve email and name of the users ???
                 userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
                         .getDefaultUserImage()));
+                ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
+                        new Id(users.getLong(i)));
+                mService.sendRequest(userInfoRequest);
+
             }
 
             Group newGroup = new Group(name, new Id(nid), userList);
@@ -491,14 +502,13 @@ public class ServiceRequestController {
             String name = response.getString("name");
             byte[] pic = convertToPrimitiveByteArray((Byte[]) response.get("pic"));
             JSONArray users = response.getJSONArray("users");
-            // TODO: Dafuq id nodes ?
             JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<User> userList = new ArrayList<>();
             for (int i = 0 ; i < users.length() ; i ++){
-                // TODO : retrieve email and name of the users ???
                 userList.add(new User("", new Id(users.getLong(i)), "", YieldsApplication
                         .getDefaultUserImage()));
+                // TODO : Send userInfos for each user ???
             }
 
             Group updatedGroup = new Group(name, new Id(nid), userList, BitmapFactory
@@ -633,29 +643,6 @@ public class ServiceRequestController {
     }
 
     private void handleUserInfoResponse(Response serverResponse) {
-        /*try {
-            if (YieldsApplication.getUser().getId().getId().equals(-1)){
-                YieldsApplication.getUser().update(serverResponse.getMessage());
-                JSONArray array = serverResponse.getMessage().getJSONArray("entourage");
-
-                for (int i = 0; i < array.length(); i++) {
-                    ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-                            new Id(array.getLong(i)));
-                    mService.sendRequest(userInfoRequest);
-                }
-            } else {
-                // TODO: uncomment when server improve response
-                //
-                //YieldsApplication.getUser()
-                //    .addUserToEntourage(new User(serverResponse.getMessage()));
-                //
-            }
-
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }*/
-
         try {
             JSONObject response = serverResponse.getMessage();
             if (YieldsApplication.getUser().getId().getId().equals(-1)){

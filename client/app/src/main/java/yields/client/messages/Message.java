@@ -110,12 +110,21 @@ public class Message extends Node {
         mStatus = MessageStatus.SENT;
     }
 
+    /**
+     * Constructor of a message from the JSON fields received from the server.
+     * @param dateTime The date in String format.
+     * @param senderID The is of the sender in String format.
+     * @param text The text of the message (if it is a text message, null otherwise).
+     * @param contentType The content type of the message.
+     * @param contents The actual content of the message.
+     * @throws ParseException In case of parse exception with the date serialization.
+     */
     public Message(String dateTime, String senderID, String text, String contentType, Byte[]
             contents)
             throws ParseException {
-        super("message", new Id(DateSerialization.dateSerializer.toDate(dateTime).getTime()));
+        super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)
+        ).getTime()));
 
-        // TODO : Sender image.
         User sender = new User(senderID, new Id(Long.parseLong(senderID)), "",
                 BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
                         R.drawable.userpicture));
@@ -130,6 +139,7 @@ public class Message extends Node {
             this.mContent = new TextContent(text);
         }
         else{
+            // TODO : Images, waiting for the problem in server side to be solved.
             throw new UnsupportedOperationException();
         }
 
