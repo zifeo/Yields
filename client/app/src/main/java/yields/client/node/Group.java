@@ -178,7 +178,7 @@ public class Group extends Node {
     }
 
     /**
-     *
+     * Validates a message received at a certain date and changes the date to the server side date.
      */
     public void validateMessage(Date date, Date newDate){
         Message message = mMessages.remove(date);

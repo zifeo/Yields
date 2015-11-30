@@ -205,12 +205,12 @@ public class RequestHandler {
      */
     protected void handleNodeMessageRequest(NodeMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
+        /*try {
             mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageRequest correctly !");
-        }
+        }*/
 
 
         mController.sendToServer(serverRequest);

@@ -290,6 +290,12 @@ public class YieldsApplication {
         return mShownImage;
     }
 
+    /**
+     * Get a certain User.
+     *
+     * @param userId The id of the user needed.
+     * @return The user to be modified.
+     */
     public static User getUser(Id userId) {
         if (userId.equals(mUser.getId())) {
             return mUser;
