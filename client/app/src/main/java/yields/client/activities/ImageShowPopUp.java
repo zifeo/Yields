@@ -1,15 +1,18 @@
 package yields.client.activities;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import yields.client.R;
+import yields.client.fragments.SaveImageToGalleryFragment;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -17,9 +20,12 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class ImageShowPopUp extends Activity {
 
+    private FragmentManager mFragmentManager;
+
     /**
      * Overriden method called on creation.
      * Set the image to be displayed on the screen.
+     *
      * @param savedInstanceState The bundle.
      */
     @Override
@@ -40,5 +46,17 @@ public class ImageShowPopUp extends Activity {
 
         ImageView imageView = (ImageView) findViewById(R.id.popupimage);
         imageView.setImageBitmap(resizedImage);
+        mFragmentManager = this.getFragmentManager();
+
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                SaveImageToGalleryFragment fragment = new SaveImageToGalleryFragment();
+                fragment.show(mFragmentManager, "Save Image to Gallery");
+                return true;
+            }
+        });
     }
+
+
 }
