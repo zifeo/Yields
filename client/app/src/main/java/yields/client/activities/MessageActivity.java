@@ -18,7 +18,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,6 +68,8 @@ public class MessageActivity extends NotifiableActivity {
     private static ListAdapterMessages mGroupMessageAdapter;
     private static ListAdapterMessages mCommentAdapter;
 
+    private static final int THUMBNAIL_PADDING = 6;
+    private static ImageView mImageThumbnail;
 
     /**
      * Starts the activity by displaying the group info and showing the most
@@ -117,7 +122,11 @@ public class MessageActivity extends NotifiableActivity {
 
         GroupHistoryRequest historyRequest = new GroupHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
+
+        mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
+        mImageThumbnail.setPadding(0, 0, 0, 0);
     }
+
 
     /**
      * @return The id of the current group
@@ -152,6 +161,8 @@ public class MessageActivity extends NotifiableActivity {
             content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
             mImage = null;
+            mImageThumbnail.setImageBitmap(null);
+            mImageThumbnail.setPadding(0, 0, 0, 0);
         } else {
             content = new TextContent(inputMessage);
         }
@@ -179,6 +190,7 @@ public class MessageActivity extends NotifiableActivity {
     public void onClickAddImage(View v) {
         mSendImage = true;
         pickImageFromGallery();
+        Log.d("MessageActivity", "Test null image");
     }
 
     /**
@@ -199,6 +211,10 @@ public class MessageActivity extends NotifiableActivity {
                 mImage = MediaStore.Images.Media.getBitmap(getContentResolver(),
                         uri);
                 if (mImage != null) {
+                    Log.d("MessageActivity", "Update Thumbnail");
+                    mImageThumbnail.setPadding(THUMBNAIL_PADDING, THUMBNAIL_PADDING,
+                            THUMBNAIL_PADDING, THUMBNAIL_PADDING);
+                    mImageThumbnail.setImageBitmap(mImage);
                     String message = "Image added to message";
                     YieldsApplication.showToast(getApplicationContext(), message);
                 }
@@ -327,6 +343,19 @@ public class MessageActivity extends NotifiableActivity {
     public void simulateImageMessage() {
         mImage = YieldsApplication.getDefaultGroupImage();
         mSendImage = true;
+    }
+
+    /**
+     * Cancel an image in a message when clicking on the thumbnail.
+     * @param v The view clicked on.
+     */
+    public void cancelImageSending(View v){
+        String message = "Image removed from message";
+        YieldsApplication.showToast(YieldsApplication.getApplicationContext(), message);
+        mImageThumbnail.setPadding(0, 0, 0, 0);
+        mSendImage = false;
+        mImageThumbnail.setImageBitmap(null);
+        mImage = null;
     }
 
     /**
