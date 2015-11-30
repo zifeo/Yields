@@ -187,7 +187,7 @@ public class MessageActivity extends NotifiableActivity {
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                    .smoothScrollToPosition(mGroupMessageAdapter.getCount()-1);
+                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
             NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
             YieldsApplication.getBinder().sendRequest(request);
         } else {
@@ -195,7 +195,7 @@ public class MessageActivity extends NotifiableActivity {
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
             ((CommentFragment) mCurrentFragment).getCommentListView()
-                    .smoothScrollToPosition(mCommentAdapter.getCount()-1);
+                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
             NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
             YieldsApplication.getBinder().sendRequest(request);
         }
@@ -502,6 +502,8 @@ public class MessageActivity extends NotifiableActivity {
             }
 
             mGroupMessageAdapter.notifyDataSetChanged();
+            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
         }
     }
 
@@ -520,6 +522,8 @@ public class MessageActivity extends NotifiableActivity {
             }
 
             mCommentAdapter.notifyDataSetChanged();
+            ((CommentFragment) mCurrentFragment).getCommentListView()
+                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
         }
     }
 
