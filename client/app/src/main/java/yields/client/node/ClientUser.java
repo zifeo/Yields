@@ -1,44 +1,64 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
-import java.io.IOException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
+import yields.client.R;
 import yields.client.exceptions.NodeException;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
-import yields.client.messages.Message;
+import yields.client.serverconnection.Response;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Connected user who will do the connexion with the outside world.
  */
-public abstract class ClientUser extends User {
+public class ClientUser extends User {
 
-    List<Group> groups;
-    List<User> mEntourage;
+    private List<Group> mGroups;
+    private final List<User> mEntourage;
 
     public ClientUser(String name, Id id, String email, Bitmap img) throws NodeException {
         super(name, id, email, img);
-        this.groups = new ArrayList<>();
+        this.mGroups = new ArrayList<>();
         mEntourage = new ArrayList<>();
     }
 
-    public abstract void sendMessage(Group group, Message message) throws IOException;
+    /**
+     * constructs a shell for a clientUser waiting for update from server.
+     * @param email The email of the user.
+     * @throws NodeException
+     */
+    public ClientUser(String email) throws NodeException {
+        this("", new Id(0l), email, YieldsApplication.getDefaultUserImage());
+    }
 
-    public abstract List<Message> getGroupMessages(Group group, Date lastDate) throws IOException;
+    public void addGroups(List<Group> groups) {
+        mGroups.clear();
+        mGroups.addAll(groups);
+        Collections.sort(mGroups, mComparator);
+    }
 
-    public abstract void createNewGroup(Group group) throws IOException;
+    public void addGroup(Group group) {
+        mGroups.add(group);
+        Collections.sort(mGroups, mComparator);
+    }
 
-    public abstract void deleteGroup(Group group);
+    public List<Group> getUserGroups() {
+        return Collections.unmodifiableList(mGroups);
+    }
 
-    public abstract Map<User, String> getHistory(Group group, Date from);
-
-    public List<Group> getGroups() {
-        return Collections.unmodifiableList(groups);
+    public void update(JSONObject response) throws JSONException{
+        this.setName(response.getString("name"));
+        this.setEmail(response.getString("email"));
     }
 
     public void addUserToEntourage(User user) {
@@ -47,5 +67,23 @@ public abstract class ClientUser extends User {
 
     public List<User> getEntourage() {
         return Collections.unmodifiableList(mEntourage);
+    }
+
+    private final Comparator<Group> mComparator = new Comparator<Group>() {
+
+        @Override
+        public int compare(Group lhs, Group rhs) {
+            return lhs.getLastUpdate().compareTo(rhs.getLastUpdate());
+        }
+    };
+
+    //TODO: to be changed when response from server changed
+    public void activateGroup(Id id) {
+        for (Group group : mGroups) {
+            if (!group.isValidated()) {
+                group.setValidated();
+                group.setId(id);
+            }
+        }
     }
 }

@@ -4,8 +4,9 @@ import akka.event.LoggingAdapter
 import akka.stream.scaladsl.BidiFlow
 import akka.util.ByteString
 import spray.json._
+import yields.server.actions.Broadcast
 import yields.server.io._
-import yields.server.mpi.{Request, Response}
+import yields.server.mpi.{Notification, Request, Response}
 
 /**
   * Parse every incoming and outgoing items from and to actions.
@@ -25,13 +26,19 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
 /** [[SerializationModule]] companion object. */
 object SerializationModule {
 
-  /** Serialize to [[ByteString]]. */
+  /** Serialize [[Response]] to [[ByteString]]. */
   def serialize(response: Response): ByteString = {
-    val json = response.toJson.toString()
+    val json = response.toJson
     ByteString(s"$json\n")
   }
 
-  /** Deserialize to [[Request]]. '\n' is needed by client to detect end of response. */
+  /** Serialize [[Notification]] to [[ByteString]]. */
+  def serialize(notification: Notification): ByteString = {
+    val json = notification.toJson
+    ByteString(s"$json\n")
+  }
+
+  /** Deserialize [[ByteString]] to [[Request]]. '\n' is needed by client to detect end of response. */
   def deserialize(raw: ByteString): Request =
     raw.utf8String.parseJson.convertTo[Request]
 

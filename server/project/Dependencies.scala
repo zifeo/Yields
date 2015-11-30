@@ -10,7 +10,7 @@ object Dependencies {
   )
 
   val akka = {
-    val version = "2.4.0"
+    val version = "2.4.1"
     Seq(
       "com.typesafe.akka" %% "akka-actor" % version,
       "com.typesafe.akka" %% "akka-slf4j" % version,
