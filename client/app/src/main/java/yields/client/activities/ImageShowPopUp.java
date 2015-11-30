@@ -1,12 +1,8 @@
 package yields.client.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -29,6 +25,7 @@ public class ImageShowPopUp extends Activity {
     /**
      * Overriden method called on creation.
      * Set the image to be displayed on the screen.
+     *
      * @param savedInstanceState The bundle.
      */
     @Override
