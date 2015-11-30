@@ -2,13 +2,18 @@ package yields.server.router
 
 import java.net.InetSocketAddress
 
-import akka.actor.{ActorRef, Actor, ActorLogging, Props}
+import akka.actor.SupervisorStrategy.{Escalate, Resume}
+import akka.actor._
 import akka.io.{IO, Tcp}
-import akka.stream.ActorMaterializer
+import akka.stream.{OverflowStrategy, ActorMaterializer}
 import akka.stream.actor.{ActorPublisher, ActorSubscriber}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.util.ByteString
 import yields.server.utils.Config
+
+import scala.concurrent.duration._
+import scala.language.postfixOps
+import scala.util.control.NonFatal
 
 /**
   * Actor in charge of handling connections and creating a client hub.
@@ -20,8 +25,18 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
   extends Actor with ActorLogging {
 
   import Tcp._
-  import Dispatcher._
   import context.system
+
+  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
+    case NonFatal(nonfatal) =>
+      val message = nonfatal.getMessage
+      log.error(nonfatal, s"non fatal: $message")
+      Resume
+    case fatal =>
+      val message = fatal.getMessage
+      log.error(fatal, s"fatal: $message")
+      Escalate
+  }
 
   override def preStart(): Unit = {
     IO(Tcp) ! Bind(
@@ -35,19 +50,20 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
   def receive: Receive = {
 
-    case Bound(_) =>
-    case CommandFailed(Bind(_, addr, _, _, _)) => context stop self
+    // ----- TCP letters -----
+
+    case Bound(_) => log.info("system ready")
+
+    case CommandFailed(Bind(_, _, _, _, _)) => context stop self
 
     case Connected(clientAddr, _) =>
-      log.info(s"connection from $clientAddr.")
 
       val socket = sender()
-      val bindings = context.actorOf(ClientHub.props(socket, clientAddr.toString, dispatcher))
-      // one actor per client
+      val bindings = context.actorOf(ClientHub.props(socket, clientAddr, dispatcher))
 
       val pub = ActorPublisher[ByteString](bindings)
       val sub = ActorSubscriber[ByteString](bindings)
-      Source(pub).via(stream).to(Sink(sub)).run()
+      Source(pub).buffer(1000, OverflowStrategy.fail).via(stream).to(Sink(sub)).run()
 
       socket ! Register(
         handler = bindings,
@@ -55,8 +71,10 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
         useResumeWriting = true
       )
 
-    case x =>
-      log.warning(s"unexpected letter received: $x")
+    // ----- Default letters -----
+
+    case unexpected => log.warning(s"unexpected letter: $unexpected")
+
   }
 
 }

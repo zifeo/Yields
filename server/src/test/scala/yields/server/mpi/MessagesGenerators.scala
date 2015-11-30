@@ -3,7 +3,7 @@ package yields.server.mpi
 import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
-import yields.server.actions.{Action, ActionsGenerators, Result}
+import yields.server.actions.{Broadcast, Action, ActionsGenerators, Result}
 import yields.server.dbi.models.UID
 
 trait MessagesGenerators extends ActionsGenerators {
@@ -22,6 +22,13 @@ trait MessagesGenerators extends ActionsGenerators {
       result <- arbitrary[Result]
       metadata <- arbitrary[Metadata]
     } yield Response(result, metadata)
+  }
+
+  implicit lazy val notificationArb: Arbitrary[Notification] = Arbitrary {
+    for {
+      bcast <- arbitrary[Broadcast]
+      metadata <- arbitrary[Metadata]
+    } yield Notification(bcast, metadata)
   }
 
   implicit lazy val metadataArb: Arbitrary[Metadata] = Arbitrary {

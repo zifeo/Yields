@@ -22,7 +22,9 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.servicerequest.ServiceRequest;
+import yields.client.servicerequest.UserUpdateRequest;
 
 /**
  * A builder for requests that will be send to the server
@@ -79,6 +81,21 @@ public class RequestBuilder {
         builder.addOptionalField(Fields.REMOVE_ENTOURAGE, remEntourage);
 
         return builder.request();
+    }
+
+    /**
+     * ServerRequest for updating user properties.
+     *
+     * @param sender The sender of the request, which wants to be updated.
+     * @param name   The name of the updated User.
+     * @param email  The email ot the updated User.
+     * @param image  The image of the updated User.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest userUpdateRequest(Id sender, String name, String email,
+                                                  Bitmap image) {
+        return userUpdateRequest(sender,name,email,image,new ArrayList<Id>(),
+                new ArrayList<Id>());
     }
 
     /**

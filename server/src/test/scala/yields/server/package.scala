@@ -27,13 +27,16 @@ package object server {
     (Source(generated), generated)
   }
 
-  /** Blocks 3 second until result is available. */
+  /** Blocks 4 second until result is available. */
   def await[T](run: Future[T]): T = {
-    Await.result(run, 3 second)
+    Await.result(run, 4 seconds)
   }
 
-  /** Serialize and deserialize a given element. */
-  def toAndFromJson[T : JsonWriter : JsonReader](elem: T): T =
-    elem.toJson.toString().parseJson.convertTo[T]
+  /** Serialize and deserialize a given element and return true on equality. */
+  def toAndFromJson[T : JsonWriter : JsonReader](elem: T): Boolean = {
+    val encoded = elem.toJson.toString()
+    val decoded = encoded.parseJson.convertTo[T].toJson.toString()
+    encoded == decoded
+  }
 
 }

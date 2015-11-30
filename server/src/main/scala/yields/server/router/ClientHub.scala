@@ -1,91 +1,121 @@
 package yields.server.router
 
-import akka.actor.{Props, Actor, ActorLogging, ActorRef}
+import java.net.InetSocketAddress
+
+import akka.actor.SupervisorStrategy.{Escalate, Resume}
+import akka.actor._
 import akka.io.Tcp
 import akka.stream.actor._
 import akka.util.ByteString
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
+import scala.util.control.NonFatal
+
 /**
   * Actor in charge of handling a **single** client request and answering with corresponding response.
   * @param socket actor representing the TCP connection between the client and the server.
-  * @param name name of this client hub used for logging purposes
+  * @param address ip and port of this client for logging purposes
   */
-final class ClientHub(private val socket: ActorRef, private val name: String, private val dispatcher: ActorRef)
-  extends Actor with ActorLogging with ActorPublisher[ByteString] with ActorSubscriber {
+final class ClientHub(private val socket: ActorRef,
+                      private val address: InetSocketAddress,
+                      private val dispatcher: ActorRef
+                     ) extends Actor with ActorLogging with ActorPublisher[ByteString] with ActorSubscriber {
 
   import ActorPublisherMessage._
   import ActorSubscriberMessage._
-  import Tcp._
-  import Dispatcher._
   import ClientHub._
+  import Dispatcher._
+  import Tcp._
 
-  private var count = 0
-
-  /** Logs at debug level with client name prefixed. */
-  def debug(channel: String, message: String): Unit = {
-    log.debug(s"$channel $name $message")
+  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
+    case NonFatal(nonfatal) =>
+      val message = nonfatal.getMessage
+      log.error(nonfatal, s"$address non fatal: $message")
+      Resume
+    case fatal =>
+      val message = fatal.getMessage
+      log.error(fatal, s"$address fatal: $message")
+      Escalate
   }
 
-  def receive: Receive = born
-
-  /** Starting state. */
-  def born: Receive = {
-
-    case Received(data) =>
-      debug("[IN]", data.utf8String)
-      count += 1
-      onNext(data)
-      dispatcher ! InitConnection(data)
-      context.become(alive)
-
-    case Request(_) =>
-    // expected
-
-    case x =>
-      log.error(s"unexpected born letter: $x")
-
+  override def preStart(): Unit = {
+    log.info(s"connected $address.")
   }
 
-  /** Casual state. */
-  def alive: Receive = {
+  override def postStop(): Unit = {
+    log.info(s"disconnected $address.")
+  }
 
-    case Received(data) =>
-      debug("[IN]", data.utf8String)
-      count += 1
-      onNext(data)
+  def receive: Receive = state(dispatched = false)
+
+  /** Casual state. It is dispatched if dispatcher has been linked. */
+  def state(dispatched: Boolean): Receive = {
+
+    // ----- Publisher letters -----
+
+    case Request(n: Long) => // Stream subscriber requests more elements.
+
+    case Cancel => // Stream subscriber cancels the subscription.
+      log.error(s"$address hub detected pipeline error")
+      terminate()
+
+    // ----- Subscriber letters -----
 
     case OnNext(data: ByteString) =>
-      debug("[OUT]", data.utf8String)
-      count -= 1
-      assert(count >= 0)
+      val outgoing = data.utf8String
+      log.debug(s"$address [OUT] $outgoing")
       socket ! Write(data)
 
-    case OnPush(data) =>
-      debug("[OUT]", data.utf8String)
+    case OnNext(element) => log.warning(s"$address unexpected onNext letter: $element")
+
+    case OnComplete => log.warning(s"$address unexpected completed letter")
+
+    case OnError(cause: Throwable) =>
+      val message = cause.getMessage
+      log.error(cause, s"$address error letter: $message")
+      socket ! Write(ByteString("""{"kind":"error"}"""))
+
+    // ----- ClientHub letters -----
+
+    case OnPush(data) => // Notification
+      val outgoing = data.utf8String
+      log.debug(s"$address [BRD] $outgoing")
       socket ! Write(data)
 
-    case OnComplete =>
-      debug("[OUT]", "completed letter /!\\")
+    // ----- TCP letters -----
 
-    case OnError(cause) =>
-      debug("[OUT]", s"error letter /!\\: $cause")
-      socket ! Write(ByteString("server error"))
-    // TODO : improve error handling taking into account the supervisor too
+    case Received(data) =>
+      val incoming = data.utf8String
+      log.debug(s"$address [INP] $incoming")
+      onNext(data)
+      if (! dispatched) {
+        dispatcher ! InitConnection(data)
+        context.become(state(dispatched = true))
+      }
 
-    case Request(_) =>
-    // onNext counterpart
+    case PeerClosed =>
+      terminate()
 
-    case PeerClosed | ErrorClosed(_) =>
-      dispatcher ! TerminateConnection
-      context stop self
+    case ErrorClosed(cause) =>
+      log.error(cause, s"$address error closed letter: $cause")
+      terminate()
 
-    case x =>
-      log.warning(s"unexpected letter received: $x")
+    // ----- Default -----
+
+    case unexpected => log.warning(s"$address unexpected letter: $unexpected")
+
   }
 
   /** Returns the number of received request at the moment of the latest result. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
-    override def requestDemand(remainingRequested: Int): Int = count
+    override def requestDemand(remainingRequested: Int): Int = 1
+  }
+
+  /** Close client hub and stop actor. */
+  private def terminate(): Unit = {
+    dispatcher ! TerminateConnection
+    context stop self
   }
 
 }
@@ -97,7 +127,7 @@ object ClientHub {
   private[router] case class OnPush(data: ByteString)
 
   /** Creates a router props with a materializer. */
-  def props(socket: ActorRef, name: String, dispatcher: ActorRef): Props =
-    Props(classOf[ClientHub], socket, name, dispatcher)
+  def props(socket: ActorRef, address: InetSocketAddress, dispatcher: ActorRef): Props =
+    Props(classOf[ClientHub], socket, address, dispatcher)
 
 }
