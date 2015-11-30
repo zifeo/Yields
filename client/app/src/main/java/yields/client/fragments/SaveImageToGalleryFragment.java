@@ -14,10 +14,16 @@ import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
- * Simple dialog box that appears
+ * Simple dialog box that appears to ask if you wan to save the image that is in YieldsApplication.mShownImage.
  */
 public class SaveImageToGalleryFragment extends DialogFragment {
 
+    /**
+     * Creates the dialog box.
+     *
+     * @param savedInstanceState The bundle given to the OnCreate
+     * @return The appropriate Dialog.
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
