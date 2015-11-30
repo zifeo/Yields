@@ -66,7 +66,7 @@ final class Dispatcher() extends Actor with ActorLogging {
           context.become(state(newPool))
 
         case None =>
-          log.warning(s"dispatch pool: init connection without uid")
+          log.warning(s"dispatch pool: terminate connection without uid")
       }
 
     case Notify(uids, result) =>
