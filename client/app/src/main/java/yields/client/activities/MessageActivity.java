@@ -129,6 +129,9 @@ public class MessageActivity extends NotifiableActivity {
         YieldsApplication.getBinder().sendRequest(historyRequest);
     }
 
+    /**
+     * what to do when the activity is no more visible
+     */
     @Override
     public void onPause() {
         super.onPause();
