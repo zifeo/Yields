@@ -26,14 +26,9 @@ import android.widget.SimpleAdapter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.SortedMap;
 
 import yields.client.R;
-
-import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -44,13 +39,8 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-
-import yields.client.node.User;
-import yields.client.service.YieldService;
-import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
-import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -225,6 +215,8 @@ public class MessageActivity extends NotifiableActivity {
                     mImageThumbnail.setPadding(THUMBNAIL_PADDING, THUMBNAIL_PADDING,
                             THUMBNAIL_PADDING, THUMBNAIL_PADDING);
                     mImageThumbnail.setImageBitmap(mImage);
+                    String message = "Image added to message";
+                    YieldsApplication.showToast(getApplicationContext(), message);
                 }
             } catch (IOException e) {
                 Log.d("Message Activity", "Couldn't add image to the message");
@@ -511,29 +503,5 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void setHeaderBar() {
         mActionBar.setTitle(mGroup.getName());
-    }
-
-
-    private class FakeBinder extends YieldServiceBinder {
-        public FakeBinder(YieldService service) {
-            super(service);
-        }
-
-        public void attachActivity(NotifiableActivity activity) {
-            Log.d("MessageActivity", "Attach activity");
-        }
-
-        public void unsetMessageActivity() {
-            Log.d("MessageActivity", "Attach activity");
-        }
-
-        public boolean isServerConnected() {
-            return true;
-        }
-
-        public void sendRequest(ServiceRequest request) {
-            Objects.requireNonNull(request);
-            Log.d("MessageActivity", "Send request : " + request.getType().toString());
-        }
     }
 }
