@@ -129,6 +129,13 @@ public class MessageActivity extends NotifiableActivity {
         YieldsApplication.getBinder().sendRequest(historyRequest);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mCommentAdapter.clear();
+        mGroupMessageAdapter.clear();
+    }
+
     /**
      * @return The id of the current group
      */
