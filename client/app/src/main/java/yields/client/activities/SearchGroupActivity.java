@@ -3,7 +3,6 @@ package yields.client.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +22,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import yields.client.R;
+import yields.client.exceptions.IllegalIntentExtraException;
+import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSearchedGroups;
 import yields.client.node.Group;
@@ -34,6 +35,10 @@ import yields.client.yieldsapplication.YieldsApplication;
  * on their name or tags.
  */
 public class SearchGroupActivity extends NotifiableActivity{
+    public enum Mode {SEARCH, ADD_NODE_NEW_GROUP, ADD_NODE_EXISTING_GROUP};
+
+    public final static String MODE_KEY = "MODE";
+
     private MenuItem mMenuSearch;
     private MenuItem mMenuClose;
     private EditText mEditTextSearch;
@@ -45,6 +50,8 @@ public class SearchGroupActivity extends NotifiableActivity{
     private TextView mTextViewInfo;
     private ListView mListView;
     private ProgressBar mProgressBar;
+
+    private Mode mMode;
 
      /*Used to not launch requests each time the user types a new character
      but rather waits a second before doing it */
@@ -68,6 +75,22 @@ public class SearchGroupActivity extends NotifiableActivity{
         mActionBar.setTitle(null);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
+        Intent intent = getIntent();
+        if (!intent.hasExtra(MODE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Mode extra is missing from intent in SearchGroupActivity");
+        }
+
+        int indexMode = intent.getIntExtra(MODE_KEY, 0);
+
+        if (indexMode < 0 || indexMode >= Mode.values().length){
+            throw new IllegalIntentExtraException(
+                    "Mode extra must be between 0 and "
+                            + (Mode.values().length - 1) +  " in SearchGroupActivity");
+        }
+
+        mMode = Mode.values()[indexMode];
+
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
 
         createFakeGroups();
@@ -83,6 +106,7 @@ public class SearchGroupActivity extends NotifiableActivity{
                 YieldsApplication.setGroup(mCurrentGroups.get(position));
 
                 Intent intent = new Intent(SearchGroupActivity.this, GroupInfoActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY, mMode.ordinal());
                 startActivity(intent);
             }
         });
@@ -134,6 +158,10 @@ public class SearchGroupActivity extends NotifiableActivity{
 
             case R.id.actionCloseSearch:
                 closeSearch();
+                return true;
+
+            case android.R.id.home:
+                onBackPressed();
                 return true;
 
             default:

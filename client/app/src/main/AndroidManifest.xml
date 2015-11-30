@@ -87,6 +87,11 @@
             android:name=".activities.ImageShowPopUp"
             android:label="@string/title_activity_image_show_pop_up" >
         </activity>
+        <activity
+            android:name=".activities.UserSettingsActivity"
+            android:parentActivityName=".activities.GroupActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
 
         <service
             android:name=".service.YieldService"
