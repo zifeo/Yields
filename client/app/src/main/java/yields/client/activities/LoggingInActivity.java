@@ -67,6 +67,11 @@ public class LoggingInActivity extends NotifiableActivity {
         startActivity(intent);
     }
 
+    /**
+     * Method call when the connection response has been received
+     *
+     * @param changed What has changed
+     */
     @Override
     public void notifyChange(Change changed) {
         switch (changed) {
@@ -91,6 +96,9 @@ public class LoggingInActivity extends NotifiableActivity {
         }
     }
 
+    /**
+     * What happens when the server is connected
+     */
     @Override
     synchronized public void notifyOnServerConnected() {
         if (!wasConnected) {
@@ -100,11 +108,17 @@ public class LoggingInActivity extends NotifiableActivity {
         }
     }
 
+    /**
+     * what happens when the server has been disconnected
+     */
     @Override
     synchronized public void notifyOnServerDisconnected() {
         wasConnected = false;
     }
 
+    /**
+     * what happens once the service has been created or disconnected
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {

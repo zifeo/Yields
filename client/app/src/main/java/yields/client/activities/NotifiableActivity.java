@@ -11,6 +11,10 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public abstract class NotifiableActivity extends AppCompatActivity{
 
+    /**
+     * Represents the changes that can be done to the model and need
+     * to be processed by the notified activity.
+     */
     public enum Change {
         GROUP_SEARCH, MESSAGES_RECEIVE, GROUP_LIST, GROUP_LEAVE, GROUP_JOIN,
         CONNECTED, NEW_USER
@@ -18,7 +22,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
 
     /**
      * Automatically called when the activity is resumed after another
-     * activity  was displayed
+     * activity was displayed.
      */
     @Override
     public void onResume(){
@@ -30,7 +34,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
     }
 
     /**
-     * Called to pause the activity
+     * Called when the activity is paused.
      */
     @Override
     public void onPause(){

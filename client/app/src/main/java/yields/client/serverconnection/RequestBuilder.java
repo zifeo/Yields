@@ -2,6 +2,7 @@ package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
 import android.util.ArrayMap;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -511,7 +512,8 @@ public class RequestBuilder {
     private void addField(Fields fieldType, Bitmap field) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         field.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        this.mConstructingMap.put(fieldType.getValue(), stream.toByteArray());
+        this.mConstructingMap.put(fieldType.getValue(),
+                Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT));
     }
 
     private void addField(Fields fieldType, Group.GroupVisibility field) {
