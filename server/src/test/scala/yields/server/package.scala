@@ -27,7 +27,7 @@ package object server {
     (Source(generated), generated)
   }
 
-  /** Blocks 3 second until result is available. */
+  /** Blocks 4 second until result is available. */
   def await[T](run: Future[T]): T = {
     Await.result(run, 4 seconds)
   }
