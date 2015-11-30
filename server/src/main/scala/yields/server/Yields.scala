@@ -3,6 +3,7 @@ package yields.server
 import java.util.logging.LogManager
 
 import akka.actor._
+import akka.stream.Supervision.{Resume, Stop}
 import akka.stream._
 import yields.server.actions.{Broadcast, Result}
 import yields.server.dbi.models.UID
@@ -24,11 +25,14 @@ object Yields {
   private implicit lazy val system = ActorSystem("Yields-server")
   private implicit lazy val materializer = {
     val decider: Supervision.Decider = {
-      case NonFatal(e) =>
-        val exception = e.getStackTrace.toList.headOption.getOrElse("error when getting the stacktrace")
-        val message = e.getMessage
-        system.log.error(s"$exception: $message")
-        Supervision.stop
+      case NonFatal(nonfatal) =>
+        val message = nonfatal.getMessage
+        system.log.error(nonfatal, s"pipeline non fatal: $message")
+        Resume
+      case fatal =>
+        val message = fatal.getMessage
+        system.log.error(fatal, s"pipeline fatal: $message")
+        Stop
     }
     ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
   }
