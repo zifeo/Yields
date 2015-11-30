@@ -30,13 +30,11 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
       val message = nonfatal.getMessage
-      val trace = nonfatal.getStackTrace.mkString("\n")
-      log.error(nonfatal, s"non fatal:\n$message\n$trace")
+      log.error(nonfatal, s"non fatal: $message")
       Resume
     case fatal =>
       val message = fatal.getMessage
-      val trace = fatal.getStackTrace.mkString("\n")
-      log.error(fatal, s"fatal:\n$message\n$trace")
+      log.error(fatal, s"fatal: $message")
       Escalate
   }
 

@@ -28,13 +28,11 @@ final class Dispatcher() extends Actor with ActorLogging {
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
       val message = nonfatal.getMessage
-      val trace = nonfatal.getStackTrace.mkString("\n")
-      log.error(nonfatal, s"non fatal:\n$message\n$trace")
+      log.error(nonfatal, s"non fatal: $message")
       Resume
     case fatal =>
       val message = fatal.getMessage
-      val trace = fatal.getStackTrace.mkString("\n")
-      log.error(fatal, s"fatal:\n$message\n$trace")
+      log.error(fatal, s"fatal: $message")
       Escalate
   }
 
@@ -56,8 +54,9 @@ final class Dispatcher() extends Actor with ActorLogging {
           val clientHub = sender()
           context.become(state(add(uid, clientHub, pool)))
 
-        case Failure(_) =>
-          log.warning(s"dispatch pool: init connection without uid")
+        case Failure(cause) =>
+          val message = cause.getMessage
+          log.warning(s"dispatch pool: init connection without uid: $message")
       }
 
     case TerminateConnection =>
@@ -67,7 +66,7 @@ final class Dispatcher() extends Actor with ActorLogging {
           context.become(state(newPool))
 
         case None =>
-          log.warning(s"dispatch pool: init connection without uid")
+          log.warning(s"dispatch pool: terminate connection without uid")
       }
 
     case Notify(uids, result) =>
@@ -90,7 +89,7 @@ final class Dispatcher() extends Actor with ActorLogging {
     if (pos >= 0) {
       val uid = message.drop(pos + uidPattern.length).takeWhile(_ != ',').trim
       Try(uid.toLong)
-    } else Failure(new NoSuchElementException(s"no uid found"))
+    } else Failure(new NoSuchElementException(s"no uid found: $message"))
   }
 
   /** Add uid - actor pair to pool. */
