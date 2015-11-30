@@ -32,8 +32,11 @@ package object server {
     Await.result(run, 3 second)
   }
 
-  /** Serialize and deserialize a given element. */
-  def toAndFromJson[T : JsonWriter : JsonReader](elem: T): T =
-    elem.toJson.toString().parseJson.convertTo[T]
+  /** Serialize and deserialize a given element and return true on equality. */
+  def toAndFromJson[T : JsonWriter : JsonReader](elem: T): Boolean = {
+    val encoded = elem.toJson.toString()
+    val decoded = encoded.parseJson.convertTo[T].toJson.toString()
+    encoded == decoded
+  }
 
 }

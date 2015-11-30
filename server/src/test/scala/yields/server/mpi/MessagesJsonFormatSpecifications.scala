@@ -9,15 +9,19 @@ object MessagesJsonFormatSpecifications extends Properties("MessagesJsonFormat")
   import Prop.forAll
 
   property("Request") = forAll { (x: Request) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
   property("Response") = forAll { (x: Response) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
+  }
+
+  property("Notification") = forAll { (x: Notification) =>
+    toAndFromJson(x)
   }
 
   property("Metadata") = forAll { (x: Metadata) =>
-    toAndFromJson(x) == x
+    toAndFromJson(x)
   }
 
 }

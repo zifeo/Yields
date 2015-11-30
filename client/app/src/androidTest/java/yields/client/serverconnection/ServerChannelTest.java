@@ -28,6 +28,15 @@ public class ServerChannelTest {
             "}" +
             "}";
 
+    private static String sSimpleRequest = "{" +
+            "\"metadata\":{" +
+            "\"sender\":0," +
+            "\"datetime\":\"TIME\"}," +
+            "\"kind\":\"PING\"," +
+            "\"message\":" +
+            "{\"content\":\"test\"}" +
+            "}\n";
+
     @Test
     public void testNonWorkingConnection() {
         ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");

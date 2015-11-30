@@ -5,6 +5,7 @@ import java.time.OffsetDateTime
 import org.scalacheck._
 import yields.server._
 import yields.server.actions.groups._
+import yields.server.actions.nodes.{NodeSearchRes, NodeSearch}
 import yields.server.dbi.models._
 
 trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
@@ -16,9 +17,7 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
       name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
       users <- arbitrary[List[UID]]
-      tags <- arbitrary[List[String]]
-      visibility: String <- Gen.oneOf("private", "public")
-    } yield GroupCreate(name, nodes, users, tags, visibility)
+    } yield GroupCreate(name, users, nodes)
   }
 
   implicit lazy val groupCreateResArb: Arbitrary[GroupCreateRes] = Arbitrary {
@@ -27,28 +26,88 @@ trait GroupsGenerators extends DefaultsGenerators with ModelsGenerators {
     } yield GroupCreateRes(nid)
   }
 
+  implicit lazy val groupCreateBrdArb: Arbitrary[GroupCreateBrd] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+      name <- arbitrary[String]
+      nodes <- arbitrary[List[NID]]
+      users <- arbitrary[List[UID]]
+    } yield GroupCreateBrd(nid, name, users, nodes)
+  }
+
+  //
+
   implicit lazy val groupUpdateArb: Arbitrary[GroupUpdate] = Arbitrary {
     for {
       nid <- arbitrary[NID]
       name <- arbitrary[Option[String]]
       image <- arbitrary[Option[Blob]]
-    } yield GroupUpdate(nid, name, image)
+      addUser <- arbitrary[List[UID]]
+      removeUser <- arbitrary[List[UID]]
+      addNode <- arbitrary[List[NID]]
+      removeNode <- arbitrary[List[NID]]
+    } yield GroupUpdate(nid, name, image, addUser, removeUser, addNode, removeNode)
   }
 
   implicit lazy val groupUpdateResArb: Arbitrary[GroupUpdateRes] = Arbitrary {
     GroupUpdateRes()
   }
 
-  implicit lazy val groupSearchArb: Arbitrary[GroupSearch] = Arbitrary {
+  implicit lazy val groupUpdateBrdArb: Arbitrary[GroupUpdateBrd] = Arbitrary {
     for {
-      pattern <- arbitrary[String]
-    } yield GroupSearch(pattern)
+      nid <- arbitrary[NID]
+      name <- arbitrary[String]
+      image <- arbitrary[Blob]
+      users <- arbitrary[List[UID]]
+      nodes <- arbitrary[List[NID]]
+    } yield GroupUpdateBrd(nid, name, image, users, nodes)
   }
 
-  implicit lazy val groupSearchResArb: Arbitrary[GroupSearchRes] = Arbitrary {
+  //
+
+  implicit lazy val groupInfoArb: Arbitrary[GroupInfo] = Arbitrary {
     for {
-      res <- arbitrary[Seq[(NID, String)]]
-    } yield GroupSearchRes(res)
+      nid <- arbitrary[NID]
+    } yield GroupInfo(nid)
+  }
+
+  implicit lazy val groupInfoResArb: Arbitrary[GroupInfoRes] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+      name <- arbitrary[String]
+      image <- arbitrary[Blob]
+      users <- arbitrary[List[UID]]
+      nodes <- arbitrary[List[NID]]
+    } yield GroupInfoRes(nid, name, image, users, nodes)
+  }
+
+  //
+
+  implicit lazy val groupMessageArb: Arbitrary[GroupMessage] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+      text <- arbitrary[Option[String]]
+      contentType <- arbitrary[Option[String]]
+      content <- arbitrary[Option[Blob]]
+    } yield GroupMessage(nid, text, contentType, content)
+  }
+
+  implicit lazy val groupMessageResArb: Arbitrary[GroupMessageRes] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+      datetime <- arbitrary[OffsetDateTime]
+    } yield GroupMessageRes(nid, datetime)
+  }
+
+  implicit lazy val groupMessageBrdArb: Arbitrary[GroupMessageBrd] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+      datetime <- arbitrary[OffsetDateTime]
+      sender <- arbitrary[UID]
+      text <- arbitrary[Option[String]]
+      contentType <- arbitrary[Option[String]]
+      content <- arbitrary[Option[Blob]]
+    } yield GroupMessageBrd(nid, datetime, sender, text, contentType, content)
   }
 
 }

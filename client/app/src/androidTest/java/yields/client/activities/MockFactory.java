@@ -95,30 +95,5 @@ public class MockFactory {
         public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {
             super(name, id, email, img);
         }
-
-        @Override
-        public void sendMessage(Group group, Message message) {
-
-        }
-
-        @Override
-        public List<Message> getGroupMessages(Group group, Date lastDate) throws IOException {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public void createNewGroup(Group group) {
-
-        }
-
-        @Override
-        public void deleteGroup(Group group) {
-
-        }
-
-        @Override
-        public Map<User, String> getHistory(Group group, Date from) {
-            return new HashMap<>();
-        }
     }
 }

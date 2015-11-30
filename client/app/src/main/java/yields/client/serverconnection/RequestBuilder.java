@@ -33,10 +33,11 @@ public class RequestBuilder {
      */
     public enum Fields {
         EMAIL("email"), TEXT("text"), NAME("name"),
-        NODES("nodes"), KIND("kind"),
-        LAST("datetime"), TO("to"), COUNT("count"), CONTENT("content"),
+        NODES("nodes"), KIND("kind"), USERS("users"),
+        LAST("datetime"), TO("to"), CONTENT("content"), COUNT("count"),
         IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
-        CONTENT_TYPE("contentType"), DATE("date");
+        CONTENT_TYPE("contentType"), UID("uid"),
+        TAG("tags"), DATE("date");
 
         private final String name;
 
@@ -87,6 +88,8 @@ public class RequestBuilder {
         Objects.requireNonNull(senderId);
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.USER_GROUP_LIST, senderId);
+
+        builder.addField(Fields.UID, senderId);
 
         return builder.request();
     }
@@ -156,7 +159,7 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_INFO, sender);
-        builder.addField(Fields.NID, userInfo);
+        builder.addField(Fields.UID, userInfo);
 
         return builder.request();
     }
@@ -167,30 +170,33 @@ public class RequestBuilder {
      * @param sender     The id of the sender.
      * @param name       The new name of the group.
      * @param visibility The visibility of the group.
-     * @param nodes      The nodes attached to the group.
+     * @param users      The users attached to the group.
      * @return The request itself.
      */
     public static ServerRequest groupCreateRequest(Id sender, String name,
                                                    Group.GroupVisibility visibility,
-                                                   List<Id> nodes) {
+                                                   List<Id> users) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(name);
-        Objects.requireNonNull(nodes);
+        Objects.requireNonNull(users);
 
-        if (nodes.size() < 1) {
+        if (users.size() < 1) {
             throw new IllegalArgumentException("No nodes to add...");
         }
-        List<Long> nodeIds = new ArrayList<>();
-        for (Id id : nodes) {
-            nodeIds.add(id.getId());
+        List<Long> usersId = new ArrayList<>();
+        for (Id id : users) {
+            usersId.add(id.getId());
         }
 
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.GROUP_CREATE, sender);
 
         builder.addField(Fields.NAME, name);
-        builder.addField(Fields.NODES, nodeIds);
+        // TODO : correct when nodes are really implemented
+        builder.addField(Fields.NODES, new ArrayList());
+        builder.addField(Fields.USERS, usersId);
         builder.addField(Fields.VISIBILITY, visibility);
+        builder.addField(Fields.TAG, new ArrayList());
 
         return builder.request();
     }
@@ -276,7 +282,7 @@ public class RequestBuilder {
                 ServiceRequest.RequestKind.GROUP_ADD, sender);
 
         builder.addField(Fields.NID, groupId);
-        builder.addField(Fields.NID, newUser);
+        builder.addField(Fields.UID, newUser);
 
         return builder.request();
     }
@@ -467,7 +473,7 @@ public class RequestBuilder {
     }
 
     private void addField(Fields fieldType, Group.GroupVisibility field) {
-        this.mConstructingMap.put(fieldType.getValue(), field.getValue());
+        this.mConstructingMap.put(fieldType.getValue(), field.getValue().toLowerCase());
     }
 
     /**
