@@ -18,7 +18,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/editTextSelectGroupName"
         android:layout_gravity="center_horizontal"
-        android:hint="@string/enterGroupName" />
+        android:hint="@string/enterGroupName"
+        android:maxLines="1"
+        android:inputType="textEmailAddress|textWebEmailAddress" />
 
     <Space
         android:layout_width="wrap_content"

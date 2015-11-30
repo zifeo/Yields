@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
-import yields.client.listadapter.ListAdapterSettings;
+import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -34,10 +35,10 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Activity where the user can change some parameters for the group, leave it and
- * where the admin can change its name, image, users...
+ * where the admin can change its name, image, add users and nodes ...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_TAG}
+    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_NODE, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
@@ -70,11 +71,12 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
+        itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
         itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
-        ListAdapterSettings arrayAdapter = new ListAdapterSettings(getApplicationContext(),
+        ListAdapterGroupSettings arrayAdapter = new ListAdapterGroupSettings(getApplicationContext(),
                 R.layout.group_settings_layout, itemList);
 
         listView.setAdapter(arrayAdapter);
@@ -89,6 +91,25 @@ public class GroupSettingsActivity extends AppCompatActivity {
     }
 
     /**
+     * Method called when this activity is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (YieldsApplication.isGroupAddedValid()){
+            Group group = YieldsApplication.getGroupAdded();
+
+            // TODO Send the request to add the new group
+
+            String text = "Group \"" + group.getName() + "\" added";
+            YieldsApplication.showToast(getApplicationContext(), text);
+
+            YieldsApplication.setGroupAddedValid(false);
+        }
+    }
+
+    /**
      * Method automatically called when the user has selected the new group image
      *
      * @param requestCode The code of the request
@@ -97,7 +118,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK) {
             Objects.requireNonNull(data);
             Objects.requireNonNull(data.getData());
@@ -110,6 +130,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
                     String message = "Group image changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
+
+                    int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
+                    mGroup.setImage(Bitmap.createScaledBitmap(image, diameter, diameter, false));
 
                     ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(), image);
                     YieldsApplication.getBinder().sendRequest(request);
@@ -142,6 +165,24 @@ public class GroupSettingsActivity extends AppCompatActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
 
             // TODO Send request to add multiple users to server
+        }
+    }
+
+    /** Method used to take care of clicks on the tool bar
+     *
+     * @param item The tool bar item clicked
+     * @return true iff the click is not propagated
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
         }
     }
 
@@ -178,6 +219,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     changeTagListener();
                     break;
 
+                case ADD_NODE:
+                    addNodeListener();
+                    break;
+
                 default:
                     addUsersListener();
                     break;
@@ -192,25 +237,45 @@ public class GroupSettingsActivity extends AppCompatActivity {
             editTextName.setId(R.id.editText);
             editTextName.setText(mGroup.getName());
 
-            new AlertDialog.Builder(GroupSettingsActivity.this)
-                    .setTitle("Change group name")
-                    .setMessage("Type the new group's name !")
+            final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
+
+            final AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
+                    .setTitle("Change the group's name")
+                    .setMessage("Your new name must be at least " + minimumSize + " characters long.")
                     .setView(editTextName)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String newName = editTextName.getText().toString();
-                            String message = "Group name changed to \"" + newName + "\"";
-                            YieldsApplication.showToast(getApplicationContext(), message);
-
-                            ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
-                            YieldsApplication.getBinder().sendRequest(request);
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
                         }
                     })
-                    .show();
+                    .create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String newName = editTextName.getText().toString();
+
+                    if (newName.length() < 2) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The new name is too short");
+                    } else {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "Group name changed to \"" + newName + "\" !");
+
+                        mUser.setName(newName);
+
+                        ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
+                        YieldsApplication.getBinder().sendRequest(request);
+
+                        dialog.dismiss();
+                    }
+                }
+            });
         }
 
         /**
@@ -286,6 +351,17 @@ public class GroupSettingsActivity extends AppCompatActivity {
         }
 
         /**
+         * Listener for the "Add node" item.
+         */
+        private void addNodeListener() {
+            Intent intent = new Intent(GroupSettingsActivity.this, SearchGroupActivity.class);
+            intent.putExtra(SearchGroupActivity.MODE_KEY,
+                    SearchGroupActivity.Mode.ADD_NODE_EXISTING_GROUP.ordinal());
+
+            startActivity(intent);
+        }
+
+        /**
          * Listener for the "Add tag" item.
          */
         private void changeTagListener() {
@@ -336,5 +412,4 @@ public class GroupSettingsActivity extends AppCompatActivity {
             });
         }
     }
-
 }

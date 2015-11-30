@@ -125,6 +125,8 @@ public class GroupActivity extends NotifiableActivity {
 
             case R.id.actionDiscover:
                 intent = new Intent(this, SearchGroupActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY,
+                        SearchGroupActivity.Mode.SEARCH.ordinal());
             break;
 
             case R.id.actionCreate:
@@ -132,9 +134,7 @@ public class GroupActivity extends NotifiableActivity {
             break;
 
             case R.id.actionSettings:
-                //TODO Create a UserSettingsActivity
-
-                intent = new Intent(this, CreatingAccountActivity.class);
+                intent = new Intent(this, UserSettingsActivity.class);
             break;
 
             default:
