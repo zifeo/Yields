@@ -17,6 +17,7 @@ import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
 import yields.client.node.User;
@@ -132,6 +133,8 @@ public class ServerRequestsTests {
     @Test
     public void testGroupCreateRequest(){
         try {
+            YieldsApplication.setUser(new ClientUser("test",new Id(-1), "test@epfl.ch",
+                    YieldsApplication.getDefaultUserImage()));
             Id senderId = new Id(11);
             String groupName = "Dank AF";
             List<User> users = MockFactory.generateMockUsers(3);
@@ -345,7 +348,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    textContent.getType());
+                    "null");
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
 
@@ -359,8 +362,8 @@ public class ServerRequestsTests {
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    imageContent.getType());
+            assertEquals(imageContent.getType().toString().toLowerCase(),
+                    json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()));
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
@@ -393,7 +396,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    textContent.getType());
+                    "null");
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
         } catch (JSONException e) {
@@ -427,7 +430,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    imageContent.getType());
+                    imageContent.getType().toString().toLowerCase());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
