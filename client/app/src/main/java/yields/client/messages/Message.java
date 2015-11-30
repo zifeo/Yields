@@ -2,6 +2,7 @@ package yields.client.messages;
 
 
 import android.graphics.BitmapFactory;
+import android.net.wifi.WifiConfiguration;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,10 +40,10 @@ public class Message extends Node {
         }
     }
 
-    private final User mSender;
+    private final Id mSender;
     private final Content mContent;
-    private final Date mDate;
-    private final MessageStatus mStatus;
+    private Date mDate;
+    private MessageStatus mStatus;
 
     /**
      * Main constructor for a Message.
@@ -55,7 +56,7 @@ public class Message extends Node {
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, User sender, Content content,
+    public Message(String nodeName, Id nodeID, Id sender, Content content,
                    Date date, MessageStatus status) {
         super(nodeName, nodeID);
         this.mSender = Objects.requireNonNull(sender);
@@ -75,38 +76,39 @@ public class Message extends Node {
      * @throws NodeException    If the Node information is incorrect.
      */
     public Message(String nodeName, Id nodeID, User sender, Content content, Date date) {
-        this(nodeName, nodeID, sender, content, date, MessageStatus.NOT_SENT);
+        this(nodeName, nodeID, sender.getId(), content, date, MessageStatus.NOT_SENT);
     }
 
     /**
-     * Create a message from a JSON object.
-     *
-     * @param object The JSON representing the message.
-     * @throws JSONException if the json is invalid.
+     * Constructor of a message from the JSON fields received from the server.
+     * @param dateTime The date in String format.
+     * @param senderID The is of the sender in String format.
+     * @param text The text of the message (if it is a text message, null otherwise).
+     * @param contentType The content type of the message.
+     * @param contents The actual content of the message.
+     * @throws ParseException In case of parse exception with the date serialization.
      */
-    public Message(JSONArray object) throws JSONException, ParseException {
-        super(object.getString(0),
-                new Id(DateSerialization.dateSerializer.toDate(object.getString(0)).getTime()));
+    public Message(String dateTime, Long senderID, String text, String contentType, Byte[]
+            contents)
+            throws ParseException {
+        super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)
+        ).getTime()));
 
-        Id idUser = new Id(Long.parseLong(object.getString(1)));
-        /* TODO : For now the sender has its id as a name, we need to implement a request to do the mapping. */
-        // TODO : The same apply for the profil pic and the email.
+        this.mSender = new Id(senderID);
 
-        User sender = new User(idUser.getId().toString(), idUser, "",
-                BitmapFactory.decodeResource(YieldsApplication.getApplicationContext().getResources(),
-                        R.drawable.userpicture));
-
-        this.mSender = sender;
-        // TODO : Implement images !!!
-        this.mContent = new TextContent(object.getString(3));
-        //TODO : Implement Groups
-
-        try {
-            this.mDate = DateSerialization.dateSerializer.toDate(object.getString(0));
-        } catch (ParseException e) {
-            throw new JSONException(e.getMessage());
+        if (text != null){
+            contentType = "text";
         }
 
+        if (contentType.equals("text")){
+            this.mContent = new TextContent(text);
+        }
+        else{
+            // TODO : Images, waiting for the problem in server side to be solved.
+            throw new UnsupportedOperationException();
+        }
+
+        this.mDate = DateSerialization.dateSerializer.toDate(dateTime);
         mStatus = MessageStatus.SENT;
     }
 
@@ -115,7 +117,7 @@ public class Message extends Node {
      *
      * @return The sender of the message.
      */
-    public User getSender() {
+    public Id getSender() {
         return mSender;
     }
 
@@ -143,7 +145,7 @@ public class Message extends Node {
      * @return A string describing the message.
      */
     public String getPreview() {
-        return mSender.getName() + " : " + mContent.getPreview();
+        return YieldsApplication.getUser().getName() + " : " + mContent.getPreview();
     }
 
     /**
@@ -153,5 +155,24 @@ public class Message extends Node {
      */
     public MessageStatus getStatus() {
         return mStatus;
+    }
+
+    /**
+     * Sets the MessageStatus of the message.
+     *
+     * @param messageStatus The MessageStatus of the message.
+     */
+    public void setStatus(MessageStatus messageStatus) {
+        mStatus = messageStatus;
+    }
+
+    /**
+     * Sets the MessageStatus of the message.
+     *
+     * @param messageStatus The MessageStatus of the message.
+     */
+    public void setStatus(MessageStatus messageStatus, Date timeStamp) {
+        setStatus(messageStatus);
+        mDate = timeStamp;
     }
 }

@@ -119,7 +119,7 @@ public class CacheDatabaseTests {
         try {
             Message message = MockFactory.generateMockMessages(3).get(0);
             Group group = MockFactory.generateMockGroups(2).get(0);
-            group.addUser(message.getSender());
+            group.addUser(YieldsApplication.getUser(message.getSender()));
             mDatabaseHelper.addMessage(message, group.getId());
 
             Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group,
@@ -144,7 +144,7 @@ public class CacheDatabaseTests {
             User user = MockFactory.generateMockUsers(2).get(1);
             Message message = new Message("Bob", new Id(2), user, content, new Date());
             Group group = MockFactory.generateMockGroups(2).get(0);
-            group.addUser(message.getSender());
+            group.addUser(YieldsApplication.getUser(message.getSender()));
             mDatabaseHelper.addMessage(message, group.getId());
 
             Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group,
@@ -593,7 +593,7 @@ public class CacheDatabaseTests {
             assertEquals(10, messagesFromDatabase.size());
             for (int i = 0; i < 10; i++) {
                 Message message = messagesFromDatabase.get(i);
-                assertEquals(Long.valueOf(2), message.getSender().getId().getId());
+                assertEquals(Long.valueOf(2), message.getSender().getId());
                 assertEquals("Mock message #" + (59 - i), ((TextContent) message.getContent()).getText());
             }
         } catch (CacheDatabaseException exception) {
@@ -717,9 +717,7 @@ public class CacheDatabaseTests {
      * @return True if the Messages are the same, false otherwise.
      */
     private boolean compareMessages(Message originalMessage, Message messageFromCache) {
-        boolean equal = originalMessage.getSender().getId().getId().equals(messageFromCache.getSender().getId().getId());
-        equal = equal && originalMessage.getSender().getEmail().equals(messageFromCache.getSender().getEmail());
-        equal = equal && originalMessage.getSender().getName().equals(messageFromCache.getSender().getName());
+        boolean equal = originalMessage.getSender().equals(messageFromCache.getSender());
 
         equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
         equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);

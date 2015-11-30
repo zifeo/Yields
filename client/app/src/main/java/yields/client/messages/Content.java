@@ -11,17 +11,7 @@ import yields.client.exceptions.ContentException;
 public abstract class Content {
 
     public enum ContentType {
-        TEXT("TEXT"), IMAGE("IMAGE");
-
-        private final String mType;
-
-        ContentType(String type) {
-            mType = type;
-        }
-
-        public String getType() {
-            return mType;
-        }
+        TEXT, IMAGE;
     }
 
     /**

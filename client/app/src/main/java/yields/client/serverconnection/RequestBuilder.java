@@ -2,6 +2,7 @@ package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
 import android.util.ArrayMap;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -21,7 +22,9 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.servicerequest.ServiceRequest;
+import yields.client.servicerequest.UserUpdateRequest;
 
 /**
  * A builder for requests that will be send to the server
@@ -37,7 +40,8 @@ public class RequestBuilder {
         LAST("datetime"), TO("to"), CONTENT("content"), COUNT("count"),
         IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
         CONTENT_TYPE("contentType"), UID("uid"),
-        TAG("tags"), DATE("date");
+        TAG("tags"), DATE("date"), ADD_ENTOURAGE("addEntourage"),
+        REMOVE_ENTOURAGE("removeEntourage");
 
         private final String name;
 
@@ -63,20 +67,61 @@ public class RequestBuilder {
      * @param image  The image of the updated User.
      * @return The appropriate ServerRequest.
      */
-    public static ServerRequest userUpdateRequest(Id sender, String name, String email, Bitmap image) {
+    private static ServerRequest userUpdateRequest(Id sender, String name, String email,
+                                                   Bitmap image, List<Id> addEntourage,
+                                                   List<Id> remEntourage) {
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(name);
-        Objects.requireNonNull(email);
-        Objects.requireNonNull(image);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
 
-        builder.addField(Fields.NAME, name);
-        builder.addField(Fields.EMAIL, email);
-        builder.addField(Fields.IMAGE, image);
+        builder.addOptionalField(Fields.NAME, name);
+        builder.addOptionalField(Fields.EMAIL, email);
+        builder.addOptionalField(Fields.IMAGE, image);
+        builder.addOptionalField(Fields.ADD_ENTOURAGE, addEntourage);
+        builder.addOptionalField(Fields.REMOVE_ENTOURAGE, remEntourage);
 
         return builder.request();
     }
+
+    /**
+     * ServerRequest for updating user properties.
+     *
+     * @param sender The sender of the request, which wants to be updated.
+     * @param name   The name of the updated User.
+     * @param email  The email ot the updated User.
+     * @param image  The image of the updated User.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest userUpdateRequest(Id sender, String name, String email,
+                                                  Bitmap image) {
+        return userUpdateRequest(sender,name,email,image,new ArrayList<Id>(),
+                new ArrayList<Id>());
+    }
+
+    /**
+     * ServerRequest for updating user properties.
+     *
+     * @param sender The sender of the request, which wants to be updated.
+     * @param name   The name of the updated User.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest userUpdateRequest(Id sender, String name) {
+        return userUpdateRequest(sender, name, null, null, new ArrayList<Id>(), new ArrayList<Id>());
+    }
+
+    /**
+     *
+     */
+    public static ServerRequest groupInfoRequest(Id sender, Id groupId) {
+        Objects.requireNonNull(sender);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_INFO, sender);
+
+        builder.addField(Fields.NID, groupId);
+
+        return builder.request();
+    }
+
 
     /**
      * ServerRequest to receive the group list.
@@ -338,7 +383,7 @@ public class RequestBuilder {
      * @param content The content of the message.
      * @return The request itself.
      */
-    public static ServerRequest nodeTextMessageRequest(Id sender, Id groupId,
+    private static ServerRequest nodeTextMessageRequest(Id sender, Id groupId,
                                                        TextContent content, Date date) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
@@ -349,9 +394,10 @@ public class RequestBuilder {
                 ServiceRequest.RequestKind.NODE_MESSAGE, sender);
 
         builder.addField(Fields.NID, groupId);
-        builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
+        builder.addOptionalField(Fields.CONTENT_TYPE, null);
         builder.addField(Fields.TEXT, content.getText());
         builder.addField(Fields.DATE, DateSerialization.dateSerializer.toString(date));
+        builder.addOptionalField(Fields.CONTENT, null);
 
 
         return builder.request();
@@ -365,7 +411,7 @@ public class RequestBuilder {
      * @param content The ImageContent to send.
      * @return The request itself.
      */
-    public static ServerRequest nodeImageMessageRequest(Id sender, Id groupId,
+    private static ServerRequest nodeImageMessageRequest(Id sender, Id groupId,
                                                         ImageContent content, Date date) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
@@ -376,7 +422,7 @@ public class RequestBuilder {
                 ServiceRequest.RequestKind.NODE_MESSAGE, sender);
 
         builder.addField(Fields.NID, groupId);
-        builder.addField(Fields.CONTENT_TYPE, content.getType().getType());
+        builder.addField(Fields.CONTENT_TYPE, content.getType().toString().toLowerCase());
         builder.addField(Fields.TEXT, content.getCaption());
         builder.addField(Fields.CONTENT, content.getImage());
         builder.addField(Fields.DATE, DateSerialization.dateSerializer.toString(date));
@@ -439,12 +485,26 @@ public class RequestBuilder {
         this.mConstructingMap = new ArrayMap<>();
     }
 
+    private <T> Boolean addOptionalField(Fields fieldType, T field) {
+        if (field == null) {
+            this.mConstructingMap.put(fieldType.getValue(), JSONObject.NULL);
+        } else {
+            addField(fieldType, field);
+        }
+
+        return true;
+    }
+
     /**
      * Here are the methods allowing us to add fields to the request builder.
      *
      * @param fieldType The type of the field to be added.
      * @param field     The value of this field.
      */
+    private void addField(Fields fieldType, Object field) {
+        this.mConstructingMap.put(fieldType.getValue(), field);
+    }
+
     private void addField(Fields fieldType, String field) {
         this.mConstructingMap.put(fieldType.getValue(), field);
     }
@@ -469,7 +529,8 @@ public class RequestBuilder {
     private void addField(Fields fieldType, Bitmap field) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         field.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        this.mConstructingMap.put(fieldType.getValue(), stream.toString());
+        this.mConstructingMap.put(fieldType.getValue(),
+                Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT));
     }
 
     private void addField(Fields fieldType, Group.GroupVisibility field) {

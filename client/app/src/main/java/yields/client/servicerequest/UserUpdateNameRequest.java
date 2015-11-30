@@ -9,7 +9,7 @@ import yields.client.serverconnection.ServerRequest;
 /**
  * ServiceRequest asking the Service to update a User.
  */
-public class UserUpdateRequest extends ServiceRequest {
+public class UserUpdateNameRequest extends ServiceRequest {
 
     private final User mUser;
 
@@ -18,7 +18,7 @@ public class UserUpdateRequest extends ServiceRequest {
      *
      * @param user The ClientUser sending the request.
      */
-    public UserUpdateRequest(User user) {
+    public UserUpdateNameRequest(User user) {
         super();
         Objects.requireNonNull(user);
 
@@ -42,7 +42,7 @@ public class UserUpdateRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userUpdateRequest(mUser.getId(), mUser.getName(), mUser.getEmail(), mUser.getImg());
+        return RequestBuilder.userUpdateRequest(mUser.getId(), mUser.getName());
     }
 
     /**

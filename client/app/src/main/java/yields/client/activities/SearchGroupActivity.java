@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -271,7 +272,7 @@ public class SearchGroupActivity extends NotifiableActivity{
 
                         YieldsApplication.setGroupsSearched(newGroupsSearched);
 
-                        notifyChange();
+                        notifyChange(Change.GROUP_SEARCH);
                     }
                 }, 2000);
             }
@@ -326,29 +327,34 @@ public class SearchGroupActivity extends NotifiableActivity{
      * data set has changed
      */
     @Override
-    public void notifyChange() {
+    public void notifyChange(Change change) {
+        switch (change) {
+            case GROUP_SEARCH:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRequestsCount--;
 
-        // Need to run on the UI thread because some views are modified
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mRequestsCount--;
+                        mCurrentGroups.clear();
+                        mCurrentGroups.addAll(YieldsApplication.getGroupsSearched());
 
-                mCurrentGroups.clear();
-                mCurrentGroups.addAll(YieldsApplication.getGroupsSearched());
-
-                if (mRequestsCount == 0) {
-                    if (mCurrentGroups.size() == 0) {
-                        setNoResultsState();
-                    } else {
-                        setNewResultsState();
+                        if (mRequestsCount == 0) {
+                            if (mCurrentGroups.size() == 0) {
+                                setNoResultsState();
+                            } else {
+                                setNewResultsState();
+                            }
+                            mAdapterCurrentGroups.notifyDataSetChanged();
+                        } else {
+                            setWaitingState();
+                        }
                     }
-                    mAdapterCurrentGroups.notifyDataSetChanged();
-                } else {
-                    setWaitingState();
-                }
-            }
-        });
+                });
+                break;
+            default:
+                Log.d("Y:" + this.getClass().getName(), "useless notify change...");
+        }
+
     }
 
     /**

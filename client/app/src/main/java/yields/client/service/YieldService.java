@@ -78,8 +78,10 @@ public class YieldService extends Service {
                 YieldsApplication.setUser(new ClientUser(email));
             }
 
-            ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
-            sendRequest(connectReq);
+            /*if (mServiceRequestController.isConnected()) {
+                ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
+                sendRequest(connectReq);
+            }*/
         }
 
         Log.d("Y:" + this.getClass().getName(), "Starting yield service");
@@ -114,10 +116,10 @@ public class YieldService extends Service {
         }).start();
     }
 
-    public void notifyChange() {
+    public void notifyChange(NotifiableActivity.Change change) {
         if (mCurrentNotifiableActivity != null) {
             Log.d("Y:" + this.getClass().getName(), "notified activity");
-            mCurrentNotifiableActivity.notifyChange();
+            mCurrentNotifiableActivity.notifyChange(change);
         } else {
             Log.d("Y:" + this.getClass().getName(), "not notified activity");
         }
@@ -214,33 +216,17 @@ public class YieldService extends Service {
     synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
-            List<Group> groups = YieldsApplication.getUser().getUserGroups();
-            for (Group group : groups) {
-                if (group.getId().getId().equals(groupId.getId())) {
-                    group.addMessage(message);
-                    sendMessageNotification(group, message);
-                }
+            Group group = YieldsApplication.getUser().modifyGroup(groupId);
+            group.addMessage(message);
+            sendMessageNotification(group, message);
+            if (mCurrentNotifiableActivity != null) {
+                mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
         } else {
             mCurrentGroup.addMessage(message);
-            mCurrentNotifiableActivity.notifyChange();
+            mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         }
     }
-
-    /**
-     * Updates a Message that is already in the Group bound to the service.
-     *
-     * @param group   The group to which the Message was sent.
-     * @param message The message's updated version.
-     * @param oldDate The original date of the Message before it's update.
-     */
-    synchronized public void updateMessage(Group group, Message message, Date oldDate) {
-        if (mCurrentNotifiableActivity != null || mCurrentGroup.getId() == group.getId()) {
-            mCurrentGroup.addMessage(message);
-            mCurrentNotifiableActivity.notifyChange();
-        }
-    }
-
 
     /**
      * Called when multiple message is received from the server
@@ -252,14 +238,13 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity != null && mCurrentGroup != null &&
                 mCurrentGroup.getId().getId().equals(groupId.getId())) {
             mCurrentGroup.addMessages(messages);
-            mCurrentNotifiableActivity.notifyChange();
+            mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } else {
-            List<Group> groups = YieldsApplication.getUser().getUserGroups();
-            for (Group group : groups) {
-                if (group.getId().getId().equals(groupId.getId())) {
-                    group.addMessages(messages);
-                }
+            if (mCurrentNotifiableActivity != null) {
+                mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
+
+            YieldsApplication.getUser().modifyGroup(groupId).addMessages(messages);
         }
     }
 
@@ -283,7 +268,8 @@ public class YieldService extends Service {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.send_icon)
-                        .setContentTitle("Message from " + message.getSender().getName())
+                        .setContentTitle("Message from " + YieldsApplication
+                                .getUser(message.getSender()).getName())
                         .setContentText(message.getContent().toString().substring(0, 50));
 
         // Creates an explicit intent for an Activity in your app

@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -122,9 +123,9 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users, Date lastUpdate) {
+    public Group(String name, Id id, List<User> users, Boolean validated, Date lastUpdate) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
-                false, lastUpdate);
+                validated, lastUpdate);
     }
 
     /**
@@ -134,8 +135,19 @@ public class Group extends Node {
      * @throws JSONException
      */
     public Group(JSONArray jsonGroup) throws JSONException, ParseException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(),
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(), false,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
+    }
+
+    /**
+     * Construct a Group from the Id and the name recieved from the server.
+     * @param groupId The Id of the group in String format.
+     * @param name The name of the group.
+     * @param refreshedAt Last date the group has been refreshed.
+     */
+    public Group(String groupId, String name, String refreshedAt) throws ParseException {
+        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), true,
+                DateSerialization.dateSerializer.toDate(refreshedAt));
     }
 
     /**
@@ -163,6 +175,19 @@ public class Group extends Node {
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
         return new Group("message comment", messageComment.getId(), group.getUsers());
+    }
+
+    /**
+     * Validates a message received at a certain date and changes the date to the server side date.
+     */
+    public void validateMessage(Date date, Date newDate){
+        Message message = mMessages.remove(date);
+        if (message != null){
+            message.setStatus(Message.MessageStatus.SENT, newDate);
+            mMessages.put(newDate, message);
+        } else {
+            Log.d("Y:" + this.getClass().getName(), mMessages.keySet().toString());
+        }
     }
 
     /**
@@ -321,7 +346,7 @@ public class Group extends Node {
      * @return The last message.
      */
     private Message getLastMessage() {
-        return mMessages.firstEntry().getValue();
+        return mMessages.lastEntry().getValue();
     }
 
     /**

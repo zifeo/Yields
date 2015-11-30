@@ -1,6 +1,7 @@
 package yields.client.Requests;
 
 import android.graphics.Bitmap;
+import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
 import yields.client.node.User;
@@ -132,6 +134,8 @@ public class ServerRequestsTests {
     @Test
     public void testGroupCreateRequest(){
         try {
+            YieldsApplication.setUser(new ClientUser("test",new Id(-1), "test@epfl.ch",
+                    YieldsApplication.getDefaultUserImage()));
             Id senderId = new Id(11);
             String groupName = "Dank AF";
             List<User> users = MockFactory.generateMockUsers(3);
@@ -240,6 +244,7 @@ public class ServerRequestsTests {
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateImageRequest(senderId, groupId,
                     newImage);
@@ -250,7 +255,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
-                    stream.toString());
+                    imageEncoded);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
         } catch (JSONException e) {
@@ -333,6 +338,7 @@ public class ServerRequestsTests {
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     textContent, new Date());
@@ -345,7 +351,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    textContent.getType().getType());
+                    "null");
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
 
@@ -359,12 +365,12 @@ public class ServerRequestsTests {
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    imageContent.getType().getType());
+            assertEquals(imageContent.getType().toString().toLowerCase(),
+                    json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()));
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
-                    stream.toString());
+                    imageEncoded);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -382,7 +388,7 @@ public class ServerRequestsTests {
             String text = "Apple pie is best pie !";
             TextContent textContent = new TextContent(text);
 
-            ServerRequest serverRequest = RequestBuilder.nodeTextMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -393,7 +399,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    textContent.getType().getType());
+                    "null");
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
         } catch (JSONException e) {
@@ -415,8 +421,9 @@ public class ServerRequestsTests {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
             ImageContent imageContent = new ImageContent(newImage, text);
+            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
 
-            ServerRequest serverRequest = RequestBuilder.nodeImageMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     imageContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -427,11 +434,11 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()),
-                    imageContent.getType().getType());
+                    imageContent.getType().toString().toLowerCase());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
-                    stream.toString());
+                    imageEncoded);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }

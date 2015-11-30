@@ -2,35 +2,23 @@ package yields.client.service;
 
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import yields.client.cache.CacheDatabaseHelper;
-import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ServiceRequestException;
-import yields.client.id.Id;
-import yields.client.messages.Message;
-import yields.client.node.ClientUser;
-import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
-import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
@@ -41,8 +29,7 @@ import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
-import yields.client.servicerequest.UserUpdateRequest;
-import yields.client.yieldsapplication.YieldsApplication;
+import yields.client.servicerequest.UserUpdateNameRequest;
 
 import static java.lang.Thread.sleep;
 
@@ -53,6 +40,8 @@ import static java.lang.Thread.sleep;
  */
 public class ServiceRequestController {
 
+    private final ResponseHandler mResponseHandler;
+    private final RequestHandler mRequestHandler;
     private final String TAG = "RequestController";
     private final CacheDatabaseHelper mCacheHelper;
     private final YieldService mService;
@@ -61,12 +50,20 @@ public class ServiceRequestController {
     private CommunicationChannel mCommunicationChannel;
     private Thread mConnector;
 
+    /**
+     * Constructs the requestController which will serve as a link to the server and database
+     *
+     * @param cacheDatabaseHelper
+     * @param service
+     */
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
         mCacheHelper.clearDatabase();
         mService = service;
         isConnecting = new AtomicBoolean(true);
         connectToServer();
+        mResponseHandler = new ResponseHandler(mCacheHelper, mService);
+        mRequestHandler = new RequestHandler(mCacheHelper, mService, this);
     }
 
     /**
@@ -74,7 +71,6 @@ public class ServiceRequestController {
      *
      * @param e the exception that was triggered the connection error
      */
-
     public void handleConnectionError(final IOException e) {
         if (!isConnecting.getAndSet(true)) {
             mService.onServerDisconnected();
@@ -111,7 +107,6 @@ public class ServiceRequestController {
      *
      * @return
      */
-
     public boolean isConnected() {
         return !isConnecting.get();
     }
@@ -124,49 +119,52 @@ public class ServiceRequestController {
     public void handleServiceRequest(ServiceRequest serviceRequest) {
         switch (serviceRequest.getType()) {
             case PING:
-                handlePingRequest(serviceRequest);
+                mRequestHandler.handlePingRequest(serviceRequest);
                 break;
             case USER_CONNECT:
-                handleUserConnectRequest(serviceRequest);
+                mRequestHandler.handleUserConnectRequest(serviceRequest);
                 break;
             case USER_UPDATE:
-                handleUserUpdateRequest((UserUpdateRequest) serviceRequest);
+                mRequestHandler.handleUserUpdateRequest((UserUpdateNameRequest) serviceRequest);
                 break;
             case USER_GROUP_LIST:
-                handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
+                mRequestHandler.handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
                 break;
             case USER_ENTOURAGE_ADD:
-                handleUserEntourageAddRequest((UserEntourageAddRequest) serviceRequest);
+                mRequestHandler.handleUserEntourageAddRequest((UserEntourageAddRequest) serviceRequest);
                 break;
             case USER_ENTOURAGE_REMOVE:
-                handleUserEntourageRemoveRequest((UserEntourageRemoveRequest) serviceRequest);
+                mRequestHandler.handleUserEntourageRemoveRequest((UserEntourageRemoveRequest) serviceRequest);
                 break;
             case USER_INFO:
-                handleUserInfoRequest((UserInfoRequest) serviceRequest);
+                mRequestHandler.handleUserInfoRequest((UserInfoRequest) serviceRequest);
                 break;
             case GROUP_CREATE:
-                handleGroupCreateRequest((GroupCreateRequest) serviceRequest);
+                mRequestHandler.handleGroupCreateRequest((GroupCreateRequest) serviceRequest);
+                break;
+            case GROUP_INFO:
+                mRequestHandler.handleGroupInfoRequest((GroupInfoRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_NAME:
-                handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
+                mRequestHandler.handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_VISIBILITY:
-                handleGroupUpdateVisibilityRequest((GroupUpdateVisibilityRequest) serviceRequest);
+                mRequestHandler.handleGroupUpdateVisibilityRequest((GroupUpdateVisibilityRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_IMAGE:
-                handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
+                mRequestHandler.handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
                 break;
             case GROUP_ADD:
-                handleGroupAddRequest((GroupAddRequest) serviceRequest);
+                mRequestHandler.handleGroupAddRequest((GroupAddRequest) serviceRequest);
                 break;
             case GROUP_REMOVE:
-                handleGroupRemoveRequest((GroupRemoveRequest) serviceRequest);
+                mRequestHandler.handleGroupRemoveRequest((GroupRemoveRequest) serviceRequest);
                 break;
             case NODE_MESSAGE:
-                handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
+                mRequestHandler.handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
                 break;
             case NODE_HISTORY:
-                handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
+                mRequestHandler.handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceRequest type !");
@@ -176,95 +174,88 @@ public class ServiceRequestController {
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
             case NODE_HISTORY_RESPONSE:
-                handleNodeHistoryResponse(serverResponse);
+                mResponseHandler.handleNodeHistoryResponse(serverResponse); /* Done */
                 break;
             case NODE_MESSAGE_RESPONSE:
-                handleNodeMessageResponse(serverResponse);
+                mResponseHandler.handleNodeMessageResponse(serverResponse); /* DONE */
                 break;
             case USER_CONNECT_RESPONSE:
-                handleUserConnectResponse(serverResponse);
+                mResponseHandler.handleUserConnectResponse(serverResponse); /* DONE */
                 break;
             case USER_GROUP_LIST_RESPONSE:
-                handleUserGroupListResponse(serverResponse);
+                mResponseHandler.handleUserGroupListResponse(serverResponse); /* DONE */
                 break;
             case USER_INFO_RESPONSE:
-                handleUserInfoResponse(serverResponse);
+                mResponseHandler.handleUserInfoResponse(serverResponse); /* DONE */
                 break;
             case GROUP_CREATE_RESPONSE:
-                handleGroupCreateResponse(serverResponse);
+                mResponseHandler.handleGroupCreateResponse(serverResponse); /* DONE */
+                break;
+            case USER_UPDATE_RESPONSE:
+                mResponseHandler.handleUserUpdateResponse(serverResponse);
+                break;
+            case USER_SEARCH_RESPONSE:
+                mResponseHandler.handleUserSearchResponse(serverResponse);
+                break;
+            case NODE_SEARCH_RESPONSE:
+                mResponseHandler.handleNodeSearchResponse(serverResponse);
+                break;
+            case GROUP_UPDATE_RESPONSE:
+                mResponseHandler.handleGroupUpdateResponse(serverResponse);
+                break;
+            case GROUP_INFO_RESPONSE:
+                mResponseHandler.handleGroupInfoResponse(serverResponse);
+                break;
+            case GROUP_MESSAGE_RESPONSE:
+                mResponseHandler.handleGroupMessageResponse(serverResponse);
+                break;
+            case PUBLISHER_CREATE_RESPONSE:
+                mResponseHandler.handlePublisherCreateResponse(serverResponse);
+                break;
+            case PUBLISHER_UPDATE_RESPONSE:
+                mResponseHandler.handlePublisherUpdateResponse(serverResponse);
+                break;
+            case PUBLISHER_INFO_RESPONSE:
+                mResponseHandler.handlePublisherInfoResponse(serverResponse);
+                break;
+            case PUBLISHER_MESSAGE_RESPONSE:
+                mResponseHandler.handlePublisherMessageResponse(serverResponse);
+                break;
+            case RSS_CREATE_RESPONSE:
+                mResponseHandler.handleRSSCreateResponse(serverResponse);
+                break;
+            case NODE_MESSAGE_BCAST:
+                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
+                break;
+            case USER_UPDATE_BCAST:
+                mResponseHandler.handleUserUpdateBroadcast(serverResponse);
+                break;
+            case GROUP_CREATE_BCAST:
+                mResponseHandler.handleGroupCreateBroadcast(serverResponse);
+                break;
+            case GROUP_UPDATE_BCAST:
+                mResponseHandler.handleGroupUpdateBroadcast(serverResponse);
+                break;
+            case GROUP_MESSAGE_BCAST:
+                mResponseHandler.handleGroupMessageBroadcast(serverResponse);
+                break;
+            case PUBLISHER_CREATE_BCAST:
+                mResponseHandler.handlePublisherCreateBroadcast(serverResponse);
+                break;
+            case PUBLISHER_UPDATE_BCAST:
+                mResponseHandler.handlePublisherUpdateBroadcast(serverResponse);
+                break;
+            case PUBLISHER_MESSAGE_BCAST:
+                mResponseHandler.handlePublisherMessageBroadcast(serverResponse);
+                break;
+            case RSS_CREATE_BCAST:
+                mResponseHandler.handleRSSCreateBroadcast(serverResponse);
+                break;
+            case RSS_MESSAGE_BCAST:
+                mResponseHandler.handleRSSMessageBroadcast(serverResponse);
                 break;
             default:
-                throw new ServiceRequestException("No such ServiceResponse type !");
-                //TODO: In need of another exception ?
-        }
-    }
-
-    private void handleGroupCreateResponse(Response serverResponse) {
-        try {
-            YieldsApplication.getUser().activateGroup(
-                    new Id(serverResponse.getMessage().getLong("nid")));
-            mService.notifyChange();
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleUserInfoResponse(Response serverResponse) {
-        try {
-            if (YieldsApplication.getUser().getId().getId().equals(-1)){
-                YieldsApplication.getUser().update(serverResponse.getMessage());
-                JSONArray array = serverResponse.getMessage().getJSONArray("entourage");
-
-                for (int i = 0; i < array.length(); i++) {
-                    ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-                            new Id(array.getLong(i)));
-                    mService.sendRequest(userInfoRequest);
-                }
-            } else {
-                // TODO: uncomment when server improve response
-                /*
-                YieldsApplication.getUser()
-                    .addUserToEntourage(new User(serverResponse.getMessage()));
-                */
-            }
-
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    private void handleUserGroupListResponse(Response serverResponse) {
-        try {
-            JSONArray groupSeq = serverResponse.getMessage().getJSONArray("groups");
-            for (int i = 0; i < groupSeq.length(); i++) {
-                JSONArray jsonGroup = groupSeq.getJSONArray(i);
-                Group group = new Group(jsonGroup);
-                YieldsApplication.getUser().addGroup(group);
-                ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
-                mService.sendRequest(historyRequest);
-            }
-            mService.notifyChange();
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-
-    }
-
-    private void handleUserConnectResponse(Response serverResponse) {
-        ClientUser user = YieldsApplication.getUser();
-        try {
-            user.setId(new Id(serverResponse.getMessage().getLong("uid")));
-            YieldsApplication.setUser(user);
-            ServiceRequest groupListRequest = new UserGroupListRequest(user);
-            mService.sendRequest(groupListRequest);
-            ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
-            mService.sendRequest(userInfoRequest);
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
+                Log.d("Y:" + this.getClass().getName(),"");
         }
     }
 
@@ -293,299 +284,13 @@ public class ServiceRequestController {
     }
 
     /**
-     * Handles NodeMessage responses.
      *
-     * @param serverResponse The Response received from the server.
      */
-    private void handleNodeMessageResponse(Response serverResponse) {
-        try {
-            //FOR DEMO
-            sleep(3000);
-            //FOR DEMO
-            JSONObject responseMessage = serverResponse.getMessage();
-            JSONObject metadata = serverResponse.getMetadata();
-            String time = metadata.getString("ref");
-            Date date = DateSerialization.dateSerializer.toDate(time);
-            Group group = mCacheHelper.getGroup(new Id(Long.valueOf(responseMessage.getString("nid"))));
-            Message message = mCacheHelper.getMessagesForGroup(group, date, 1).get(0);
-            mCacheHelper.deleteMessage(message, group.getId());
-            Message updatedMessage = new Message("", new Id(-1), message.getSender(), message.getContent(),
-                    DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
-                    Message.MessageStatus.SENT);
-            mCacheHelper.addMessage(updatedMessage, group.getId());
-            mService.updateMessage(group, updatedMessage, date);
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Handles NodeHistory responses.
-     *
-     * @param serverResponse The response received from the server.
-     */
-    private void handleNodeHistoryResponse(Response serverResponse) {
-        try {
-            JSONArray array = serverResponse.getMessage().getJSONArray("nodes");
-            if (array.length() > 0) {
-                ArrayList<Message> list = new ArrayList<>();
-                Message message;
-                Id groupId = new Id(serverResponse.getMessage().getLong("nid"));
-                for (int i = 0; i < array.length(); i++) {
-                    message = new Message(array.getJSONArray(i));
-                    list.add(message);
-                    mCacheHelper.addMessage(message, groupId);
-                }
-                mService.receiveMessages(groupId, list);
-            }
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeMessageResponse correctly !");
-        }
-    }
-
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserGroupListRequest(UserGroupListRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            List<Group> groups = mCacheHelper.getAllGroups();
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserGroupListRequest correctly !");
-        }
+    protected void sendToServer(ServerRequest serverRequest) {
         try {
             mCommunicationChannel.sendRequest(serverRequest);
         } catch (IOException e) {
             mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserEntourageRemoveRequest(UserEntourageRemoveRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.updateUser(serviceRequest.getUserToRemove());
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserEntourageRemove correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserInfoRequest(UserInfoRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.getUser(serviceRequest.getUserInfoId());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupCreateRequest(GroupCreateRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addGroup(serviceRequest.getGroup());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle GroupCreateRequest correctly !");
-        }
-
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addUser(serviceRequest.getUserToAdd());
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserEntourageAddRequest correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupUpdateVisibilityRequest(GroupUpdateVisibilityRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupVisibility(serviceRequest.getGroupId(), serviceRequest.getNewGroupVisibility());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupUpdateImageRequest(GroupUpdateImageRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupUpdateNameRequest(GroupUpdateNameRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupName(serviceRequest.getGroupId(), serviceRequest.getNewGroupName());
-        //TODO : Notify app
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupAddRequest(GroupAddRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addUserToGroup(serviceRequest.getGroupId(), serviceRequest.getUser());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle handleGroupAddRequest correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleGroupRemoveRequest(GroupRemoveRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.removeUserFromGroup(serviceRequest.getGroupId(), serviceRequest.getUserToRemoveId());
-        //TODO : Notify app
-
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserUpdateRequest(UserUpdateRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.updateUser(serviceRequest.getUser());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle UserUpdateRequest correctly !");
-        }
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleUserConnectRequest(ServiceRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handlePingRequest(ServiceRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleNodeMessageRequest(NodeMessageRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNode().getId());
-            //TODO : Notify app
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeMessageRequest correctly !");
-        }
-
-        try {
-            mCommunicationChannel.sendRequest(serverRequest);
-        } catch (IOException e) {
-            mService.receiveError("No connection available : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    private void handleNodeHistoryRequest(GroupHistoryRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
-                    serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
-            mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
-        } catch (CacheDatabaseException e) {
-            Log.d(TAG, "Couldn't handle NodeHistoryRequest correctly !");
-        }
-
-        if (isConnected()) {
-            try {
-                mCommunicationChannel.sendRequest(serverRequest);
-            } catch (IOException e) {
-                mService.receiveError("No connection available : " + e.getMessage());
-            }
         }
     }
 

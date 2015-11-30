@@ -12,30 +12,43 @@ import yields.client.yieldsapplication.YieldsApplication;
 public abstract class NotifiableActivity extends AppCompatActivity{
 
     /**
+     * Represents the changes that can be done to the model and need
+     * to be processed by the notified activity.
+     */
+    public enum Change {
+        GROUP_SEARCH, MESSAGES_RECEIVE, GROUP_LIST, GROUP_LEAVE, GROUP_JOIN,
+        CONNECTED, NEW_USER
+    }
+
+    /**
      * Automatically called when the activity is resumed after another
-     * activity  was displayed
+     * activity was displayed.
      */
     @Override
     public void onResume(){
         super.onResume();
-        YieldsApplication.getBinder().attachActivity(this);
-        YieldsApplication.getBinder().connectionStatus();
+        if (YieldsApplication.getBinder() != null) {
+            YieldsApplication.getBinder().attachActivity(this);
+            YieldsApplication.getBinder().connectionStatus();
+        }
     }
 
     /**
-     * Called to pause the activity
+     * Called when the activity is paused.
      */
     @Override
     public void onPause(){
         super.onPause();
-        YieldsApplication.getBinder().unsetMessageActivity();
+        if (YieldsApplication.getBinder() != null) {
+            YieldsApplication.getBinder().unsetMessageActivity();
+        }
     }
 
     /**
      * Method that tells the activity
      * that the data set it holds has changed
      */
-    abstract public void notifyChange();
+    abstract public void notifyChange(Change changed);
 
     /**
      * Method called when the server is connected
