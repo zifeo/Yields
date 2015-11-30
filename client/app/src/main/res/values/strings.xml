@@ -62,4 +62,9 @@
     <string name="saveImageToGalleryDialog">Save image to Gallery ?</string>
     <string name="saveImageAcceptButton">Save</string>
     <string name="saveImageDeclineButton">Cancel</string>
+    <string name="addGroup">Add group</string>
+    <string name="changeUserName">Change username</string>
+    <string name="changeUserImage">Change your picture</string>
+    <string name="logout">Logout</string>
+    <string name="addNode">Add node</string>
 </resources>

@@ -1,7 +1,6 @@
 package yields.client.listadapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import java.util.Map;
 import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.User;
-import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Class used to represent a list of user, each with a checkbox

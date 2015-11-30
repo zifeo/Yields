@@ -21,11 +21,11 @@ case class GroupInfo(nid: NID) extends Action {
     val group = Group(nid)
     val sender = metadata.client
 
-    if (! group.users.contains(sender))
+    if (!group.users.contains(sender))
       throw new UnauthorizedActionException(s"$sender does not belong to $nid")
 
     group.hydrate()
-    GroupInfoRes(group.nid, group.name, Array.empty, group.users, group.nodes)
+    GroupInfoRes(group.nid, group.name, group.pic, group.users, group.nodes)
 
   }
 

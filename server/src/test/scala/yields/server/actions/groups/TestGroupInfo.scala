@@ -8,13 +8,13 @@ import yields.server.mpi.Metadata
 
 class TestGroupInfo extends DBFlatSpec with Matchers {
 
-  "UserInfo" should "get group info" in {
+  "GroupInfo" should "get group info" in {
 
     val meta = Metadata.now(0)
     val group = Group.create("GroupName", meta.client)
     group.addUser(List[UID](3, 4, 5))
     group.addNode(List[NID](13, 14, 15))
-    // group.pic = Array[Byte](1, 2)
+    group.picSetter(Array[Byte](1, 2), meta.client)
 
     val action = GroupInfo(group.nid)
 
@@ -22,7 +22,7 @@ class TestGroupInfo extends DBFlatSpec with Matchers {
       case GroupInfoRes(nid, name, pic, currentUsers, currentNodes) =>
         nid should be (group.nid)
         name should be (group.name)
-        //pic should be (group.pic)
+        pic should be (group.pic)
         currentUsers should contain theSameElementsAs group.users
         currentNodes should contain theSameElementsAs group.nodes
     }

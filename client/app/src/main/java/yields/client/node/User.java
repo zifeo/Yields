@@ -62,6 +62,14 @@ public class User extends Node {
     }
 
     /**
+     * Setter for the user picture
+     * @param img The new image
+     */
+    public void setImg(Bitmap img) {
+        mImg = Objects.requireNonNull(img);
+    }
+
+    /**
      * Setter for the email of the user.
      *
      * @param email The new email of the user.

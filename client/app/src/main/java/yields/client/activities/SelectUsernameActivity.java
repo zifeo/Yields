@@ -36,7 +36,7 @@ public class SelectUsernameActivity extends AppCompatActivity {
             String message = getString(R.string.messageUsernameContainsSpaces);
             YieldsApplication.showToast(getApplicationContext(), message);
         }
-        else if (username.length() < 1){
+        else if (username.length() < getResources().getInteger(R.integer.minimumNameSize)){
             String message = getString(R.string.messageUsernameTooShort);
             YieldsApplication.showToast(getApplicationContext(), message);
         }
