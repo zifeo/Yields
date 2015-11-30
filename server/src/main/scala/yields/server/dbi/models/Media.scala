@@ -5,8 +5,10 @@ import java.nio.file.{Files, Paths}
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
+import yields.server.dbi.exceptions.MediaException
 import yields.server.dbi.models.Media._
 import yields.server.utils.Config
+import scala.io._
 
 /**
   * Represent a media ressource
@@ -18,7 +20,7 @@ import yields.server.utils.Config
   *            nodes:[nid]   -> hash  hash / path / contentType
   *
   */
-class Media private(override val nid: NID) extends Node {
+class Media private(nid: NID) extends Node(nid) {
 
   object MediaKey {
     val hash = "hash"
@@ -32,20 +34,13 @@ class Media private(override val nid: NID) extends Node {
 
   /** Media content getter */
   def content: Blob = {
-    import scala.io._
     // hydrate hash
     if (_hash.isEmpty) {
       hash
     }
     path = _hash.get
-    if (checkFileExist(_hash.get)) {
-      val p = _path.get
-      val source = Source.fromFile(s"$p")
-      val lines = try source.mkString finally source.close()
-      lines
-    } else {
-      throw new Exception("Content doesnt exist on disk")
-    }
+
+    getContentFromDisk(path).getOrElse(throw new MediaException("Content doesn't exist on disk"))
   }
 
   /** Media content setter on disk */
@@ -55,56 +50,44 @@ class Media private(override val nid: NID) extends Node {
       hash
     }
     path = _hash.get
-    if (_path.isDefined) {
-      val p = _path.get
-      val file = new File(p)
-      if (!checkFileExist(_hash.get)) {
-        file.getParentFile.mkdirs
-        file.createNewFile()
-      }
 
-      if (checkFileExist(_hash.get)) {
-        val pw = new PrintWriter(new File(p))
-        pw.write(content)
-        pw.close()
-      } else {
-        throw new Exception("Error creating the file on disk")
-      }
-    } else {
-      throw new Exception("Cannot write in non-existent path")
-    }
+    if (_path.isEmpty)
+      throw new MediaException("Cannot write in non-existent path")
+
+    writeContentOnDisk(_path.get, content)
+
   }
 
   def hash: String = _hash.getOrElse {
-    _hash = redis.withClient(_.hget[String](NodeKey.node, MediaKey.hash))
+    _hash = redis(_.hget[String](NodeKey.node, MediaKey.hash))
     valueOrException(_hash)
   }
 
   /** Store the hash in the database to easily retrieve the content from the disk */
   private def hash_=(hash: String): Unit = {
-    redis.withClient(_.hset(NodeKey.node, MediaKey.hash, hash))
+    redis(_.hset(NodeKey.node, MediaKey.hash, hash))
     _hash = Some(hash)
     path = _hash.get
   }
 
   private def contentType_=(contentType: String): Unit = {
-    redis.withClient(_.hset(NodeKey.node, MediaKey.contentType, contentType))
+    redis(_.hset(NodeKey.node, MediaKey.contentType, contentType))
     _contentType = Some(contentType)
   }
 
   def contentType: String = _contentType.getOrElse {
-    _contentType = redis.withClient(_.hget[String](NodeKey.node, MediaKey.contentType))
+    _contentType = redis(_.hget[String](NodeKey.node, MediaKey.contentType))
     valueOrException(_contentType)
   }
 
   def path: String = _path.getOrElse {
-    _path = redis.withClient(_.hget[String](NodeKey.node, MediaKey.path))
+    _path = redis(_.hget[String](NodeKey.node, MediaKey.path))
     valueOrException(_path)
   }
 
   private def path_=(hash: String): Unit = {
     val path = buildPathFromName(hash)
-    redis.withClient(_.hset(NodeKey.node, MediaKey.path, path))
+    redis(_.hset(NodeKey.node, MediaKey.path, path))
     _path = Some(path)
   }
 
@@ -120,9 +103,9 @@ object Media {
     * @param content base64 media
     * @return media
     */
-  def createMedia(contentType: String, content: Blob, creator: UID): Media = {
+  def create(contentType: String, content: Blob, creator: UID): Media = {
     // Create hash
-    val media = Media(Node.newNID())
+    val media = Media(newIdentity())
 
     // set values
     media.hash = createHash(content)
@@ -139,18 +122,44 @@ object Media {
     media
   }
 
+  /**
+    * Create hash from some content
+    * @param content content to hash
+    * @return hash
+    */
   def createHash(content: Blob): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
     val ha = new sun.misc.BASE64Encoder().encode(md.digest(content.getBytes))
     ha.filter(_ != '/')
   }
 
+  /**
+    * Check if a file exists on disk
+    * @param name name of the file to test
+    * @return
+    */
   def checkFileExist(name: String): Boolean = {
     Files.exists(Paths.get(buildPathFromName(name)))
   }
 
+  /**
+    * Build a path from a file name
+    * @param name filename
+    * @return path
+    */
   def buildPathFromName(name: String): String = {
     Config.getString("ressource.media.folder") + name + Config.getString("ressource.media.extension")
   }
 
+  /**
+    * Delete a file on disk
+    * @param nid
+    */
+  def deleteContentOnDisk(nid: NID): Unit = {
+    val media = Media(nid)
+    val file = new File(media.path)
+    if (file.exists) {
+      file.delete()
+    }
+  }
 }

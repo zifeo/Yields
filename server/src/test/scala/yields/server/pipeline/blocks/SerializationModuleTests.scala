@@ -7,7 +7,7 @@ import org.scalatest.FlatSpec
 import spray.json._
 import yields.server._
 import yields.server.io._
-import yields.server.mpi.{MessagesGenerators, Request}
+import yields.server.mpi.{Response, MessagesGenerators, Request}
 
 class SerializationModuleTests extends FlatSpec with MessagesGenerators {
 
@@ -19,18 +19,22 @@ class SerializationModuleTests extends FlatSpec with MessagesGenerators {
 
     val zipGen = requestArb.arbitrary.map(request => request -> responseArb.arbitrary.sample.get)
     val (source, generated) = generateSource(zipGen, cases)
-    val correspondence = generated.toMap
+
+    val correspondence = generated.toMap.map { case (req, res) =>
+      req.toJson.toString -> res
+    }
+    val mapping = Flow[Request].map(req => correspondence(req.toJson.toString))
 
     source
       .map { case (request, _) =>
         ByteString(request.toJson.toString())
       }
-      .via(module.join(Flow[Request].map(correspondence)))
+      .via(module.join(mapping))
       .map(_.utf8String)
       .runWith(TestSink.probe[String])
       .request(cases)
       .expectNextN(generated.map { case (_, response) =>
-        val json = response.toJson.toString()
+        val json = response.toJson
         s"$json\n"
       })
       .expectComplete()

@@ -8,21 +8,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ListView;
 
-import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.id.Id;
-import yields.client.listadapter.ListAdapterUsersCheckBox;
+import yields.client.listadapter.ListAdapterUsersGroupsCheckBox;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupCreateRequest;
@@ -33,8 +27,9 @@ import yields.client.yieldsapplication.YieldsApplication;
  * In this activity, the user is able to go to AddUsersFromEntourageActivity to add contacts
  */
 public class CreateGroupActivity extends AppCompatActivity {
-    private ListAdapterUsersCheckBox mAdapterUsersCheckBox;
-    private List<Map.Entry<User, Boolean> > mUsers;
+    private ListAdapterUsersGroupsCheckBox mAdapterUsersGroupsCheckBox;
+    private List<User> mUsers;
+    private List<Group> mGroups;
     private ListView mListView;
 
     private String mGroupName;
@@ -75,30 +70,40 @@ public class CreateGroupActivity extends AppCompatActivity {
                 intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
 
         mUsers = new ArrayList<>();
-        mUsers.add(new AbstractMap.SimpleEntry<User, Boolean>(YieldsApplication.getUser(), true));
+        mUsers.add(YieldsApplication.getUser());
 
-        mAdapterUsersCheckBox = new ListAdapterUsersCheckBox(getApplicationContext(),
-                R.layout.add_user_layout, mUsers, true);
+        mGroups = new ArrayList<>();
+
+        mAdapterUsersGroupsCheckBox = new ListAdapterUsersGroupsCheckBox(getApplicationContext(),
+                R.layout.add_user_layout, mUsers, mGroups);
 
         mListView = (ListView) findViewById(R.id.listViewCreateGroup);
 
-        mListView.setAdapter(mAdapterUsersCheckBox);
+        mListView.setAdapter(mAdapterUsersGroupsCheckBox);
 
-        mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkboxUser);
+        /* This indicates the app that we don't want to add the group
+        currently in YieldsApplication.getGroupAdded() */
+        YieldsApplication.setGroupAddedValid(false);
+    }
 
-                boolean b = mUsers.get(position).getValue();
+    /**
+     * Method called when this activity is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
 
-                checkBox.setChecked(!b);
-                mUsers.get(position).setValue(!b);
+        if (YieldsApplication.isGroupAddedValid()){
+            Group group = YieldsApplication.getGroupAdded();
+
+            if (!mGroups.contains(group)) {
+                mGroups.add(group);
             }
-        });
 
-        mListView.setItemsCanFocus(false);
+            YieldsApplication.setGroupAddedValid(false);
 
-        mAdapterUsersCheckBox.notifyDataSetChanged();
+            mAdapterUsersGroupsCheckBox.notifyDataSetChanged();
+        }
     }
 
     /**
@@ -129,7 +134,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 ArrayList<String> emailList = new ArrayList<>();
 
                 for (int i = 0; i < mUsers.size(); i++){
-                    emailList.add(mUsers.get(i).getKey().getEmail());
+                    emailList.add(mUsers.get(i).getEmail());
                 }
 
                 Intent intentSelectUsers = new Intent(this, AddUsersFromEntourageActivity.class);
@@ -140,14 +145,18 @@ public class CreateGroupActivity extends AppCompatActivity {
             break;
 
             case R.id.actionAddNodeToGroup:
+                Intent intent = new Intent(this, SearchGroupActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY,
+                        SearchGroupActivity.Mode.ADD_NODE_NEW_GROUP.ordinal());
 
-            break;
+                startActivity(intent);
+                break;
 
             case R.id.actionDoneCreateGroup:
                 List<User> userList = new ArrayList<>();
 
                 for (int i = 0; i < mUsers.size(); i++){
-                    userList.add(mUsers.get(i).getKey());
+                    userList.add(mUsers.get(i));
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
@@ -161,13 +170,13 @@ public class CreateGroupActivity extends AppCompatActivity {
                         | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                 startActivity(createGroupIntent);
+
             break;
 
             default:
                 return super.onOptionsItemSelected(item);
 
         }
-
         return true;
     }
 
@@ -189,7 +198,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                 boolean found = false;
                 for (int j = 0; j < mUsers.size(); j++){ // check if user is already present
-                    if (mUsers.get(j).getKey().getEmail().equals(emailList.get(i))){
+                    if (mUsers.get(j).getEmail().equals(emailList.get(i))){
                         found = true;
                     }
                 }
@@ -197,14 +206,13 @@ public class CreateGroupActivity extends AppCompatActivity {
                 if (!found){
                     for (int j = 0; j < entourage.size(); j++){ // find the user from its email
                         if (entourage.get(j).getEmail().equals(emailList.get(i))){
-                            mUsers.add(new AbstractMap.SimpleEntry<User, Boolean>(entourage.get(j), true));
+                            mUsers.add(entourage.get(j));
                         }
                     }
                 }
             }
 
-            mAdapterUsersCheckBox.notifyDataSetChanged();
+            mAdapterUsersGroupsCheckBox.notifyDataSetChanged();
         }
     }
-
 }

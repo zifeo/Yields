@@ -1,6 +1,7 @@
 package yields.client.Requests;
 
 import android.graphics.Bitmap;
+import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -243,6 +244,7 @@ public class ServerRequestsTests {
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateImageRequest(senderId, groupId,
                     newImage);
@@ -253,7 +255,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
-                    stream.toString());
+                    imageEncoded);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
         } catch (JSONException e) {
@@ -336,6 +338,7 @@ public class ServerRequestsTests {
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
+            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     textContent, new Date());
@@ -367,7 +370,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
-                    stream.toString());
+                    imageEncoded);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -418,6 +421,7 @@ public class ServerRequestsTests {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
             ImageContent imageContent = new ImageContent(newImage, text);
+            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     imageContent, new Date());
@@ -434,7 +438,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
-                    stream.toString());
+                    imageEncoded);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
