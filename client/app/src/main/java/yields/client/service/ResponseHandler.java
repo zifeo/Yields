@@ -41,7 +41,7 @@ public class ResponseHandler {
 
 
     protected void handleUserUpdateResponse(Response serverResponse){
-        Log.d("ServiceRequestCtrllr", "Response for UserUpdate");
+        Log.d("Y:" + this.getClass().getName(), "Response for UserUpdate");
         // Nothing to parse.
         // TODO : decide what to do.
     }

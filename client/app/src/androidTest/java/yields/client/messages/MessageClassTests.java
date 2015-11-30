@@ -19,6 +19,7 @@ import yields.client.activities.MessageActivity;
 import yields.client.activities.MockFactory;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
+import yields.client.node.ClientUser;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -51,10 +52,12 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
      */
     @Test
     public void testMessageHasCorrectSender() {
+        YieldsApplication.setUser(new ClientUser("test",new Id(-1), "test@epfl.ch",
+            YieldsApplication.getDefaultUserImage()));
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Message message = new Message("message", new Id(-4), user,
                 MockFactory.generateFakeTextContent(1), new Date());
-        assertEquals(user, message.getSender());
+        assertEquals(user.getId(), message.getSender());
     }
 
     /**
