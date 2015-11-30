@@ -127,6 +127,11 @@ public class MessageActivity extends NotifiableActivity {
         mImageThumbnail.setPadding(0, 0, 0, 0);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        retrieveGroupMessages();
+    }
 
     /**
      * what to do when the activity is no more visible
@@ -181,12 +186,16 @@ public class MessageActivity extends NotifiableActivity {
             Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
+            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                    .smoothScrollToPosition(mGroupMessageAdapter.getCount()-1);
             NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
             YieldsApplication.getBinder().sendRequest(request);
         } else {
             Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
+            ((CommentFragment) mCurrentFragment).getCommentListView()
+                    .smoothScrollToPosition(mCommentAdapter.getCount()-1);
             NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
             YieldsApplication.getBinder().sendRequest(request);
         }
@@ -484,27 +493,34 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        for (Message message : messagesTree.values()) {
-            mGroupMessageAdapter.remove(message);
-            mGroupMessageAdapter.add(message);
-        }
+        if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
+            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+            mGroupMessageAdapter.clear();
 
-        mGroupMessageAdapter.notifyDataSetChanged();
+            for (Message message : messagesTree.values()) {
+                mGroupMessageAdapter.add(message);
+            }
+
+            mGroupMessageAdapter.notifyDataSetChanged();
+        }
     }
 
     /**
      * Retrieve comments for a message an puts them in the comments adapter.
      */
     private void retrieveCommentMessages() {
-        Log.d("MessageActivity", "retrieveCommentMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        for (Message message : messagesTree.values()) {
-            mCommentAdapter.remove(message);
-            mCommentAdapter.add(message);
-        }
+        if(mCommentAdapter.getCount() < messagesTree.size()) {
+            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+            mCommentAdapter.clear();
 
-        mCommentAdapter.notifyDataSetChanged();
+            for (Message message : messagesTree.values()) {
+                mCommentAdapter.add(message);
+            }
+
+            mCommentAdapter.notifyDataSetChanged();
+        }
     }
 
     /**
