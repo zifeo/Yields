@@ -65,8 +65,8 @@ public class MessageActivity extends NotifiableActivity {
     private static FragmentManager mFragmentManager;
     private static Fragment mCurrentFragment;
 
-    private static ListAdapterMessages mGroupMessageAdapter;
-    private static ListAdapterMessages mCommentAdapter;
+    private ListAdapterMessages mGroupMessageAdapter;
+    private ListAdapterMessages mCommentAdapter;
 
     private static final int THUMBNAIL_PADDING = 6;
     private static ImageView mImageThumbnail;
@@ -129,6 +129,16 @@ public class MessageActivity extends NotifiableActivity {
 
 
     /**
+     * what to do when the activity is no more visible
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mCommentAdapter.clear();
+        mGroupMessageAdapter.clear();
+    }
+
+    /**
      * @return The id of the current group
      */
     public Id getGroupId() {
@@ -180,6 +190,8 @@ public class MessageActivity extends NotifiableActivity {
             NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
             YieldsApplication.getBinder().sendRequest(request);
         }
+
+        YieldsApplication.getGroup().addMessage(message);
     }
 
     /**
@@ -259,17 +271,24 @@ public class MessageActivity extends NotifiableActivity {
      * data set has changed.
      */
     @Override
-    public void notifyChange() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mType == ContentType.GROUP_MESSAGES) {
-                    retrieveGroupMessages();
-                } else {
-                    retrieveCommentMessages();
-                }
-            }
-        });
+    public void notifyChange(Change change) {
+        switch (change) {
+            case MESSAGES_RECEIVE:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mType == ContentType.GROUP_MESSAGES) {
+                            retrieveGroupMessages();
+                        } else {
+                            retrieveCommentMessages();
+                        }
+                    }
+                });
+                break;
+            default:
+                Log.d("Y:" + this.getClass().getName(), "useless notify change...");
+        }
+
     }
 
     @Override
@@ -368,7 +387,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mActionBar.setTitle("Message from " + mCommentMessage.getSender()
+        mActionBar.setTitle("Message from " + YieldsApplication.getUser(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
@@ -469,6 +488,7 @@ public class MessageActivity extends NotifiableActivity {
             mGroupMessageAdapter.remove(message);
             mGroupMessageAdapter.add(message);
         }
+
         mGroupMessageAdapter.notifyDataSetChanged();
     }
 
@@ -483,6 +503,7 @@ public class MessageActivity extends NotifiableActivity {
             mCommentAdapter.remove(message);
             mCommentAdapter.add(message);
         }
+
         mCommentAdapter.notifyDataSetChanged();
     }
 
