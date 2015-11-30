@@ -74,6 +74,7 @@ UserGroupList
 UserSearch
 	input	email: String
 	output	uid: UID
+	rules	uid == 0 if not found
 ```
 
 ### Nodes actions
@@ -124,12 +125,11 @@ PublisherCreate
 PublisherUpdate
 	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]
 	output	()
-	rules	nid in groups
+	rules	uid in users
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 PublisherInfo
 	input	nid: NID
 	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
-	rules	nid in nodes
 PublisherMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 	output	nid: NID, datetime: OffsetDateTime

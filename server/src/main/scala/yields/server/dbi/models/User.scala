@@ -27,7 +27,7 @@ import yields.server.utils.Temporal
   *
   * @param uid user id
   */
-final class User private (val uid: UID) {
+final class User private(val uid: UID) {
 
   object Key {
     val user = s"users:$uid"
@@ -37,7 +37,7 @@ final class User private (val uid: UID) {
 
   private var _name: Option[String] = None
   private var _email: Option[Email] = None
-  private var _pic: Option[Blob] = None
+  private var _pic: Option[NID] = None
   private var _created_at: Option[OffsetDateTime] = None
   private var _updated_at: Option[OffsetDateTime] = None
   private var _connected_at: Option[OffsetDateTime] = None
@@ -72,15 +72,29 @@ final class User private (val uid: UID) {
   def email_=(newEmail: Email): Unit =
     _email = update(StaticKey.email, newEmail)
 
-  /** Picture getter. TODO: format to be determined. */
-  def pic: Blob = _pic.getOrElse {
-    _pic = redis(_.hget[Blob](Key.user, StaticKey.pic))
-    valueOrDefault(_pic, Array.empty)
+  /** Picture getter. */
+  def pic: Blob = {
+    _pic = redis(_.hget[NID](Key.user, StaticKey.pic))
+    if (_pic.isDefined) {
+      val m = Media(_pic.get)
+      m.content
+    } else {
+      Array()
+    }
+
   }
 
-  /** Picture setter. */
-  def pic_=(newPic: Blob): Unit =
-    _pic = update(StaticKey.pic, newPic)
+  /**
+    * Picture setter.
+    * Delete old picture if there is one and create new media on disk
+    */
+  def pic_=(content: Blob): Unit = {
+    if (_pic.isDefined) {
+      Media.deleteContentOnDisk(_pic.get)
+    }
+    val newPic = Media.create("image", content, uid)
+    _pic = update(StaticKey.pic, newPic.nid)
+  }
 
   /** Creation datetime getter. */
   def created_at: OffsetDateTime = _created_at.getOrElse {
@@ -114,11 +128,11 @@ final class User private (val uid: UID) {
   def groupsWithUpdates: List[(NID, OffsetDateTime, OffsetDateTime)] = {
     val currentGroup = groups // need to be computed before pipeline
     val query = redisPipeline { p =>
-      currentGroup.map { nid =>
-        val nodeKey = Group(nid).NodeKey.node
-        p.hmget[String, OffsetDateTime](nodeKey, StaticNodeKey.updated_at, StaticNodeKey.refreshed_at)
+        currentGroup.map { nid =>
+          val nodeKey = Group(nid).NodeKey.node
+          p.hmget[String, OffsetDateTime](nodeKey, StaticNodeKey.updated_at, StaticNodeKey.refreshed_at)
+        }
       }
-    }
     val res = valueOrException(query).asInstanceOf[List[Option[Map[String, OffsetDateTime]]]]
     currentGroup.zip(res.flatten).map { case (nid, values) =>
       (nid, values(StaticNodeKey.updated_at), values(StaticNodeKey.refreshed_at))
@@ -144,12 +158,12 @@ final class User private (val uid: UID) {
     val currentEntourage = entourage // need to be computed before pipeline
     val query = redisPipeline { p =>
         currentEntourage.map { id =>
-        val userKey = User(id).Key.user
-        p.hget[OffsetDateTime](userKey, StaticKey.updated_at)
+          val userKey = User(id).Key.user
+          p.hget[OffsetDateTime](userKey, StaticKey.updated_at)
+        }
       }
-    }
     val res = valueOrException(query).asInstanceOf[List[Option[OffsetDateTime]]].flatten
-    assert(res.size == currentEntourage.size)
+    assert(res.size == currentEntourage.size, "entourageWithUpdates returns incoherent results")
     currentEntourage.zip(res)
   }
 
@@ -169,7 +183,7 @@ final class User private (val uid: UID) {
   def removeEntourage(oldUsers: List[UID]): Boolean =
     remWithTime(Key.entourage, oldUsers)
 
-    /**
+  /**
     * Loads the entire model for intensive usage (except entourage and groups).
     * Makes the hypothesis that the values are valid, if this is not the case, a second attempt to get them will be done
     * on the concerned getter call and issue either the default value or a corresponding exception.

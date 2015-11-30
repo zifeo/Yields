@@ -1,15 +1,20 @@
 package yields.server.dbi
 
+import java.io.{PrintWriter, File}
+import java.nio.file.{Paths, Files}
 import java.time.OffsetDateTime
 
 import com.redis.serialization.{Format, Parse}
+import yields.server.dbi.exceptions.MediaException
+
+import scala.io.Source
 
 /**
   * Short models types and some formats.
   */
 package object models {
 
-  private type Identity = Long
+  type Identity = Long
 
   /** Represents an user identifier. */
   type UID = Identity
@@ -27,7 +32,7 @@ package object models {
   type Blob = Array[Byte]
 
   /** Represents a feed content (or so called message). */
-  type FeedContent = (OffsetDateTime, UID, Option[NID], String)
+  type FeedContent = (OffsetDateTime, Identity, Option[NID], String)
 
   import Parse.Implicits._
 
@@ -50,6 +55,55 @@ package object models {
       case Array(datetime, uid, nid, text) =>
         (OffsetDateTime.parse(datetime), uid.toLong, Some(nid.toLong), text)
     }
+  }
+
+  /**
+    * write some blob on disk
+    * @param path path to write at
+    * @param content blob to write
+    *
+    *                TODO security verification, open door to everyone who wants to write on disk
+    */
+  def writeContentOnDisk(path: String, content: Blob): Unit = {
+    val file = new File(path)
+    if (!checkFileExist(path)) {
+      file.getParentFile.mkdirs
+      file.createNewFile()
+    }
+
+    if (!checkFileExist(path))
+      throw new MediaException("Error creating the file on disk")
+
+    val pw = new PrintWriter(new File(path))
+    pw.write(content.toCharArray)
+    pw.close()
+  }
+
+  /**
+    * get some content from disk
+    * @param path path to content to get
+    * @return blob content
+    *
+    *         TODO security verification, open door to everyone who wants to get content from the disk
+    */
+  def getContentFromDisk(path: String): Option[Blob] = {
+    if (checkFileExist(path)) {
+
+      val source = Source.fromFile(s"$path")
+      val lines = try source.mkString finally source.close()
+      Some(lines.toCharArray.map(_.toByte))
+    } else {
+      None
+    }
+  }
+
+  /**
+    * Checks if a file exists on the disk
+    * @param path path to file
+    * @return true if exists false otherwise
+    */
+  def checkFileExist(path: String): Boolean = {
+    Files.exists(Paths.get(path))
   }
 
 }

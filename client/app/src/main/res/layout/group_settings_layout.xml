@@ -23,7 +23,7 @@
         android:textColor="#000000"
         android:maxLines="1"
         android:paddingLeft="10sp"
-        android:paddingTop="13sp"
+        android:gravity="center_vertical"
         android:text="Username" />
 
 </RelativeLayout>
