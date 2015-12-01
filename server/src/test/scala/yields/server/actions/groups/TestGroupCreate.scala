@@ -30,6 +30,9 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
         group.nodes should contain theSameElementsAs nodes.distinct
         group.creator should be(user.uid)
         user.groups should contain only nid
+        users.foreach { uid =>
+          User(uid).groups should contain (nid)
+        }
     }
   }
 
