@@ -24,16 +24,17 @@ case class GroupCreate(name: String, users: List[UID], nodes: List[NID]) extends
     val user = User(metadata.client)
     val entourage = user.entourage
     val sender = user.uid
+    val usersExceptSender = users.filter(_ != sender)
 
-    if (! users.filter(_ != sender).forall(entourage.contains))
+    if (! usersExceptSender.forall(entourage.contains))
       throw new UnauthorizedActionException(s"not all users are $sender's entourage: $users")
 
     // TODO: check public node
 
     val group = Group.create(name, sender)
 
-    if (users.nonEmpty) {
-      group.addUser(users)
+    if (usersExceptSender.nonEmpty) {
+      group.addUser(usersExceptSender)
     }
 
     if (nodes.nonEmpty) {
@@ -41,8 +42,9 @@ case class GroupCreate(name: String, users: List[UID], nodes: List[NID]) extends
     }
 
     user.addGroup(group.nid)
+    usersExceptSender.foreach(User(_).addGroup(group.nid))
 
-    Yields.broadcast(group.users.filter(_ != sender)) {
+    Yields.broadcast(usersExceptSender) {
       GroupCreateBrd(group.nid, name, users, nodes)
     }
 
