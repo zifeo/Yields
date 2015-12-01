@@ -24,7 +24,7 @@ import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.Response;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -515,7 +515,7 @@ public class ResponseHandler {
                 ServiceRequest groupInfo =
                         new GroupInfoRequest(YieldsApplication.getUser().getId(),group.getId());
                 mService.sendRequest(groupInfo);
-                ServiceRequest historyRequest = new GroupHistoryRequest(group, new Date());
+                ServiceRequest historyRequest = new NodeHistoryRequest(group, new Date());
                 mService.sendRequest(historyRequest);
             }
 

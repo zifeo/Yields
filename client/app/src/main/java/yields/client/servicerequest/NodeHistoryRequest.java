@@ -11,7 +11,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * ServerRequest asking the Service to retrieve Messages from a Group.
  */
-public class GroupHistoryRequest extends ServiceRequest {
+public class NodeHistoryRequest extends ServiceRequest {
 
     public static final int MESSAGE_COUNT = 10;
 
@@ -24,7 +24,7 @@ public class GroupHistoryRequest extends ServiceRequest {
      * @param group        The Group from which the Messages should be retrieved.
      * @param furthestDate The furthest Date from which Messages will be retrieved.
      */
-    public GroupHistoryRequest(Group group, Date furthestDate) {
+    public NodeHistoryRequest(Group group, Date furthestDate) {
         super();
 
         Objects.requireNonNull(group);

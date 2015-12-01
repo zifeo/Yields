@@ -17,7 +17,7 @@ import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
@@ -165,7 +165,7 @@ public class ServiceRequestController {
                 mRequestHandler.handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
                 break;
             case NODE_HISTORY:
-                mRequestHandler.handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
+                mRequestHandler.handleNodeHistoryRequest((NodeHistoryRequest) serviceRequest);
                 break;
             case USER_SEARCH:
                 mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
