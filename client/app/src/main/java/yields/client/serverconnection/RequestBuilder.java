@@ -538,7 +538,15 @@ public class RequestBuilder {
 
     private void addField(Fields fieldType, Bitmap field) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Bitmap.createScaledBitmap(field, 500, 500, true).compress(Bitmap.CompressFormat.JPEG, 20, stream);
+
+        int width = field.getWidth();
+        int height = field.getHeight();
+        double ratio = width > height ? 800.0/width : 800.0/height;
+
+
+
+        Bitmap.createScaledBitmap(field, (int) (width*ratio), (int) (height*ratio), true)
+                .compress(Bitmap.CompressFormat.JPEG, 20, stream);
 
         this.mConstructingMap.put(fieldType.getValue(),
                 Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT));
