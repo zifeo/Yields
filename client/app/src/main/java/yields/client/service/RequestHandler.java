@@ -2,7 +2,6 @@ package yields.client.service;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.List;
 
 import yields.client.cache.CacheDatabaseHelper;
@@ -12,7 +11,7 @@ import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
@@ -223,11 +222,11 @@ public class RequestHandler {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    protected void handleNodeHistoryRequest(GroupHistoryRequest serviceRequest) {
+    protected void handleNodeHistoryRequest(NodeHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
-                    serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
+                    serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
             mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeHistoryRequest correctly !");
