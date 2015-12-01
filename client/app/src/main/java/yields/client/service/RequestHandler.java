@@ -212,6 +212,7 @@ public class RequestHandler {
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageRequest correctly !");
         }*/
+
         YieldsApplication.getUser().modifyGroup(serviceRequest.getReceivingNode().getId())
                 .setLastUpdate(serviceRequest.getMessage().getDate());
 

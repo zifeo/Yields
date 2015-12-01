@@ -111,7 +111,11 @@ public class RequestBuilder {
     }
 
     /**
+     * ServerRequest for retrieving information on a Group.
      *
+     * @param sender  The Id of the sender of the request, which wants the information.
+     * @param groupId The Id of the Group.
+     * @return The appropriate ServerRequest.
      */
     public static ServerRequest groupInfoRequest(Id sender, Id groupId) {
         Objects.requireNonNull(sender);
@@ -123,12 +127,11 @@ public class RequestBuilder {
         return builder.request();
     }
 
-
     /**
      * ServerRequest to receive the group list.
      *
      * @param senderId The senderId of the request.
-     * @return The request.
+     * @return The appropriate ServerRequest.
      */
     public static ServerRequest userGroupListRequest(Id senderId) {
         Objects.requireNonNull(senderId);
@@ -145,7 +148,7 @@ public class RequestBuilder {
      *
      * @param sender The sender of the request.
      * @param email  Email of the new contact to add.
-     * @return The request.
+     * @return The appropriate ServerRequest.
      */
     public static ServerRequest userEntourageAddRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
@@ -163,7 +166,7 @@ public class RequestBuilder {
      *
      * @param sender The sender of the request.
      * @param email  Email of the contact to remove.
-     * @return The request.
+     * @return The appropriate ServerRequest.
      */
     public static ServerRequest userEntourageRemoveRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
@@ -181,7 +184,7 @@ public class RequestBuilder {
      *
      * @param sender The sender of the request.
      * @param email  Email of the user.
-     * @return The request.
+     * @return The appropriate ServerRequest.
      */
     public static ServerRequest userConnectRequest(Id sender, String email) {
         Objects.requireNonNull(sender);
@@ -195,11 +198,29 @@ public class RequestBuilder {
     }
 
     /**
+     * ServerRequest for searching a User by his email.
+     *
+     * @param sender The sender of the request.
+     * @param email  The email of the user being searched for.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest userSearchRequest(Id sender, String email) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(email);
+        RequestBuilder builder = new RequestBuilder(
+                ServiceRequest.RequestKind.USER_SEARCH, sender);
+
+        builder.addField(Fields.EMAIL, email);
+
+        return builder.request();
+    }
+
+    /**
      * Created a User information request.
      *
      * @param sender   The Id of the sender of the request.
      * @param userInfo The Id of the User from which information shall be retrieved.
-     * @return The request.
+     * @return The appropriate ServerRequest.
      */
     public static ServerRequest userInfoRequest(Id sender, Id userInfo) {
         Objects.requireNonNull(sender);
@@ -244,15 +265,6 @@ public class RequestBuilder {
         builder.addField(Fields.VISIBILITY, visibility);
         builder.addField(Fields.TAG, new ArrayList());
 
-        return builder.request();
-    }
-
-    public static ServerRequest nodeSearchRequest(Id sender, String pattern) {
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(pattern);
-
-        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.NODE_SEARCH, sender);
-        builder.addField(Fields.PATTERN, pattern);
         return builder.request();
     }
 
@@ -394,7 +406,7 @@ public class RequestBuilder {
      * @return The request itself.
      */
     private static ServerRequest nodeTextMessageRequest(Id sender, Id groupId,
-                                                       TextContent content, Date date) {
+                                                        TextContent content, Date date) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(content);
@@ -422,7 +434,7 @@ public class RequestBuilder {
      * @return The request itself.
      */
     private static ServerRequest nodeImageMessageRequest(Id sender, Id groupId,
-                                                        ImageContent content, Date date) {
+                                                         ImageContent content, Date date) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(content);
@@ -441,15 +453,15 @@ public class RequestBuilder {
     }
 
     /**
-     * Creates a group history request.
+     * Creates a node history request.
      *
      * @param groupId      The id of the group you want the history from.
      * @param last         The last time we got a message from this group.
      * @param messageCount The max number of message we want.
      * @return The request itself.
      */
-    public static ServerRequest groupHistoryRequest(Id senderId, Id groupId, Date last,
-                                                    int messageCount) {
+    public static ServerRequest nodeHistoryRequest(Id senderId, Id groupId, Date last,
+                                                   int messageCount) {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(last);
         Objects.requireNonNull(messageCount);
@@ -460,6 +472,25 @@ public class RequestBuilder {
         builder.addField(Fields.LAST, last);
         builder.addField(Fields.COUNT, messageCount);
         builder.addField(Fields.NID, groupId);
+
+        return builder.request();
+    }
+
+    /**
+     * Creates a node search request.
+     *
+     * @param senderId
+     * @param pattern
+     * @return
+     */
+    public static ServerRequest nodeSearchRequest(Id senderId, String pattern) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(pattern);
+
+        RequestBuilder builder = new RequestBuilder(
+                ServiceRequest.RequestKind.NODE_SEARCH, senderId);
+
+        builder.addField(Fields.PATTERN, pattern);
 
         return builder.request();
     }

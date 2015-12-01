@@ -51,7 +51,7 @@ public class GroupHistoryRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupHistoryRequest(YieldsApplication.getUser().getId(),
+        return RequestBuilder.nodeHistoryRequest(YieldsApplication.getUser().getId(),
                 getGroup().getId(), getDate(), MESSAGE_COUNT);
     }
 
