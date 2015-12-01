@@ -29,6 +29,7 @@ import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 /**
@@ -66,16 +67,16 @@ public class ServerRequestsTests {
     public void testUserEntourageAddRequest() {
         try {
             Id senderId = new Id(11);
-            String email = "dank@pepe.jpg";
-            ServerRequest serverRequest = RequestBuilder.userEntourageAddRequest(senderId, email);
+            Id entourageId = new Id(12);
+            ServerRequest serverRequest = RequestBuilder.userEntourageAddRequest(senderId, entourageId);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
                     ServiceRequest.RequestKind.USER_ENTOURAGE_ADD.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
-                    email);
+            assertTrue(json.getJSONObject("message").getJSONArray(
+                    RequestBuilder.Fields.ADD_ENTOURAGE.getValue()).getLong(0) == entourageId.getId().longValue());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
