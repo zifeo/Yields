@@ -440,7 +440,8 @@ public class ResponseHandler {
     protected void handleUserInfoResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            if (YieldsApplication.getUser().getId().getId().equals(-1) ){
+            if (YieldsApplication.getUser().getId().getId().equals(-1) ||
+                    YieldsApplication.getUser().getId().getId().equals(response.getLong("uid"))){
                 YieldsApplication.getUser().update(response);
                 JSONArray entourage = response.getJSONArray("entourage");
                 JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
@@ -451,6 +452,7 @@ public class ResponseHandler {
                         if (DateSerialization.dateSerializer.toDate(entourageRefreshedAt.getString(i)
                         ).compareTo(new Date()) == -1){
                             ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
+
                                     new Id(entourage.getLong(i)));
                             mService.sendRequest(userInfoRequest);
                         }
@@ -458,6 +460,15 @@ public class ResponseHandler {
                 }
             }
             else {
+                User user = YieldsApplication.getUser(new Id(response.getLong("uid")));
+                user.setName(response.getString("name"));
+                user.setEmail(response.getString("email"));
+
+
+                byte[] byteArray = Base64.decode(response.getString("pic"), Base64.DEFAULT);
+                Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+                user.setImg(img);
 
             }
         } catch (JSONException | ParseException e) {

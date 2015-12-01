@@ -24,6 +24,7 @@ import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
+import yields.client.servicerequest.UserSearchRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -101,7 +102,7 @@ public class RequestHandler {
     protected void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
-            mCacheHelper.addUser(serviceRequest.getUserToAdd());
+            mCacheHelper.addUser(YieldsApplication.getUser(serviceRequest.getUserToAdd()));
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserEntourageAddRequest correctly !");
         }
@@ -240,6 +241,10 @@ public class RequestHandler {
      * Handles a group info request
      */
     protected void handleGroupInfoRequest(GroupInfoRequest serviceRequest) {
+        mController.sendToServer(serviceRequest.parseRequestForServer());
+    }
+
+    public void handleUserSearchRequest(UserSearchRequest serviceRequest) {
         mController.sendToServer(serviceRequest.parseRequestForServer());
     }
 }
