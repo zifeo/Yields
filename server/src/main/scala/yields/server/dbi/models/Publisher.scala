@@ -11,7 +11,7 @@ import yields.server.utils.Temporal
   *
   * @param nid Node id to build
   */
-final class Publisher private(nid: NID) extends AbstractPublisher(nid) {}
+final class Publisher private(nid: NID) extends AbstractPublisher(nid)
 
 /** [[Publisher]] companion object. */
 object Publisher {
