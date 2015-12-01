@@ -5,7 +5,7 @@ import java.net.InetSocketAddress
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor._
 import akka.io.{IO, Tcp}
-import akka.stream.{OverflowStrategy, ActorMaterializer}
+import akka.stream.ActorMaterializer
 import akka.stream.actor.{ActorPublisher, ActorSubscriber}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.util.ByteString
@@ -43,7 +43,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
       handler = self,
       localAddress = new InetSocketAddress(Config.getString("addr"), Config.getInt("port")),
       options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = true)),
-      backlog = 100,
+      backlog = Config.getInt("backlog"),
       pullMode = false
     )
   }
@@ -63,7 +63,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
       val pub = ActorPublisher[ByteString](bindings)
       val sub = ActorSubscriber[ByteString](bindings)
-      Source(pub).buffer(1000, OverflowStrategy.fail).via(stream).to(Sink(sub)).run()
+      Source(pub).via(stream).to(Sink(sub)).run()
 
       socket ! Register(
         handler = bindings,
