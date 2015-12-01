@@ -65,6 +65,8 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
      */
     @Test
     public void testMessageHasCorrectDate() {
+        YieldsApplication.setUser(new ClientUser("test",new Id(-1), "test@epfl.ch",
+                YieldsApplication.getDefaultUserImage()));
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Date date = new Date();
         Message message = new Message("message", new Id(-4), user,
@@ -77,6 +79,8 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
      */
     @Test
     public void testMessageHasCorrectContent() {
+        YieldsApplication.setUser(new ClientUser("test",new Id(-1), "test@epfl.ch",
+                YieldsApplication.getDefaultUserImage()));
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Content content = MockFactory.generateFakeTextContent(1);
         Message message = new Message("message", new Id(-4), user, content, new Date());
