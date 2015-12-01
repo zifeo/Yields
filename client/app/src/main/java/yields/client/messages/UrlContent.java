@@ -2,8 +2,9 @@ package yields.client.messages;
 
 import android.view.View;
 
-import java.net.URL;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import yields.client.exceptions.ContentException;
 
@@ -13,6 +14,9 @@ import yields.client.exceptions.ContentException;
 public class UrlContent extends Content{
     private static String mCaption;
     private static String mUrl;
+
+    private static final String URL_REGEX = "(https?|ftp|file):\\/\\/[-a-zA-Z0-9+&@#\\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\\/%=~_|]";
+    private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
 
     /**
      * Constructor of a Url content for the given caption, the url is directely extracted from
@@ -29,7 +33,7 @@ public class UrlContent extends Content{
      */
     @Override
     public ContentType getType() {
-        return "url";
+        return ContentType.URL;
     }
 
     /**
@@ -67,6 +71,7 @@ public class UrlContent extends Content{
      * @return True if the text indeed contains an URL, False otherwise.
      */
     public static boolean containsUrl(String text){
-        return true;
+        Matcher m = URL_PATTERN.matcher(Objects.requireNonNull(text));
+        return m.matches();
     }
 }
