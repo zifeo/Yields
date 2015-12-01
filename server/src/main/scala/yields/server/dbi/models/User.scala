@@ -79,9 +79,8 @@ final class User private(val uid: UID) {
       val m = Media(_pic.get)
       m.content
     } else {
-      Array()
+      ""
     }
-
   }
 
   /**

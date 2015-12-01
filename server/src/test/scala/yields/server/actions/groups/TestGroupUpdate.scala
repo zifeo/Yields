@@ -30,9 +30,9 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val start = Group.create("name1", meta.client)
-    start.picSetter(Array[Byte](2, 1), meta.client)
+    start.picSetter("21", meta.client)
 
-    val newPic = Array[Byte](1, 2)
+    val newPic = "12"
     val action = new GroupUpdate(start.nid, None, Some(newPic), List.empty, List.empty, List.empty, List.empty)
     action.run(meta)
 

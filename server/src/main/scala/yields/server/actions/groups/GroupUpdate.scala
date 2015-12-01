@@ -59,7 +59,7 @@ case class GroupUpdate(nid: NID,
     }
 
     Yields.broadcast(group.users.filter(_ != sender)) {
-      GroupUpdateBrd(group.nid, group.name, Array.empty, group.users, group.nodes)
+      GroupUpdateBrd(group.nid, group.name, group.pic, group.users, group.nodes)
     }
 
     GroupUpdateRes()

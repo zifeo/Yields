@@ -70,7 +70,7 @@ class TestUser extends DBFlatSpec with Matchers {
   it should "add the picture in the model" in {
     val u1 = User.create(email)
     val pictureAsString = "Actually we don't have any picture to put in our database"
-    u1.pic = pictureAsString.toCharArray.map(_.toByte)
+    u1.pic = pictureAsString
     val u2 = User(u1.uid)
 
     u2.pic should be (u1.pic)
