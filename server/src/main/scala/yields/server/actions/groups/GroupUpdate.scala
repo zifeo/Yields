@@ -11,6 +11,10 @@ import yields.server.mpi.Metadata
   * @param nid group id
   * @param name new name
   * @param pic new profile image
+  * @param addUsers users to add
+  * @param removeUsers users to remove
+  * @param addNodes nodes to add
+  * @param removeNodes nodes to remove
   * TODO: set picture
   */
 case class GroupUpdate(nid: NID,
@@ -39,7 +43,7 @@ case class GroupUpdate(nid: NID,
     }
 
     for (newPic <- pic) {
-      group.picSetter(newPic, metadata.client)
+      group.picSetter(newPic, sender)
     }
 
     if (addUsers.nonEmpty) {

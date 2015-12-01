@@ -10,7 +10,8 @@ import yields.server.mpi.Metadata
 
 class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
-  it should "change only the name" in {
+  "PublisherUpdate" should "change only the name" in {
+
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
 
@@ -45,6 +46,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
   }
 
   it should "only change users" in {
+
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
 
@@ -71,6 +73,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
   }
 
   it should "only change nodes" in {
+
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
 
@@ -96,11 +99,13 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
   }
 
   it should "not be updated by someone who cannot publish" in {
+
     val meta = Metadata.now(0)
     val start = Group.create("name1", meta.client + 1)
     val action = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty)
 
-    an[UnauthorizedActionException] should be thrownBy action.run(meta)
+    val thrown = the [UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include (meta.client.toString)
 
   }
 

@@ -43,8 +43,8 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
     val users = List[UID](4, 5, 6)
     val action = new PublisherCreate("name", users, List.empty)
 
-    val error = the[UnauthorizedActionException] thrownBy action.run(meta)
-    error.getMessage should be("users must be in sender's entourage")
+    val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include(user.uid.toString)
 
   }
 
