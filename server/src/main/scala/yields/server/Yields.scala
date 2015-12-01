@@ -67,10 +67,8 @@ object Yields {
     * @return empty future representing server liveness
     */
   private[server] def start(): Unit = {
-    system.log.info("Server starting.")
     dispatcher
     router
-    system.log.info("Server started.")
   }
 
   /**
@@ -78,9 +76,7 @@ object Yields {
     * This include the actor system and the database.
     */
   private[server] def close(): Unit = {
-    system.log.info("Server closing.")
     system.terminate()
-    system.log.info("Server closed.")
   }
 
 }

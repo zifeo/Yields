@@ -27,6 +27,8 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
   import Tcp._
   import context.system
 
+  val pipelineBuffer = Config.getInt("pipeline.buffer")
+
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
       val message = nonfatal.getMessage
@@ -43,7 +45,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
       handler = self,
       localAddress = new InetSocketAddress(Config.getString("addr"), Config.getInt("port")),
       options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = true)),
-      backlog = 100,
+      backlog = Config.getInt("tcp.buffer"),
       pullMode = false
     )
   }
@@ -52,7 +54,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
     // ----- TCP letters -----
 
-    case Bound(_) => log.info("system ready")
+    case Bound(_) => log.info("System ready & bound.")
 
     case CommandFailed(Bind(_, _, _, _, _)) => context stop self
 
@@ -63,7 +65,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
       val pub = ActorPublisher[ByteString](bindings)
       val sub = ActorSubscriber[ByteString](bindings)
-      Source(pub).buffer(1000, OverflowStrategy.fail).via(stream).to(Sink(sub)).run()
+      Source(pub).buffer(pipelineBuffer, OverflowStrategy.fail).via(stream).to(Sink(sub)).run()
 
       socket ! Register(
         handler = bindings,
