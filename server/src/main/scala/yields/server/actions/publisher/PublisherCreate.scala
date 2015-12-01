@@ -12,31 +12,39 @@ import yields.server.mpi.Metadata
   * @param users users that can publish
   * @param nodes subscribed nodes
   */
-case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) extends Action {
+case class PublisherCreate(name: String, users: List[UID], nodes: List[NID]) extends Action {
+
   /**
     * Run the action given the sender.
     * @param metadata action requester
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    if (name.isEmpty)
-      throw new ActionArgumentException("publisher name cannot be empty")
 
-    val sender = User(metadata.client)
-    val entourage = sender.entourage
+    val user = User(metadata.client)
+    val entourage = user.entourage
+    val sender = user.uid
+    val otherUsers = users.filter(_ != sender)
 
-    if (!users.forall(entourage.contains))
-      throw new UnauthorizedActionException("users must be in sender's entourage")
+    if (! otherUsers.forall(entourage.contains))
+      throw new UnauthorizedActionException(s"not all users are $sender's entourage: $users")
 
-    val publisher = Publisher.create(name, metadata.client)
+    // TODO: check public node
 
-    publisher.addUser(metadata.client :: users.toList)
+    val publisher = Publisher.create(name, sender)
 
-    if (nodes.nonEmpty) {
-      publisher.addNode(nodes.toList)
+    if (otherUsers.nonEmpty) {
+      publisher.addUser(otherUsers)
     }
 
-    Yields.broadcast(publisher.users.filter(_ != sender)) {
+    if (nodes.nonEmpty) {
+      publisher.addNode(nodes)
+    }
+
+    user.addGroup(publisher.nid)
+    otherUsers.foreach(User(_).addGroup(publisher.nid))
+
+    Yields.broadcast(otherUsers) {
       PublisherCreateBrd(publisher.nid, name, users, nodes)
     }
 
@@ -58,4 +66,4 @@ case class PublisherCreateRes(nid: NID) extends Result
   * @param users list of users
   * @param nodes list of nodes
   */
-case class PublisherCreateBrd(nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]) extends Broadcast
+case class PublisherCreateBrd(nid: NID, name: String, users: List[UID], nodes: List[NID]) extends Broadcast
