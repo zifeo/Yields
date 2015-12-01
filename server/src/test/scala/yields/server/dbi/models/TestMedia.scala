@@ -57,12 +57,14 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
   }
 
   "saving a file on disk" should "have the same content" in {
-    val mediaBefore = Media.create("image", "Some content".getBytes, 0)
+    val content = "Some content".getBytes
+    val contentType = "image"
+    val mediaBefore = Media.create(contentType, content, 0)
     val mediaAfter = Media(mediaBefore.nid)
-    mediaBefore.content should be("Some content".getBytes)
-    mediaAfter.content should be("Some content".getBytes)
-    mediaBefore.contentType should be("image")
-    mediaAfter.contentType should be("image")
+    mediaBefore.content should be(content)
+    mediaAfter.content should be(content)
+    mediaBefore.contentType should be(contentType)
+    mediaAfter.contentType should be(contentType)
     mediaBefore.creator should be(0)
     mediaAfter.creator should be(0)
   }
