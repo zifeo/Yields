@@ -212,7 +212,6 @@ public class RequestHandler {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageRequest correctly !");
         }*/
 
-
         mController.sendToServer(serverRequest);
     }
 
