@@ -1,8 +1,11 @@
 package yields.client.messages;
 
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.wifi.WifiConfiguration;
+import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -85,27 +88,34 @@ public class Message extends Node {
      * @param senderID The is of the sender in String format.
      * @param text The text of the message (if it is a text message, null otherwise).
      * @param contentType The content type of the message.
-     * @param contents The actual content of the message.
+     * @param content The content of the message.
      * @throws ParseException In case of parse exception with the date serialization.
      */
-    public Message(String dateTime, Long senderID, String text, String contentType, Byte[]
-            contents)
+    public Message(String dateTime, Long senderID, String text, String contentType, String content)
             throws ParseException {
         super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)
         ).getTime()));
 
         this.mSender = new Id(senderID);
 
+        /*
+        I WILL KILL YOU !!!!
         if (text != null){
             contentType = "text";
-        }
+        }*/
 
-        if (contentType.equals("text")){
-            this.mContent = new TextContent(text);
+        if (contentType.equals("image")){
+            byte[] byteArray = Base64.decode(content, Base64.DEFAULT);
+            Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+            if (img == null){
+                Log.d("Y:"+ this.getClass().getName(), "Youston we have a problem");
+                mContent = new TextContent(text);
+            }else {
+                mContent = new ImageContent(img, text);
+            }
         }
-        else{
-            // TODO : Images, waiting for the problem in server side to be solved.
-            throw new UnsupportedOperationException();
+        else {
+            this.mContent = new TextContent(text);
         }
 
         this.mDate = DateSerialization.dateSerializer.toDate(dateTime);
