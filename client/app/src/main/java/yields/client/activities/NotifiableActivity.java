@@ -17,7 +17,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
      */
     public enum Change {
         GROUP_SEARCH, MESSAGES_RECEIVE, GROUP_LIST, GROUP_LEAVE, GROUP_JOIN,
-        CONNECTED, NEW_USER, ADD_ENTOURAGE
+        CONNECTED, NEW_USER, NOT_EXIST, ADD_ENTOURAGE
     }
 
     /**
