@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.zip.GZIPInputStream;
 
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
@@ -23,9 +22,7 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.servicerequest.ServiceRequest;
-import yields.client.servicerequest.UserUpdateRequest;
 
 /**
  * A builder for requests that will be send to the server
@@ -69,17 +66,19 @@ public class RequestBuilder {
      * @return The appropriate ServerRequest.
      */
     private static ServerRequest userUpdateRequest(Id sender, String name, String email,
-                                                   Bitmap image, List<Long> addEntourage,
-                                                   List<Long> remEntourage) {
+                                                       Bitmap image, List<Long> addEntourage,
+                                                       List<Long> remEntourage) {
         Objects.requireNonNull(sender);
+        Objects.requireNonNull(addEntourage);
+        Objects.requireNonNull(remEntourage);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
 
         builder.addOptionalField(Fields.NAME, name);
         builder.addOptionalField(Fields.EMAIL, email);
         builder.addOptionalField(Fields.IMAGE, image);
-        builder.addOptionalField(Fields.ADD_ENTOURAGE, addEntourage);
-        builder.addOptionalField(Fields.REMOVE_ENTOURAGE, remEntourage);
+        builder.addField(Fields.ADD_ENTOURAGE, addEntourage);
+        builder.addField(Fields.REMOVE_ENTOURAGE, remEntourage);
 
         return builder.request();
     }
@@ -93,8 +92,8 @@ public class RequestBuilder {
      * @param image  The image of the updated User.
      * @return The appropriate ServerRequest.
      */
-    public static ServerRequest userUpdateRequest(Id sender, String name, String email,
-                                                  Bitmap image) {
+    public static ServerRequest userUpdateInfoRequest(Id sender, String name, String email,
+                                                      Bitmap image) {
         return userUpdateRequest(sender, name, email, image, new ArrayList<Long>(),
                 new ArrayList<Long>());
     }
@@ -106,8 +105,23 @@ public class RequestBuilder {
      * @param name   The name of the updated User.
      * @return The appropriate ServerRequest.
      */
-    public static ServerRequest userUpdateRequest(Id sender, String name) {
+    public static ServerRequest userUpdateNameRequest(Id sender, String name) {
         return userUpdateRequest(sender, name, null, null, new ArrayList<Long>(), new ArrayList<Long>());
+    }
+
+    /**
+     * ServerRequest for adding a 'contact' to the user entourage list.
+     *
+     * @param sender The sender of the request.
+     * @param userAdded  Id of the new contact to add.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest userEntourageAddRequest(Id sender, Id userAdded) {
+        List<Long> userAdd = new ArrayList<>();
+        userAdd.add(userAdded.getId());
+
+        return userUpdateRequest(sender, null, null,
+                null, userAdd, new ArrayList<Long>());
     }
 
     /**
@@ -135,27 +149,11 @@ public class RequestBuilder {
      */
     public static ServerRequest userGroupListRequest(Id senderId) {
         Objects.requireNonNull(senderId);
+
         RequestBuilder builder = new RequestBuilder(
                 ServiceRequest.RequestKind.USER_GROUP_LIST, senderId);
 
-        builder.addField(Fields.UID, senderId);
-
         return builder.request();
-    }
-
-    /**
-     * ServerRequest for adding a 'contact' to the user entourage list.
-     *
-     * @param sender The sender of the request.
-     * @param userAdded  Id of the new contact to add.
-     * @return The appropriate ServerRequest.
-     */
-    public static ServerRequest userEntourageAddRequest(Id sender, Id userAdded) {
-        List<Long> userAdd = new ArrayList<Long>();
-        userAdd.add(userAdded.getId());
-
-        return userUpdateRequest(sender, null, null,
-                null, userAdd, new ArrayList<Long>());
     }
 
     /**
