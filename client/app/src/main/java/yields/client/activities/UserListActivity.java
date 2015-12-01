@@ -53,9 +53,9 @@ public class UserListActivity extends AppCompatActivity {
 
         Log.d("hello", YieldsApplication.getUser().toString());
 
-        final List<User> userList = new ArrayList<>();
-        //Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
-        //        "The user list in YieldsApplication cannot be null when UserListActivity is created");
+        final List<User> userList = YieldsApplication.getUser().getEntourage();
+        Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
+                "The user list in YieldsApplication cannot be null when UserListActivity is created");
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
 

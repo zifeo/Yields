@@ -460,15 +460,35 @@ public class ResponseHandler {
                 }
             }
             else {
-                User user = YieldsApplication.getUser(new Id(response.getLong("uid")));
-                user.setName(response.getString("name"));
-                user.setEmail(response.getString("email"));
+                if (YieldsApplication.getUser(new Id(response.getLong("uid"))) == null) {
+                    User newUser = new User(new Id(response.getLong("uid")));
+                    newUser.setName(response.getString("name"));
+                    newUser.setEmail(response.getString("email"));
 
+                    if (!response.optString("pic").equals("")) {
+                        byte[] byteArray = Base64.decode(response.getString("pic"), Base64.DEFAULT);
+                        Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
-                byte[] byteArray = Base64.decode(response.getString("pic"), Base64.DEFAULT);
-                Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+                        newUser.setImg(img);
+                    } else {
+                        newUser.setImg(YieldsApplication.getDefaultUserImage());
+                    }
 
-                user.setImg(img);
+                    YieldsApplication.getUser().addUserToEntourage(newUser);
+                } else {
+                    User user = YieldsApplication.getUser(new Id(response.getLong("uid")));
+                    user.setName(response.getString("name"));
+                    user.setEmail(response.getString("email"));
+
+                    if (!response.optString("pic").equals("")) {
+                        byte[] byteArray = Base64.decode(response.getString("pic"), Base64.DEFAULT);
+                        Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+                        user.setImg(img);
+                    } else {
+                        user.setImg(YieldsApplication.getDefaultUserImage());
+                    }
+                }
 
             }
         } catch (JSONException | ParseException e) {
