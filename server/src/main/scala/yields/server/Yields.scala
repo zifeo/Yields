@@ -76,6 +76,7 @@ object Yields {
     */
   private[server] def stop(): Unit = {
     system.terminate()
+    system.log.info("Server closed.")
   }
 
 }
