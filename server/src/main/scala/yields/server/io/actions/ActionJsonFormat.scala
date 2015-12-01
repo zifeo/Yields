@@ -36,7 +36,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
 
     case x: UserConnect => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
-    case x: UserGroupList => packWithKind(x)
+    case x: UserNodeList => packWithKind(x)
     case x: UserInfo => packWithKind(x)
     case x: UserSearch => packWithKind(x)
 
@@ -59,7 +59,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
 
           case "UserConnect" => message.convertTo[UserConnect]
           case "UserUpdate" => message.convertTo[UserUpdate]
-          case "UserGroupList" => message.convertTo[UserGroupList]
+          case "UserNodeList" => message.convertTo[UserNodeList]
           case "UserInfo" => message.convertTo[UserInfo]
           case "UserSearch" => message.convertTo[UserSearch]
 

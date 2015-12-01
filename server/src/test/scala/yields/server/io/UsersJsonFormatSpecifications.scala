@@ -33,21 +33,21 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
 
   //
 
-  property("UserGroupList") = forAll { (x: UserGroupList) =>
+  property("UserGroupList") = forAll { (x: UserNodeList) =>
     toAndFromJson(x)
   }
 
-  property("UserGroupListRes") = forAll { (x: UserGroupListRes) =>
+  property("UserGroupListRes") = forAll { (x: UserNodeListRes) =>
     toAndFromJson(x)
   }
 
   //
 
-  property("UserInfo") = forAll { (x: UserGroupListRes) =>
+  property("UserInfo") = forAll { (x: UserNodeListRes) =>
     toAndFromJson(x)
   }
 
-  property("UserInfoRes") = forAll { (x: UserGroupListRes) =>
+  property("UserInfoRes") = forAll { (x: UserNodeListRes) =>
     toAndFromJson(x)
   }
 

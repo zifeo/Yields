@@ -68,9 +68,9 @@ UserInfo
 	output	(1) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
 	output	(2) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
 	rules	uid == client (1) | uid in entourage (2)
-UserGroupList
+UserNodeList
 	input	()
-	output	groups: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
+	output	nodes: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	email: String
 	output	uid: UID

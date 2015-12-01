@@ -58,8 +58,8 @@ package object io {
   implicit lazy val userConnectJF = jsonFormat1(UserConnect)
   implicit lazy val userConnectResJF = jsonFormat2(UserConnectRes)
 
-  implicit lazy val userGroupListJF = jsonFormat0(UserGroupList)
-  implicit lazy val userGroupListResJF = jsonFormat3(UserGroupListRes)
+  implicit lazy val userGroupListJF = jsonFormat0(UserNodeList)
+  implicit lazy val userGroupListResJF = jsonFormat3(UserNodeListRes)
 
   implicit lazy val userUpdateJF = jsonFormat5(UserUpdate)
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
