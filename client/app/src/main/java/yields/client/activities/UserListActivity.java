@@ -27,6 +27,7 @@ public class UserListActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -69,7 +70,18 @@ public class UserListActivity extends AppCompatActivity {
         listView.setItemsCanFocus(true);
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Called once the button to add a user to the enoutrage is pressed.
+     *
+     * @param view The view of the button.
+     */
+    public void onAddUserButton(View view) {
+        Intent intent = new Intent(this, AddUserToEntourageActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated

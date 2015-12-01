@@ -528,7 +528,7 @@ public class RequestBuilder {
 
     private void addField(Fields fieldType, Bitmap field) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        field.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        field.compress(Bitmap.CompressFormat.JPEG, 0, stream);
         this.mConstructingMap.put(fieldType.getValue(),
                 Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT));
     }
