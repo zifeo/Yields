@@ -9,6 +9,7 @@ import akka.stream.actor._
 import akka.util.ByteString
 import org.slf4j.MDC
 
+import scala.collection.immutable.Queue
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.control.NonFatal
@@ -50,68 +51,94 @@ final class ClientHub(private val socket: ActorRef,
     log.info(s"disconnected $address.")
   }
 
-  def receive: Receive = state(dispatched = false)
+
+  def receive: Receive = state(Queue.empty, dispatched = false)
 
   /** Casual state. It is dispatched if dispatcher has been linked. */
-  def state(dispatched: Boolean): Receive = {
+  def state(buffer: Queue[ByteString], dispatched: Boolean): Receive = {
 
-    // ----- Publisher letters -----
-
-    case Request(n: Long) => // Stream subscriber requests more elements.
-
-    case Cancel => // Stream subscriber cancels the subscription.
-      log.error(s"$address hub detected pipeline error")
-      terminate()
-
-    // ----- Subscriber letters -----
-
-    case OnNext(data: ByteString) =>
-      val outgoing = data.utf8String
-      log.debug(s"$address [OUT] $outgoing")
-      socket ! Write(data)
-
-    case OnNext(element) => log.warning(s"$address unexpected onNext letter: $element")
-
-    case OnComplete => log.warning(s"$address unexpected completed letter")
-
-    case OnError(cause: Throwable) =>
-      val message = cause.getMessage
-      log.error(cause, s"$address error letter: $message")
-      socket ! Write(ByteString("""{"kind":"error"}"""))
-
-    // ----- ClientHub letters -----
-
-    case OnPush(data) => // Notification
-      val outgoing = data.utf8String
-      log.debug(s"$address [BRD] $outgoing")
-      socket ! Write(data)
-
-    // ----- TCP letters -----
-
-    case Received(data) =>
-      val incoming = data.utf8String
-      log.debug(s"$address [INP] $incoming")
-      onNext(data)
-      if (! dispatched) {
-        dispatcher ! InitConnection(data)
-        context.become(state(dispatched = true))
+    def send(data: ByteString): Unit = {
+      val count = buffer.size
+      count match {
+        case 0 => socket ! Write(data, Ack)
+        case len if len > 5 => log.warning(s"$address queue already buffer: $len")
+        case _ =>
       }
+      val message = data.utf8String
+      log.debug(s"$address buffer enqueue (#$count): $message")
+      context.become(state(buffer.enqueue[ByteString](data), dispatched))
+    }
 
-    case PeerClosed =>
-      terminate()
+    {
 
-    case ErrorClosed(cause) =>
-      log.error(cause, s"$address error closed letter: $cause")
-      terminate()
+      // ----- Publisher letters -----
 
-    case CommandFailed(Write(data, event)) =>
-      val failing = data.utf8String
-      log.error(s"write failed: $event $failing")
+      case Request(n: Long) => // Stream subscriber requests more elements.
 
-    // ----- Default -----
+      case Cancel => // Stream subscriber cancels the subscription.
+        log.error(s"$address hub detected pipeline error")
+        terminate()
 
-    case unexpected => log.warning(s"$address unexpected letter: $unexpected")
+      // ----- Subscriber letters -----
 
+      case OnNext(data: ByteString) =>
+        val outgoing = data.utf8String
+        log.debug(s"$address [OUT] $outgoing")
+        send(data)
+
+      case OnNext(element) => log.warning(s"$address unexpected onNext letter: $element")
+
+      case OnComplete => log.warning(s"$address unexpected completed letter")
+
+      case OnError(cause: Throwable) =>
+        val message = cause.getMessage
+        log.error(cause, s"$address error letter: $message")
+        send(ByteString("""{"kind":"error"}"""))
+
+      // ----- ClientHub letters -----
+
+      case OnPush(data) => // Notification
+        val outgoing = data.utf8String
+        log.debug(s"$address [BRD] $outgoing")
+        send(data)
+
+      case Ack =>
+        val (dequeue, remaining) = buffer.dequeue
+        val message = dequeue.utf8String
+        val count = remaining.size
+        log.debug(s"$address buffer dequeue (#$count): $message")
+        if (remaining.nonEmpty) {
+          socket ! Write(remaining.head, Ack)
+        }
+        context.become(state(remaining, dispatched))
+
+      // ----- TCP letters -----
+
+      case Received(data) =>
+        val incoming = data.utf8String
+        log.debug(s"$address [INP] $incoming")
+        onNext(data)
+        if (! dispatched) {
+          dispatcher ! InitConnection(data)
+          context.become(state(buffer, dispatched = true))
+        }
+
+      case PeerClosed =>
+        terminate()
+
+      case ErrorClosed(cause) =>
+        log.error(cause, s"$address error closed letter: $cause")
+        terminate()
+
+      case CommandFailed(Write(data, event)) =>
+        val failing = data.utf8String
+        log.error(s"write failed: $event $failing")
+
+      // ----- Default -----
+
+      case unexpected => log.warning(s"$address unexpected letter: $unexpected")
+
+    }
   }
 
   /** Returns the number of received request at the moment of the latest result. */
@@ -132,6 +159,9 @@ object ClientHub {
 
   /** Handle a notification. */
   private[router] case class OnPush(data: ByteString)
+
+  /** Confirms a write. */
+  private[router] case object Ack extends Tcp.Event
 
   /** Creates a router props with a materializer. */
   def props(socket: ActorRef, address: InetSocketAddress, dispatcher: ActorRef): Props =
