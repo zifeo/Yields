@@ -17,10 +17,7 @@ import scala.util.control.NonFatal
   */
 object Yields {
 
-  { // Configure logging with LogBack
-    val manager = LogManager.getLogManager
-    manager.readConfiguration()
-  }
+  LogManager.getLogManager.readConfiguration()
 
   private implicit lazy val system = ActorSystem("Yields-server")
   private implicit lazy val materializer = {
@@ -59,7 +56,9 @@ object Yields {
     */
   def broadcast(uids: List[UID])(bcast: Broadcast): Unit = {
     import Dispatcher._
-    Yields.dispatcher ! Notify(uids, bcast)
+    if (uids.nonEmpty) {
+      Yields.dispatcher ! Notify(uids, bcast)
+    }
   }
 
   /**
@@ -75,7 +74,7 @@ object Yields {
     * Closes the server (cannot be restart without full restart).
     * This include the actor system and the database.
     */
-  private[server] def close(): Unit = {
+  private[server] def stop(): Unit = {
     system.terminate()
   }
 
