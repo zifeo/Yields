@@ -316,7 +316,7 @@ public class ResponseHandler {
             long senderId = response.getLong("sender");
             String text = response.getString("text");
             String contentType = response.getString("contentType");
-            Byte[] content = (Byte[]) response.get("content");
+            String content = response.getString("content");
 
             Message message = new Message(datetime.toString(), senderId, text,
                     contentType, content);
@@ -369,7 +369,7 @@ public class ResponseHandler {
             long senderId = response.getLong("sender");
             String text = response.getString("text");
             String contentType = response.getString("contentType");
-            Byte[] content = (Byte[]) response.get("content");
+            String content = response.getString("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
             Message message = new Message(datetime.toString(), senderId, text,
@@ -405,7 +405,7 @@ public class ResponseHandler {
             long senderId = response.getLong("sender");
             String text = response.getString("text");
             String contentType = response.getString("contentType");
-            Byte[] content = (Byte[]) response.get("content");
+            String content = response.getString("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
             Message message = new Message(datetime.toString(), senderId, text,
@@ -552,10 +552,12 @@ public class ResponseHandler {
 
             Id groupId = new Id(nid);
             ArrayList<Message> messageList = new ArrayList<>();
-            for (int i = 0 ; i < count ; i ++){
-                //TODO images
+            for (int i = 0 ; i < count ; i ++) {
+
+                Log.d("AFHIUDGSFG AS", contentTypes.getString(i));
+
                 Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
-                        .getString(i), contentTypes.getString(i), null);
+                        .getString(i), contentTypes.getString(i), contents.getString(i));
                 messageList.add(message);
                 //mCacheHelper.addMessage(message, groupId);
             }
