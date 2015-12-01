@@ -51,16 +51,16 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
 
   //
 
-  implicit lazy val userGroupListArb: Arbitrary[UserGroupList] = Arbitrary {
-    UserGroupList()
+  implicit lazy val userGroupListArb: Arbitrary[UserNodeList] = Arbitrary {
+    UserNodeList()
   }
 
-  implicit lazy val userGroupListResArb: Arbitrary[UserGroupListRes] = Arbitrary {
+  implicit lazy val userGroupListResArb: Arbitrary[UserNodeListRes] = Arbitrary {
     for {
       groups <- arbitrary[List[NID]]
       updates <- arbitrary[List[OffsetDateTime]]
       refreshes <- arbitrary[List[OffsetDateTime]]
-    } yield UserGroupListRes(groups, updates, refreshes)
+    } yield UserNodeListRes(groups, updates, refreshes)
   }
 
   //

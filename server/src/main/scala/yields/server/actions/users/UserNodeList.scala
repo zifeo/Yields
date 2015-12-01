@@ -10,7 +10,7 @@ import yields.server.mpi.Metadata
 /**
   * Lists the groups of the user.
   */
-case class UserGroupList() extends Action {
+case class UserNodeList() extends Action {
 
   /**
     * Run the action given the sender.
@@ -20,17 +20,17 @@ case class UserGroupList() extends Action {
   override def run(metadata: Metadata): Result = {
 
       val user = User(metadata.client)
-      val (groups, updates, refreshes) = user.groupsWithUpdates.unzip3
-      UserGroupListRes(groups, updates, refreshes)
+      val (nodes, updates, refreshes) = user.groupsWithUpdates.unzip3
+      UserNodeListRes(nodes, updates, refreshes)
 
   }
 
 }
 
 /**
-  * [[UserGroupList]] result.
+  * [[UserNodeList]] result.
   * @param groups sequence of nid, name and last activity
   */
-case class UserGroupListRes(groups: Seq[NID],
-                            updatedAt: Seq[OffsetDateTime],
-                            refreshedAt: Seq[OffsetDateTime]) extends Result
+case class UserNodeListRes(groups: Seq[NID],
+                           updatedAt: Seq[OffsetDateTime],
+                           refreshedAt: Seq[OffsetDateTime]) extends Result

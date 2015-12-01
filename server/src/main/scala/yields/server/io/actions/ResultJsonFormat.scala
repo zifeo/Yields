@@ -32,7 +32,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
 
       case x: UserConnectRes => packWithKind(x)
       case x: UserUpdateRes => packWithKind(x)
-      case x: UserGroupListRes => packWithKind(x)
+      case x: UserNodeListRes => packWithKind(x)
       case x: UserInfoRes => packWithKind(x)
       case x: UserSearchRes => packWithKind(x)
 
@@ -65,7 +65,7 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
 
           case "UserConnectRes" => message.convertTo[UserConnectRes]
           case "UserUpdateRes" => message.convertTo[UserUpdateRes]
-          case "UserGroupListRes" => message.convertTo[UserGroupListRes]
+          case "UserNodeListRes" => message.convertTo[UserNodeListRes]
           case "UserInfoRes" => message.convertTo[UserInfoRes]
           case "UserSearchRes" => message.convertTo[UserSearchRes]
 
