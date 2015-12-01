@@ -19,7 +19,7 @@ import yields.server.utils.Temporal
   *
   * Database structure:
   * users:[uid] Map[String, String] - name / email / pic / created_at / updated_at / connected_at
-  * users:[uid]:groups Map[NID, OffsetDateTime]
+  * users:[uid]:nodes Map[NID, OffsetDateTime]
   * users:[uid]:entourage Map[UID, OffsetDateTime]
   * users:indexes:email Map[Email, UID] - email
   *
@@ -31,7 +31,7 @@ final class User private(val uid: UID) {
 
   object Key {
     val user = s"users:$uid"
-    val groups = s"$user:groups"
+    val nodes = s"$user:nodes"
     val entourage = s"$user:entourage"
   }
 
@@ -42,7 +42,7 @@ final class User private(val uid: UID) {
   private var _updated_at: Option[OffsetDateTime] = None
   private var _connected_at: Option[OffsetDateTime] = None
 
-  private var _groups: Option[List[NID]] = None
+  private var _nodes: Option[List[NID]] = None
   private var _entourage: Option[List[UID]] = None
 
   /** Name getter. */
@@ -54,13 +54,6 @@ final class User private(val uid: UID) {
   /** Name setter. */
   def name_=(newName: String): Unit =
     _name = update(StaticKey.name, newName)
-
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (StaticKey.updated_at, Temporal.now))
-    redis(_.hmset(Key.user, updates))
-    Some(value)
-  }
 
   /** Email getter. */
   def email: Email = _email.getOrElse {
@@ -118,14 +111,14 @@ final class User private(val uid: UID) {
     _connected_at = update(StaticKey.connected_at, Temporal.now)
 
   /** Groups getter. */
-  def groups: List[NID] = _groups.getOrElse {
-    _groups = redis(_.hkeys[NID](Key.groups))
-    valueOrDefault(_groups, List.empty)
+  def nodes: List[NID] = _nodes.getOrElse {
+    _nodes = redis(_.hkeys[NID](Key.nodes))
+    valueOrDefault(_nodes, List.empty)
   }
 
   /** Groups with updates getter. */
   def groupsWithUpdates: List[(NID, OffsetDateTime, OffsetDateTime)] = {
-    val currentGroup = groups // need to be computed before pipeline
+    val currentGroup = nodes // need to be computed before pipeline
     val query = redisPipeline { p =>
         currentGroup.map { nid =>
           val nodeKey = Group(nid).NodeKey.node
@@ -139,12 +132,12 @@ final class User private(val uid: UID) {
   }
 
   /** Adds a group and returns whether this group has been added. */
-  def addGroup(newGroup: NID): Boolean =
-    addWithTime(Key.groups, newGroup)
+  def addNode(newNode: NID): Boolean =
+    addWithTime(Key.nodes, newNode)
 
   /** Remove a group and returns whether this group has been removed. */
-  def removeGroups(oldGroups: NID): Boolean =
-    remWithTime(Key.groups, oldGroups)
+  def removeNode(oldNode: NID): Boolean =
+    remWithTime(Key.nodes, oldNode)
 
   /** Entourage getter. */
   def entourage: List[UID] = _entourage.getOrElse {
@@ -194,6 +187,13 @@ final class User private(val uid: UID) {
     _email = values.get(StaticKey.email)
     _created_at = values.get(StaticKey.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(StaticKey.updated_at).map(OffsetDateTime.parse)
+  }
+
+  // Updates the field with given value and actualize timestamp.
+  private def update[T](field: String, value: T): Option[T] = {
+    val updates = List((field, value), (StaticKey.updated_at, Temporal.now))
+    redis(_.hmset(Key.user, updates))
+    Some(value)
   }
 
 }
