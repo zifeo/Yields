@@ -1,6 +1,8 @@
 package yields.client.service;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -77,7 +79,7 @@ public class ResponseHandler {
             JSONObject response = serverResponse.getMessage();
             JSONArray nodes = response.getJSONArray("nodes");
             JSONArray names = response.getJSONArray("names");
-            JSONArray pics = response.getJSONArray("pic");
+            String pics = response.getString("pic");
 
             assert (nodes.length() == names.length() && nodes.length() == pics.length());
             int nodeCount = nodes.length();
@@ -86,9 +88,9 @@ public class ResponseHandler {
                 long nid = nodes.getLong(i);
                 Id id = new Id(nid);
                 String nodeName = names.getString(i);
-                byte[] pic = convertToPrimitiveByteArray((Byte[]) pics.get(i));
+                byte[] pic = Base64.decode(pics, Base64.DEFAULT);
 
-                // TODO : Make the fucking class representing nodes having an image.
+                new Group(nodeName, id, new ArrayList<User>(), BitmapFactory.decodeByteArray(pic, 0, pic.length));
             }
             // TODO : (Nico) Notify activity.
         } catch (JSONException e) {
@@ -144,6 +146,11 @@ public class ResponseHandler {
             Date serverDatetime = DateSerialization.dateSerializer
                     .toDate(response.getString("datetime"));
             Id id = new Id(nid);
+
+            if (YieldsApplication.getUser().modifyGroup(id).getLastUpdate().before(serverDatetime)) {
+                YieldsApplication.getUser().modifyGroup(id)
+                        .setLastUpdate(serverDatetime);
+            }
 
             YieldsApplication.getUser().modifyGroup(id).validateMessage(prevDatetime, serverDatetime);
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
@@ -550,11 +557,11 @@ public class ResponseHandler {
                 Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
                         .getString(i), contentTypes.getString(i), null);
                 messageList.add(message);
-                mCacheHelper.addMessage(message, groupId);
+                //mCacheHelper.addMessage(message, groupId);
             }
 
             mService.receiveMessages(groupId, messageList);
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
     }

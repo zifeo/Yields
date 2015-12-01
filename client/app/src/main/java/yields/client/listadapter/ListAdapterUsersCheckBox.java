@@ -1,6 +1,7 @@
 package yields.client.listadapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,8 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
         CheckBox checkBox = (CheckBox) userView.findViewById(R.id.checkboxUser);
 
         User user = mUsers.get(position).getKey();
+
+        Log.d("name", user.getName());
 
         textViewUserName.setText(user.getName());
 

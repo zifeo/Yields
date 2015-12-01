@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.zip.GZIPInputStream;
 
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
@@ -41,7 +42,7 @@ public class RequestBuilder {
         IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
         CONTENT_TYPE("contentType"), UID("uid"),
         TAG("tags"), DATE("date"), ADD_ENTOURAGE("addEntourage"),
-        REMOVE_ENTOURAGE("removeEntourage");
+        REMOVE_ENTOURAGE("removeEntourage"), PATTERN("pattern");
 
         private final String name;
 
@@ -94,7 +95,7 @@ public class RequestBuilder {
      */
     public static ServerRequest userUpdateRequest(Id sender, String name, String email,
                                                   Bitmap image) {
-        return userUpdateRequest(sender,name,email,image,new ArrayList<Id>(),
+        return userUpdateRequest(sender, name, email, image, new ArrayList<Id>(),
                 new ArrayList<Id>());
     }
 
@@ -243,6 +244,15 @@ public class RequestBuilder {
         builder.addField(Fields.VISIBILITY, visibility);
         builder.addField(Fields.TAG, new ArrayList());
 
+        return builder.request();
+    }
+
+    public static ServerRequest nodeSearchRequest(Id sender, String pattern) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(pattern);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.NODE_SEARCH, sender);
+        builder.addField(Fields.PATTERN, pattern);
         return builder.request();
     }
 
@@ -528,7 +538,8 @@ public class RequestBuilder {
 
     private void addField(Fields fieldType, Bitmap field) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        field.compress(Bitmap.CompressFormat.PNG, 0, stream);
+        Bitmap.createScaledBitmap(field, 500, 500, true).compress(Bitmap.CompressFormat.JPEG, 20, stream);
+
         this.mConstructingMap.put(fieldType.getValue(),
                 Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT));
     }

@@ -1,6 +1,7 @@
 package yields.client.listadapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,10 +70,13 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.d("JBIFIABAS", "test");
         if (position < mUsers.size()){
+            Log.d("JBIFIABAS", "user");
             return getUserView(position, parent);
         }
         else {
+            Log.d("JBIFIABAS", "group");
             return getGroupView(position - mUsers.size(), parent);
         }
     }
@@ -87,15 +91,25 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
         View userView = inflater.inflate(R.layout.add_user_layout, parent, false);
 
         User user = mUsers.get(pos);
+        Log.d("coucou", "ansjdnan");
 
         TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
         ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
+
+        Log.d("coucou", "ansjdnan");
+
         CheckBox checkBox = (CheckBox) userView.findViewById(R.id.checkboxUser);
 
+        Log.d("coucou", "ansjdnan");
         textViewUserName.setText(user.getName());
+
+        Log.d("coucou", "ansjdnan");
+
+        Log.d("coucou", user.getName());
 
         imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
+        Log.d("coucou", "ansjdnan");
 
         checkBox.setChecked(true);
 
@@ -132,6 +146,8 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
         CheckBox checkBox = (CheckBox) groupView.findViewById(R.id.checkboxGroup);
 
         textViewGroupName.setText(group.getName());
+
+        Log.d("IFGFASGUZFGUZASGFA", group.getName());
 
         imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(group.getImage(),
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
