@@ -445,18 +445,18 @@ public class ServerRequestsTests {
     }
 
     /**
-     * Tests if a GroupHistoryRequest is correctly built.
-     * (Test for groupHistoryRequest(Id senderId, Id groupId, Date last, int messageCount))
+     * Tests if a nodeHistoryRequest is correctly built.
+     * (Test for nodeHistoryRequest(Id senderId, Id groupId, Date last, int messageCount))
      */
     @Test
-    public void testGroupHistoryRequest() {
+    public void testNodeHistoryRequest() {
         try {
             Id groupId = new Id(12);
             Id senderId = new Id(11);
             Date date = new Date();
             int messageCount = 10;
 
-            ServerRequest serverRequest = RequestBuilder.groupHistoryRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.nodeHistoryRequest(senderId, groupId,
                     date, messageCount);
             JSONObject json = new JSONObject(serverRequest.message());
 
