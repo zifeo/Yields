@@ -342,11 +342,6 @@ public class YieldsApplication {
 
         User user = mUser.modifyEntourage(userId);
 
-        if (user == null) {
-            throw new IllegalArgumentException(
-                    "request information about a user you aren't suppose to ask");
-        }
-
         return user;
     }
 }
