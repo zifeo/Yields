@@ -41,8 +41,8 @@ case class PublisherCreate(name: String, users: List[UID], nodes: List[NID]) ext
       publisher.addNode(nodes)
     }
 
-    user.addGroup(publisher.nid)
-    otherUsers.foreach(User(_).addGroup(publisher.nid))
+    user.addNode(publisher.nid)
+    otherUsers.foreach(User(_).addNode(publisher.nid))
 
     Yields.broadcast(otherUsers) {
       PublisherCreateBrd(publisher.nid, name, users, nodes)

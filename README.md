@@ -137,6 +137,8 @@ PublisherMessage
 	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 ```
 
+Publishers is very similar to groups and even share some of its structures but most the request are separated for allowing further differences to appears.
+
 ### RSS actions
 
 ```

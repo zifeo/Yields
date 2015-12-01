@@ -28,9 +28,9 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
         publisher.users should contain theSameElementsAs (user.uid :: users).distinct
         publisher.nodes should contain theSameElementsAs nodes.distinct
         publisher.creator should be(user.uid)
-        user.groups should contain only nid
+        user.nodes should contain only nid
         users.foreach { uid =>
-          User(uid).groups should contain (nid)
+          User(uid).nodes should contain (nid)
         }
     }
   }

@@ -41,8 +41,8 @@ case class GroupCreate(name: String, users: List[UID], nodes: List[NID]) extends
       group.addNode(nodes)
     }
 
-    user.addGroup(group.nid)
-    otherUsers.foreach(User(_).addGroup(group.nid))
+    user.addNode(group.nid)
+    otherUsers.foreach(User(_).addNode(group.nid))
 
     Yields.broadcast(otherUsers) {
       GroupCreateBrd(group.nid, name, users, nodes)

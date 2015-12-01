@@ -51,20 +51,20 @@ class TestUser extends DBFlatSpec with Matchers {
 
   it should "have this group in his list" in {
     val u1 = User.create(email)
-    u1.addGroup(1234)
+    u1.addNode(1234)
     val u2 = User(u1.uid)
 
-    u2.groups should contain(1234)
+    u2.nodes should contain(1234)
   }
 
   it should "remove the group in the user" in {
     val u1 = User.create(email)
-    u1.addGroup(1234)
+    u1.addNode(1234)
     val u2 = User(u1.uid)
-    u2.removeGroups(1234)
+    u2.removeNode(1234)
     val u3 = User(u1.uid)
 
-    u3.groups should not contain 1234
+    u3.nodes should not contain 1234
   }
 
   it should "add the picture in the model" in {

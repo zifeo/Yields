@@ -27,8 +27,8 @@ class TestUserGroupList extends DBFlatSpec with Matchers {
     val meta = Metadata.now(user.uid)
     val group1 = Group.create("g1", user.uid)
     val group2 = Group.create("g2", user.uid)
-    user.addGroup(group1.nid)
-    user.addGroup(group2.nid)
+    user.addNode(group1.nid)
+    user.addNode(group2.nid)
     val action = UserGroupList()
 
     action.run(meta) match {
