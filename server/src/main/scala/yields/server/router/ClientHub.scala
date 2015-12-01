@@ -7,6 +7,7 @@ import akka.actor._
 import akka.io.Tcp
 import akka.stream.actor._
 import akka.util.ByteString
+import org.slf4j.MDC
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -27,6 +28,8 @@ final class ClientHub(private val socket: ActorRef,
   import ClientHub._
   import Dispatcher._
   import Tcp._
+
+  MDC.put("client", address.toString)
 
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
@@ -100,6 +103,10 @@ final class ClientHub(private val socket: ActorRef,
     case ErrorClosed(cause) =>
       log.error(cause, s"$address error closed letter: $cause")
       terminate()
+
+    case CommandFailed(Write(data, event)) =>
+      val failing = data.utf8String
+      log.error(s"write failed: $event $failing")
 
     // ----- Default -----
 

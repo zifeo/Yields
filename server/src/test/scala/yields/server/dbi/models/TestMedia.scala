@@ -18,7 +18,7 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     """
       |this is an impossible content for a normal image so it can be used for testing and
       |it can be deleted after each test
-    """.stripMargin.toCharArray.map(_.toByte)
+    """.stripMargin
 
   val pathForContentTest = Media.buildPathFromName(Media.createHash(contentTest, Temporal.now))
 

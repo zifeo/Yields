@@ -15,7 +15,7 @@ class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
     val publisher = Publisher.create("name", meta.client)
     publisher.addUser(List[UID](3, 4, 5))
     publisher.addNode(List[NID](13, 14, 15))
-    publisher.picSetter(Array[Byte](1, 2), meta.client)
+    publisher.picSetter("12", meta.client)
 
     val action = PublisherInfo(publisher.nid)
 

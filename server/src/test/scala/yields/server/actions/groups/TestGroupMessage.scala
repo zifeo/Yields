@@ -36,7 +36,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val contentType = "image"
-    val content = Array[Byte](1, 2)
+    val content = "12"
 
     val group = Group.create("name", meta.client)
     val action = GroupMessage(group.nid, None, Some(contentType), Some(content))
@@ -64,7 +64,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val meta = Metadata.now(0)
     val text = "A message"
     val contentType = "image"
-    val content = Array[Byte](1, 2)
+    val content = "12"
 
     val group = Group.create("name", meta.client)
     val action = GroupMessage(group.nid, Some(text), Some(contentType), Some(content))
@@ -91,7 +91,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val group = Group.create("name", meta.client)
-    val action = GroupMessage(group.nid, None, None, Some(Array[Byte](1, 2)))
+    val action = GroupMessage(group.nid, None, None, Some("12"))
     val actionInverse = GroupMessage(group.nid, None, Some("type"), None)
 
     the [ActionArgumentException] thrownBy action.run(meta)
