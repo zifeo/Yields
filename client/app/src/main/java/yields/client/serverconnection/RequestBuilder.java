@@ -69,8 +69,8 @@ public class RequestBuilder {
      * @return The appropriate ServerRequest.
      */
     private static ServerRequest userUpdateRequest(Id sender, String name, String email,
-                                                   Bitmap image, List<Id> addEntourage,
-                                                   List<Id> remEntourage) {
+                                                   Bitmap image, List<Long> addEntourage,
+                                                   List<Long> remEntourage) {
         Objects.requireNonNull(sender);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
@@ -95,8 +95,8 @@ public class RequestBuilder {
      */
     public static ServerRequest userUpdateRequest(Id sender, String name, String email,
                                                   Bitmap image) {
-        return userUpdateRequest(sender, name, email, image, new ArrayList<Id>(),
-                new ArrayList<Id>());
+        return userUpdateRequest(sender, name, email, image, new ArrayList<Long>(),
+                new ArrayList<Long>());
     }
 
     /**
@@ -107,7 +107,7 @@ public class RequestBuilder {
      * @return The appropriate ServerRequest.
      */
     public static ServerRequest userUpdateRequest(Id sender, String name) {
-        return userUpdateRequest(sender, name, null, null, new ArrayList<Id>(), new ArrayList<Id>());
+        return userUpdateRequest(sender, name, null, null, new ArrayList<Long>(), new ArrayList<Long>());
     }
 
     /**
@@ -151,11 +151,11 @@ public class RequestBuilder {
      * @return The appropriate ServerRequest.
      */
     public static ServerRequest userEntourageAddRequest(Id sender, Id userAdded) {
-        List<Id> userAdd = new ArrayList<Id>();
-        userAdd.add(userAdded);
+        List<Long> userAdd = new ArrayList<Long>();
+        userAdd.add(userAdded.getId());
 
         return userUpdateRequest(sender, null, null,
-                null, userAdd, null);
+                null, userAdd, new ArrayList<Long>());
     }
 
     /**

@@ -29,6 +29,7 @@ import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
+import yields.client.servicerequest.UserSearchRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
 
 import static java.lang.Thread.sleep;
@@ -165,6 +166,9 @@ public class ServiceRequestController {
                 break;
             case NODE_HISTORY:
                 mRequestHandler.handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
+                break;
+            case USER_SEARCH:
+                mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
                 break;
             default:
                 throw new ServiceRequestException("No such ServiceRequest type !");

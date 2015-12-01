@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,8 +51,11 @@ public class UserListActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(intent.getStringExtra(TITLE_KEY));
 
-        final List<User> userList = Objects.requireNonNull(YieldsApplication.getUserList(),
-                "The user list in YieldsApplication cannot be null when UserListActivity is created");
+        Log.d("hello", YieldsApplication.getUser().toString());
+
+        final List<User> userList = new ArrayList<>();
+        //Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
+        //        "The user list in YieldsApplication cannot be null when UserListActivity is created");
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
 
