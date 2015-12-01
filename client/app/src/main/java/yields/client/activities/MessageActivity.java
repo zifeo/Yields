@@ -130,7 +130,12 @@ public class MessageActivity extends NotifiableActivity {
     @Override
     public void onResume() {
         super.onResume();
-        retrieveGroupMessages();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                retrieveGroupMessages();
+            }
+        });
     }
 
     /**

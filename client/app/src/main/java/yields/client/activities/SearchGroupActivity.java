@@ -29,6 +29,8 @@ import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSearchedGroups;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.servicerequest.NodeSearchRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -195,13 +197,20 @@ public class SearchGroupActivity extends NotifiableActivity{
                 } else {
                     setWaitingState();
 
+                    ServiceRequest searchRequest = new NodeSearchRequest(YieldsApplication
+                            .getUser().getId(),
+                            mEditTextSearch.getText().toString());
+
+                    YieldsApplication.getBinder().sendRequest(searchRequest);
+
+                    /*
                     mTimer = new Timer("DelayedRequestTimer");
                     mTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
                             launchSearch(mEditTextSearch.getText().toString());
                         }
-                    }, 1000);
+                    }, 1000);*/
                 }
             }
 

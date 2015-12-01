@@ -25,6 +25,7 @@ import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class RequestHandler {
 
@@ -211,7 +212,8 @@ public class RequestHandler {
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageRequest correctly !");
         }*/
-
+        YieldsApplication.getUser().modifyGroup(serviceRequest.getReceivingNode().getId())
+                .setLastUpdate(serviceRequest.getMessage().getDate());
 
         mController.sendToServer(serverRequest);
     }
