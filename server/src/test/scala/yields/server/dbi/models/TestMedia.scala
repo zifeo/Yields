@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.{Paths, Files}
 
 import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.utils.Config
+import yields.server.utils.{Temporal, Config}
 
 /**
   * Test class for image model
@@ -20,7 +20,7 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
       |it can be deleted after each test
     """.stripMargin.toCharArray.map(_.toByte)
 
-  val pathForContentTest = Media.buildPathFromName(Media.createHash(contentTest))
+  val pathForContentTest = Media.buildPathFromName(Media.createHash(contentTest, Temporal.now))
 
   before {
     val file = new File(pathForContentTest)
@@ -42,7 +42,7 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     exists should be(true)
   }
 
-  "file path" should "respect pattern storage/media/hash.bin" in {
+  "file path" should "respect pattern storage/media/date_hash.bin" in {
     val img = Media.create(contentTypeTest, contentTest, 1)
     val hash = img.hash
     val path = Media.buildPathFromName(hash)
@@ -54,6 +54,19 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     val img2 = Media(img.nid)
 
     img2.content should be(img.content)
+  }
+
+  "saving a file on disk" should "have the same content" in {
+    val content = "Some content".getBytes
+    val contentType = "image"
+    val mediaBefore = Media.create(contentType, content, 0)
+    val mediaAfter = Media(mediaBefore.nid)
+    mediaBefore.content should be(content)
+    mediaAfter.content should be(content)
+    mediaBefore.contentType should be(contentType)
+    mediaAfter.contentType should be(contentType)
+    mediaBefore.creator should be(0)
+    mediaAfter.creator should be(0)
   }
 
 }

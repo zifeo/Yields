@@ -2,12 +2,13 @@ package yields.server.dbi.models
 
 import java.io.{File, PrintWriter}
 import java.nio.file.{Files, Paths}
+import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.MediaException
 import yields.server.dbi.models.Media._
-import yields.server.utils.Config
+import yields.server.utils.{Temporal, Config}
 import scala.io._
 
 /**
@@ -39,7 +40,6 @@ class Media private(nid: NID) extends Node(nid) {
       hash
     }
     path = _hash.get
-
     getContentFromDisk(path).getOrElse(throw new MediaException("Content doesn't exist on disk"))
   }
 
@@ -108,7 +108,7 @@ object Media {
     val media = Media(newIdentity())
 
     // set values
-    media.hash = createHash(content)
+    media.hash = createHash(content, Temporal.now)
     media.content = content
     media.contentType = contentType
     media.creator = creator
@@ -127,15 +127,15 @@ object Media {
     * @param content content to hash
     * @return hash
     */
-  def createHash(content: Blob): String = {
+  def createHash(content: Blob, date: OffsetDateTime): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
     val ha = new sun.misc.BASE64Encoder().encode(md.digest(content.getBytes))
-    ha.filter(_ != '/')
+    date + "_" + ha.replace('/', '-')
   }
 
   /**
-    * Check if a file exists on disk
-    * @param name name of the file to test
+    * Check if a file exists on disk with full name
+    * @param name name of the file to test (name format: date_hash
     * @return
     */
   def checkFileExist(name: String): Boolean = {
