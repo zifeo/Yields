@@ -27,6 +27,7 @@ import yields.client.serverconnection.Response;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.ServiceRequest;
+import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -65,9 +66,17 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
             long uid = response.getLong("uid");
-            Id id = new Id(uid);
-            // Send uid.
-            // TODO : (Nico) Notify Activity.
+            if (uid != 0) {
+                Id id = new Id(uid);
+                ServiceRequest addToEntourageRequest =
+                        new UserEntourageAddRequest(YieldsApplication.getUser().getId(), id);
+                mService.sendRequest(addToEntourageRequest);
+                YieldsApplication.getUser().addUserToEntourage(new User(id));
+            } else {
+                mService.notifyChange(NotifiableActivity.Change.NOT_EXIST);
+            }
+
+
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -431,7 +440,7 @@ public class ResponseHandler {
     protected void handleUserInfoResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            if (YieldsApplication.getUser().getId().getId().equals(-1)){
+            if (YieldsApplication.getUser().getId().getId().equals(-1) ){
                 YieldsApplication.getUser().update(response);
                 JSONArray entourage = response.getJSONArray("entourage");
                 JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
@@ -449,7 +458,7 @@ public class ResponseHandler {
                 }
             }
             else {
-                // TODO
+
             }
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +

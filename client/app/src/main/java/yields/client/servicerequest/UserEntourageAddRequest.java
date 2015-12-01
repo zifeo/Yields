@@ -2,6 +2,7 @@ package yields.client.servicerequest;
 
 import java.util.Objects;
 
+import yields.client.id.Id;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
@@ -11,8 +12,8 @@ import yields.client.serverconnection.ServerRequest;
  */
 public class UserEntourageAddRequest extends ServiceRequest {
 
-    private final User mUser;
-    private final User mUserToAdd;
+    private final Id mUser;
+    private final Id mUserToAdd;
 
     /**
      * Main constructor for this type of ServiceRequest (adding a User to another User's entourage).
@@ -20,7 +21,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      * @param user          The User that send this request and which wants it's entourage modified.
      * @param userToBeAdded The User that will be added to user's entourage.
      */
-    public UserEntourageAddRequest(User user, User userToBeAdded) {
+    public UserEntourageAddRequest(Id user, Id userToBeAdded) {
         super();
         Objects.requireNonNull(user);
         Objects.requireNonNull(userToBeAdded);
@@ -46,7 +47,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userEntourageAddRequest(mUser.getId(), mUserToAdd.getEmail());
+        return RequestBuilder.userEntourageAddRequest(mUser , mUserToAdd);
     }
 
     /**
@@ -54,7 +55,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      *
      * @return The User that should be added to the entourage.
      */
-    public User getUserToAdd() {
+    public Id getUserToAdd() {
         return mUserToAdd;
     }
 }

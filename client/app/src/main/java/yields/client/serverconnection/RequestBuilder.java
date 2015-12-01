@@ -147,18 +147,15 @@ public class RequestBuilder {
      * ServerRequest for adding a 'contact' to the user entourage list.
      *
      * @param sender The sender of the request.
-     * @param email  Email of the new contact to add.
+     * @param userAdded  Id of the new contact to add.
      * @return The appropriate ServerRequest.
      */
-    public static ServerRequest userEntourageAddRequest(Id sender, String email) {
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(email);
-        RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USER_ENTOURAGE_ADD, sender);
+    public static ServerRequest userEntourageAddRequest(Id sender, Id userAdded) {
+        List<Id> userAdd = new ArrayList<Id>();
+        userAdd.add(userAdded);
 
-        builder.addField(Fields.EMAIL, email);
-
-        return builder.request();
+        return userUpdateRequest(sender, null, null,
+                null, userAdd, null);
     }
 
     /**

@@ -6,10 +6,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import yields.client.R;
 import yields.client.servicerequest.UserEntourageAddRequest;
+import yields.client.servicerequest.UserSearchRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class AddUserToEntourageActivity extends NotifiableActivity {
@@ -18,6 +20,14 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user_to_entourage);
+
+        Button b = (Button) findViewById(R.id.addUserToEntourageButton);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addUser(v);
+            }
+        });
     }
 
     /**
@@ -28,6 +38,9 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
         switch (change) {
             case ADD_ENTOURAGE:
                     finish();
+                break;
+            case NOT_EXIST:
+                Log.d("Y:" + this.getClass().getName(), "not existing user");
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "useless notify change...");
@@ -54,7 +67,8 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
         TextView v = (TextView) findViewById(R.id.emailOfUser);
         String email = v.getText().toString();
 
-        //YieldsApplication.getBinder().sendRequest(new UserEntourageAddRequest(YieldsApplication.getUser(), ));
+        YieldsApplication.getBinder().sendRequest(
+                new UserSearchRequest(YieldsApplication.getUser().getId(), email));
 
     }
 }
