@@ -3,11 +3,9 @@ package yields.server
 import akka.stream.scaladsl.{Sink, Source, Tcp}
 import akka.util.ByteString
 import org.scalatest.{BeforeAndAfterAll, Matchers}
-import org.slf4j.LoggerFactory
 import spray.json._
 import yields.server.actions.groups._
-import yields.server.actions.nodes.NodeMessage
-import yields.server.actions.users.{UserUpdateRes, UserUpdate, UserConnect, UserConnectRes}
+import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
 import yields.server.io._
@@ -28,7 +26,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   }
 
   override def afterAll(): Unit = {
-    server.close()
+    server.stop()
   }
 
   /**
@@ -108,7 +106,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   "The system" should "not generate error caused too many requests" in {
 
     val client = new FakeClient(1)
-    val tries = 100
+    val tries = 50
 
     client.send(UserConnect("client@yields.im"))
     await(client.receive()).result should be (UserConnectRes(client.uid, returning = false))

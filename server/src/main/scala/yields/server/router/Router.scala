@@ -54,7 +54,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
     // ----- TCP letters -----
 
-    case Bound(_) => log.info("System ready & bound.")
+    case Bound(_) => log.info("System ready")
 
     case CommandFailed(Bind(_, _, _, _, _)) => context stop self
 
