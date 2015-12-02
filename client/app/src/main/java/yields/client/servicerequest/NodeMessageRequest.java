@@ -1,6 +1,7 @@
 package yields.client.servicerequest;
 
 import android.opengl.Visibility;
+import android.util.Log;
 
 import java.util.Objects;
 
@@ -58,6 +59,8 @@ public class NodeMessageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         Message message = getMessage();
 
+        Log.d("hello", "yellow");
+
         return RequestBuilder.nodeMessageRequest(message.getSender(), mReceivingGroupId,
                 mVisibility, message.getContent(), message.getDate());
     }
@@ -70,6 +73,7 @@ public class NodeMessageRequest extends ServiceRequest {
     public Message getMessage(){
         return mMessage;
     }
+
     /**
      * Getter method for the receiving Node of this ServiceRequest.
      *

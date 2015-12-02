@@ -275,11 +275,12 @@ public class CacheDatabaseTests {
     @Test
     public void testDatabaseCanGetAllUsersFromEntourage() {
         try {
-            List<Id> users = MockFactory.generateMockUsers(6);
 
             ClientUser clientUser = MockFactory.generateFakeClientUser("ClientUser", new Id(999), "jskdfj@jpg.com",
                     YieldsApplication.getDefaultUserImage());
             YieldsApplication.setUser(clientUser);
+
+            List<Id> users = MockFactory.generateMockUsers(6);
             for (Id userId : users) {
                 User user = YieldsApplication.getUser(userId);
                 clientUser.addUserToEntourage(user);
