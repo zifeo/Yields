@@ -26,6 +26,7 @@ import android.widget.SimpleAdapter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.SortedMap;
 
 import yields.client.R;
@@ -37,8 +38,12 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
+import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
+import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -173,6 +178,9 @@ public class MessageActivity extends NotifiableActivity {
             mImage = null;
             mImageThumbnail.setImageBitmap(null);
             mImageThumbnail.setPadding(0, 0, 0, 0);
+        }
+        else if (UrlContent.containsUrl(inputMessage)){
+            content = new UrlContent(inputMessage);
         } else {
             content = new TextContent(inputMessage);
         }
