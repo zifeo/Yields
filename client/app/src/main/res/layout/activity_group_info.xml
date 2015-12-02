@@ -81,8 +81,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="@string/leaveGroup"
-        android:id="@+id/buttonLeaveGroup"
+        android:text="@string/unsubscribeGroup"
+        android:id="@+id/buttonUnsubscribeGroup"
         android:layout_gravity="center_horizontal"
         android:visibility="gone" />
 
