@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
@@ -334,10 +335,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
          */
         private void addUsersListener() {
             ArrayList<String> emailList = new ArrayList<>();
-            List<User> currentUsers = mGroup.getUsers();
+            List<Id> currentUsers = mGroup.getUsers();
 
             for (int i = 0; i < currentUsers.size(); i++) {
-                emailList.add(currentUsers.get(i).getEmail());
+                emailList.add(YieldsApplication.getUser(currentUsers.get(i)).getEmail());
             }
 
             Intent intentSelectUsers = new Intent(GroupSettingsActivity.this, AddUsersFromEntourageActivity.class);

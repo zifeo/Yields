@@ -96,7 +96,6 @@ public class SearchGroupActivity extends NotifiableActivity{
 
         mTextViewInfo = (TextView) findViewById(R.id.textViewInfoSearch);
 
-        createFakeGroups();
         mCurrentGroups = new ArrayList<>();
         mAdapterCurrentGroups = new ListAdapterSearchedGroups(getApplicationContext(),
                 R.layout.group_searched_layout, mCurrentGroups);
@@ -380,31 +379,5 @@ public class SearchGroupActivity extends NotifiableActivity{
     @Override
     public void notifyOnServerDisconnected() {
 
-    }
-
-    /**
-     * To be removed when the requests are operational, and the actual searched
-     * groups can be fetched from the server
-     */
-    private void createFakeGroups(){
-        mGlobalGroups = new ArrayList<>();
-        Group g1 = new Group("SWENG", new Id(666), new ArrayList<User>());
-        g1.addTag(new Group.Tag("hard"));
-        g1.addUser(new User("Jean", new Id(13), "a@a.a", YieldsApplication.getDefaultUserImage()));
-        mGlobalGroups.add(g1);
-
-        Group g2 = new Group("Hello", new Id(667), new ArrayList<User>());
-        g2.addTag(new Group.Tag("nice"));
-        mGlobalGroups.add(g2);
-
-        Group g3 = new Group("nature", new Id(668), new ArrayList<User>());
-        g3.addTag(new Group.Tag("wild"));
-        g3.addTag(new Group.Tag("nature"));
-        mGlobalGroups.add(g3);
-
-        Group g4 = new Group("HelloNature", new Id(668), new ArrayList<User>());
-        g4.addTag(new Group.Tag("wild"));
-        g4.addTag(new Group.Tag("nice"));
-        mGlobalGroups.add(g4);
     }
 }

@@ -180,7 +180,8 @@ public class GroupInfoActivity extends NotifiableActivity {
      */
     private void checkButtons(){
         if (mMode == SearchGroupActivity.Mode.SEARCH){
-            YieldsApplication.setUserList(mGroup.getUsers());
+            // TODO: figure out what this is for
+            //YieldsApplication.setUserList(mGroup.getUsers());
 
             final Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
 
