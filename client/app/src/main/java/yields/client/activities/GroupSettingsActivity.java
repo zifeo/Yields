@@ -29,7 +29,6 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.GroupUpdateVisibilityRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -310,8 +309,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
                             } else {
                                 visibility = Group.GroupVisibility.PUBLIC;
                             }
-                            ServiceRequest request = new GroupUpdateVisibilityRequest(mUser, mGroup.getId(), visibility);
-                            YieldsApplication.getBinder().sendRequest(request);
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
