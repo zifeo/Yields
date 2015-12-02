@@ -1,22 +1,25 @@
 package yields.client.messages;
 
+import android.graphics.Color;
+import android.text.Html;
 import android.view.View;
+import android.widget.TextView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import yields.client.exceptions.ContentException;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Content representing an Url in a message.
  */
 public class UrlContent extends Content{
     private static String mCaption;
-    private static String mUrl;
-
-    private static final String URL_REGEX = "(https?|ftp|file):\\/\\/[-a-zA-Z0-9+&@#\\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\\/%=~_|]";
-    private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
+    private static ArrayList<String> mUrl;
 
     /**
      * Constructor of a Url content for the given caption, the url is directely extracted from
@@ -25,6 +28,13 @@ public class UrlContent extends Content{
      */
     public UrlContent(String caption){
         mCaption = Objects.requireNonNull(caption);
+        ArrayList<String> urls  = extractUrlsFromCaption(caption);
+        if (urls.size() == 0){
+            throw new ContentException("Error : Trying to construct an UrlContent without URL.");
+        }
+        else{
+            mUrl = urls;
+        }
     }
 
     /**
@@ -43,7 +53,14 @@ public class UrlContent extends Content{
      */
     @Override
     public View getView() throws ContentException {
-        return null;
+        TextView text = new TextView(YieldsApplication.getApplicationContext());
+        String viewText = mCaption;
+        for (int i = 0 ; i < mUrl.size() ; i ++){
+            viewText = viewText.replace(mUrl.get(i), "<font color='#EE0000'>" + mUrl.get(i) + "</font>");
+        }
+        text.setText(Html.fromHtml(viewText));
+        text.setTextSize(20);
+        return text;
     }
 
     /**
@@ -52,7 +69,7 @@ public class UrlContent extends Content{
      */
     @Override
     public String getPreview() {
-        return mUrl;
+        return mCaption;
     }
 
     /**
@@ -71,7 +88,27 @@ public class UrlContent extends Content{
      * @return True if the text indeed contains an URL, False otherwise.
      */
     public static boolean containsUrl(String text){
-        Matcher m = URL_PATTERN.matcher(Objects.requireNonNull(text));
-        return m.matches();
+        return extractUrlsFromCaption(text).size() != 0;
+    }
+
+    /**
+     * Extract all the urls from a caption.
+     * @param caption The caption.
+     * @return An array list containing the URLs in order.
+     */
+    private static ArrayList<String> extractUrlsFromCaption(String caption){
+        String words[] = caption.split(" ");
+        ArrayList<String> urls = new ArrayList<>();
+        for (String word : words) {
+            if (word.contains(".")) {
+                try {
+                    URL url = new URL(word);
+                    urls.add(word);
+                } catch (MalformedURLException e) {
+                    // nothing.
+                }
+            }
+        }
+        return urls;
     }
 }
