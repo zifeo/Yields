@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.util.Base64;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
 import yields.client.exceptions.ContentException;
@@ -118,5 +120,21 @@ public class ImageContent extends Content {
     @Override
     public String getTextForRequest() {
         return mCaption;
+    }
+
+    public String getContentForRequest() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        int width = mImage.getWidth();
+        int height = mImage.getHeight();
+        double ratio = width > height ? 800.0/width : 800.0/height;
+
+
+
+        Bitmap.createScaledBitmap(mImage, (int) (width*ratio), (int) (height*ratio), true)
+                .compress(Bitmap.CompressFormat.JPEG, 20, stream);
+
+
+        return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
     }
 }
