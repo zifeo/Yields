@@ -71,8 +71,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="@string/joinGroup"
-        android:id="@+id/buttonJoinGroup"
+        android:text="@string/subscribeGroup"
+        android:id="@+id/buttonSubscribeGroup"
         android:layout_gravity="center_horizontal"
         android:visibility="gone" />
 
