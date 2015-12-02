@@ -82,6 +82,11 @@ public class UrlContent extends Content{
         return null;
     }
 
+    @Override
+    public boolean isCommentable() {
+        return true;
+    }
+
     /**
      * Check if the text given in parameter contains an URL.
      * @param text The text to check.
