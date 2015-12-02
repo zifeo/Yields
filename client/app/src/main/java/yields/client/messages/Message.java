@@ -21,6 +21,7 @@ import yields.client.id.Id;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 
@@ -78,8 +79,8 @@ public class Message extends Node {
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, User sender, Content content, Date date) {
-        this(nodeName, nodeID, sender.getId(), content, date, MessageStatus.NOT_SENT);
+    public Message(String nodeName, Id nodeID, Id sender, Content content, Date date) {
+        this(nodeName, nodeID, sender, content, date, MessageStatus.NOT_SENT);
     }
 
     /**
@@ -98,15 +99,9 @@ public class Message extends Node {
 
         this.mSender = new Id(senderID);
 
-        /*
-        I WILL KILL YOU !!!!
-        if (text != null){
-            contentType = "text";
-        }*/
+        Bitmap img = ImageSerialization.unSerializeImage(content);
 
         if (contentType.equals("image")){
-            byte[] byteArray = Base64.decode(content, Base64.DEFAULT);
-            Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             if (img == null){
                 Log.d("Y:"+ this.getClass().getName(), "Youston we have a problem");
                 mContent = new TextContent(text);

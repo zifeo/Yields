@@ -139,13 +139,13 @@ public class ServerRequestsTests {
                     YieldsApplication.getDefaultUserImage()));
             Id senderId = new Id(11);
             String groupName = "Dank AF";
-            List<User> users = MockFactory.generateMockUsers(3);
+            List<Id> users = MockFactory.generateMockUsers(3);
             List<Long> userIdsAsString = new ArrayList<>();
             List<Id> userIds = new ArrayList<>();
             List<Id> nodeIds = new ArrayList<>();
-            for(User user : users){
-                userIdsAsString.add(user.getId().getId());
-                userIds.add(user.getId());
+            for(Id user : users){
+                userIdsAsString.add(user.getId());
+                userIds.add(user);
             }
 
             ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId, groupName,
@@ -377,7 +377,7 @@ public class ServerRequestsTests {
     public void testGroupImageMessageRequest() {
         try {
             Id groupId = new Id(12);
-            Group g = new Group("", groupId, new ArrayList<User>(), YieldsApplication.getDefaultGroupImage());
+            Group g = new Group("", groupId, new ArrayList<Id>(), YieldsApplication.getDefaultGroupImage());
             Id senderId = new Id(11);
             String text = "Apple pie is best pie !";
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();

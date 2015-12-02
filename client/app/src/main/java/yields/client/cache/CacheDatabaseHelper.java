@@ -373,8 +373,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             try {
                 ContentValues values = createContentValuesForGroup(group);
                 mDatabase.insert(TABLE_GROUPS, null, values);
-                for (User user : group.getUsers()) {
-                    addUser(user);
+                for (Id user : group.getUsers()) {
+                    addUser(YieldsApplication.getUser(user));
                 }
                 for (Message message : group.getLastMessages().values()) {
                     addMessage(message, group.getId());
@@ -403,8 +403,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                     new String[]{group.getId().getId().toString()});
-            for (User user : group.getUsers()) {
-                addUser(user);
+            for (Id user : group.getUsers()) {
+                addUser(YieldsApplication.getUser(user));
             }
             for (Message message : group.getLastMessages().values()) {
                 addMessage(message, group.getId());
@@ -598,14 +598,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
-            List<User> groupUsers = new ArrayList<>();
+            List<Id> groupUsers = new ArrayList<>();
             if (!allUsers.equals("")) {
                 String[] usersIDs = allUsers.split(",");
                 for (String userID : usersIDs) {
-                    User user = getUser(new Id(Long.parseLong(userID)));
-                    if (user != null) {
-                        groupUsers.add(user);
-                    }
+                    groupUsers.add(new Id(Long.parseLong(userID)));
                 }
             }
             cursor.close();
@@ -686,14 +683,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
                 String nodeName = ""; //TODO: Define message's Node name attribute
 
-                List<User> users = group.getUsers();
-                Iterator iterator = users.iterator();
-                User messageSender = null;
+                List<Id> users = group.getUsers();
+                Iterator<Id> iterator = users.iterator();
+                Id messageSender = null;
                 boolean foundUser = false;
                 while (iterator.hasNext() && !foundUser) {
-                    User tmpUser = (User) iterator.next();
+                    Id tmpUser = iterator.next();
 
-                    Long userID = tmpUser.getId().getId();
+                    Long userID = tmpUser.getId();
                     if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID))))) {
                         messageSender = tmpUser;
                         foundUser = true;
@@ -1003,12 +1000,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         int validated = group.isValidated() ? 1 : 0;
         values.put(KEY_GROUP_VALIDATED, validated);
 
-        List<User> users = group.getUsers();
-        List<Id> userIDs = new ArrayList<>();
-        for (User user : users) {
-            userIDs.add(user.getId());
-        }
-        values.put(KEY_GROUP_USERS, getStringFromIds(userIDs));
+        List<Id> users = group.getUsers();
+        values.put(KEY_GROUP_USERS, getStringFromIds(users));
         return values;
     }
 

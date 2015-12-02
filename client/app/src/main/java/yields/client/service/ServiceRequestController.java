@@ -167,7 +167,8 @@ public class ServiceRequestController {
                 mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
                 break;
             default:
-                throw new ServiceRequestException("No such ServiceRequest type !");
+                Log.d("Y:" + this.getClass().getName(), "No such ServiceRequest type ! : " +
+                        serviceRequest.getType());
         }
     }
 
@@ -255,7 +256,8 @@ public class ServiceRequestController {
                 mResponseHandler.handleRSSMessageBroadcast(serverResponse);
                 break;
             default:
-                Log.d("Y:" + this.getClass().getName(),"");
+                Log.d("Y:" + this.getClass().getName(),"No such response kind : " +
+                        serverResponse.getKind());
         }
     }
 

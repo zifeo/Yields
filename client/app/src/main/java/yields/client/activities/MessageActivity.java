@@ -184,7 +184,7 @@ public class MessageActivity extends NotifiableActivity {
         } else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(0), mUser, content, new Date());
+        Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
         if (mType == ContentType.GROUP_MESSAGES) {
             Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);

@@ -42,7 +42,7 @@ public class Group extends Node {
 
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
-    private List<User> mUsers;
+    private List<Id> mUsers;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
     private Set<Tag> mTags;
@@ -59,7 +59,7 @@ public class Group extends Node {
      * @param validated  If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility,
+    public Group(String name, Id id, List<Id> users, Bitmap image, GroupVisibility visibility,
                  boolean validated, Date lastUpdate) {
         super(name, id);
         Objects.requireNonNull(users);
@@ -83,7 +83,7 @@ public class Group extends Node {
      * @param image The current image of the group
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image) {
+    public Group(String name, Id id, List<Id> users, Bitmap image) {
         this(name, id, users, image, GroupVisibility.PRIVATE, false, new Date());
     }
 
@@ -95,7 +95,7 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users) {
+    public Group(String name, Id id, List<Id> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
                 false, new Date());
     }
@@ -108,7 +108,7 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users, Boolean validated, Date lastUpdate) {
+    public Group(String name, Id id, List<Id> users, Boolean validated, Date lastUpdate) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
                 validated, lastUpdate);
     }
@@ -120,7 +120,7 @@ public class Group extends Node {
      * @throws JSONException
      */
     public Group(JSONArray jsonGroup) throws JSONException, ParseException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(), false,
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<Id>(), false,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
@@ -131,7 +131,7 @@ public class Group extends Node {
      * @param refreshedAt Last date the group has been refreshed.
      */
     public Group(String groupId, String name, String refreshedAt) throws ParseException {
-        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), true,
+        this(name, new Id(Long.parseLong(groupId)), new ArrayList<Id>(), true,
                 DateSerialization.dateSerializer.toDate(refreshedAt));
     }
 
@@ -171,7 +171,7 @@ public class Group extends Node {
             message.setStatus(Message.MessageStatus.SENT, newDate);
             mMessages.put(newDate, message);
         } else {
-            Log.d("Y:" + this.getClass().getName(), mMessages.keySet().toString());
+            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant");
         }
     }
 
@@ -198,9 +198,19 @@ public class Group extends Node {
      *
      * @param user The user we want to add
      */
-    public void addUser(User user) {
+    public void addUser(Id user) {
         Objects.requireNonNull(user);
         mUsers.add(user);
+    }
+
+    /**
+     * Changes/updates the users of the group
+     *
+     * @param userList
+     */
+    public void updateUsers(ArrayList<Id> userList) {
+        mUsers.clear();
+        mUsers.addAll(userList);
     }
 
     /**
@@ -312,7 +322,7 @@ public class Group extends Node {
      *
      * @return the users.
      */
-    public List<User> getUsers() {
+    public List<Id> getUsers() {
         return Collections.unmodifiableList(mUsers);
     }
 
@@ -378,6 +388,7 @@ public class Group extends Node {
             if (o instanceof Tag) {
                 return ((Tag) o).mText.equals(this.mText);
             }
+
             return super.equals(o);
         }
 
