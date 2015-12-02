@@ -38,7 +38,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * where the admin can change its name, image, add users and nodes ...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_NODE, ADD_TAG}
+    public enum Settings {NAME, IMAGE, USERS, ADD_NODE, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
@@ -68,7 +68,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
         List<String> itemList = new ArrayList<>(Settings.values().length);
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeGroupName));
-        itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
@@ -207,10 +206,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     changeNameListener();
                     break;
 
-                case TYPE:
-                    changeTypeListener();
-                    break;
-
                 case IMAGE:
                     changeImageListener();
                     break;
@@ -276,50 +271,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     }
                 }
             });
-        }
-
-        /**
-         * Listener for the "Change group type" item.
-         */
-        private void changeTypeListener() {
-            final CharSequence[] types = {" Public", " Private"};
-            final int[] itemSelected = {0}; // used as a pointer
-            AlertDialog groupTypeDialog;
-
-            // Creating and Building the Dialog
-            AlertDialog.Builder builder = new AlertDialog.Builder(GroupSettingsActivity.this)
-                    .setTitle("Change group type")
-                    .setSingleChoiceItems(types, 0, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int item) {
-                            itemSelected[0] = item;
-                        }
-                    })
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String type = "public";
-                            if (itemSelected[0] == 1) {
-                                type = "private";
-                            }
-
-                            String message = "Group type changed to : " + type;
-                            YieldsApplication.showToast(getApplicationContext(), message);
-
-                            Group.GroupVisibility visibility;
-                            if (itemSelected[0] == 1) {
-                                visibility = Group.GroupVisibility.PRIVATE;
-                            } else {
-                                visibility = Group.GroupVisibility.PUBLIC;
-                            }
-                            ServiceRequest request = new GroupUpdateVisibilityRequest(mUser, mGroup.getId(), visibility);
-                            YieldsApplication.getBinder().sendRequest(request);
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        }
-                    });
-            groupTypeDialog = builder.create();
-            groupTypeDialog.show();
         }
 
         /**
