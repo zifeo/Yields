@@ -1,8 +1,12 @@
 package yields.client.servicerequest;
 
+import android.opengl.Visibility;
+
 import java.util.Objects;
 
+import yields.client.id.Id;
 import yields.client.messages.Message;
+import yields.client.node.Group;
 import yields.client.node.Node;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
@@ -13,21 +17,26 @@ import yields.client.serverconnection.ServerRequest;
 public class NodeMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
-    private final Node mReceivingNode;
+    private final Id mReceivingGroupId;
+    private final Group.GroupVisibility mVisibility;
+
 
     /**
      * Main constructor for this type of ServiceRequest (sending a Message to a Node).
      *
-     * @param message        The Message that should be sent.
-     * @param receivingNode The Node to which the Message should be added.
+     * @param message           The Message that should be sent.
+     * @param receivingGroupId  The Id of the group to which the Message should be added.
      */
-    public NodeMessageRequest(Message message, Node receivingNode) {
+    public NodeMessageRequest(Message message, Id receivingGroupId,
+                              Group.GroupVisibility visibility) {
         super();
         Objects.requireNonNull(message);
-        Objects.requireNonNull(receivingNode);
+        Objects.requireNonNull(receivingGroupId);
+        Objects.requireNonNull(visibility);
 
         mMessage = message;
-        mReceivingNode = receivingNode;
+        mReceivingGroupId = receivingGroupId;
+        mVisibility = visibility;
     }
 
     /**
@@ -47,11 +56,10 @@ public class NodeMessageRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        Node group = getReceivingNode();
         Message message = getMessage();
 
-        return RequestBuilder.nodeMessageRequest(message.getSender(), group.getId(),
-                message.getContent(), message.getDate());
+        return RequestBuilder.nodeMessageRequest(message.getSender(), mReceivingGroupId,
+                mVisibility, message.getContent(), message.getDate());
     }
 
     /**
@@ -67,7 +75,7 @@ public class NodeMessageRequest extends ServiceRequest {
      *
      * @return The receiving Node of this ServiceRequest.
      */
-    public Node getReceivingNode(){
-        return mReceivingNode;
+    public Id getReceivingNodeId(){
+        return mReceivingGroupId;
     }
 }

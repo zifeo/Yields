@@ -74,21 +74,6 @@ public class Group extends Node {
     }
 
     /**
-     * Overloaded constructor for groups for default validation.
-     * By default a group is not validated yet.
-     *
-     * @param name       The name of the group
-     * @param id         The id of the group
-     * @param users      The current users of the group
-     * @param image      The current image of the group
-     * @param visibility The visibility of the group
-     * @throws NodeException If nodes or image is null
-     */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
-        this(name, id, users, image, visibility, false, new Date());
-    }
-
-    /**
      * Overloaded constructor for groups for default visibility.
      * By default a group is set to private.
      *

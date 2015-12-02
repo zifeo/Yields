@@ -368,31 +368,32 @@ public class RequestBuilder {
     /**
      * Creates a Node message request for a Message (no matter what it's Content is).
      *
-     * @param sender  The Id of the sender.
-     * @param group The group to which the Message is sent to.
-     * @param contentType The Content of the Message that is sent.
-     * @param date    The date of when the Message was created.
-     * @param content   The content of the message.
+     * @param sender        The Id of the sender.
+     * @param groupId       The group to which the Message is sent to.
+     * @param contentType   The Content of the Message that is sent.
+     * @param date          The date of when the Message was created.
+     * @param content       The content of the message.
      * @return The request itself.
      */
-    private static ServerRequest nodeMessageRequest(Id sender, Group group,
-                                                   String contentType,
-                                                   Date date, ImageContent content) {
+    private static ServerRequest nodeMessageRequest(Id sender, Id groupId,
+                                                    Group.GroupVisibility visibility,
+                                                    String contentType,
+                                                    Date date, ImageContent content) {
 
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(date);
 
         RequestBuilder builder;
 
-        if (group.getVisibility() == Group.GroupVisibility.PRIVATE) {
+        if (visibility.equals(Group.GroupVisibility.PRIVATE)) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
         }
         else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
         }
 
-        builder.addField(Fields.NID, group.getId());
+        builder.addField(Fields.NID, groupId);
         builder.addOptionalField(Fields.TEXT, content.getTextForRequest());
         builder.addOptionalField(Fields.CONTENT_TYPE, contentType);
         builder.addOptionalField(Fields.CONTENT, content);
@@ -404,18 +405,20 @@ public class RequestBuilder {
      * Builds a message request for the server.
      *
      * @param senderId The sender Id.
-     * @param group The group to send to.
+     * @param groupId The group to send to.
      * @param content The content of the message
      * @param date The reference date for the message (Id)
      * @return The request for the server
      */
-    public static ServerRequest nodeMessageRequest(Id senderId, Group group,
-                                                    Content content, Date date) {
+    public static ServerRequest nodeMessageRequest(Id senderId, Id groupId,
+                                                   Group.GroupVisibility visibility,
+                                                   Content content, Date date) {
         switch (content.getType()) {
             case TEXT:
-                return nodeMessageRequest(senderId, group, null, date, null);
+                return nodeMessageRequest(senderId, groupId, visibility, null, date, null);
             case IMAGE:
-                return nodeMessageRequest(senderId, group, "image", date, (ImageContent) content);
+                return nodeMessageRequest(senderId, groupId, visibility, "image", date,
+                        (ImageContent) content);
             default:
                 throw new ContentException("No such ContentType exists !");
         }

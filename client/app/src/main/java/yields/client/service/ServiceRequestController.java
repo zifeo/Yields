@@ -22,7 +22,6 @@ import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.GroupUpdateVisibilityRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -148,9 +147,6 @@ public class ServiceRequestController {
                 break;
             case GROUP_UPDATE_NAME:
                 mRequestHandler.handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
-                break;
-            case GROUP_UPDATE_VISIBILITY:
-                mRequestHandler.handleGroupUpdateVisibilityRequest((GroupUpdateVisibilityRequest) serviceRequest);
                 break;
             case GROUP_UPDATE_IMAGE:
                 mRequestHandler.handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);

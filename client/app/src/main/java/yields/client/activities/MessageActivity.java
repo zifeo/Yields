@@ -191,7 +191,8 @@ public class MessageActivity extends NotifiableActivity {
             mGroupMessageAdapter.notifyDataSetChanged();
             ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                     .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
-            NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
+            NodeMessageRequest request = new NodeMessageRequest(message, mGroup.getId(),
+                    mGroup.getVisibility());
             YieldsApplication.getBinder().sendRequest(request);
         } else {
             Log.d("MessageActivity", "Send comment");
@@ -199,7 +200,8 @@ public class MessageActivity extends NotifiableActivity {
             mCommentAdapter.notifyDataSetChanged();
             ((CommentFragment) mCurrentFragment).getCommentListView()
                     .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
+            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage.getId(),
+                    Group.GroupVisibility.PRIVATE);
             YieldsApplication.getBinder().sendRequest(request);
         }
 

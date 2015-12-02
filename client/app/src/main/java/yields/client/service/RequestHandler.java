@@ -16,7 +16,6 @@ import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.GroupUpdateVisibilityRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -105,17 +104,6 @@ public class RequestHandler {
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserEntourageAddRequest correctly !");
         }
-
-        mController.sendToServer(serverRequest);
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    protected void handleGroupUpdateVisibilityRequest(GroupUpdateVisibilityRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupVisibility(serviceRequest.getGroupId(), serviceRequest.getNewGroupVisibility());
-        //TODO : Notify app
 
         mController.sendToServer(serverRequest);
     }
@@ -213,7 +201,7 @@ public class RequestHandler {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageRequest correctly !");
         }*/
 
-        YieldsApplication.getUser().modifyGroup(serviceRequest.getReceivingNode().getId())
+        YieldsApplication.getUser().modifyGroup(serviceRequest.getReceivingNodeId())
                 .setLastUpdate(serviceRequest.getMessage().getDate());
 
         mController.sendToServer(serverRequest);
