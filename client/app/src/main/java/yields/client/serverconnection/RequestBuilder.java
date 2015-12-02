@@ -376,7 +376,7 @@ public class RequestBuilder {
     private static ServerRequest nodeMessageRequest(Id sender, Id groupId,
                                                     Group.GroupVisibility visibility,
                                                     String contentType,
-                                                    Date date, ImageContent content) {
+                                                    Date date, Content content) {
 
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
@@ -411,12 +411,30 @@ public class RequestBuilder {
     public static ServerRequest nodeMessageRequest(Id senderId, Id groupId,
                                                    Group.GroupVisibility visibility,
                                                    Content content, Date date) {
+
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(date);
+
+        RequestBuilder builder;
+
+        if (visibility.equals(Group.GroupVisibility.PRIVATE)) {
+            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, senderId);
+        }
+        else {
+            builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, senderId);
+        }
+
+        builder.addField(Fields.NID, groupId);
+        builder.addOptionalField(Fields.TEXT, content.getTextForRequest());
+
         switch (content.getType()) {
             case TEXT:
-                return nodeMessageRequest(senderId, groupId, visibility, null, date, null);
+                builder.addNullField(Fields.CONTENT_TYPE);
+                builder.addNullField(Fields.CONTENT);
             case IMAGE:
-                return nodeMessageRequest(senderId, groupId, visibility, "image", date,
-                        (ImageContent) content);
+                builder.addField(Fields.CONTENT_TYPE, "image");
+                builder.addField(Fields.CONTENT, (ImageContent) content);
             default:
                 throw new ContentException("No such ContentType exists !");
         }
@@ -508,6 +526,15 @@ public class RequestBuilder {
         }
 
         return true;
+    }
+
+    /**
+     * Adds a field and initialise it to null
+     *
+     * @param fieldType The field type.
+     */
+    private void addNullField(Fields fieldType) {
+        this.mConstructingMap.put(fieldType.getValue(), new ArrayList());
     }
 
     /**
