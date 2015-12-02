@@ -167,11 +167,13 @@ public class Group extends Node {
      */
     public void validateMessage(Date date, Date newDate){
         Message message = mMessages.remove(date);
+
         if (message != null){
             message.setStatus(Message.MessageStatus.SENT, newDate);
             mMessages.put(newDate, message);
         } else {
-            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant");
+            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant in " +
+                    mMessages.firstKey().getTime() + "or " + mMessages.lastKey().getTime());
         }
     }
 

@@ -18,6 +18,7 @@ import java.util.Date;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.MockFactory;
 import yields.client.exceptions.ContentException;
+import yields.client.generalhelpers.MockModel;
 import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.User;
@@ -44,6 +45,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(getInstrumentation().getContext().getResources());
+        new MockModel();
         MOCK_TEXT_CONTENT_1 = new TextContent("Mock text.");
     }
 

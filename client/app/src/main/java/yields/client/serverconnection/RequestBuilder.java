@@ -1,15 +1,11 @@
 package yields.client.serverconnection;
 
 import android.graphics.Bitmap;
-import android.opengl.Visibility;
 import android.util.ArrayMap;
-import android.util.Base64;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,13 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import yields.client.BuildConfig;
-import yields.client.activities.MessageActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
-import yields.client.messages.TextContent;
 import yields.client.node.Group;
 import yields.client.servicerequest.ServiceRequest;
 
@@ -76,11 +69,21 @@ public class RequestBuilder {
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
 
-        builder.addOptionalField(Fields.NAME, name);
-        builder.addOptionalField(Fields.EMAIL, email);
-        builder.addOptionalField(Fields.IMAGE, image);
-        builder.addOptionalField(Fields.ADD_ENTOURAGE, addEntourage);
-        builder.addOptionalField(Fields.REMOVE_ENTOURAGE, remEntourage);
+        if (!builder.addNullIfNullField(Fields.NAME, name)) {
+            builder.addField(Fields.NAME, name);
+        }
+        if (!builder.addNullIfNullField(Fields.EMAIL, email)) {
+            builder.addField(Fields.EMAIL, email);
+        }
+        if (!builder.addNullIfNullField(Fields.IMAGE, image)) {
+            builder.addField(Fields.IMAGE, image);
+        }
+        if (!builder.addNullIfNullField(Fields.ADD_ENTOURAGE, addEntourage)) {
+            builder.addField(Fields.ADD_ENTOURAGE, addEntourage);
+        }
+        if (!builder.addNullIfNullField(Fields.REMOVE_ENTOURAGE, remEntourage)) {
+            builder.addField(Fields.REMOVE_ENTOURAGE, remEntourage);
+        }
 
         return builder.request();
     }
@@ -289,12 +292,24 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_UPDATE, sender);
 
         builder.addField(Fields.NID, groupId);
-        builder.addOptionalField(Fields.NAME, newName);
-        builder.addOptionalField(Fields.IMAGE, newName);
-        builder.addOptionalField(Fields.ADD_USERS, newName);
-        builder.addOptionalField(Fields.REM_USERS, newName);
-        builder.addOptionalField(Fields.ADD_NODES, newName);
-        builder.addOptionalField(Fields.REM_NODES, newName);
+        if (!builder.addNullIfNullField(Fields.NAME, newName)) {
+            builder.addField(Fields.NAME, newName);
+        }
+        if (!builder.addNullIfNullField(Fields.IMAGE, image)) {
+            builder.addField(Fields.IMAGE, image);
+        }
+        if (!builder.addNullIfNullField(Fields.ADD_USERS, addusers)) {
+            builder.addField(Fields.ADD_USERS, addusers);
+        }
+        if (!builder.addNullIfNullField(Fields.REM_USERS, remUsers)) {
+            builder.addField(Fields.REM_USERS, remUsers);
+        }
+        if (!builder.addNullIfNullField(Fields.ADD_NODES, addNodes)) {
+            builder.addField(Fields.ADD_NODES, addNodes);
+        }
+        if (!builder.addNullIfNullField(Fields.REM_NODES, remNodes)) {
+            builder.addField(Fields.REM_NODES, remNodes);
+        }
 
         return builder.request();
     }
@@ -364,42 +379,6 @@ public class RequestBuilder {
     }
 
     /**
-     * Creates a Node message request for a Message (no matter what it's Content is).
-     *
-     * @param sender        The Id of the sender.
-     * @param groupId       The group to which the Message is sent to.
-     * @param contentType   The Content of the Message that is sent.
-     * @param date          The date of when the Message was created.
-     * @param content       The content of the message.
-     * @return The request itself.
-     */
-    private static ServerRequest nodeMessageRequest(Id sender, Id groupId,
-                                                    Group.GroupVisibility visibility,
-                                                    String contentType,
-                                                    Date date, Content content) {
-
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(groupId);
-        Objects.requireNonNull(date);
-
-        RequestBuilder builder;
-
-        if (visibility.equals(Group.GroupVisibility.PRIVATE)) {
-            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
-        }
-        else {
-            builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
-        }
-
-        builder.addField(Fields.NID, groupId);
-        builder.addOptionalField(Fields.TEXT, content.getTextForRequest());
-        builder.addOptionalField(Fields.CONTENT_TYPE, contentType);
-        builder.addOptionalField(Fields.CONTENT, content);
-
-        return builder.request();
-    }
-
-    /**
      * Builds a message request for the server.
      *
      * @param senderId The sender Id.
@@ -419,26 +398,30 @@ public class RequestBuilder {
         RequestBuilder builder;
 
         if (visibility.equals(Group.GroupVisibility.PRIVATE)) {
-            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, senderId);
+            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_MESSAGE, senderId);
         }
         else {
-            builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, senderId);
+            builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_MESSAGE, senderId);
         }
 
         builder.addField(Fields.NID, groupId);
-        builder.addOptionalField(Fields.TEXT, content.getTextForRequest());
+        builder.addField(Fields.DATE, date);
+        builder.addField(Fields.TEXT, content.getTextForRequest());
 
         switch (content.getType()) {
             case TEXT:
                 builder.addNullField(Fields.CONTENT_TYPE);
                 builder.addNullField(Fields.CONTENT);
+                break;
             case IMAGE:
                 builder.addField(Fields.CONTENT_TYPE, "image");
-                builder.addField(Fields.CONTENT, (ImageContent) content);
+                builder.addField(Fields.CONTENT, content.getContentForRequest());
+                break;
             default:
-                throw new ContentException("No such ContentType exists !");
+                throw new ContentException("No such ContentType exists ! " + content.getType().toString());
         }
 
+        return builder.request();
     }
 
     /**
@@ -499,42 +482,42 @@ public class RequestBuilder {
     }
 
     /**
-     * Adds an optional field -> JSONObject.NULL if the field is null.
-     * @param fieldType The field type.
-     * @param field     The field to add.
-     * @param <T>       The type of the field.
-     */
-    private <T> void addOptionalField(Fields fieldType, T field) {
-        if (field == null) {
-            this.mConstructingMap.put(fieldType.getValue(), JSONObject.NULL);
-        } else {
-            addField(fieldType, field);
-        }
-    }
-
-    /**
-     * Adds an optional list -> empty list if the field is null.
-     * @param fieldType The field type.
-     * @param field     The field to add.
-     * @param <T>       The type of the field.
-     */
-    private <T> Boolean addOptionalField(Fields fieldType, List<T> field) {
-        if (field == null) {
-            this.mConstructingMap.put(fieldType.getValue(), new ArrayList());
-        } else {
-            addField(fieldType, field);
-        }
-
-        return true;
-    }
-
-    /**
-     * Adds a field and initialise it to null
      *
-     * @param fieldType The field type.
      */
     private void addNullField(Fields fieldType) {
-        this.mConstructingMap.put(fieldType.getValue(), new ArrayList());
+        this.mConstructingMap.put(fieldType.getValue(), JSONObject.NULL);
+    }
+
+    /**
+     * Adds a field and initialise it to null if it is null.
+     *
+     * @param fieldType The field type.
+     * @param field The field to add
+     * @return true if the field was null
+     */
+    private boolean addNullIfNullField(Fields fieldType, Object field) {
+        if (field == null) {
+            this.mConstructingMap.put(fieldType.getValue(), JSONObject.NULL);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a field and initialise it to empty list if it is null.
+     *
+     * @param fieldType The field type.
+     * @param field The field to add
+     * @return true if the field was null
+     */
+    private <T> boolean addNullIfNullField(Fields fieldType, List<T> field) {
+        if (field == null) {
+            this.mConstructingMap.put(fieldType.getValue(), new ArrayList<>());
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -567,12 +550,13 @@ public class RequestBuilder {
                 formatDate(field));
     }
 
-    private void addField(Fields fieldType, ImageContent field) {
-        this.mConstructingMap.put(fieldType.getValue(), field.getContentForRequest());
-    }
-
     private void addField(Fields fieldType, Group.GroupVisibility field) {
         this.mConstructingMap.put(fieldType.getValue(), field.getValue().toLowerCase());
+    }
+
+    private void addField(Fields fieldType, Bitmap field) {
+        this.mConstructingMap.put(fieldType.getValue(),
+                ImageSerialization.serializeImage(field, 200));
     }
 
     /**
@@ -589,9 +573,12 @@ public class RequestBuilder {
 
         Date ref = new Date();
         try {
-            ref = mKind.equals(ServiceRequest.RequestKind.NODE_MESSAGE) ?
-                    DateSerialization.dateSerializer.toDate((String) mConstructingMap.get(Fields.DATE.getValue()))
-                    : new Date();
+            Object date =  mConstructingMap.get(Fields.DATE.getValue());
+            if (date != null) {
+                ref = DateSerialization.dateSerializer.toDate((String) mConstructingMap.get(Fields.DATE.getValue()));
+            } else {
+                ref = new Date();
+            }
         } catch (ParseException e) {
             Log.d("RequestBuilder", "Couldn't handle build ServerRequest correctly !");
         }

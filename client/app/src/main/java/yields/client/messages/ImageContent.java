@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
 import yields.client.exceptions.ContentException;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -123,18 +124,6 @@ public class ImageContent extends Content {
     }
 
     public String getContentForRequest() {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-        int width = mImage.getWidth();
-        int height = mImage.getHeight();
-        double ratio = width > height ? 800.0/width : 800.0/height;
-
-
-
-        Bitmap.createScaledBitmap(mImage, (int) (width*ratio), (int) (height*ratio), true)
-                .compress(Bitmap.CompressFormat.JPEG, 20, stream);
-
-
-        return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+        return ImageSerialization.serializeImage(mImage, 800);
     }
 }
