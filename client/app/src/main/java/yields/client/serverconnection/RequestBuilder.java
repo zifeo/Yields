@@ -73,8 +73,6 @@ public class RequestBuilder {
                                                        Bitmap image, List<Id> addEntourage,
                                                        List<Id> remEntourage) {
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(addEntourage);
-        Objects.requireNonNull(remEntourage);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
 
