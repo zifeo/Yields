@@ -119,4 +119,9 @@ public class ImageContent extends Content {
     public String getTextForRequest() {
         return mCaption;
     }
+
+    @Override
+    public boolean isCommentable() {
+        return true;
+    }
 }
