@@ -65,13 +65,22 @@ public class GroupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Group Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
+        mGroup = YieldsApplication.getGroup();
+        mUser = YieldsApplication.getUser();
+
+        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
+        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created";
+
         List<String> itemList = new ArrayList<>(Settings.values().length);
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeGroupName));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
-        itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
+
+        if (mGroup.getVisibility() != Group.GroupVisibility.PRIVATE){
+            itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
+        }
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
@@ -81,12 +90,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new CustomListener());
         listView.setItemsCanFocus(true);
-
-        mGroup = YieldsApplication.getGroup();
-        mUser = YieldsApplication.getUser();
-
-        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
-        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created";
     }
 
     /**
