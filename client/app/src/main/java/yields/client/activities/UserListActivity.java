@@ -60,10 +60,15 @@ public class UserListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                YieldsApplication.setUserSearched(userList.get(position));
+                if (position < userList.size()) {
+                    YieldsApplication.setUserSearched(userList.get(position));
 
-                Intent intent = new Intent(UserListActivity.this, UserInfoActivity.class);
-                startActivity(intent);
+                    Intent intent = new Intent(UserListActivity.this, UserInfoActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    // TODO Merge Nico's PR to have the new activity
+                }
             }
         });
         listView.setItemsCanFocus(true);
