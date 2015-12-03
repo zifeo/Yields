@@ -2,6 +2,7 @@ package yields.client.messages;
 
 import android.graphics.Color;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import yields.client.exceptions.ContentException;
@@ -20,6 +22,11 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class UrlContent extends Content{
     private static String mCaption;
     private static ArrayList<String> mUrl;
+
+    private static final String URL_REGEX = "(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
+    private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
+
+    private static final String URL_COLOR = "#00BFFF";
 
     /**
      * Constructor of a Url content for the given caption, the url is directely extracted from
@@ -33,6 +40,7 @@ public class UrlContent extends Content{
             throw new ContentException("Error : Trying to construct an UrlContent without URL.");
         }
         else{
+            Log.d("UrlContent", "Caption : " + caption + "  contains " + urls.size() +" URL.");
             mUrl = urls;
         }
     }
@@ -54,12 +62,13 @@ public class UrlContent extends Content{
     @Override
     public View getView() throws ContentException {
         TextView text = new TextView(YieldsApplication.getApplicationContext());
-        String viewText = mCaption;
+        String viewText = new String(mCaption);
         for (int i = 0 ; i < mUrl.size() ; i ++){
-            viewText = viewText.replace(mUrl.get(i), "<font color='#EE0000'>" + mUrl.get(i) + "</font>");
+            viewText = viewText.replace(mUrl.get(i), "<font color='#00BFFF'>" + mUrl.get(i) + "</font>");
         }
         text.setText(Html.fromHtml(viewText));
         text.setTextSize(20);
+        text.setTextColor(Color.BLACK);
         return text;
     }
 
@@ -102,15 +111,15 @@ public class UrlContent extends Content{
      * @return An array list containing the URLs in order.
      */
     private static ArrayList<String> extractUrlsFromCaption(String caption){
+        Log.d("UrlContent", "extractUrlsFromCaption : " + caption);
         String words[] = caption.split(" ");
         ArrayList<String> urls = new ArrayList<>();
         for (String word : words) {
-            if (word.contains(".")) {
-                try {
-                    URL url = new URL(word);
+            Log.d("UrlContent", "Word : "  + word);
+            if (word.contains(".")){
+                Matcher matcher = URL_PATTERN.matcher(word);
+                if (matcher.matches()){
                     urls.add(word);
-                } catch (MalformedURLException e) {
-                    // nothing.
                 }
             }
         }
