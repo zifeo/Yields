@@ -3,6 +3,7 @@ package yields.server
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
 import yields.server.actions.nodes._
+import yields.server.actions.publisher._
 import yields.server.actions.users._
 import yields.server.io.actions.{BroadcastJsonFormat, ActionJsonFormat, ResultJsonFormat}
 import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
@@ -44,6 +45,23 @@ package object io {
   implicit lazy val groupMessageJF = jsonFormat4(GroupMessage)
   implicit lazy val groupMessageResJF = jsonFormat2(GroupMessageRes)
   implicit lazy val groupMessageBrdJF = jsonFormat6(GroupMessageBrd)
+
+  // Publishers
+
+  implicit lazy val publisherCreateJF = jsonFormat3(PublisherCreate)
+  implicit lazy val publisherCreateResJF = jsonFormat1(PublisherCreateRes)
+  implicit lazy val publisherCreateBrdJF = jsonFormat4(PublisherCreateBrd)
+
+  implicit lazy val publisherUpdateJF = jsonFormat7(PublisherUpdate)
+  implicit lazy val publisherUpdateResJF = jsonFormat0(PublisherUpdateRes)
+  implicit lazy val publisherUpdateBrdF = jsonFormat5(PublisherUpdateBrd)
+
+  implicit lazy val publisherInfoJF = jsonFormat1(PublisherInfo)
+  implicit lazy val publisherInfoResJF = jsonFormat5(PublisherInfoRes)
+
+  implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
+  implicit lazy val publisherMessageResJF = jsonFormat2(PublisherMessageRes)
+  implicit lazy val publisherMessageBrdJF = jsonFormat6(PublisherMessageBrd)
 
   // Nodes
 
