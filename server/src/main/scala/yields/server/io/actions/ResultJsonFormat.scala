@@ -5,6 +5,7 @@ import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeHistoryRes, NodeSearchRes}
+import yields.server.actions.publisher.{PublisherCreateRes, PublisherUpdateRes, PublisherInfoRes, PublisherMessageRes}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -26,6 +27,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case x: GroupUpdateRes => packWithKind(x)
       case x: GroupInfoRes => packWithKind(x)
       case x: GroupMessageRes => packWithKind(x)
+
+      case x: PublisherCreateRes => packWithKind(x)
+      case x: PublisherUpdateRes => packWithKind(x)
+      case x: PublisherInfoRes => packWithKind(x)
+      case x: PublisherMessageRes => packWithKind(x)
 
       case x: NodeHistoryRes => packWithKind(x)
       case x: NodeSearchRes => packWithKind(x)
@@ -59,6 +65,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "GroupUpdateRes" => message.convertTo[GroupUpdateRes]
           case "GroupInfoRes" => message.convertTo[GroupInfoRes]
           case "GroupMessageRes" => message.convertTo[GroupMessageRes]
+
+          case "PublisherCreateRes" => message.convertTo[PublisherCreateRes]
+          case "PublisherUpdateRes" => message.convertTo[PublisherUpdateRes]
+          case "PublisherInfoRes" => message.convertTo[PublisherInfoRes]
+          case "PublisherMessageRes" => message.convertTo[PublisherMessageRes]
 
           case "NodeHistoryRes" => message.convertTo[NodeHistoryRes]
           case "NodeSearchRes" => message.convertTo[NodeSearchRes]
