@@ -20,7 +20,7 @@ case class UserNodeList() extends Action {
   override def run(metadata: Metadata): Result = {
 
       val user = User(metadata.client)
-      val (nodes, updates, refreshes) = user.groupsWithUpdates.unzip3
+      val (nodes, updates, refreshes) = user.nodesWithUpdates.unzip3
       UserNodeListRes(nodes, updates, refreshes)
 
   }

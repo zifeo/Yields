@@ -116,8 +116,8 @@ final class User private(val uid: UID) {
     valueOrDefault(_nodes, List.empty)
   }
 
-  /** Groups with updates getter. */
-  def groupsWithUpdates: List[(NID, OffsetDateTime, OffsetDateTime)] = {
+  /** Nodes with updates getter. */
+  def nodesWithUpdates: List[(NID, OffsetDateTime, OffsetDateTime)] = {
     val currentGroup = nodes // need to be computed before pipeline
     val query = redisPipeline { p =>
         currentGroup.map { nid =>
