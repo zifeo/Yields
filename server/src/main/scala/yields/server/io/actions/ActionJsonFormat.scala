@@ -5,6 +5,7 @@ import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeMessage, NodeSearch, NodeHistory}
+import yields.server.actions.publisher.{PublisherMessage, PublisherInfo, PublisherUpdate, PublisherCreate}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -31,6 +32,11 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     case x: GroupInfo => packWithKind(x)
     case x: GroupMessage => packWithKind(x)
 
+    case x: PublisherCreate => packWithKind(x)
+    case x: PublisherUpdate => packWithKind(x)
+    case x: PublisherInfo => packWithKind(x)
+    case x: PublisherMessage => packWithKind(x)
+
     case x: NodeSearch => packWithKind(x)
     case x: NodeHistory => packWithKind(x)
 
@@ -53,6 +59,11 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "GroupUpdate" => message.convertTo[GroupUpdate]
           case "GroupInfo" => message.convertTo[GroupInfo]
           case "GroupMessage" => message.convertTo[GroupMessage]
+
+          case "PublisherCreate" => message.convertTo[PublisherCreate]
+          case "PublisherUpdate" => message.convertTo[PublisherUpdate]
+          case "PublisherInfo" => message.convertTo[PublisherInfo]
+          case "PublisherMessage" => message.convertTo[PublisherMessage]
 
           case "NodeSearch" => message.convertTo[NodeSearch]
           case "NodeHistory" => message.convertTo[NodeHistory]
