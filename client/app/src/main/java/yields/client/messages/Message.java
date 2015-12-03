@@ -103,7 +103,7 @@ public class Message extends Node {
 
         if (contentType.equals("image")){
             if (img == null){
-                Log.d("Y:"+ this.getClass().getName(), "Youston we have a problem");
+                Log.d("Y:"+ this.getClass().getName(), "We have no image with contentType image");
                 mContent = new TextContent(text);
             }else {
                 mContent = new ImageContent(img, text);
