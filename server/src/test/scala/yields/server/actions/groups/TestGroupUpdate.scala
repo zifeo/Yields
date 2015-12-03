@@ -58,6 +58,9 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
     middle.pic should be (start.pic)
     middle.users should be (meta.client :: newUsers)
     middle.nodes should be (start.nodes)
+    newUsers.foreach { uid =>
+      User(uid).nodes should contain (middle.nid)
+    }
 
     val oldUsers = List[UID](3)
     val removeAction = new GroupUpdate(start.nid, None, None, List.empty, oldUsers, List.empty, List.empty)
@@ -68,6 +71,9 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
     end.pic should be (start.pic)
     end.users should be (meta.client :: newUsers.diff(oldUsers))
     end.nodes should be (start.nodes)
+    oldUsers.foreach { uid =>
+      User(uid).nodes should not contain end.nid
+    }
 
   }
 

@@ -48,10 +48,12 @@ case class PublisherUpdate(nid: NID,
     if (addUsers.nonEmpty) {
       publisher.addUser(addUsers)
     }
+    addUsers.foreach(User(_).addNode(publisher.nid))
 
     if (removeUsers.nonEmpty) {
       publisher.removeUser(removeUsers)
     }
+    removeUsers.foreach(User(_).removeNode(publisher.nid))
 
     if (addNodes.nonEmpty) {
       publisher.addNode(addNodes)
