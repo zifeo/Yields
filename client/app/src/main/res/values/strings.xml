@@ -68,4 +68,8 @@
     <string name="logout">Logout</string>
     <string name="addNode">Add node</string>
     <string name="rss">RSS feed</string>
+    <string name="enterUrl">Enter the feed\'s url</string>
+    <string name="messageUrlHttp">The url must start with http://</string>
+    <string name="messageRssCreated">RSS feed created !</string>
+    <string name="typeUrl">Type the URL of the RSS feed !</string>
 </resources>

@@ -87,7 +87,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
                 groupType = Group.GroupVisibility.RSS;
                 intent = new Intent(this, CreateRSSFeedActivity.class);
             }
-            
+
             intent.putExtra(GROUP_NAME_KEY, groupName);
             intent.putExtra(GROUP_TYPE_KEY, groupType.toString());
 
