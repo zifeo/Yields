@@ -27,9 +27,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 
 import yields.client.R;
+import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -46,6 +49,7 @@ import yields.client.service.YieldService;
 import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.GroupHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -98,6 +102,21 @@ public class MessageActivity extends NotifiableActivity {
 
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
+
+        /** TESTING **/
+
+        YieldsApplication.setBinder(new FakeBinder(new YieldService()));
+        // Set the user.
+        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
+                .createBitmap(80, 80, Bitmap.Config.RGB_565));
+        YieldsApplication.setUser(mUser);
+        // Set the group.
+        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
+                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
+                .GroupVisibility.PUBLIC, true, new Date());
+        YieldsApplication.setGroup(mGroup);
+
+        /** **/
 
         mImage = null;
         mSendImage = false;
@@ -181,7 +200,8 @@ public class MessageActivity extends NotifiableActivity {
         }
         else if (UrlContent.containsUrl(inputMessage)){
             content = new UrlContent(inputMessage);
-        } else {
+        }
+        else {
             content = new TextContent(inputMessage);
         }
         Message message = new Message("message", new Id(0), mUser, content, new Date());
@@ -532,5 +552,45 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void setHeaderBar() {
         mActionBar.setTitle(mGroup.getName());
+    }
+
+    /** Private classes for the purpose of testing. **/
+    private class FakeBinder extends YieldServiceBinder {
+        public FakeBinder(YieldService service) {
+            super(service);
+        }
+
+        public void attachActivity(NotifiableActivity activity) {
+            Log.d("MessageActivity", "Attach activity");
+        }
+
+        public void unsetMessageActivity() {
+            Log.d("MessageActivity", "Attach activity");
+        }
+
+        public boolean isServerConnected() {
+            return true;
+        }
+
+        public void sendRequest(ServiceRequest request) {
+            Objects.requireNonNull(request);
+            Log.d("MessageActivity", "Send request : " + request.getType().toString());
+        }
+    }
+
+    private class FakeUser extends ClientUser {
+        public FakeUser(String name, Id id, String email, Bitmap img) throws
+                NodeException {
+            super(name, id, email, img);
+        }
+    }
+
+    /**
+     * Privte class for quick testing purposes.-
+     */
+    private class FakeGroup extends Group {
+        public FakeGroup(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated, Date lastUpdate) {
+            super(name, id, users, image, visibility, validated, lastUpdate);
+        }
     }
 }
