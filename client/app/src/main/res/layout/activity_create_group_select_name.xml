@@ -44,15 +44,22 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/publicGroup"
-            android:id="@+id/radioButtonPublicGroup"
+            android:text="@string/privateGroup"
+            android:id="@+id/radioButtonPrivateGroup"
             android:checked="true" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/privateGroup"
-            android:id="@+id/radioButtonPrivateGroup" />
+            android:text="@string/publicGroup"
+            android:id="@+id/radioButtonPublicGroup"
+            />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rss"
+            android:id="@+id/radioButtonRss" />
     </RadioGroup>
 
     <Space
