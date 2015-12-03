@@ -18,6 +18,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +49,8 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class GroupActivity extends NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
+
+    private TextView mTextViewNoGroup;
 
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
@@ -89,6 +94,11 @@ public class GroupActivity extends NotifiableActivity {
                 YieldsApplication.getBinder().reconnect();
             }
         });
+
+        mTextViewNoGroup = (TextView) findViewById(R.id.textViewNoGroup);
+        mTextViewNoGroup.setText("Search for publishers, RSS feed, or " +
+                "create a new group to start using Yields !");
+        checkNoGroup();
 
         YieldsApplication.setResources(getResources());
         YieldsApplication.setApplicationContext(getApplicationContext());
@@ -167,6 +177,8 @@ public class GroupActivity extends NotifiableActivity {
                         mGroups.clear();
                         mGroups.addAll(YieldsApplication.getUser().getUserGroups());
                         mAdapterGroups.notifyDataSetChanged();
+
+                        checkNoGroup();
                     }
                 });
                 break;
@@ -219,5 +231,20 @@ public class GroupActivity extends NotifiableActivity {
         mGroups.clear();
         mGroups.addAll(YieldsApplication.getUser().getUserGroups());
         mAdapterGroups.notifyDataSetChanged();
+
+        checkNoGroup();
+    }
+
+    /**
+     * Method that sets the right visibility to the
+     * textView depending on the number of groups
+     */
+    private void checkNoGroup(){
+        if (mGroups.size() > 0){
+            mTextViewNoGroup.setVisibility(View.GONE);
+        }
+        else {
+            mTextViewNoGroup.setVisibility(View.VISIBLE);
+        }
     }
 }

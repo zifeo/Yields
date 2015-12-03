@@ -10,7 +10,7 @@
     android:weightSum="1">
 
     <GridLayout
-        android:id="@id/connectionStatus"
+        android:id="@+id/connectionStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:rowCount="1"
@@ -36,13 +36,24 @@
 
     </GridLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Large Text"
+        android:id="@+id/textViewNoGroup"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="30dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:gravity="center"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:id="@+id/listViewGroups"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="1.00"
-        >
+        android:layout_weight="1.00">
     </ListView>
 
     <yields.client.gui.CenteredToolBar
