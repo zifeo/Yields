@@ -3,7 +3,7 @@ package yields.server.actions.groups
 import yields.server.Yields
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.{Action, Broadcast, Result}
-import yields.server.dbi.models.{Blob, Group, NID, UID}
+import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
@@ -49,10 +49,12 @@ case class GroupUpdate(nid: NID,
     if (addUsers.nonEmpty) {
       group.addUser(addUsers)
     }
+    addUsers.foreach(User(_).addNode(group.nid))
 
     if (removeUsers.nonEmpty) {
       group.removeUser(removeUsers)
     }
+    removeUsers.foreach(User(_).removeNode(group.nid))
 
     if (addNodes.nonEmpty) {
       group.addNode(addNodes)
