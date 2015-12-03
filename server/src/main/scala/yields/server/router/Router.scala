@@ -42,7 +42,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
     IO(Tcp) ! Bind(
       handler = self,
       localAddress = new InetSocketAddress(Config.getString("addr"), Config.getInt("port")),
-      options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = true)),
+      options = List(SO.KeepAlive(on = true), SO.TcpNoDelay(on = true)),
       backlog = Config.getInt("backlog"),
       pullMode = false
     )
