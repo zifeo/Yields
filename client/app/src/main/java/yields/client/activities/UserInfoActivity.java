@@ -44,6 +44,9 @@ public class UserInfoActivity extends AppCompatActivity {
 
         TextView textViewName = (TextView) findViewById(R.id.textViewUserName);
         textViewName.setText(user.getName());
+
+        TextView textViewEmail = (TextView) findViewById(R.id.textViewEmail);
+        textViewEmail.setText(user.getEmail());
     }
 
     /** Method used to take care of clicks on the tool bar
