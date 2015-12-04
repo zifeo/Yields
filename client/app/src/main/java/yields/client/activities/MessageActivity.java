@@ -553,44 +553,4 @@ public class MessageActivity extends NotifiableActivity {
     private void setHeaderBar() {
         mActionBar.setTitle(mGroup.getName());
     }
-
-    /** Private classes for the purpose of testing. **/
-    private class FakeBinder extends YieldServiceBinder {
-        public FakeBinder(YieldService service) {
-            super(service);
-        }
-
-        public void attachActivity(NotifiableActivity activity) {
-            Log.d("MessageActivity", "Attach activity");
-        }
-
-        public void unsetMessageActivity() {
-            Log.d("MessageActivity", "Attach activity");
-        }
-
-        public boolean isServerConnected() {
-            return true;
-        }
-
-        public void sendRequest(ServiceRequest request) {
-            Objects.requireNonNull(request);
-            Log.d("MessageActivity", "Send request : " + request.getType().toString());
-        }
-    }
-
-    private class FakeUser extends ClientUser {
-        public FakeUser(String name, Id id, String email, Bitmap img) throws
-                NodeException {
-            super(name, id, email, img);
-        }
-    }
-
-    /**
-     * Privte class for quick testing purposes.-
-     */
-    private class FakeGroup extends Group {
-        public FakeGroup(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility, boolean validated, Date lastUpdate) {
-            super(name, id, users, image, visibility, validated, lastUpdate);
-        }
-    }
 }
