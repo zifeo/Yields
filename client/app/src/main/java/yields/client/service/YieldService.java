@@ -251,10 +251,6 @@ public class YieldService extends Service {
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
-            Log.d("Y:" + this.getClass().getName(), "Id of group : " + groupId.getId());
-            for (Group group : YieldsApplication.getUser().getUserGroups()) {
-                Log.d("Y:" + this.getClass().getName(), "Id of groups : " + group.getId().getId());
-            }
             YieldsApplication.getUser().modifyGroup(groupId).addMessages(messages);
         }
     }
