@@ -469,7 +469,7 @@ public class CacheDatabaseTests {
         try {
             Group group = MockFactory.generateMockGroups(3).get(2);
             mDatabaseHelper.addGroup(group);
-            mDatabaseHelper.removeUserFromGroup(group.getId(), group.getUsers().get(0));
+            mDatabaseHelper.removeUserFromGroup(group.getId(), group.getUsers().get(0).getId());
             Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
             assertEquals(fromDatabase.getName(), group.getName());
             assertEquals(fromDatabase.getId().getId(), group.getId().getId());
@@ -477,7 +477,7 @@ public class CacheDatabaseTests {
             assertEquals(group.getUsers().size() - 1, fromDatabase.getUsers().size());
             assertEquals(group.isValidated(), fromDatabase.isValidated());
 
-            ArrayList<Id> usersCopy = new ArrayList<>(group.getUsers());
+            ArrayList<User> usersCopy = new ArrayList<>(group.getUsers());
             usersCopy.remove(0);
             assertTrue(compareUsers(fromDatabase.getUsers(), usersCopy));
         } catch (CacheDatabaseException exception) {
@@ -506,8 +506,8 @@ public class CacheDatabaseTests {
             assertEquals(group.getUsers().size() + 1, fromDatabase.getUsers().size());
             assertEquals(group.isValidated(), fromDatabase.isValidated());
 
-            ArrayList<Id> usersCopy = new ArrayList<>(group.getUsers());
-            usersCopy.add(userToAdd);
+            ArrayList<User> usersCopy = new ArrayList<>(group.getUsers());
+            usersCopy.add(YieldsApplication.getUser(userToAdd));
             assertTrue(compareUsers(fromDatabase.getUsers(), usersCopy));
         } catch (CacheDatabaseException exception) {
             fail(exception.getMessage());
@@ -649,9 +649,9 @@ public class CacheDatabaseTests {
                 cursor.getString(cursor.getColumnIndex("groupName")));
 
         StringBuilder userIDS = new StringBuilder();
-        List<Id> users = group.getUsers();
-        for (Id user : users) {
-            userIDS.append(user.getId()).append(",");
+        List<User> users = group.getUsers();
+        for (User user : users) {
+            userIDS.append(user.getId().getId()).append(",");
         }
         if (users.size() != 0) {
             userIDS.deleteCharAt(userIDS.length() - 1);
@@ -691,14 +691,14 @@ public class CacheDatabaseTests {
      * @return True if for every index of the lists, the Users have the same name, email and Id.
      * False otherwise.
      */
-    private boolean compareUsers(List<Id> users1, List<Id> users2) {
+    private boolean compareUsers(List<User> users1, List<User> users2) {
         boolean sameSize = users1.size() == users2.size();
         if (!sameSize) {
             return false;
         } else {
             boolean same = true;
             for (int i = 0; i < users1.size(); i++) {
-                same = same && compareUser(users1.get(i), users2.get(i));
+                same = same && compareUser(users1.get(i).getId(), users2.get(i).getId());
             }
             return same;
         }

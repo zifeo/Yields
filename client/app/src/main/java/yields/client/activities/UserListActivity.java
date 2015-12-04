@@ -51,9 +51,10 @@ public class UserListActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(intent.getStringExtra(TITLE_KEY));
 
-        Log.d("hello", YieldsApplication.getUser().toString());
 
-        final List<User> userList = YieldsApplication.getUser().getEntourage();
+
+        final List<User> userList = YieldsApplication.getUserList();
+
         Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
                 "The user list in YieldsApplication cannot be null when UserListActivity is created");
 

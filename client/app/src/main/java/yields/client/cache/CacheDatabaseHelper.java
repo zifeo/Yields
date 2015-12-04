@@ -373,8 +373,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             try {
                 ContentValues values = createContentValuesForGroup(group);
                 mDatabase.insert(TABLE_GROUPS, null, values);
-                for (Id user : group.getUsers()) {
-                    addUser(YieldsApplication.getUser(user));
+                for (User user : group.getUsers()) {
+                    addUser(user);
                 }
                 for (Message message : group.getLastMessages().values()) {
                     addMessage(message, group.getId());
@@ -403,8 +403,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             ContentValues values = createContentValuesForGroup(group);
             mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                     new String[]{group.getId().getId().toString()});
-            for (Id user : group.getUsers()) {
-                addUser(YieldsApplication.getUser(user));
+            for (User user : group.getUsers()) {
+                addUser(user);
             }
             for (Message message : group.getLastMessages().values()) {
                 addMessage(message, group.getId());
@@ -683,14 +683,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
                 String nodeName = ""; //TODO: Define message's Node name attribute
 
-                List<Id> users = group.getUsers();
-                Iterator<Id> iterator = users.iterator();
-                Id messageSender = null;
+                List<User> users = group.getUsers();
+                Iterator<User> iterator = users.iterator();
+                User messageSender = null;
                 boolean foundUser = false;
                 while (iterator.hasNext() && !foundUser) {
-                    Id tmpUser = iterator.next();
+                    User tmpUser = iterator.next();
 
-                    Long userID = tmpUser.getId();
+                    Long userID = tmpUser.getId().getId();
                     if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID))))) {
                         messageSender = tmpUser;
                         foundUser = true;
@@ -705,7 +705,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
                     if (messageSender != null && content != null) {
-                        messages.add(new Message(nodeName, id, messageSender, content, date));
+                        messages.add(new Message(nodeName, id, messageSender.getId(), content, date));
                     }
                 } catch (CacheDatabaseException | ParseException exception) {
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
@@ -1000,8 +1000,13 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         int validated = group.isValidated() ? 1 : 0;
         values.put(KEY_GROUP_VALIDATED, validated);
 
-        List<Id> users = group.getUsers();
-        values.put(KEY_GROUP_USERS, getStringFromIds(users));
+        List<User> users = group.getUsers();
+        List<Id> userIDs = new ArrayList<>();
+        for (User user : users) {
+            userIDs.add(user.getId());
+        }
+        values.put(KEY_GROUP_USERS, getStringFromIds(userIDs));
+
         return values;
     }
 

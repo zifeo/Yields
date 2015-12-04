@@ -50,8 +50,13 @@ public class GroupCreateRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        List<Id> userIds = mGroup.getUsers();
+        List<Id> userIds = new ArrayList<>();
         List<Id> nodeIds = new ArrayList<>();
+
+        for (User user : mGroup.getUsers()) {
+            userIds.add(user.getId());
+        }
+
 
         return RequestBuilder.groupCreateRequest(mCreator.getId(), mGroup.getName(), mGroup
                 .getVisibility(), userIds, nodeIds);
