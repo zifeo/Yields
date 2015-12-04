@@ -8,6 +8,9 @@ import java.io.ByteArrayOutputStream;
 
 public class ImageSerialization {
 
+    public static final int SIZE_IMAGE = 800;
+    public static final int SIZE_IMAGE_NODE = 200;
+
     public static String serializeImage(Bitmap image, int resizeTo) {
 
         if (image.getWidth() > resizeTo || image.getHeight() > resizeTo) {

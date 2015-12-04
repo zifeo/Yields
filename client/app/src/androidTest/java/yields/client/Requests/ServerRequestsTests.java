@@ -206,7 +206,8 @@ public class ServerRequestsTests {
             Id senderId = new Id(11);
 
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
-            String imageEncoded = ImageSerialization.serializeImage(newImage, 200);
+            String imageEncoded = ImageSerialization.serializeImage(newImage,
+                    ImageSerialization.SIZE_IMAGE_NODE);
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateImageRequest(senderId, groupId,
                     newImage);
@@ -298,7 +299,8 @@ public class ServerRequestsTests {
             Content textContent = new TextContent(text);
             Content imageContent = new ImageContent(YieldsApplication.getDefaultGroupImage(), text);
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
-            String imageEncoded = ImageSerialization.serializeImage(newImage, 200);
+            String imageEncoded = ImageSerialization.serializeImage(newImage,
+                    ImageSerialization.SIZE_IMAGE_NODE);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     Group.GroupVisibility.PRIVATE, textContent, new Date());
@@ -380,7 +382,8 @@ public class ServerRequestsTests {
             String text = "Apple pie is best pie !";
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             ImageContent imageContent = new ImageContent(newImage, text);
-            String imageEncoded = ImageSerialization.serializeImage(newImage, 800);
+            String imageEncoded = ImageSerialization.serializeImage(newImage,
+                    ImageSerialization.SIZE_IMAGE);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
                     Group.GroupVisibility.PRIVATE, imageContent, new Date());

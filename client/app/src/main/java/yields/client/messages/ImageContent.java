@@ -124,6 +124,6 @@ public class ImageContent extends Content {
     }
 
     public String getContentForRequest() {
-        return ImageSerialization.serializeImage(mImage, 800);
+        return ImageSerialization.serializeImage(mImage, ImageSerialization.SIZE_IMAGE);
     }
 }
