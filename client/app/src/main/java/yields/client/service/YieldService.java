@@ -218,6 +218,7 @@ public class YieldService extends Service {
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             Group group = YieldsApplication.getUser().modifyGroup(groupId);
             group.addMessage(message);
+            group.setLastUpdate(message.getDate());
             sendMessageNotification(group, message);
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);

@@ -193,8 +193,8 @@ public class GroupInfoActivity extends NotifiableActivity {
             subscribeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    List<User> userList = new ArrayList<User>();
-                    userList.add(YieldsApplication.getUser());
+                    List<Id> userList = new ArrayList<>();
+                    userList.add(YieldsApplication.getUser().getId());
                     Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
 
                     //TODO Add the publisher in the new group

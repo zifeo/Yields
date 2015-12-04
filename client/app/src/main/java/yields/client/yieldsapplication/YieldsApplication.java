@@ -7,7 +7,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,7 +25,8 @@ public class YieldsApplication {
     private static List<User> mUserList;
     private static Group mGroup;
 
-    private static List<Group> mGroupsSearched;
+    private static List<Group> mGroupsSearched = new ArrayList<>();
+    private static Date mLastDateSearch;
     private static Group mGroupAdded;
     private static boolean mGroupAddedValid;
 
@@ -65,6 +68,24 @@ public class YieldsApplication {
      */
     public static List<Group> getGroupsSearched() {
         return mGroupsSearched;
+    }
+
+    /**
+     * Getter for the last time we searched for groups.
+     *
+     * @return The Date of the last search.
+     */
+    public static Date getLastDateSearch() {
+        return mLastDateSearch;
+    }
+
+    /**
+     * Setter for the last time we searched for groups.
+     *
+     * @param lastSearch The mLastDateSearch time.
+     */
+    public static void setLastDateSearch(Date lastSearch) {
+        YieldsApplication.mLastDateSearch = lastSearch;
     }
 
     /**
@@ -341,11 +362,6 @@ public class YieldsApplication {
         }
 
         User user = mUser.modifyEntourage(userId);
-
-        if (user == null) {
-            throw new IllegalArgumentException(
-                    "request information about a user you aren't suppose to ask");
-        }
 
         return user;
     }

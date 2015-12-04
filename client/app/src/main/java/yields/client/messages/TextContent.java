@@ -74,4 +74,9 @@ public class TextContent extends Content {
     public String getTextForRequest() {
         return mText;
     }
+
+    @Override
+    public String getContentForRequest() {
+        return null;
+    }
 }
