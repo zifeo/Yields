@@ -25,6 +25,8 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class UserListActivity extends AppCompatActivity {
 
+    private ListAdapterUsers mArrayAdapter;
+
     public final static String TITLE_KEY = "TITLE";
 
     /**
@@ -60,10 +62,10 @@ public class UserListActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
 
-        ListAdapterUsers arrayAdapter = new ListAdapterUsers(getApplicationContext(),
+        mArrayAdapter = new ListAdapterUsers(getApplicationContext(),
                 R.layout.user_layout, userList);
 
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(mArrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -74,7 +76,8 @@ public class UserListActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 else {
-                    // TODO Merge Nico's PR to have the new activity
+                    Intent intent = new Intent(UserListActivity.this, AddUserToEntourageActivity.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -82,13 +85,13 @@ public class UserListActivity extends AppCompatActivity {
     }
 
     /**
-     * Called once the button to add a user to the enoutrage is pressed.
-     *
-     * @param view The view of the button.
+     * Automatically called when the activity is resumed after another
+     * activity was displayed.
      */
-    public void onAddUserButton(View view) {
-        Intent intent = new Intent(this, AddUserToEntourageActivity.class);
-        startActivity(intent);
+    @Override
+    public void onResume(){
+        super.onResume();
+        mArrayAdapter.notifyDataSetChanged();
     }
 
     /**

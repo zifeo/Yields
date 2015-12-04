@@ -72,4 +72,9 @@
     <string name="messageUrlHttp">The url must start with http://</string>
     <string name="messageRssCreated">RSS feed created !</string>
     <string name="typeUrl">Type the URL of the RSS feed !</string>
+    <string name="typeEmailEntourage">Type the email of the person to add him !</string>
+    <string name="enterEmail">name@domain.com</string>
+    <string name="messageWrongEmail">The email is malformed</string>
+    <string name="messageContactAdded">User added to your entourage !</string>
+    <string name="messageNoUser">No user exists with this email</string>
 </resources>
