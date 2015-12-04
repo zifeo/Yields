@@ -35,6 +35,7 @@ public class YieldsSocketProvider implements SocketProvider {
     public Socket getConnection() throws IOException {
 
         Socket socket = new Socket(mDstAddress, DST_PORT);
+        socket.setKeepAlive(true);
         return socket;
     }
 }
