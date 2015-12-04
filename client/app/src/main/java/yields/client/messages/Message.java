@@ -99,9 +99,8 @@ public class Message extends Node {
 
         this.mSender = new Id(senderID);
 
-        Bitmap img = ImageSerialization.unSerializeImage(content);
-
         if (contentType.equals("image")){
+            Bitmap img = ImageSerialization.unSerializeImage(content);
             if (img == null){
                 Log.d("Y:"+ this.getClass().getName(), "We have no image with contentType image");
                 mContent = new TextContent(text);
