@@ -103,21 +103,6 @@ public class MessageActivity extends NotifiableActivity {
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
-        /** TESTING **/
-
-        YieldsApplication.setBinder(new FakeBinder(new YieldService()));
-        // Set the user.
-        mUser = new FakeUser("Bob Ross", new Id(2), "topkek", Bitmap
-                .createBitmap(80, 80, Bitmap.Config.RGB_565));
-        YieldsApplication.setUser(mUser);
-        // Set the group.
-        mGroup = new FakeGroup("Mock Group", new Id(2), new ArrayList<User>(),
-                Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565), Group
-                .GroupVisibility.PUBLIC, true, new Date());
-        YieldsApplication.setGroup(mGroup);
-
-        /** **/
-
         mImage = null;
         mSendImage = false;
 
@@ -191,7 +176,9 @@ public class MessageActivity extends NotifiableActivity {
         String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
         Content content;
+        Log.d("MessageActivity", "Input message = " + inputMessage);
         if (mSendImage && mImage != null) {
+            Log.d("MessageActivity", "Create image content");
             content = new ImageContent(mImage, inputMessage);
             mSendImage = false;
             mImage = null;
@@ -199,9 +186,12 @@ public class MessageActivity extends NotifiableActivity {
             mImageThumbnail.setPadding(0, 0, 0, 0);
         }
         else if (UrlContent.containsUrl(inputMessage)){
+            Log.d("MessageActivity", "Create URL content.");
             content = new UrlContent(inputMessage);
+            Log.d("MessageActivity", "URL content created.");
         }
         else {
+            Log.d("MessageActivity", "Create text content");
             content = new TextContent(inputMessage);
         }
         Message message = new Message("message", new Id(0), mUser, content, new Date());
@@ -442,8 +432,10 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
+        /* TODO : Uncomment this to load comments.
         GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
+        */
     }
 
     /**
