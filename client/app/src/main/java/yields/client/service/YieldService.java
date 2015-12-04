@@ -42,6 +42,7 @@ public class YieldService extends Service {
     private int mIdLastNotification;
     private ServiceRequestController mServiceRequestController;
     private ConnectControllerTask mConnectControllerTask;
+    private boolean mWasConnected;
 
     /**
      * Connects the service to the server when it is created and
@@ -52,6 +53,7 @@ public class YieldService extends Service {
         mBinder = new YieldServiceBinder(this);
         mIdLastNotification = 0;
         Log.d("Y:" + this.getClass().getName(), "create Yield Service");
+        mWasConnected = false;
         mConnectControllerTask = new ConnectControllerTask();
         mConnectControllerTask.execute();
     }
@@ -196,12 +198,17 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity != null) {
             mCurrentNotifiableActivity.notifyOnServerDisconnected();
         }
+        mWasConnected = false;
     }
 
     /**
      * Called when the server is connected
      */
     synchronized public void onServerConnected() {
+        if (mWasConnected) {
+            ServiceRequest request = new UserConnectRequest(YieldsApplication.getUser());
+            this.sendRequest(request);
+        }
         if (mCurrentNotifiableActivity != null) {
             mCurrentNotifiableActivity.notifyOnServerConnected();
         }
@@ -218,6 +225,7 @@ public class YieldService extends Service {
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             Group group = YieldsApplication.getUser().modifyGroup(groupId);
             group.addMessage(message);
+            group.setLastUpdate(message.getDate());
             sendMessageNotification(group, message);
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -243,7 +251,6 @@ public class YieldService extends Service {
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
-
             YieldsApplication.getUser().modifyGroup(groupId).addMessages(messages);
         }
     }

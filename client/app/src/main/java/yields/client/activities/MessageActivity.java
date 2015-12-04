@@ -19,9 +19,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +37,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -120,7 +118,7 @@ public class MessageActivity extends NotifiableActivity {
         mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
 
-        GroupHistoryRequest historyRequest = new GroupHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
@@ -186,22 +184,24 @@ public class MessageActivity extends NotifiableActivity {
         } else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(0), mUser, content, new Date());
+
+        Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
         if (mType == ContentType.GROUP_MESSAGES) {
             Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
             ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                     .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
-            NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
+            NodeMessageRequest request = new NodeMessageRequest(message, mGroup.getId(),
+                    mGroup.getVisibility());
             YieldsApplication.getBinder().sendRequest(request);
         } else {
-            Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
             ((CommentFragment) mCurrentFragment).getCommentListView()
                     .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
+            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage.getId(),
+                    Group.GroupVisibility.PRIVATE);
             YieldsApplication.getBinder().sendRequest(request);
         }
 
@@ -428,7 +428,7 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest request = new NodeHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
 
@@ -499,7 +499,7 @@ public class MessageActivity extends NotifiableActivity {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
-            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
 
             for (Message message : messagesTree.values()) {
@@ -507,9 +507,10 @@ public class MessageActivity extends NotifiableActivity {
             }
 
             mGroupMessageAdapter.notifyDataSetChanged();
-            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
+        ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
 
     /**
