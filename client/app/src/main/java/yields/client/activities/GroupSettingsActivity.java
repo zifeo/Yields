@@ -28,6 +28,8 @@ import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -38,7 +40,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * where the admin can change its name, image, add users and nodes ...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, IMAGE, USERS, ADD_NODE, ADD_TAG}
+    public enum Settings {NAME, IMAGE, USERS, ADD_NODE, LEAVE_GROUP, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
@@ -77,6 +79,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
+        itemList.add(Settings.LEAVE_GROUP.ordinal(), getResources().getString(R.string.leaveGroup));
 
         if (mGroup.getVisibility() != Group.GroupVisibility.PRIVATE){
             itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
@@ -221,6 +224,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     addNodeListener();
                     break;
 
+                case LEAVE_GROUP:
+                    leaveGroupListener();
+                    break;
+
                 default:
                     addUsersListener();
                     break;
@@ -313,6 +320,37 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     SearchGroupActivity.Mode.ADD_NODE_EXISTING_GROUP.ordinal());
 
             startActivity(intent);
+        }
+
+        /**
+         * Listener for the "Leave group" item.
+         */
+        private void leaveGroupListener() {
+            AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
+                .setTitle("Leave group")
+                .setMessage("Are you sure you want to leave this group ?")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        YieldsApplication.getBinder().sendRequest(
+                                new GroupRemoveRequest(YieldsApplication.getUser(), mGroup.getId(),
+                                        YieldsApplication.getUser().getId()));
+
+                        YieldsApplication.showToast(getApplicationContext(), "Group left !");
+
+                        Intent intent = new Intent(GroupSettingsActivity.this, GroupActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create();
+            dialog.show();
         }
 
         /**
