@@ -17,12 +17,11 @@ import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.GroupUpdateVisibilityRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -149,9 +148,6 @@ public class ServiceRequestController {
             case GROUP_UPDATE_NAME:
                 mRequestHandler.handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
                 break;
-            case GROUP_UPDATE_VISIBILITY:
-                mRequestHandler.handleGroupUpdateVisibilityRequest((GroupUpdateVisibilityRequest) serviceRequest);
-                break;
             case GROUP_UPDATE_IMAGE:
                 mRequestHandler.handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
                 break;
@@ -165,13 +161,14 @@ public class ServiceRequestController {
                 mRequestHandler.handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
                 break;
             case NODE_HISTORY:
-                mRequestHandler.handleNodeHistoryRequest((GroupHistoryRequest) serviceRequest);
+                mRequestHandler.handleNodeHistoryRequest((NodeHistoryRequest) serviceRequest);
                 break;
             case USER_SEARCH:
                 mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
                 break;
             default:
-                throw new ServiceRequestException("No such ServiceRequest type !");
+                Log.d("Y:" + this.getClass().getName(), "No such ServiceRequest type ! : " +
+                        serviceRequest.getType());
         }
     }
 
@@ -259,7 +256,8 @@ public class ServiceRequestController {
                 mResponseHandler.handleRSSMessageBroadcast(serverResponse);
                 break;
             default:
-                Log.d("Y:" + this.getClass().getName(),"");
+                Log.d("Y:" + this.getClass().getName(),"No such response kind : " +
+                        serverResponse.getKind());
         }
     }
 

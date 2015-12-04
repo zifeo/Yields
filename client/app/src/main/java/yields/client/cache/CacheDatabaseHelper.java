@@ -598,14 +598,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
             String allUsers = cursor.getString(
                     cursor.getColumnIndex(KEY_GROUP_USERS));
-            List<User> groupUsers = new ArrayList<>();
+            List<Id> groupUsers = new ArrayList<>();
             if (!allUsers.equals("")) {
                 String[] usersIDs = allUsers.split(",");
                 for (String userID : usersIDs) {
-                    User user = getUser(new Id(Long.parseLong(userID)));
-                    if (user != null) {
-                        groupUsers.add(user);
-                    }
+                    groupUsers.add(new Id(Long.parseLong(userID)));
                 }
             }
             cursor.close();
@@ -687,11 +684,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 String nodeName = ""; //TODO: Define message's Node name attribute
 
                 List<User> users = group.getUsers();
-                Iterator iterator = users.iterator();
+                Iterator<User> iterator = users.iterator();
                 User messageSender = null;
                 boolean foundUser = false;
                 while (iterator.hasNext() && !foundUser) {
-                    User tmpUser = (User) iterator.next();
+                    User tmpUser = iterator.next();
 
                     Long userID = tmpUser.getId().getId();
                     if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID))))) {
@@ -708,7 +705,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                     String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
                     if (messageSender != null && content != null) {
-                        messages.add(new Message(nodeName, id, messageSender, content, date));
+                        messages.add(new Message(nodeName, id, messageSender.getId(), content, date));
                     }
                 } catch (CacheDatabaseException | ParseException exception) {
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
@@ -1009,6 +1006,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             userIDs.add(user.getId());
         }
         values.put(KEY_GROUP_USERS, getStringFromIds(userIDs));
+
         return values;
     }
 
