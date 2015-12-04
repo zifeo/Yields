@@ -335,10 +335,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
          */
         private void addUsersListener() {
             ArrayList<String> emailList = new ArrayList<>();
-            List<Id> currentUsers = mGroup.getUsers();
+            List<User> currentUsers = mGroup.getUsers();
 
             for (int i = 0; i < currentUsers.size(); i++) {
-                emailList.add(YieldsApplication.getUser(currentUsers.get(i)).getEmail());
+                emailList.add(currentUsers.get(i).getEmail());
             }
 
             Intent intentSelectUsers = new Intent(GroupSettingsActivity.this, AddUsersFromEntourageActivity.class);

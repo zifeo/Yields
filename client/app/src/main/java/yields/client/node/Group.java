@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.graphics.YuvImage;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -42,7 +43,7 @@ public class Group extends Node {
 
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
-    private List<Id> mUsers;
+    private List<User> mUsers;
     private List<Group> mNodes;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
@@ -66,12 +67,36 @@ public class Group extends Node {
         Objects.requireNonNull(users);
         Objects.requireNonNull(lastUpdate);
         this.mMessages = new TreeMap<>();
-        mUsers = new ArrayList<>(Objects.requireNonNull(users));
+        mUsers = new ArrayList<>();
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
         mTags = new HashSet<>();
         mDate = lastUpdate;
+        mNodes = new ArrayList<>();
+
+        for (Id uId : users) {
+            mUsers.add(YieldsApplication.getUser(uId));
+        }
+    }
+
+    /**
+     * Constructor for groups
+     *
+     * @param name       The name of the group
+     * @param id         The id of the group
+     * @throws NodeException If nodes or image is null
+     */
+    public Group(String name, Id id, Group group) {
+        super(name, id);
+        Objects.requireNonNull(group);
+        this.mMessages = new TreeMap<>();
+        mUsers = group.getUsers();
+        mImage = group.getImage();
+        mValidated = false;
+        mVisibility = GroupVisibility.PRIVATE;
+        mTags = new HashSet<>();
+        mDate = new Date();
         mNodes = new ArrayList<>();
     }
 
@@ -161,7 +186,7 @@ public class Group extends Node {
      * @return The group wrapper for this message.
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
-        return new Group("message comment", messageComment.getId(), group.getUsers());
+        return new Group("message comment", messageComment.getId(), group);
     }
 
     /**
@@ -204,7 +229,7 @@ public class Group extends Node {
      */
     public void addUser(Id user) {
         Objects.requireNonNull(user);
-        mUsers.add(user);
+        mUsers.add(YieldsApplication.getUser(user));
     }
 
     /**
@@ -214,7 +239,9 @@ public class Group extends Node {
      */
     public void updateUsers(ArrayList<Id> userList) {
         mUsers.clear();
-        mUsers.addAll(userList);
+        for (Id uId : userList) {
+            mUsers.add(YieldsApplication.getUser(uId));
+        }
     }
 
     /**
@@ -330,7 +357,7 @@ public class Group extends Node {
      *
      * @return the users.
      */
-    public List<Id> getUsers() {
+    public List<User> getUsers() {
         return Collections.unmodifiableList(mUsers);
     }
 

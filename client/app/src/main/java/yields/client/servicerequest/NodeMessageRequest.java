@@ -59,8 +59,6 @@ public class NodeMessageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         Message message = getMessage();
 
-        Log.d("hello", "yellow");
-
         return RequestBuilder.nodeMessageRequest(message.getSender(), mReceivingGroupId,
                 mVisibility, message.getContent(), message.getDate());
     }
