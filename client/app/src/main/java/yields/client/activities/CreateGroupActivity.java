@@ -153,10 +153,10 @@ public class CreateGroupActivity extends AppCompatActivity {
                 break;
 
             case R.id.actionDoneCreateGroup:
-                List<User> userList = new ArrayList<>();
+                List<Id> userList = new ArrayList<>();
 
                 for (int i = 0; i < mUsers.size(); i++){
-                    userList.add(mUsers.get(i));
+                    userList.add(mUsers.get(i).getId());
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);

@@ -48,7 +48,7 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         user.addUserToEntourage(MockFactory.generateFakeClientUser("Friend", new Id(125), "a@b.d", YieldsApplication.getDefaultUserImage()));
 
         YieldsApplication.setUser(user);
-        YieldsApplication.setGroup(new Group("Group", new Id(124), new ArrayList<User>()));
+        YieldsApplication.setGroup(new Group("Group", new Id(124), new ArrayList<Id>()));
     }
 
     @Override

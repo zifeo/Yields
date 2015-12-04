@@ -39,7 +39,7 @@ public class ServerChannelTest {
 
     @Test
     public void testNonWorkingConnection() {
-        ServerRequest simpleServerRequest = RequestBuilder.pingRequest(new Id(0), "test");
+        ServerRequest simpleServerRequest = RequestBuilder.userInfoRequest(new Id(0), new Id(1));
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 

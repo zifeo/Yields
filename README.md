@@ -118,12 +118,12 @@ GroupMessage
 
 ```
 PublisherCreate
-	input	name: String, users: Seq[UID], nodes: Seq[NID]
+	input	name: String, users: Seq[UID], nodes: Seq[NID], tags: Seq[String]
 	output	nid: NID
 	rules	users in entourage & (nodes "public" | nodes in groups)
 	bcast	nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]
 PublisherUpdate
-	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]
+	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID], addTags: Seq[String], removeTags: Seq[String]
 	output	()
 	rules	uid in users
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
