@@ -77,4 +77,5 @@
     <string name="messageWrongEmail">The email is malformed</string>
     <string name="messageContactAdded">User added to your entourage !</string>
     <string name="messageNoUser">No user exists with this email</string>
+    <string name="leaveGroup">Leave group</string>
 </resources>

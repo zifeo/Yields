@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import yields.client.R;
 import yields.client.servicerequest.UserSearchRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -49,8 +52,9 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String email = mEditTextEmail.getText().toString();
-
-        if (!email.contains("@") || !email.contains(".")){
+        Pattern pattern = Pattern.compile(".+@.+\\.[a-z]+");
+        Matcher matcher = pattern.matcher(email);
+        if (!matcher.matches()) {
             String message = getString(R.string.messageWrongEmail);
             YieldsApplication.showToast(getApplicationContext(), message);
         }
@@ -80,9 +84,13 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
                 });
                 break;
             case NOT_EXIST:
-                String messageNoUser = getString(R.string.messageNoUser);
-                YieldsApplication.showToast(getApplicationContext(), messageNoUser);
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String messageNoUser = getString(R.string.messageNoUser);
+                        YieldsApplication.showToast(getApplicationContext(), messageNoUser);
+                    }
+                });
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "useless notify change...");
