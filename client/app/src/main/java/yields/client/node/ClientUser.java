@@ -113,7 +113,7 @@ public class ClientUser extends User {
 
         @Override
         public int compare(Group lhs, Group rhs) {
-            return lhs.getLastUpdate().compareTo(rhs.getLastUpdate());
+            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
         }
     };
 

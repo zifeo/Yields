@@ -50,7 +50,7 @@ public class UserEntourageRemoveRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userEntourageRemoveRequest(mUser.getId(), mUserToRemove.getEmail());
+        return RequestBuilder.userEntourageRemoveRequest(mUser.getId(), mUserToRemove.getId());
     }
 
     /**

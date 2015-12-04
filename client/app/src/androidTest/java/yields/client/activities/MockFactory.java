@@ -28,13 +28,13 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class MockFactory {
 
 
-    public static Group createMockGroup(String name, Id id, List<User> connectedUsers) {
+    public static Group createMockGroup(String name, Id id, List<Id> connectedUsers) {
         return new FakeGroup(name, id, connectedUsers);
     }
 
     private static class FakeGroup extends Group {
 
-        public FakeGroup(String name, Id id, List<User> users) throws NodeException {
+        public FakeGroup(String name, Id id, List<Id> users) throws NodeException {
             super(name, id, users, Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
         }
 
@@ -52,10 +52,12 @@ public class MockFactory {
         return messages;
     }
 
-    public static List<User> generateMockUsers(int number) {
-        ArrayList<User> users = new ArrayList<>();
+    public static List<Id> generateMockUsers(int number) {
+        ArrayList<Id> users = new ArrayList<>();
         for (int i = 0; i < number; i++) {
-            users.add(generateFakeUser("Mock user name " + i, new Id(-i), "Mock email " + i));
+            User u = generateFakeUser("Mock user name " + i, new Id(-i), "Mock email " + i);
+            YieldsApplication.getUser().addUserToEntourage(u);
+            users.add(u.getId());
         }
         return users;
     }
@@ -69,7 +71,7 @@ public class MockFactory {
     }
 
     public static Message generateMockMessage(String nodeName, Id nodeID, User sender, Content content) {
-        return new Message(nodeName, nodeID, sender, content, new Date());
+        return new Message(nodeName, nodeID, sender.getId(), content, new Date());
     }
 
     public static TextContent generateFakeTextContent(int i) {

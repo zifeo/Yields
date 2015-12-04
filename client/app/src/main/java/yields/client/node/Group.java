@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.graphics.YuvImage;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -43,6 +44,7 @@ public class Group extends Node {
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
     private List<User> mUsers;
+    private List<Group> mNodes;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
     private Set<Tag> mTags;
@@ -59,33 +61,43 @@ public class Group extends Node {
      * @param validated  If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility,
+    public Group(String name, Id id, List<Id> users, Bitmap image, GroupVisibility visibility,
                  boolean validated, Date lastUpdate) {
         super(name, id);
         Objects.requireNonNull(users);
         Objects.requireNonNull(lastUpdate);
         this.mMessages = new TreeMap<>();
-        mUsers = new ArrayList<>(Objects.requireNonNull(users));
+        mUsers = new ArrayList<>();
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
         mTags = new HashSet<>();
         mDate = lastUpdate;
+        mNodes = new ArrayList<>();
+
+        for (Id uId : users) {
+            mUsers.add(YieldsApplication.getUser(uId));
+        }
     }
 
     /**
-     * Overloaded constructor for groups for default validation.
-     * By default a group is not validated yet.
+     * Constructor for groups
      *
      * @param name       The name of the group
      * @param id         The id of the group
-     * @param users      The current users of the group
-     * @param image      The current image of the group
-     * @param visibility The visibility of the group
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image, GroupVisibility visibility) {
-        this(name, id, users, image, visibility, false, new Date());
+    public Group(String name, Id id, Group group) {
+        super(name, id);
+        Objects.requireNonNull(group);
+        this.mMessages = new TreeMap<>();
+        mUsers = group.getUsers();
+        mImage = group.getImage();
+        mValidated = false;
+        mVisibility = GroupVisibility.PRIVATE;
+        mTags = new HashSet<>();
+        mDate = new Date();
+        mNodes = new ArrayList<>();
     }
 
     /**
@@ -98,7 +110,7 @@ public class Group extends Node {
      * @param image The current image of the group
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<User> users, Bitmap image) {
+    public Group(String name, Id id, List<Id> users, Bitmap image) {
         this(name, id, users, image, GroupVisibility.PRIVATE, false, new Date());
     }
 
@@ -110,7 +122,7 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users) {
+    public Group(String name, Id id, List<Id> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
                 false, new Date());
     }
@@ -123,7 +135,7 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
-    public Group(String name, Id id, List<User> users, Boolean validated, Date lastUpdate) {
+    public Group(String name, Id id, List<Id> users, Boolean validated, Date lastUpdate) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
                 validated, lastUpdate);
     }
@@ -135,7 +147,7 @@ public class Group extends Node {
      * @throws JSONException
      */
     public Group(JSONArray jsonGroup) throws JSONException, ParseException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<User>(), false,
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<Id>(), false,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
@@ -146,7 +158,7 @@ public class Group extends Node {
      * @param refreshedAt Last date the group has been refreshed.
      */
     public Group(String groupId, String name, String refreshedAt) throws ParseException {
-        this(name, new Id(Long.parseLong(groupId)), new ArrayList<User>(), true,
+        this(name, new Id(Long.parseLong(groupId)), new ArrayList<Id>(), true,
                 DateSerialization.dateSerializer.toDate(refreshedAt));
     }
 
@@ -174,7 +186,7 @@ public class Group extends Node {
      * @return The group wrapper for this message.
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
-        return new Group("message comment", messageComment.getId(), group.getUsers());
+        return new Group("message comment", messageComment.getId(), group);
     }
 
     /**
@@ -182,11 +194,13 @@ public class Group extends Node {
      */
     public void validateMessage(Date date, Date newDate){
         Message message = mMessages.remove(date);
+
         if (message != null){
             message.setStatus(Message.MessageStatus.SENT, newDate);
             mMessages.put(newDate, message);
         } else {
-            Log.d("Y:" + this.getClass().getName(), mMessages.keySet().toString());
+            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant in " +
+                    mMessages.firstKey().getTime() + "or " + mMessages.lastKey().getTime());
         }
     }
 
@@ -213,9 +227,39 @@ public class Group extends Node {
      *
      * @param user The user we want to add
      */
-    public void addUser(User user) {
+    public void addUser(Id user) {
         Objects.requireNonNull(user);
-        mUsers.add(user);
+        mUsers.add(YieldsApplication.getUser(user));
+    }
+
+    /**
+     * Changes/updates the users of the group
+     *
+     * @param userList
+     */
+    public void updateUsers(ArrayList<Id> userList) {
+        mUsers.clear();
+        for (Id uId : userList) {
+            mUsers.add(YieldsApplication.getUser(uId));
+        }
+    }
+
+    /**
+     * Gets all nodes from a group.
+     *
+     * @return A list of group nodes.
+     */
+    public List<Group> getNodes() {
+        return mNodes;
+    }
+
+    /**
+     * Adds a group node to the nodes of the group.
+     *
+     * @param node The group node to add.
+     */
+    public void addNode(Group node) {
+        mNodes.add(node);
     }
 
     /**
@@ -245,6 +289,10 @@ public class Group extends Node {
     synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
             mMessages.put(newMessage.getDate(), newMessage);
+        }
+
+        if (!mMessages.isEmpty()) {
+            setLastUpdate(mMessages.lastKey());
         }
     }
 
@@ -393,6 +441,7 @@ public class Group extends Node {
             if (o instanceof Tag) {
                 return ((Tag) o).mText.equals(this.mText);
             }
+
             return super.equals(o);
         }
 

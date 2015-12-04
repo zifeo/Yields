@@ -40,7 +40,7 @@ public class TagsTests {
     public void testCorrectTagInGroup(){
         Group.Tag tag = new Group.Tag("nature");
         Group.Tag copyTag = new Group.Tag("nature");
-        Group g1 = new Group("Nature gurus", new Id(11), new ArrayList<User>());
+        Group g1 = new Group("Nature gurus", new Id(11), new ArrayList<Id>());
         g1.addTag(tag);
 
         assertTrue(g1.matchToTag(tag));
@@ -58,7 +58,7 @@ public class TagsTests {
         Group.Tag tag3 = new Group.Tag("animals");
         Group.Tag copyTag3 = new Group.Tag("animals");
 
-        Group g1 = new Group("Nature gurus2", new Id(11), new ArrayList<User>());
+        Group g1 = new Group("Nature gurus2", new Id(11), new ArrayList<Id>());
         g1.addTag(tag1);
         g1.addTag(tag2);
         g1.addTag(tag3);

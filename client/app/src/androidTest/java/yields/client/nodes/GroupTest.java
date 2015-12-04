@@ -55,7 +55,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
                 "Ross", new Id(1337), "HappyLittleTree@joyOfPainting.ru", Bitmap
                 .createBitmap(80, 80, Bitmap.Config.RGB_565)));
 
-        mG = new FakeGroup("Group", new Id(32), new ArrayList<User>());
+        mG = new FakeGroup("Group", new Id(32), new ArrayList<Id>());
         YieldsApplication.setGroup(mG);
     }
 
@@ -94,7 +94,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
 
     private class FakeGroup extends Group{
 
-        public FakeGroup(String name, Id id, List<User> users) {
+        public FakeGroup(String name, Id id, List<Id> users) {
             super(name, id, users);
         }
 

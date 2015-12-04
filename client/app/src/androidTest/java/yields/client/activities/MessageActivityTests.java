@@ -45,7 +45,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<User>());
+    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
 
     public MessageActivityTests() {
         super(MessageActivity.class);

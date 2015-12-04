@@ -19,9 +19,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +37,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -120,13 +118,23 @@ public class MessageActivity extends NotifiableActivity {
         mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
 
-        GroupHistoryRequest historyRequest = new GroupHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                retrieveGroupMessages();
+            }
+        });
+    }
 
     /**
      * what to do when the activity is no more visible
@@ -176,18 +184,25 @@ public class MessageActivity extends NotifiableActivity {
         } else {
             content = new TextContent(inputMessage);
         }
-        Message message = new Message("message", new Id(0), mUser, content, new Date());
+
+        Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
         if (mType == ContentType.GROUP_MESSAGES) {
             Log.d("MessageActivity", "Send group message");
             mGroupMessageAdapter.add(message);
             mGroupMessageAdapter.notifyDataSetChanged();
-            NodeMessageRequest request = new NodeMessageRequest(message, mGroup);
+            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+            NodeMessageRequest request = new NodeMessageRequest(message, mGroup.getId(),
+                    mGroup.getVisibility());
             YieldsApplication.getBinder().sendRequest(request);
         } else {
             Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
-            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage);
+            ((CommentFragment) mCurrentFragment).getCommentListView()
+                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage.getId(),
+                    Group.GroupVisibility.PRIVATE);
             YieldsApplication.getBinder().sendRequest(request);
         }
 
@@ -414,7 +429,7 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest request = new NodeHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
 
@@ -484,27 +499,38 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        for (Message message : messagesTree.values()) {
-            mGroupMessageAdapter.remove(message);
-            mGroupMessageAdapter.add(message);
-        }
+        if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
+            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+            mGroupMessageAdapter.clear();
 
-        mGroupMessageAdapter.notifyDataSetChanged();
+            for (Message message : messagesTree.values()) {
+                mGroupMessageAdapter.add(message);
+            }
+
+            mGroupMessageAdapter.notifyDataSetChanged();
+            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+        }
     }
 
     /**
      * Retrieve comments for a message an puts them in the comments adapter.
      */
     private void retrieveCommentMessages() {
-        Log.d("MessageActivity", "retrieveCommentMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        for (Message message : messagesTree.values()) {
-            mCommentAdapter.remove(message);
-            mCommentAdapter.add(message);
-        }
+        if(mCommentAdapter.getCount() < messagesTree.size()) {
+            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+            mCommentAdapter.clear();
 
-        mCommentAdapter.notifyDataSetChanged();
+            for (Message message : messagesTree.values()) {
+                mCommentAdapter.add(message);
+            }
+
+            mCommentAdapter.notifyDataSetChanged();
+            ((CommentFragment) mCurrentFragment).getCommentListView()
+                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+        }
     }
 
     /**
