@@ -2,7 +2,6 @@ package yields.client.service;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.List;
 
 import yields.client.cache.CacheDatabaseHelper;
@@ -12,19 +11,20 @@ import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupHistoryRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.GroupUpdateVisibilityRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
+import yields.client.servicerequest.UserSearchRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
+import yields.client.yieldsapplication.YieldsApplication;
 
 public class RequestHandler {
 
@@ -100,21 +100,10 @@ public class RequestHandler {
     protected void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
-            mCacheHelper.addUser(serviceRequest.getUserToAdd());
+            mCacheHelper.addUser(YieldsApplication.getUser(serviceRequest.getUserToAdd()));
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserEntourageAddRequest correctly !");
         }
-
-        mController.sendToServer(serverRequest);
-    }
-
-    /**
-     * Handles a ServiceRequest which is given to it by argument.
-     */
-    protected void handleGroupUpdateVisibilityRequest(GroupUpdateVisibilityRequest serviceRequest) {
-        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupVisibility(serviceRequest.getGroupId(), serviceRequest.getNewGroupVisibility());
-        //TODO : Notify app
 
         mController.sendToServer(serverRequest);
     }
@@ -212,6 +201,8 @@ public class RequestHandler {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageRequest correctly !");
         }*/
 
+        YieldsApplication.getUser().modifyGroup(serviceRequest.getReceivingNodeId())
+                .setLastUpdate(serviceRequest.getMessage().getDate());
 
         mController.sendToServer(serverRequest);
     }
@@ -219,11 +210,11 @@ public class RequestHandler {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    protected void handleNodeHistoryRequest(GroupHistoryRequest serviceRequest) {
+    protected void handleNodeHistoryRequest(NodeHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
-                    serviceRequest.getDate(), GroupHistoryRequest.MESSAGE_COUNT);
+                    serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
             mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeHistoryRequest correctly !");
@@ -237,6 +228,10 @@ public class RequestHandler {
      * Handles a group info request
      */
     protected void handleGroupInfoRequest(GroupInfoRequest serviceRequest) {
+        mController.sendToServer(serviceRequest.parseRequestForServer());
+    }
+
+    public void handleUserSearchRequest(UserSearchRequest serviceRequest) {
         mController.sendToServer(serviceRequest.parseRequestForServer());
     }
 }

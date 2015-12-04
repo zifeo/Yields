@@ -48,4 +48,6 @@ public abstract class Content {
      * @return The text associated to this Content (for a request).
      */
     public abstract String getTextForRequest();
+
+    public abstract String getContentForRequest();
 }
