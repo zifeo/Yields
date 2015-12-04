@@ -476,13 +476,10 @@ public class ResponseHandler {
                 if (entourage != null && entourageRefreshedAt != null){
                     for (int i = 0; i < entourage.length(); i++) {
                         // TODO : Improve this, add field in user  ?
-                        if (DateSerialization.dateSerializer.toDate(entourageRefreshedAt.getString(i)
-                        ).compareTo(new Date()) == -1){
                             ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
-
                                     new Id(entourage.getLong(i)));
+
                             mService.sendRequest(userInfoRequest);
-                        }
                     }
                 }
             }
@@ -493,10 +490,8 @@ public class ResponseHandler {
                     newUser.setEmail(response.getString("email"));
 
                     if (!response.optString("pic").equals("")) {
-                        byte[] byteArray = Base64.decode(response.getString("pic"), Base64.DEFAULT);
-                        Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-
-                        newUser.setImg(img);
+                        newUser.setImg(ImageSerialization
+                                .unSerializeImage(response.getString("pic")));
                     } else {
                         newUser.setImg(YieldsApplication.getDefaultUserImage());
                     }
@@ -508,17 +503,15 @@ public class ResponseHandler {
                     user.setEmail(response.getString("email"));
 
                     if (!response.optString("pic").equals("")) {
-                        byte[] byteArray = Base64.decode(response.getString("pic"), Base64.DEFAULT);
-                        Bitmap img = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-
-                        user.setImg(img);
+                        user.setImg(ImageSerialization
+                                .unSerializeImage(response.getString("pic")));
                     } else {
                         user.setImg(YieldsApplication.getDefaultUserImage());
                     }
                 }
 
             }
-        } catch (JSONException | ParseException e) {
+        } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
@@ -559,11 +552,11 @@ public class ResponseHandler {
         try {
             user.setId(new Id(serverResponse.getMessage().getLong("uid")));
             if (serverResponse.getMessage().getBoolean("returning")) {
-                ServiceRequest groupListRequest = new UserGroupListRequest(user);
-                mService.sendRequest(groupListRequest);
                 ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
                 mService.sendRequest(userInfoRequest);
                 mService.notifyChange(NotifiableActivity.Change.CONNECTED);
+                ServiceRequest groupListRequest = new UserGroupListRequest(user);
+                mService.sendRequest(groupListRequest);
             } else {
                 mService.notifyChange(NotifiableActivity.Change.NEW_USER);
             }
