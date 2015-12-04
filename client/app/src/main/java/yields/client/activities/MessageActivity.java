@@ -79,8 +79,6 @@ public class MessageActivity extends NotifiableActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("Y:" + this.getClass().getName(), "Start creating Message Activity");
-
         setContentView(R.layout.activity_message);
         YieldsApplication.setApplicationContext(getApplicationContext());
         YieldsApplication.setResources(getResources());
@@ -125,8 +123,6 @@ public class MessageActivity extends NotifiableActivity {
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
-
-        Log.d("Y:" + this.getClass().getName(), "Start creating Message Activity");
     }
 
     @Override
@@ -431,7 +427,7 @@ public class MessageActivity extends NotifiableActivity {
      * ServiceBinder.
      */
     private void loadComments() {
-        Log.d("MessageActivity", "loadComments - ");
+        Log.d("MessageActivity", "loadComments");
         NodeHistoryRequest request = new NodeHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
