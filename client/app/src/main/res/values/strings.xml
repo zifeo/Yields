@@ -78,4 +78,6 @@
     <string name="messageContactAdded">User added to your entourage !</string>
     <string name="messageNoUser">No user exists with this email</string>
     <string name="leaveGroup">Leave group</string>
+    <string name="enterKeyword">Leave empty to allow all feeds</string>
+    <string name="typeKeywords">Then, type the keywords that the feed must contain to be published.</string>
 </resources>

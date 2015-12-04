@@ -23,6 +23,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class CreateRSSFeedActivity extends NotifiableActivity {
 
     private EditText mEditTextUrl;
+    private EditText mEditTextKeywords;
 
     private String mGroupName;
 
@@ -40,7 +41,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
         getSupportActionBar().setTitle(null);
 
         mEditTextUrl = (EditText) findViewById(R.id.editTextUrl);
-        mEditTextUrl.requestFocus();
+        mEditTextKeywords = (EditText) findViewById(R.id.editTextKeyWords);
 
         Intent intent = getIntent();
 
