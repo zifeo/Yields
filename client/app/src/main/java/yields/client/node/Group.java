@@ -43,6 +43,7 @@ public class Group extends Node {
     private TreeMap<Date, Message> mMessages;
     private boolean mValidated;
     private List<Id> mUsers;
+    private List<Group> mNodes;
     private Bitmap mImage;
     private GroupVisibility mVisibility;
     private Set<Tag> mTags;
@@ -71,6 +72,7 @@ public class Group extends Node {
         mVisibility = visibility;
         mTags = new HashSet<>();
         mDate = lastUpdate;
+        mNodes = new ArrayList<>();
     }
 
     /**
@@ -242,6 +244,10 @@ public class Group extends Node {
     synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
             mMessages.put(newMessage.getDate(), newMessage);
+        }
+
+        if (!mMessages.isEmpty()) {
+            setLastUpdate(mMessages.lastKey());
         }
     }
 
