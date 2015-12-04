@@ -97,8 +97,7 @@
         <activity
             android:name=".activities.CreateRSSFeedActivity"
             android:parentActivityName=".activities.CreateGroupSelectNameActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysVisible">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activities.AddUserToEntourageActivity"
