@@ -245,6 +245,24 @@ public class Group extends Node {
     }
 
     /**
+     * Gets all nodes from a group.
+     *
+     * @return A list of group nodes.
+     */
+    public List<Group> getNodes() {
+        return mNodes;
+    }
+
+    /**
+     * Adds a group node to the nodes of the group.
+     *
+     * @param node The group node to add.
+     */
+    public void addNode(Group node) {
+        mNodes.add(node);
+    }
+
+    /**
      * Indicates if a user belongs to the group
      *
      * @param user The user we want to test
