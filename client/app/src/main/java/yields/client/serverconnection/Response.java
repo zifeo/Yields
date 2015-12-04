@@ -15,7 +15,7 @@ public class Response {
      */
     public enum ResKind {
         NODE_HISTORY_RESPONSE("NodeHistoryRes"), NODE_MESSAGE_RESPONSE("NodeMessageRes"),
-        USER_CONNECT_RESPONSE("UserConnectRes"), USER_GROUP_LIST_RESPONSE("UserGroupListRes"),
+        USER_CONNECT_RESPONSE("UserConnectRes"), USER_GROUP_LIST_RESPONSE("UserNodeListRes"),
         USER_INFO_RESPONSE("UserInfoRes"), GROUP_CREATE_RESPONSE("GroupCreateRes"),
         USER_UPDATE_RESPONSE("UserUpdateres"), USER_SEARCH_RESPONSE("UserSearchRes"),
         NODE_SEARCH_RESPONSE("NodeSearchRes"), GROUP_UPDATE_RESPONSE("GroupUpdateRes"),
