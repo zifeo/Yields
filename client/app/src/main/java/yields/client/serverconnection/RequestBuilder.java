@@ -556,7 +556,7 @@ public class RequestBuilder {
 
     private void addField(Fields fieldType, Bitmap field) {
         this.mConstructingMap.put(fieldType.getValue(),
-                ImageSerialization.serializeImage(field, 200));
+                ImageSerialization.serializeImage(field, ImageSerialization.SIZE_IMAGE_NODE));
     }
 
     /**
