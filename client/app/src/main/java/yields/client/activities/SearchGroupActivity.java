@@ -47,7 +47,6 @@ public class SearchGroupActivity extends NotifiableActivity{
     private EditText mEditTextSearch;
     private ActionBar mActionBar;
     private List<Group> mCurrentGroups;
-    private List<Group> mGlobalGroups; // to be removed when the requests are operational
     private ListAdapterSearchedGroups mAdapterCurrentGroups;
 
     private TextView mTextViewInfo;
@@ -196,20 +195,13 @@ public class SearchGroupActivity extends NotifiableActivity{
                 } else {
                     setWaitingState();
 
-                    ServiceRequest searchRequest = new NodeSearchRequest(YieldsApplication
-                            .getUser().getId(),
-                            mEditTextSearch.getText().toString());
-
-                    YieldsApplication.getBinder().sendRequest(searchRequest);
-
-                    /*
                     mTimer = new Timer("DelayedRequestTimer");
                     mTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
                             launchSearch(mEditTextSearch.getText().toString());
                         }
-                    }, 1000);*/
+                    }, 1000);
                 }
             }
 
@@ -244,45 +236,10 @@ public class SearchGroupActivity extends NotifiableActivity{
             public void run() {
                 mRequestsCount++;
 
-                /**
-                 * When the search request is operational, the whole
-                 * part below should be removed and replaced by a
-                 * call to the service
-                 */
-                mTemporaryTimer = new Timer("FakeRequestTimer");
-                mTemporaryTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        List<Group> newGroupsSearched = new ArrayList<>();
+                ServiceRequest searchRequest = new NodeSearchRequest(YieldsApplication
+                        .getUser().getId(), text);
 
-                        String tagText = text.toLowerCase().replace(' ', '_');
-
-
-                        // match for the names
-                        for (int i = 0; i < mGlobalGroups.size(); i++) {
-                            if (mGlobalGroups.get(i).getName().toLowerCase().startsWith(tagText)) {
-                                newGroupsSearched.add(mGlobalGroups.get(i));
-                            }
-                        }
-
-                        if (text.length() > Group.Tag.MIN_TAG_LENGTH
-                                && text.length() < Group.Tag.MAX_TAG_LENGTH) {
-                            Group.Tag tag = new Group.Tag(tagText);
-
-                            //match for the tags
-                            for (int i = 0; i < mGlobalGroups.size(); i++) {
-                                if (mGlobalGroups.get(i).matchToTag(tag) &&
-                                        !newGroupsSearched.contains(mGlobalGroups.get(i))) {
-                                    newGroupsSearched.add(mGlobalGroups.get(i));
-                                }
-                            }
-                        }
-
-                        YieldsApplication.setGroupsSearched(newGroupsSearched);
-
-                        notifyChange(Change.GROUP_SEARCH);
-                    }
-                }, 2000);
+                YieldsApplication.getBinder().sendRequest(searchRequest);
             }
         });
     }
