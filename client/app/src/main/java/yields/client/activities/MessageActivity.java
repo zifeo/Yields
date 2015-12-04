@@ -196,7 +196,6 @@ public class MessageActivity extends NotifiableActivity {
                     mGroup.getVisibility());
             YieldsApplication.getBinder().sendRequest(request);
         } else {
-            Log.d("MessageActivity", "Send comment");
             mCommentAdapter.add(message);
             mCommentAdapter.notifyDataSetChanged();
             ((CommentFragment) mCurrentFragment).getCommentListView()
@@ -500,7 +499,7 @@ public class MessageActivity extends NotifiableActivity {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
-            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
 
             for (Message message : messagesTree.values()) {
@@ -508,9 +507,10 @@ public class MessageActivity extends NotifiableActivity {
             }
 
             mGroupMessageAdapter.notifyDataSetChanged();
-            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
+        ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
 
     /**

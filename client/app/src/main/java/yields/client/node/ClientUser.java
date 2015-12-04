@@ -64,6 +64,11 @@ public class ClientUser extends User {
      * @param group the group to add.
      */
     public void addGroup(Group group) {
+        for (Group prevGroup : mGroups) {
+            if (prevGroup.getId().getId().equals(group.getId().getId())) {
+                return;
+            }
+        }
         mGroups.add(group);
     }
 
