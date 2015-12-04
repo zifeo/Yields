@@ -11,11 +11,11 @@ import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -40,7 +40,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserGroupListRequest(UserGroupListRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -55,7 +55,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserEntourageRemoveRequest(UserEntourageRemoveRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -69,7 +69,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserInfoRequest(UserInfoRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -79,7 +79,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleGroupCreateRequest(GroupCreateRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -95,7 +95,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -109,7 +109,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleGroupUpdateImageRequest(GroupUpdateImageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -120,7 +120,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleGroupUpdateNameRequest(GroupUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -131,7 +131,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleGroupAddRequest(GroupAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -146,7 +146,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleGroupRemoveRequest(GroupRemoveRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -157,7 +157,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserUpdateRequest(UserUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -172,7 +172,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserConnectRequest(ServiceRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -181,7 +181,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handlePingRequest(ServiceRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -190,7 +190,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleNodeMessageRequest(NodeMessageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -208,7 +208,7 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a ServiceRequest which is given to it by argument.
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleNodeHistoryRequest(NodeHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
@@ -225,12 +225,15 @@ public class RequestHandler {
     }
 
     /**
-     * Handles a group info request
+     * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleGroupInfoRequest(GroupInfoRequest serviceRequest) {
         mController.sendToServer(serviceRequest.parseRequestForServer());
     }
 
+    /**
+     * Handles the appropriate ServiceRequest which is given to it by argument.
+     */
     public void handleUserSearchRequest(UserSearchRequest serviceRequest) {
         mController.sendToServer(serviceRequest.parseRequestForServer());
     }
