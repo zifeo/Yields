@@ -21,7 +21,7 @@ abstract class AbstractPublisher protected(nid: NID) extends Node(nid) {
     val tags = s"$node:tags"
   }
 
-  var _tags: Option[Set[TID]] = None
+  private var _tags: Option[Set[TID]] = None
 
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {
