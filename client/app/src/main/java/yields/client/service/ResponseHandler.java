@@ -46,6 +46,9 @@ public class ResponseHandler {
 
     protected void handleUserUpdateResponse(Response serverResponse){
         Log.d("Y:" + this.getClass().getName(), "Response for UserUpdate");
+        ServiceRequest userInfo = new UserInfoRequest(YieldsApplication.getUser(),
+                YieldsApplication.getUser().getId());
+        mService.sendRequest(userInfo);
         // Nothing to parse.
     }
 
@@ -58,7 +61,6 @@ public class ResponseHandler {
                 ServiceRequest addToEntourageRequest =
                         new UserEntourageAddRequest(YieldsApplication.getUser().getId(), id);
                 mService.sendRequest(addToEntourageRequest);
-                YieldsApplication.getUser().addUserToEntourage(new User(id));
                 mService.notifyChange(NotifiableActivity.Change.ADD_ENTOURAGE);
             } else {
                 mService.notifyChange(NotifiableActivity.Change.NOT_EXIST);
@@ -271,11 +273,11 @@ public class ResponseHandler {
             User user;
             Boolean newUser = false;
 
-            if (YieldsApplication.getUser(new Id(response.getLong("uid"))) == null) {
+            if (YieldsApplication.getUserFromId(new Id(response.getLong("uid"))) == null) {
                 user = new User(new Id(response.getLong("uid")));
                 newUser = true;
             } else {
-                user = YieldsApplication.getUser(new Id(response.getLong("uid")));
+                user = YieldsApplication.getUserFromId(new Id(response.getLong("uid")));
             }
 
             user.setName(response.getString("name"));
@@ -483,49 +485,42 @@ public class ResponseHandler {
     protected void handleUserInfoResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            if (YieldsApplication.getUser().getId().getId().equals(-1) ||
-                    YieldsApplication.getUser().getId().getId().equals(response.getLong("uid"))){
-                YieldsApplication.getUser().update(response);
-                JSONArray entourage = response.getJSONArray("entourage");
-                JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
+            Id infoId = new Id(response.getLong("uid"));
+            User user = YieldsApplication.getUserFromId(infoId);
+            if (response.getString("email").equals("")) {
+                if (user != null) {
+                    user.update(response);
+                } else {
+                    user = new User(response);
+                    YieldsApplication.addNotKnown(user);
+                }
+            } else {
+                if (YieldsApplication.getUser().getId().getId().equals(-1) ||
+                        YieldsApplication.getUser().getId().equals(infoId)) {
+                    YieldsApplication.getUser().update(response);
 
-                if (entourage != null && entourageRefreshedAt != null){
-                    for (int i = 0; i < entourage.length(); i++) {
-                        // TODO : Improve this, add field in user  ?
+                    JSONArray entourage = response.getJSONArray("entourage");
+                    JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
+
+                    if (entourage != null && entourageRefreshedAt != null) {
+                        for (int i = 0; i < entourage.length(); i++) {
+                            // TODO : Improve this, add field in user  ?
                             ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
                                     new Id(entourage.getLong(i)));
 
                             mService.sendRequest(userInfoRequest);
+                        }
                     }
-                }
-            }
-            else {
-                if (YieldsApplication.getUser(new Id(response.getLong("uid"))) == null) {
-                    User newUser = new User(new Id(response.getLong("uid")));
-                    newUser.setName(response.getString("name"));
-                    newUser.setEmail(response.getString("email"));
-
-                    if (!response.optString("pic").equals("")) {
-                        newUser.setImg(ImageSerialization
-                                .unSerializeImage(response.getString("pic")));
-                    } else {
-                        newUser.setImg(YieldsApplication.getDefaultUserImage());
-                    }
-
-                    YieldsApplication.getUser().addUserToEntourage(newUser);
                 } else {
-                    User user = YieldsApplication.getUser(new Id(response.getLong("uid")));
-                    user.setName(response.getString("name"));
-                    user.setEmail(response.getString("email"));
+                    if (user == null) {
+                        user = new User(response);
 
-                    if (!response.optString("pic").equals("")) {
-                        user.setImg(ImageSerialization
-                                .unSerializeImage(response.getString("pic")));
+                        YieldsApplication.getUser().addUserToEntourage(user);
                     } else {
-                        user.setImg(YieldsApplication.getDefaultUserImage());
+                        user.update(response);
                     }
-                }
 
+                }
             }
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +

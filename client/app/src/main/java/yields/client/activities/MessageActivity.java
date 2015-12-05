@@ -408,7 +408,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mActionBar.setTitle("Message from " + YieldsApplication.getUser(mCommentMessage.getSender())
+        mActionBar.setTitle("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();

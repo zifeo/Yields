@@ -276,7 +276,7 @@ public class YieldService extends Service {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.send_icon)
                         .setContentTitle("Message from " + YieldsApplication
-                                .getUser(message.getSender()).getName())
+                                .getUserFromId(message.getSender()).getName())
                         .setContentText(message.getContent().toString().substring(0, 50));
 
         // Creates an explicit intent for an Activity in your app
