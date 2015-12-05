@@ -2,7 +2,6 @@ package yields.server.router
 
 import java.net.InetSocketAddress
 
-import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor._
 import akka.io.Tcp
 import akka.stream.actor._
@@ -12,12 +11,11 @@ import yields.server.actions.Broadcast
 import yields.server.actions.users.UserConnectRes
 import yields.server.mpi.{Metadata, Notification, Response}
 import yields.server.pipeline.blocks.SerializationModule
+import yields.server.utils.FaultTolerance
 
 import scala.collection.immutable.Queue
-import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.util.{Failure, Try, Success}
-import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 /**
   * Actor in charge of handling a **single** client request and answering with corresponding response.
@@ -37,27 +35,10 @@ final class ClientHub(private val socket: ActorRef,
   import Tcp._
 
   MDC.put("client", address.toString)
-
   val errorMessage = """{"kind":"error"}"""
 
-  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
-    case NonFatal(nonfatal) =>
-      val message = nonfatal.getMessage
-      log.error(nonfatal, s"non fatal: $message")
-      Resume
-    case fatal =>
-      val message = fatal.getMessage
-      log.error(fatal, s"fatal: $message")
-      Escalate
-  }
-
-  override def preStart(): Unit =
-    log.info("connected.")
-
-  override def postStop(): Unit =
-    log.info("disconnected.")
-
-  def receive: Receive = state(Queue.empty, identified = false)
+  def receive: Receive =
+    state(Queue.empty, identified = false)
 
   /** Casual state. It is dispatched if dispatcher has been linked. */
   def state(buffer: Queue[ByteString], identified: Boolean = true): Receive = {
@@ -118,6 +99,15 @@ final class ClientHub(private val socket: ActorRef,
       log.warning(s"unexpected letter: $unexpected")
 
   }
+
+  override val supervisorStrategy =
+    FaultTolerance.nonFatalResume(log)
+
+  override def preStart(): Unit =
+    log.info("connected")
+
+  override def postStop(): Unit =
+    log.info("disconnected")
 
   /** Returns the number of received request at the moment of the latest result. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
