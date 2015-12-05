@@ -72,6 +72,13 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
         mAdapterEntourage.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mAdapterEntourage.notifyDataSetChanged();
+    }
+
     /**
      * Method automatically called for the tool bar items
      * @param menu The tool bar menu
