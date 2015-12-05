@@ -49,7 +49,6 @@ public class ResponseHandler {
         ServiceRequest userInfo = new UserInfoRequest(YieldsApplication.getUser(),
                 YieldsApplication.getUser().getId());
         mService.sendRequest(userInfo);
-        // Nothing to parse.
     }
 
     protected void handleUserSearchResponse(Response serverResponse){
@@ -129,9 +128,15 @@ public class ResponseHandler {
             for (int i = 0 ; i < users.length() ; i ++) {
                 Id userId = new Id(users.getLong(i));
                 userList.add(userId);
+                if (YieldsApplication.getUser() == null) {
+                    User newUser = new User(userId);
+                    YieldsApplication.addNotKnown(newUser);
+                    ServiceRequest userInfo =
+                            new UserInfoRequest(YieldsApplication.getUser(), userId);
+                    mService.sendRequest(userInfo);
+                }
             }
 
-            // _KetzA : I'm not really sure what to do here ...
             Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
             group.setName(name);
             group.setLastUpdate(new Date());
@@ -315,6 +320,7 @@ public class ResponseHandler {
             }
 
             Group newGroup = new Group(name, new Id(nid), userList);
+            newGroup.setValidated();
             YieldsApplication.getUser().addGroup(newGroup);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
