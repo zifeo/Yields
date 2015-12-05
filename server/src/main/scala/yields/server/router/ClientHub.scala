@@ -87,6 +87,7 @@ final class ClientHub(private val socket: ActorRef,
       onNext(data)
 
     case PeerClosed => // Client exited
+      log.info("peer closed")
       terminate()
 
     case ErrorClosed(cause) =>
