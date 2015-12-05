@@ -23,11 +23,13 @@ class TestUserInfo extends DBFlatSpec with Matchers {
     val meta = Metadata.now(user.uid)
 
     action.run(meta) match {
-      case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
+      case UserInfoRes(uid, name, email, pic, entourage, entourageUpdates) =>
         uid should be (user.uid)
         name should be (user.name)
         email should be (user.email)
+        pic should be (user.pic)
         entourage should contain theSameElementsAs user.entourage
+        entourage should not be empty
     }
   }
 
@@ -42,10 +44,11 @@ class TestUserInfo extends DBFlatSpec with Matchers {
     val meta = Metadata.now(user.uid)
 
     action.run(meta) match {
-      case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
+      case UserInfoRes(uid, name, email, pic, entourage, entourageUpdates) =>
         uid should be (contact.uid)
         name should be (contact.name)
         email should be (contact.email)
+        pic should be (user.pic)
         entourage should be (empty)
         entourageUpdates should be (empty)
     }
@@ -66,10 +69,11 @@ class TestUserInfo extends DBFlatSpec with Matchers {
     val meta = Metadata.now(user.uid)
 
     action.run(meta) match {
-      case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
+      case UserInfoRes(uid, name, email, pic, entourage, entourageUpdates) =>
         uid should be (contact.uid)
         name should be (contact.name)
         email should be (empty)
+        pic should be (user.pic)
         entourage should be (empty)
         entourageUpdates should be (empty)
     }
