@@ -5,6 +5,7 @@ import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeHistoryRes, NodeSearchRes}
+import yields.server.actions.publisher.{PublisherCreateRes, PublisherUpdateRes, PublisherInfoRes, PublisherMessageRes}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -27,13 +28,19 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case x: GroupInfoRes => packWithKind(x)
       case x: GroupMessageRes => packWithKind(x)
 
+      case x: PublisherCreateRes => packWithKind(x)
+      case x: PublisherUpdateRes => packWithKind(x)
+      case x: PublisherInfoRes => packWithKind(x)
+      case x: PublisherMessageRes => packWithKind(x)
+
       case x: NodeHistoryRes => packWithKind(x)
       case x: NodeSearchRes => packWithKind(x)
 
       case x: UserConnectRes => packWithKind(x)
       case x: UserUpdateRes => packWithKind(x)
-      case x: UserGroupListRes => packWithKind(x)
+      case x: UserNodeListRes => packWithKind(x)
       case x: UserInfoRes => packWithKind(x)
+      case x: UserSearchRes => packWithKind(x)
 
       case _ => serializationError(s"unregistered result kind: $kind")
     }
@@ -59,13 +66,19 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "GroupInfoRes" => message.convertTo[GroupInfoRes]
           case "GroupMessageRes" => message.convertTo[GroupMessageRes]
 
+          case "PublisherCreateRes" => message.convertTo[PublisherCreateRes]
+          case "PublisherUpdateRes" => message.convertTo[PublisherUpdateRes]
+          case "PublisherInfoRes" => message.convertTo[PublisherInfoRes]
+          case "PublisherMessageRes" => message.convertTo[PublisherMessageRes]
+
           case "NodeHistoryRes" => message.convertTo[NodeHistoryRes]
           case "NodeSearchRes" => message.convertTo[NodeSearchRes]
 
           case "UserConnectRes" => message.convertTo[UserConnectRes]
           case "UserUpdateRes" => message.convertTo[UserUpdateRes]
-          case "UserGroupListRes" => message.convertTo[UserGroupListRes]
+          case "UserNodeListRes" => message.convertTo[UserNodeListRes]
           case "UserInfoRes" => message.convertTo[UserInfoRes]
+          case "UserSearchRes" => message.convertTo[UserSearchRes]
 
           case _ => deserializationError(s"unregistered result kind: $kind")
         }

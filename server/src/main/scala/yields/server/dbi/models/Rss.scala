@@ -8,10 +8,18 @@ import yields.server.utils.Temporal
   * Rss publisher node class
   * @param nid nid of publisher
   */
-final class Rss private(nid: NID) extends AbstractPublisher(nid) {
+final class Rss private(nid: NID) extends Node(nid) {
 
   object RSSKey {
     val url = "rss_url"
+  }
+
+  /** Add message */
+  override def addMessage(content: FeedContent): Boolean = {
+    val children = for (nid <- nodes) yield {
+      Node(nid).addMessage(content)
+    }
+    children.forall(x => x)
   }
 
   private var _url: Option[String] = None

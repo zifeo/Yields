@@ -1,10 +1,10 @@
 package yields.server.actions.users
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models.User
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 
 class TestUserSearch extends DBFlatSpec with Matchers {
 
