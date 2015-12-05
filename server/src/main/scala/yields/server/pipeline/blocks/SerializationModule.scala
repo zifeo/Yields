@@ -26,21 +26,21 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
 /** [[SerializationModule]] companion object. */
 object SerializationModule {
 
-  /** Serialize [[Response]] to [[ByteString]]. */
+  /** Serialize [[Response]] to [[ByteString]]. '\n' is needed by client to detect end of response. */
   def serialize(response: Response): ByteString = {
     val json = response.toJson
     ByteString(s"$json\n")
   }
 
-  /** Serialize [[Notification]] to [[ByteString]]. */
+  /** Serialize [[Notification]] to [[ByteString]]. '\n' is needed by client to detect end of response. */
   def serialize(notification: Notification): ByteString = {
     val json = notification.toJson
     ByteString(s"$json\n")
   }
 
-  /** Deserialize [[ByteString]] to [[Request]]. '\n' is needed by client to detect end of response. */
-  def deserialize(raw: ByteString): Request =
-    raw.utf8String.parseJson.convertTo[Request]
+  /** Deserialize [[ByteString]] to [[Request]]. */
+  def deserialize[T : JsonReader](raw: ByteString): T =
+    raw.utf8String.parseJson.convertTo[T]
 
   /** Shortcut for creating a new logging module. */
   def apply()(implicit logger: LoggingAdapter): BidiFlow[ByteString, Request, Response, ByteString, Unit] =

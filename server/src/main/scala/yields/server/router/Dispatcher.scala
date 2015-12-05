@@ -23,7 +23,7 @@ final class Dispatcher() extends Actor with ActorLogging {
   import Dispatcher._
 
   private type Pool = (Map[UID, ActorRef], Map[ActorRef, UID])
-  private val uidPattern = """"client":"""
+  private val uidPattern = """"uid":"""
 
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
@@ -48,16 +48,9 @@ final class Dispatcher() extends Actor with ActorLogging {
 
     // ----- ClientHub letters -----
 
-    case InitConnection(data) =>
-      parse(data) match {
-        case Success(uid) =>
-          val clientHub = sender()
-          context.become(state(add(uid, clientHub, pool)))
-
-        case Failure(cause) =>
-          val message = cause.getMessage
-          log.warning(s"dispatch pool: init connection without uid: $message")
-      }
+    case InitConnection(uid) =>
+      val newPool = add(uid, sender(), pool)
+      context become state(newPool)
 
     case TerminateConnection =>
       val clientHub = sender()
@@ -69,12 +62,10 @@ final class Dispatcher() extends Actor with ActorLogging {
           log.warning(s"dispatch pool: terminate connection without uid")
       }
 
-    case Notify(uids, result) =>
+    case Notify(uids, broadcast) =>
       val users = uids.mkString("[", ",", "]")
-      log.debug(s"dispatch pool: notify $users with $result")
-      val metadata = Metadata.now(0)
-      val push = OnPush(SerializationModule.serialize(Notification(result, metadata)))
-      filter(uids, pool).foreach(_ ! push)
+      log.debug(s"dispatch pool: notify $users with $broadcast")
+      filter(uids, pool).foreach(_ ! OnPush(broadcast))
 
     // ----- Default letters -----
 
@@ -119,7 +110,7 @@ final class Dispatcher() extends Actor with ActorLogging {
 object Dispatcher {
 
   /** Sent each time a new connection happen and received with a message. */
-  private[router] case class InitConnection(data: ByteString)
+  private[router] case class InitConnection(uid: UID)
 
   /** Sent each time a connection is terminated. */
   private[router] case class TerminateConnection()
