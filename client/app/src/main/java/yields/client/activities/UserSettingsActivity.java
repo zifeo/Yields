@@ -25,6 +25,7 @@ import yields.client.R;
 import yields.client.listadapter.ListAdapterUserSettings;
 import yields.client.node.ClientUser;
 import yields.client.servicerequest.ServiceRequest;
+import yields.client.servicerequest.UserUpdateNameRequest;
 import yields.client.servicerequest.UserUpdateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -202,7 +203,7 @@ public class UserSettingsActivity extends AppCompatActivity {
 
                         mUser.setName(newName);
 
-                        ServiceRequest request = new UserUpdateRequest(mUser);
+                        ServiceRequest request = new UserUpdateNameRequest(mUser);
                         YieldsApplication.getBinder().sendRequest(request);
 
                         dialog.dismiss();

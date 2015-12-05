@@ -23,7 +23,7 @@ public class YieldsApplication {
     private static ClientUser mUser;
     private static User mUserSearched;
     private static List<User> mUserList;
-    private static List<User> mNotKnown;
+    private static List<User> mNotKnown = new ArrayList<>();
     private static Group mGroup;
 
     private static List<Group> mGroupsSearched = new ArrayList<>();

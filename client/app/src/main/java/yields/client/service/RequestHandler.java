@@ -17,6 +17,7 @@ import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -24,6 +25,7 @@ import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserSearchRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
+import yields.client.servicerequest.UserUpdateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class RequestHandler {
@@ -99,11 +101,11 @@ public class RequestHandler {
      */
     protected void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
+        /*try {
             mCacheHelper.addUser(YieldsApplication.getUserFromId(serviceRequest.getUserToAdd()));
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserEntourageAddRequest correctly !");
-        }
+        }*/
 
         mController.sendToServer(serverRequest);
     }
@@ -159,7 +161,22 @@ public class RequestHandler {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    protected void handleUserUpdateRequest(UserUpdateNameRequest serviceRequest) {
+    protected void handleUserUpdateRequest(UserUpdateRequest serviceRequest) {
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        try {
+            mCacheHelper.updateUser(serviceRequest.getUser());
+            //TODO : Notify app
+        } catch (CacheDatabaseException e) {
+            Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserUpdateNameRequest correctly !");
+        }
+
+        mController.sendToServer(serverRequest);
+    }
+
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
+    protected void handleUserUpdateNameRequest(UserUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             mCacheHelper.updateUser(serviceRequest.getUser());
@@ -233,6 +250,10 @@ public class RequestHandler {
     }
 
     public void handleUserSearchRequest(UserSearchRequest serviceRequest) {
+        mController.sendToServer(serviceRequest.parseRequestForServer());
+    }
+
+    public void handleNodeSearchRequest(NodeSearchRequest serviceRequest) {
         mController.sendToServer(serviceRequest.parseRequestForServer());
     }
 }
