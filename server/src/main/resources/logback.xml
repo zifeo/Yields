@@ -2,6 +2,7 @@
 
 <configuration>
 
+    <!-- standard out -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
@@ -9,10 +10,13 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <encoder>
-            <pattern>%date{ISO8601} %-5level %-30logger{30} %replace(%.-300msg){'\\r\\n', ' '} %ex{short}%n</pattern>
+            <pattern>
+                %date{ISO8601} %-5level %-30logger{30} %+3X{user} %replace(%.-300msg){'\\r\\n', ' '} %ex{short}%n
+            </pattern>
         </encoder>
     </appender>
 
+    <!-- logstash -->
     <appender name="STASH" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
         <appender class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
             <destination>91.121.7.102:25000</destination>
@@ -31,7 +35,8 @@
                             "message": "%.-500message",
                             "akkaSource": "%X{akkaSource}",
                             "akkaTimestamp": "%X{akkaTimestamp}",
-                            "client": "%X{client}"
+                            "client": "%X{client}",
+                            "user": "%X{user}"
                             }
                         </pattern>
                     </pattern>
@@ -40,6 +45,9 @@
         </appender>
         <includeCallerData>true</includeCallerData>
     </appender>
+
+    <!-- do not log under warn level for akka slf4j logger -->
+    <logger name="akka.event.slf4j.Slf4jLogger" level="WARN"/>
 
     <root level="ALL">
         <appender-ref ref="STDOUT"/>
