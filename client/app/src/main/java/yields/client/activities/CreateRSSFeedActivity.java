@@ -20,6 +20,10 @@ import yields.client.node.User;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Activity where the user can type in the url of the rss feed
+ * and some keywords to filter the future feeds.
+ */
 public class CreateRSSFeedActivity extends NotifiableActivity {
 
     private EditText mEditTextUrl;
