@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class UrlContent extends Content {
     private String mCaption;
     private String mUrl;
+    private String mValidUrl;
     private String mTitle;
     private String mDescription;
 
@@ -38,7 +40,7 @@ public class UrlContent extends Content {
     private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
     private static final String URL_COLOR = "#00BFFF";
 
-    private static final String ERROR_DESCRIPTION_INVALID_URL = "Unknown page";
+    private static final String ERROR_INVALID_URL = "Unknown page";
     private static final String NO_DESCRIPTION = "No description";
     private static final String NO_TITLE = "No title";
     private static final String CONNECTION_ERROR = "No connection";
@@ -55,9 +57,14 @@ public class UrlContent extends Content {
         if (mUrl.length() == 0) {
             throw new ContentException("Error in URL content constructor, caption does not contain any URL.");
         }
-        makeUrlValid(mUrl);
         Log.d("UrlContent", "Caption : " + caption + "  contains url : " + mUrl);
-        getTitleAndDescrition();
+        mValidUrl = makeUrlValid(mUrl);
+        try {
+            getTitleAndDescrition();
+        } catch (ExecutionException | InterruptedException e) {
+            mTitle = ERROR_INVALID_URL;
+            mDescription = ERROR_INVALID_URL;
+        }
         Log.d("UrlContent", "Title = " + mTitle);
         Log.d("UrlContent", "Description = " + mDescription);
     }
@@ -95,7 +102,7 @@ public class UrlContent extends Content {
     }
 
     public String getUrl() {
-        return mUrl;
+        return mValidUrl;
     }
 
     public String getDescription() {
@@ -109,7 +116,7 @@ public class UrlContent extends Content {
     public static String makeUrlValid(String url){
         boolean addHttp = false;
         boolean addWww = false;
-        if (!url.startsWith("http://")){
+        if (!url.startsWith("https://")){
             addHttp = true;
         }
         if (!url.contains("www.")){
@@ -118,15 +125,16 @@ public class UrlContent extends Content {
 
         if (addHttp){
             if (addWww) {
-                url = "http://www." + url;
+                url = "https://www." + url;
             }
             else{
-                url = "http://" + url;
+                url = "https://" + url;
             }
         }
         else if (addWww){
-            url = "http://" + url.substring(7, url.length());
+            url = "https://" + url.substring(7, url.length());
         }
+        Log.d("UrlContent", "valid URL = " + url);
         return url;
     }
 
@@ -157,7 +165,7 @@ public class UrlContent extends Content {
 
     @Override
     public String getContentForRequest() {
-        return mUrl;
+        return mValidUrl;
     }
 
     /**
@@ -208,17 +216,17 @@ public class UrlContent extends Content {
         return sb.toString();
     }
 
-    private void getTitleAndDescrition() {
+    private void getTitleAndDescrition() throws ExecutionException, InterruptedException {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 URL url = null;
                 try {
-                    url = new URL(mUrl);
+                    url = new URL(mValidUrl);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setConnectTimeout(2000);
-                    connection.connect();
+                    connection.setConnectTimeout(1000);
                     String pageBody = inputStreamToString(connection.getInputStream());
+                    Log.d("UrlContent", "Page body = " + pageBody);
                     mTitle = getTitleFromMetadata(pageBody);
                     mDescription = getDescriptionFromMetadata(pageBody);
                 } catch (IOException e) {
@@ -247,23 +255,14 @@ public class UrlContent extends Content {
     private static String getDescriptionFromMetadata(String pageBody) {
         int posMetaDescr = pageBody.indexOf("meta name=\"description\" content=\"");
         int lengthMetaDescrField = new String("meta name=\"description\" content=\"").length();
-        if (posMetaDescr == -1) {
+        int posMetaDescrClose = pageBody.indexOf("\"", posMetaDescr + lengthMetaDescrField);
+        if (posMetaDescr == -1 || posMetaDescrClose == -1) {
             // No description.
             return NO_DESCRIPTION;
         }
-        StringBuilder builder = new StringBuilder();
-        boolean found = false;
-        for (int i = posMetaDescr + lengthMetaDescrField; i < pageBody.length(); i++) {
-            if (pageBody.charAt(i) != '"') {
-                builder.append(pageBody.charAt(i));
-            } else {
-                found = true;
-            }
-        }
-        if (!found) {
-            return NO_DESCRIPTION;
-        } else {
-            return builder.toString();
+        else{
+            String description = pageBody.substring(posMetaDescr + lengthMetaDescrField, posMetaDescrClose);
+            return description;
         }
     }
 }
