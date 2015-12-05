@@ -3,9 +3,9 @@ package yields.server.actions
 import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
-import yields.server.DefaultsGenerators
 import yields.server.actions.publisher._
 import yields.server.dbi.models.{Blob, UID, NID}
+import yields.server.tests.DefaultsGenerators
 
 trait PublishersGenerators extends DefaultsGenerators {
 

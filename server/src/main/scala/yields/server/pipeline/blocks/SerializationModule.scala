@@ -19,26 +19,20 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
   override val incoming: ByteString => Request = deserialize[Request]
 
   /** Outgoing serialization. */
-  override val outgoing: Response => ByteString = serialize
+  override val outgoing: Response => ByteString = serialize[Response]
 
 }
 
 /** [[SerializationModule]] companion object. */
 object SerializationModule {
 
-  /** Serialize [[Response]] to [[ByteString]]. '\n' is needed by client to detect end of response. */
-  def serialize(response: Response): ByteString = {
-    val json = response.toJson
+  /** Serialize [[T]] to [[ByteString]]. '\n' is needed by client to detect end of response. */
+  def serialize[T : JsonWriter](obj: T): ByteString = {
+    val json = obj.toJson
     ByteString(s"$json\n")
   }
 
-  /** Serialize [[Notification]] to [[ByteString]]. '\n' is needed by client to detect end of response. */
-  def serialize(notification: Notification): ByteString = {
-    val json = notification.toJson
-    ByteString(s"$json\n")
-  }
-
-  /** Deserialize [[ByteString]] to [[Request]]. */
+  /** Deserialize [[ByteString]] to [[T]]. */
   def deserialize[T : JsonReader](raw: ByteString): T =
     raw.utf8String.parseJson.convertTo[T]
 

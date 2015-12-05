@@ -7,6 +7,7 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {

@@ -3,7 +3,7 @@ package yields.server.io
 import org.scalacheck.{Prop, Properties}
 import yields.server.actions.PublishersGenerators
 import yields.server.actions.publisher._
-import yields.server._
+import yields.server.tests._
 
 object PublishersJsonFormatSpecifications extends Properties("PublishersJsonFormat") with PublishersGenerators {
 
