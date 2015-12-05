@@ -128,17 +128,17 @@ final class ClientHub(private val socket: ActorRef,
     val total = tcpHistory.size
     val first = tcpHistory.last._2
     val latest = tcpHistory.head._2
-    val length = ChronoUnit.MINUTES.between(first, latest)
+    val length = ChronoUnit.MINUTES.between(latest, first)
     log.info(
       s"""
          |stats
+         |len:$length
          |tot:$total
          |inp:$totalInp
          |out:$totalOut
          |brd:$totalBrd
          |fir:$first
          |lat:$latest
-         |len:$length
        """.stripMargin)
   }
 
