@@ -84,7 +84,7 @@ package object io {
   implicit lazy val userUpdateBrdJF = jsonFormat4(UserUpdateBrd)
 
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
-  implicit lazy val userInfoResJF = jsonFormat5(UserInfoRes)
+  implicit lazy val userInfoResJF = jsonFormat6(UserInfoRes)
 
   implicit lazy val userSearchJF = jsonFormat1(UserSearch)
   implicit lazy val userSearchResJF = jsonFormat1(UserSearchRes)
