@@ -8,10 +8,15 @@ import akka.io.Tcp
 import akka.stream.actor._
 import akka.util.ByteString
 import org.slf4j.MDC
+import yields.server.actions.Broadcast
+import yields.server.actions.users.UserConnectRes
+import yields.server.mpi.{Metadata, Notification, Response}
+import yields.server.pipeline.blocks.SerializationModule
 
 import scala.collection.immutable.Queue
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.util.{Failure, Try, Success}
 import scala.util.control.NonFatal
 
 /**
@@ -28,122 +33,155 @@ final class ClientHub(private val socket: ActorRef,
   import ActorSubscriberMessage._
   import ClientHub._
   import Dispatcher._
+  import SerializationModule._
   import Tcp._
 
   MDC.put("client", address.toString)
 
+  val errorMessage = """{"kind":"error"}"""
+
   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
     case NonFatal(nonfatal) =>
       val message = nonfatal.getMessage
-      log.error(nonfatal, s"$address non fatal: $message")
+      log.error(nonfatal, s"non fatal: $message")
       Resume
     case fatal =>
       val message = fatal.getMessage
-      log.error(fatal, s"$address fatal: $message")
+      log.error(fatal, s"fatal: $message")
       Escalate
   }
 
-  override def preStart(): Unit = {
-    log.info(s"connected $address.")
-  }
+  override def preStart(): Unit =
+    log.info("connected.")
 
-  override def postStop(): Unit = {
-    log.info(s"disconnected $address.")
-  }
+  override def postStop(): Unit =
+    log.info("disconnected.")
 
-
-  def receive: Receive = state(Queue.empty, dispatched = false)
+  def receive: Receive = state(Queue.empty, identified = false)
 
   /** Casual state. It is dispatched if dispatcher has been linked. */
-  def state(buffer: Queue[ByteString], dispatched: Boolean): Receive = {
+  def state(buffer: Queue[ByteString], identified: Boolean = true): Receive = {
 
-    def send(data: ByteString): Unit = {
-      val count = buffer.size
-      count match {
-        case 0 => socket ! Write(data, Ack)
-        case len if len > 5 => log.warning(s"$address queue already buffer: $len")
-        case _ =>
-      }
-      val message = data.utf8String
-      log.debug(s"$address buffer enqueue (#$count): $message")
-      context.become(state(buffer.enqueue[ByteString](data), dispatched))
-    }
+    // ----- Publisher letters -----
 
-    {
+    case Request(n: Long) => // Stream subscriber requests more elements
 
-      // ----- Publisher letters -----
+    case Cancel => // Stream subscriber cancels the subscription
+      log.error("hub detected pipeline error")
+      terminate()
 
-      case Request(n: Long) => // Stream subscriber requests more elements.
+    // ----- Subscriber letters -----
 
-      case Cancel => // Stream subscriber cancels the subscription.
-        log.error(s"$address hub detected pipeline error")
-        terminate()
+    case OnNext(data: ByteString) if ! identified => // First outgoing message
+      identify(data, buffer)
 
-      // ----- Subscriber letters -----
+    case OnNext(data: ByteString) => // Outgoing message
+      val outgoing = data.utf8String
+      log.debug(s"[OUT] $outgoing")
+      send(data, buffer)
 
-      case OnNext(data: ByteString) =>
-        val outgoing = data.utf8String
-        log.debug(s"$address [OUT] $outgoing")
-        send(data)
+    case OnError(cause: Throwable) => // Processing error message
+      log.error(cause, "error letter")
+      send(errorMessage, buffer)
 
-      case OnNext(element) => log.warning(s"$address unexpected onNext letter: $element")
+    // ----- ClientHub letters -----
 
-      case OnComplete => log.warning(s"$address unexpected completed letter")
+    case OnPush(broadcast) => // Notification
+      val notification = Notification(broadcast, Metadata.now(0))
+      log.debug(s"[BRD] $notification")
+      send(serialize(notification), buffer)
 
-      case OnError(cause: Throwable) =>
-        val message = cause.getMessage
-        log.error(cause, s"$address error letter: $message")
-        send(ByteString("""{"kind":"error"}"""))
+    case Ack(data) => // Confirm send
+      confirm(data, buffer)
 
-      // ----- ClientHub letters -----
+    // ----- TCP letters -----
 
-      case OnPush(data) => // Notification
-        val outgoing = data.utf8String
-        log.debug(s"$address [BRD] $outgoing")
-        send(data)
+    case Received(data) => // Incoming message
+      val incoming = data.utf8String
+      log.debug(s"$address [INP] $incoming")
+      onNext(data)
 
-      case Ack =>
-        val (dequeue, remaining) = buffer.dequeue
-        val message = dequeue.utf8String
-        val count = remaining.size
-        log.debug(s"$address buffer dequeue (#$count): $message")
-        if (remaining.nonEmpty) {
-          socket ! Write(remaining.head, Ack)
-        }
-        context.become(state(remaining, dispatched))
+    case PeerClosed => // Client exited
+      terminate()
 
-      // ----- TCP letters -----
+    case ErrorClosed(cause) =>
+      log.error(cause, s"error closed letter")
+      terminate()
 
-      case Received(data) =>
-        val incoming = data.utf8String
-        log.debug(s"$address [INP] $incoming")
-        onNext(data)
-        if (! dispatched) {
-          dispatcher ! InitConnection(data)
-          context.become(state(buffer, dispatched = true))
-        }
+    case CommandFailed(Write(data, event)) =>
+      val failing = data.utf8String
+      log.error(s"write failed: $event $failing")
 
-      case PeerClosed =>
-        terminate()
+    // ----- Default -----
 
-      case ErrorClosed(cause) =>
-        log.error(cause, s"$address error closed letter: $cause")
-        terminate()
+    case unexpected =>
+      log.warning(s"unexpected letter: $unexpected")
 
-      case CommandFailed(Write(data, event)) =>
-        val failing = data.utf8String
-        log.error(s"write failed: $event $failing")
-
-      // ----- Default -----
-
-      case unexpected => log.warning(s"$address unexpected letter: $unexpected")
-
-    }
   }
 
   /** Returns the number of received request at the moment of the latest result. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
     override def requestDemand(remainingRequested: Int): Int = 1
+  }
+
+  /** Send a message to the socket if buffer empty otherwise buffer it. */
+  private def send(data: String, buffer: Queue[ByteString]): Unit =
+    send(ByteString(data), buffer)
+
+  /** Send a message to the socket if buffer empty otherwise buffer it. */
+  private def send(data: ByteString, buffer: Queue[ByteString]): Unit = {
+    buffer.size match {
+      case 0 => socket ! Write(data, Ack(data))
+      case len if len > 5 => log.warning(s"queue already buffer: $len")
+      case _ =>
+    }
+    context become state(buffer.enqueue[ByteString](data))
+  }
+
+  /** Identify connection by catching [[UserConnectRes]]. */
+  private def identify(data: ByteString, buffer: Queue[ByteString]): Unit =
+    Try(deserialize[Response](data)) match {
+
+      case Success(Response(UserConnectRes(uid, _), _)) =>
+        MDC.put("user", uid.toString)
+        dispatcher ! InitConnection(uid)
+
+        val newState = state(buffer)
+        newState(data)
+        context become newState
+
+      case _ =>
+        val message = data.utf8String
+        log.warning(s"first request was not user connect: $message")
+        send(errorMessage, buffer)
+
+    }
+
+  /** Confirm message sending. */
+  private def confirm(data: ByteString, buffer: Queue[ByteString]): Unit = {
+    val newBuffer = Try(buffer.dequeue) match {
+
+      case Success((`data`, Queue.empty)) =>
+        Queue.empty
+
+      case Success((`data`, remaining)) =>
+        socket ! Write(remaining.head, Ack(remaining.head))
+        remaining
+
+      case Success((expected, remaining)) =>
+        val receivedMessage = data.utf8String
+        val expectedMessage = expected.utf8String
+        log.warning(s"ack message not in the buffer, received: $receivedMessage")
+        log.warning(s"ack message not in the buffer, expected: $expectedMessage")
+        remaining
+
+      case Failure(_) =>
+        val message = data.utf8String
+        log.warning(s"unexpected buffer empty on Ack for: $message")
+        Queue.empty
+
+    }
+    context become state(newBuffer)
   }
 
   /** Close client hub and stop actor. */
@@ -158,10 +196,10 @@ final class ClientHub(private val socket: ActorRef,
 object ClientHub {
 
   /** Handle a notification. */
-  private[router] case class OnPush(data: ByteString)
+  private[router] case class OnPush(broadcast: Broadcast)
 
   /** Confirms a write. */
-  private[router] case object Ack extends Tcp.Event
+  private[router] case class Ack(data: ByteString) extends Tcp.Event
 
   /** Creates a router props with a materializer. */
   def props(socket: ActorRef, address: InetSocketAddress, dispatcher: ActorRef): Props =
