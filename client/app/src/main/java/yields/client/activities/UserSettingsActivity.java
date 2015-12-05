@@ -32,7 +32,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the user can change some settings, like its username, its image, ...
  */
 public class UserSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, IMAGE, LOGOUT}
+    public enum Settings {NAME, IMAGE, REMOVE_ENTOURAGE, LOGOUT}
 
     private ClientUser mUser;
 
@@ -60,6 +60,7 @@ public class UserSettingsActivity extends AppCompatActivity {
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeUserName));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeUserImage));
+        itemList.add(Settings.REMOVE_ENTOURAGE.ordinal(), getResources().getString(R.string.removeFromEtourage));
         itemList.add(Settings.LOGOUT.ordinal(), getResources().getString(R.string.logout));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
@@ -157,6 +158,10 @@ public class UserSettingsActivity extends AppCompatActivity {
                     changeImageListener();
                     break;
 
+                case REMOVE_ENTOURAGE:
+                    removeUsersListener();
+                    break;
+
                 default:
                     logoutListener();
                     break;
@@ -219,6 +224,15 @@ public class UserSettingsActivity extends AppCompatActivity {
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE);
+        }
+
+        /**
+         * Listener for the "Remove users" item.
+         */
+        private void removeUsersListener() {
+            Intent intent = new Intent(UserSettingsActivity.this, RemoveUsersFromEntourageActivity.class);
+
+            startActivity(intent);
         }
 
         /**
