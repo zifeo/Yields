@@ -221,7 +221,7 @@ public class YieldService extends Service {
      * @param message The message in question.
      */
     synchronized public void receiveMessage(Id groupId, Message message) {
-        if (mCurrentNotifiableActivity == null ||
+        if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             Group group = YieldsApplication.getUser().modifyGroup(groupId);
             group.addMessage(message);
