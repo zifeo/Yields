@@ -36,7 +36,7 @@ public class RequestBuilder {
         CONTENT_TYPE("contentType"), UID("uid"),
         TAG("tags"), DATE("date"), ADD_ENTOURAGE("addEntourage"),
         REMOVE_ENTOURAGE("removeEntourage"), PATTERN("pattern"), ADD_USERS("addUsers"),
-        REM_USERS("remUsers"), ADD_NODES("addNodes"), REM_NODES("remNodes");
+        REM_USERS("removeUsers"), ADD_NODES("addNodes"), REM_NODES("removeNodes");
 
         private final String name;
 
