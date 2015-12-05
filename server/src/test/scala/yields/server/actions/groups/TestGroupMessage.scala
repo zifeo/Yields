@@ -1,12 +1,12 @@
 package yields.server.actions.groups
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.nodes.NodeMessage
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {

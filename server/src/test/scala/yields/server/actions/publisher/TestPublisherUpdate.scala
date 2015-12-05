@@ -1,12 +1,12 @@
 package yields.server.actions.publisher
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupUpdate
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 
 class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 

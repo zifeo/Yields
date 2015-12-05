@@ -6,6 +6,7 @@ import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 
 class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
 

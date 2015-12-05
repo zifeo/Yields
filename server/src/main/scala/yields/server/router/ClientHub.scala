@@ -3,16 +3,16 @@ package yields.server.router
 import java.net.InetSocketAddress
 
 import akka.actor._
+import akka.event.{DiagnosticLoggingAdapter, Logging}
 import akka.io.Tcp
 import akka.stream.actor._
 import akka.util.ByteString
-import org.slf4j.MDC
 import yields.server.actions.Broadcast
 import yields.server.actions.users.UserConnectRes
+import yields.server.io._
 import yields.server.mpi.{Metadata, Notification, Response}
 import yields.server.pipeline.blocks.SerializationModule
 import yields.server.utils.FaultTolerance
-import yields.server.io._
 
 import scala.collection.immutable.Queue
 import scala.language.postfixOps
@@ -26,7 +26,7 @@ import scala.util.{Failure, Success, Try}
 final class ClientHub(private val socket: ActorRef,
                       private val address: InetSocketAddress,
                       private val dispatcher: ActorRef
-                     ) extends Actor with ActorLogging with ActorPublisher[ByteString] with ActorSubscriber {
+                     ) extends Actor with ActorPublisher[ByteString] with ActorSubscriber {
 
   import ActorPublisherMessage._
   import ActorSubscriberMessage._
@@ -35,8 +35,11 @@ final class ClientHub(private val socket: ActorRef,
   import SerializationModule._
   import Tcp._
 
-  MDC.put("client", address.toString)
   val errorMessage = """{"kind":"error"}"""
+  val log: DiagnosticLoggingAdapter = Logging(this)
+  val defaultMdc: Logging.MDC = Map("client" -> address)
+
+  log.mdc(defaultMdc)
 
   def receive: Receive =
     state(Queue.empty, identified = false)
@@ -134,7 +137,7 @@ final class ClientHub(private val socket: ActorRef,
     Try(deserialize[Response](data)) match {
 
       case Success(Response(UserConnectRes(uid, _), _)) =>
-        MDC.put("user", uid.toString)
+        log.mdc(defaultMdc + ("user" -> uid))
         dispatcher ! InitConnection(uid)
 
         val newState = state(buffer)

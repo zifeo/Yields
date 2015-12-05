@@ -7,6 +7,7 @@ import yields.server._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeSearchRes, NodeSearch}
 import yields.server.dbi.models._
+import yields.server.tests.DefaultsGenerators
 
 trait GroupsGenerators extends DefaultsGenerators {
 

@@ -2,7 +2,7 @@ package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
 import spray.json.JsonFormat
-import yields.server._
+import yields.server.tests._
 import yields.server.actions.GroupsGenerators
 import yields.server.actions.groups._
 import yields.server.actions.nodes.{NodeSearchRes, NodeSearch, NodeHistoryRes, NodeHistory}

@@ -3,13 +3,13 @@ package yields.server.actions.publisher
 import java.time.OffsetDateTime
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupMessage
 import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory}
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {

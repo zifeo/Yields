@@ -1,11 +1,11 @@
 package yields.server.actions.publisher
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.groups.{GroupInfoRes, GroupInfo}
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 
 class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
 
