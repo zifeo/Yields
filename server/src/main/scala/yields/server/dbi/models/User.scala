@@ -167,7 +167,7 @@ final class User private(val uid: UID) {
   /** Add multiple users. */
   def addEntourage(newUsers: List[UID]): Boolean = {
     if (newUsers == List(uid)) false
-    else addWithTime(Key.entourage, newUsers.filter(_ == uid))
+    else addWithTime(Key.entourage, newUsers.filterNot(_ == uid))
   }
 
   /** Remove a user and returns whether this user has been removed. */

@@ -133,7 +133,7 @@ class Node protected(val nid: NID) {
   /** Add multiple nodes. */
   def addNode(newNodes: List[NID]): Boolean =
     if (newNodes == List(nid)) false
-    else addWithTime(NodeKey.nodes, newNodes)
+    else addWithTime(NodeKey.nodes, newNodes.filterNot(_ == nid))
 
   /** Remove node. */
   def removeNode(oldNode: NID): Boolean =
