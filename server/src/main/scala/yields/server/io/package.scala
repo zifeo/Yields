@@ -76,15 +76,18 @@ package object io {
 
   implicit lazy val publisherCreateJF = jsonFormat4(PublisherCreate)
   implicit lazy val publisherCreateResJF = jsonFormat1(PublisherCreateRes)
+  implicit lazy val publisherCreateBrdJF = jsonFormat4(PublisherCreateBrd)
 
   implicit lazy val publisherInfoJF = jsonFormat1(PublisherInfo)
   implicit lazy val publisherInfoResJF = jsonFormat6(PublisherInfoRes)
 
   implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
   implicit lazy val publisherMessageResJF = jsonFormat2(PublisherMessageRes)
+  implicit lazy val publisherMessageBrdJF = jsonFormat6(PublisherMessageBrd)
 
   implicit lazy val publisherUpdateJF = jsonFormat9(PublisherUpdate)
   implicit lazy val publisherUpdateResJF = jsonFormat0(PublisherUpdateRes)
+  implicit lazy val publisherUpdateBrdJF = jsonFormat5(PublisherUpdateBrd)
 
   /** *** Message passing interface *****/
 
