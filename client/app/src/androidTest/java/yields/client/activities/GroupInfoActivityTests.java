@@ -102,7 +102,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
 
     /**
      * Test that the correct users are displayed
-     *//*
+     */
     public void testCorrectUsers(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
         User u1 = new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage());
@@ -119,5 +119,5 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         onView(withText("Ratchet")).perform(click());
 
         onView(withId(R.id.textViewUserName)).check(matches(isDisplayed()));
-    }*/
+    }
 }
