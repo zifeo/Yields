@@ -5,6 +5,7 @@ import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
 import yields.server.actions.nodes.NodeHistoryRes
+import yields.server.actions.publisher.{PublisherMessageBrd, PublisherUpdateBrd, PublisherCreateBrd}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -27,6 +28,10 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
       case x: GroupMessageBrd => packWithKind(x)
 
       case x: UserUpdateBrd => packWithKind(x)
+
+      case x: PublisherCreateBrd => packWithKind(x)
+      case x: PublisherUpdateBrd => packWithKind(x)
+      case x: PublisherMessageBrd => packWithKind(x)
 
       case _ => serializationError(s"unregistered broadcast kind: $kind")
     }
@@ -52,6 +57,10 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
           case "GroupMessageBrd" => message.convertTo[GroupMessageBrd]
 
           case "UserUpdateBrd" => message.convertTo[UserUpdateBrd]
+
+          case "PublisherCreateBrd" => message.convertTo[PublisherCreateBrd]
+          case "PublisherUpdateBrd" => message.convertTo[PublisherUpdateBrd]
+          case "PublisherMessageBrd" => message.convertTo[PublisherMessageBrd]
 
           case _ => deserializationError(s"unregistered broadcast kind: $kind")
         }
