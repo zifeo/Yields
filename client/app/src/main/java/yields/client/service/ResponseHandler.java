@@ -266,7 +266,16 @@ public class ResponseHandler {
     protected void handleUserUpdateBroadcast(Response serverResponse){
         try{
             JSONObject response = serverResponse.getMessage();
-            User user = YieldsApplication.getUser(new Id(response.getLong("uid")));
+            User user;
+            Boolean newUser = false;
+
+            if (YieldsApplication.getUser(new Id(response.getLong("uid"))) == null) {
+                user = new User(new Id(response.getLong("uid")));
+                newUser = true;
+            } else {
+                user = YieldsApplication.getUser(new Id(response.getLong("uid")));
+            }
+
             user.setName(response.getString("name"));
             user.setEmail(response.getString("email"));
             String optString = response.optString("pic");
@@ -276,6 +285,11 @@ public class ResponseHandler {
             } else {
                 user.setImg(YieldsApplication.getDefaultUserImage());
             }
+
+            if (newUser) {
+                //TODO : notify() to add user to entourage -> notification
+            }
+
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
