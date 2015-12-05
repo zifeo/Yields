@@ -11,7 +11,7 @@ import yields.server.actions._
   * @param name rss name
   * @param url rss url
   */
-case class RSSCreate(name: String, url: String) extends Action {
+case class RSSCreate(name: String, url: String, tags: Seq[String]) extends Action {
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -22,6 +22,10 @@ case class RSSCreate(name: String, url: String) extends Action {
       throw new ActionArgumentException("Rss create : bad name and/or url")
 
     val rss = Rss.create(name, url)
+
+    if (tags.nonEmpty) {
+      rss.addTags(tags)
+    }
     RSSCreateRes(rss.nid)
   }
 }

@@ -18,7 +18,8 @@ import yields.server.mpi.Metadata
   *
   */
 case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], addUsers: List[UID],
-                           removeUsers: List[UID], addNodes: List[NID], removeNodes: List[NID]) extends Action {
+                           removeUsers: List[UID], addNodes: List[NID], removeNodes: List[NID],
+                           addTags: Seq[String], removeTags: Seq[String]) extends Action {
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -56,6 +57,14 @@ case class PublisherUpdate(nid: NID, name: Option[String], pic: Option[Blob], ad
 
     if (removeNodes.nonEmpty) {
       publisher.removeNode(removeNodes)
+    }
+
+    if (addTags.nonEmpty) {
+      publisher.addTags(addTags)
+    }
+
+    if (removeTags.nonEmpty) {
+      publisher.remTags(removeTags)
     }
 
     Yields.broadcast(publisher.users.filter(_ != sender)) {
