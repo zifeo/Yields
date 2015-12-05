@@ -79,7 +79,7 @@ public class ServerRequestsTests {
             assertTrue(json.getJSONObject("message").getJSONArray(
                     RequestBuilder.Fields.ADD_ENTOURAGE.getValue()).getLong(0) == entourageId.getId());
         } catch (JSONException e) {
-            fail("Request was not built correctly !" + e.getMessage());
+            fail("Request was not built correctly !");
         }
     }
 
@@ -217,9 +217,8 @@ public class ServerRequestsTests {
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            /* TODO create class for image encoding/decoding
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.IMAGE.getValue()),
-                    imageEncoded);*/
+                    imageEncoded);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
         } catch (JSONException e) {
@@ -332,9 +331,8 @@ public class ServerRequestsTests {
                     json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT_TYPE.getValue()));
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
-            /* TODO;
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
-                    imageEncoded);*/
+                    imageEncoded);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -401,9 +399,8 @@ public class ServerRequestsTests {
                     imageContent.getType().toString().toLowerCase());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
-            /* TODO : create class for imgae encoding/decoding
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.CONTENT.getValue()),
-                    imageEncoded);*/
+                    imageEncoded);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
