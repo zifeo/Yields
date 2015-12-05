@@ -3,7 +3,7 @@ package yields.server.actions.publisher
 import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.{Broadcast, Result, Action}
-import yields.server.dbi.models.{User, Publisher, UID, NID}
+import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
@@ -12,7 +12,7 @@ import yields.server.mpi.Metadata
   * @param users users that can publish
   * @param nodes subscribed nodes
   */
-case class PublisherCreate(name: String, users: List[UID], nodes: List[NID]) extends Action {
+case class PublisherCreate(name: String, users: List[UID], nodes: List[NID], tags: List[String]) extends Action {
 
   /**
     * Run the action given the sender.
@@ -26,7 +26,7 @@ case class PublisherCreate(name: String, users: List[UID], nodes: List[NID]) ext
     val sender = user.uid
     val otherUsers = users.filter(_ != sender)
 
-    if (! otherUsers.forall(entourage.contains))
+    if (!otherUsers.forall(entourage.contains))
       throw new UnauthorizedActionException(s"not all users are $sender's entourage: $users")
 
     // TODO: check public node
@@ -41,10 +41,15 @@ case class PublisherCreate(name: String, users: List[UID], nodes: List[NID]) ext
       publisher.addNode(nodes)
     }
 
+    if (tags.nonEmpty) {
+      publisher.addTags(tags)
+    }
+    
     user.addNode(publisher.nid)
     otherUsers.foreach(User(_).addNode(publisher.nid))
 
     Yields.broadcast(otherUsers) {
+
       PublisherCreateBrd(publisher.nid, name, users, nodes)
     }
 
