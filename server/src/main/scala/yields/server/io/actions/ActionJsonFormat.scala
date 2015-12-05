@@ -46,6 +46,11 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     case x: UserInfo => packWithKind(x)
     case x: UserSearch => packWithKind(x)
 
+    case x: PublisherCreate => packWithKind(x)
+    case x: PublisherInfo => packWithKind(x)
+    case x: PublisherMessage => packWithKind(x)
+    case x: PublisherUpdate => packWithKind(x)
+
     case _ =>
       val kind = obj.getClass.getSimpleName
       serializationError(s"unregistered action kind: $kind")
@@ -73,6 +78,11 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "UserNodeList" => message.convertTo[UserNodeList]
           case "UserInfo" => message.convertTo[UserInfo]
           case "UserSearch" => message.convertTo[UserSearch]
+
+          case "PublisherCreate" => message.convertTo[PublisherCreate]
+          case "PublisherInfo" => message.convertTo[PublisherInfo]
+          case "PublisherMessage" => message.convertTo[PublisherMessage]
+          case "PublisherUpdate" => message.convertTo[PublisherUpdate]
 
           case _ => deserializationError(s"unregistered action kind: $kind")
         }

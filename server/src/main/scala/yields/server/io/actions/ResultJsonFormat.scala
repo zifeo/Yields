@@ -42,6 +42,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case x: UserInfoRes => packWithKind(x)
       case x: UserSearchRes => packWithKind(x)
 
+      case x: PublisherCreateRes => packWithKind(x)
+      case x: PublisherInfoRes => packWithKind(x)
+      case x: PublisherMessageRes => packWithKind(x)
+      case x: PublisherUpdateRes => packWithKind(x)
+
       case _ => serializationError(s"unregistered result kind: $kind")
     }
   }
@@ -79,6 +84,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "UserNodeListRes" => message.convertTo[UserNodeListRes]
           case "UserInfoRes" => message.convertTo[UserInfoRes]
           case "UserSearchRes" => message.convertTo[UserSearchRes]
+
+          case "PublisherCreateRes" => message.convertTo[PublisherCreateRes]
+          case "PublisherInfoRes" => message.convertTo[PublisherInfoRes]
+          case "PublisherMessageRes" => message.convertTo[PublisherMessageRes]
+          case "PublisherUpdateRes" => message.convertTo[PublisherUpdateRes]
 
           case _ => deserializationError(s"unregistered result kind: $kind")
         }
