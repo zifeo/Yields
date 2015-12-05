@@ -98,5 +98,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".activities.AddUserToEntourageActivity"
+            android:label="@string/title_activity_add_user_to_entourage" >
+        </activity>
     </application>
+
 </manifest>

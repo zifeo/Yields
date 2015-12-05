@@ -51,7 +51,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct name is displayed
      */
     public void testCorrectName(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
         YieldsApplication.setGroup(g);
 
         getActivity();
@@ -62,7 +62,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that no tag is displayed
      */
     public void testCorrectNoTags(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
         YieldsApplication.setGroup(g);
         getActivity();
 
@@ -73,7 +73,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct, unique tag, is displayed
      */
     public void testCorrectTag(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
         g.addTag(new Group.Tag("fun"));
 
         YieldsApplication.setGroup(g);
@@ -86,7 +86,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct tags are displayed
      */
     public void testCorrectTags(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
         g.addTag(new Group.Tag("fun"));
         g.addTag(new Group.Tag("happy"));
 
@@ -104,9 +104,13 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct users are displayed
      */
     public void testCorrectUsers(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<User>());
-        g.addUser(new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage()));
-        g.addUser(new User("Clank", new Id(121), "c@veldin.com", YieldsApplication.getDefaultUserImage()));
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
+        User u1 = new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage());
+        User u2 = new User("Clank", new Id(121), "c@veldin.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(u1);
+        YieldsApplication.getUser().addUserToEntourage(u2);
+        g.addUser(new Id(121));
+        g.addUser(new Id(123));
 
         YieldsApplication.setGroup(g);
         getActivity();

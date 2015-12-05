@@ -44,6 +44,14 @@ public class User extends Node {
     }
 
     /**
+     * constructs a shell for a User waiting for update from server.
+     * @param id The id of the user.
+     */
+    public User(Id id) {
+        this("", id, "", YieldsApplication.getDefaultUserImage());
+    }
+
+    /**
      * Getter for  the image of the user.
      *
      * @return The image of the user.
