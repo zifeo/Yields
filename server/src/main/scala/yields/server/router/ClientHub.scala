@@ -1,6 +1,8 @@
 package yields.server.router
 
 import java.net.InetSocketAddress
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 import akka.actor._
 import akka.event.{DiagnosticLoggingAdapter, Logging}
@@ -12,9 +14,10 @@ import yields.server.actions.users.UserConnectRes
 import yields.server.io._
 import yields.server.mpi.{Metadata, Notification, Response}
 import yields.server.pipeline.blocks.SerializationModule
-import yields.server.utils.FaultTolerance
+import yields.server.utils.{FaultTolerance, Temporal}
 
 import scala.collection.immutable.Queue
+import scala.collection.mutable
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
@@ -38,6 +41,7 @@ final class ClientHub(private val socket: ActorRef,
   val errorMessage = ByteString("""{"kind":"error"}""")
   val log: DiagnosticLoggingAdapter = Logging(this)
   val defaultMdc: Logging.MDC = Map("client" -> address)
+  val tcpHistory = mutable.ListBuffer.empty[(String, OffsetDateTime)]
 
   log.mdc(defaultMdc)
 
@@ -63,6 +67,7 @@ final class ClientHub(private val socket: ActorRef,
     case OnNext(data: ByteString) => // Outgoing message
       val outgoing = data.utf8String
       log.debug(s"[OUT] $outgoing")
+      tcpHistory += "out" -> Temporal.now
       send(data, buffer, identified)
 
     case OnError(cause: Throwable) => // Processing error message
@@ -74,6 +79,7 @@ final class ClientHub(private val socket: ActorRef,
     case OnPush(broadcast) => // Notification
       val notification = Notification(broadcast, Metadata.now(0))
       log.debug(s"[BRD] $notification")
+      tcpHistory += "brd" -> Temporal.now
       send(serialize(notification), buffer, identified)
 
     case WriteAck(data) => // Confirm send
@@ -84,6 +90,7 @@ final class ClientHub(private val socket: ActorRef,
     case Received(data) => // Incoming message
       val incoming = data.utf8String
       log.debug(s"[INP] $incoming")
+      tcpHistory += "inp" -> Temporal.now
       onNext(data)
 
     case PeerClosed => // Client exited
@@ -108,11 +115,32 @@ final class ClientHub(private val socket: ActorRef,
   override val supervisorStrategy =
     FaultTolerance.nonFatalResume(log)
 
-  override def preStart(): Unit =
+  override def preStart(): Unit = {
     log.info("connected")
+    tcpHistory += "connected" -> Temporal.now
+  }
 
-  override def postStop(): Unit =
+  override def postStop(): Unit = {
     log.info("disconnected")
+    val totalInp = tcpHistory.count(_._1 == "inp")
+    val totalOut = tcpHistory.count(_._1 == "out")
+    val totalBrd = tcpHistory.count(_._1 == "brd")
+    val total = tcpHistory.size
+    val first = tcpHistory.last._2
+    val latest = tcpHistory.head._2
+    val length = ChronoUnit.MINUTES.between(first, latest)
+    log.info(
+      s"""
+         |stats
+         |tot:$total
+         |inp:$totalInp
+         |out:$totalOut
+         |brd:$totalBrd
+         |fir:$first
+         |lat:$latest
+         |len:$length
+       """.stripMargin)
+  }
 
   /** Always ask for more so the pipeline can continually work. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
