@@ -43,8 +43,8 @@ package object io {
   implicit lazy val groupInfoResJF = jsonFormat5(GroupInfoRes)
 
   implicit lazy val groupMessageJF = jsonFormat4(GroupMessage)
-  implicit lazy val groupMessageResJF = jsonFormat2(GroupMessageRes)
-  implicit lazy val groupMessageBrdJF = jsonFormat6(GroupMessageBrd)
+  implicit lazy val groupMessageResJF = jsonFormat3(GroupMessageRes)
+  implicit lazy val groupMessageBrdJF = jsonFormat7(GroupMessageBrd)
 
   // Publishers
 
@@ -60,8 +60,8 @@ package object io {
   implicit lazy val publisherInfoResJF = jsonFormat5(PublisherInfoRes)
 
   implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
-  implicit lazy val publisherMessageResJF = jsonFormat2(PublisherMessageRes)
-  implicit lazy val publisherMessageBrdJF = jsonFormat6(PublisherMessageBrd)
+  implicit lazy val publisherMessageResJF = jsonFormat3(PublisherMessageRes)
+  implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
 
   // Nodes
 
@@ -69,7 +69,7 @@ package object io {
   implicit lazy val groupSearchResJF = jsonFormat3(NodeSearchRes)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
-  implicit lazy val nodeHistoryResJF = jsonFormat6(NodeHistoryRes)
+  implicit lazy val nodeHistoryResJF = jsonFormat7(NodeHistoryRes)
 
   // Users
 

@@ -13,7 +13,7 @@ import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
 
 /**
-  * Send a message to a publisher
+  * Send a message to a publisher.
   * @param nid nid of publisher
   * @param text text to send
   * @param contentType content type of a potential media
@@ -27,24 +27,24 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
     Publisher(nid)
 
   /** Format the result. */
-  override def result(datetime: OffsetDateTime): Result =
-    PublisherMessageRes(nid, datetime)
+  override def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result =
+    PublisherMessageRes(nid, datetime, contentNid)
 
   /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID): Broadcast =
-    PublisherMessageBrd(nid, datetime, uid, text, contentType, content)
+  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast =
+    PublisherMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
 
 }
 
 /**
-  * [[PublisherMessage]] Result
+  * [[PublisherMessage]] result.
   * @param nid nid of publisher
   * @param datetime time when action was executed
   */
-case class PublisherMessageRes(nid: NID, datetime: OffsetDateTime) extends Result
+case class PublisherMessageRes(nid: NID, datetime: OffsetDateTime, contentNid: Option[NID]) extends Result
 
 /**
-  * [[PublisherMessage]] broadcast
+  * [[PublisherMessage]] broadcast.
   * @param nid nid of publisher
   * @param datetime time when action was executed
   * @param sender message sender
@@ -57,4 +57,5 @@ case class PublisherMessageBrd(nid: NID,
                                sender: UID,
                                text: Option[String],
                                contentType: Option[String],
-                               content: Option[Blob]) extends Broadcast
+                               content: Option[Blob],
+                               contentNid: Option[NID]) extends Broadcast
