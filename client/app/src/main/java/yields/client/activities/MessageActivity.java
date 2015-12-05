@@ -144,6 +144,7 @@ public class MessageActivity extends NotifiableActivity {
         super.onPause();
         mCommentAdapter.clear();
         mGroupMessageAdapter.clear();
+        YieldsApplication.setGroup(null);
     }
 
     /**
