@@ -358,6 +358,23 @@ public class RequestBuilder {
     }
 
     /**
+     * ServerRequest for adding a new user to a group.
+     *
+     * @param senderId  The sender of the request.
+     * @param groupId Id of the group.
+     * @param newUser The user to add in this group.
+     * @return The request.
+     */
+    public static ServerRequest groupAddRequest(Id senderId, Id groupId,
+                                                List<Id> newUser) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newUser);
+
+        return groupUpdateRequest(senderId, groupId, null, null, newUser, null, null, null);
+    }
+
+    /**
      * ServerRequest for removing a user from a group.
      *
      * @param senderId       The sender of the request.
@@ -376,6 +393,23 @@ public class RequestBuilder {
         remUsers.add(userToRemove);
 
         return groupUpdateRequest(senderId, groupId, null, null, null, remUsers, null, null);
+    }
+
+    /**
+     * ServerRequest for removing a user from a group.
+     *
+     * @param senderId       The sender of the request.
+     * @param groupId      Id of the group.
+     * @param userToRemove The user to remove from  this group.
+     * @return The request.
+     */
+    public static ServerRequest groupRemoveRequest(Id senderId, Id groupId,
+                                                   List<Id> userToRemove) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(userToRemove);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, userToRemove, null, null);
     }
 
     /**

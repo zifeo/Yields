@@ -20,6 +20,7 @@ import yields.client.listadapter.ListAdapterUsersGroupsCheckBox;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -190,7 +191,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {
 
-            ArrayList<String> emailList = data.getStringArrayListExtra(
+            /*ArrayList<String> emailList = data.getStringArrayListExtra(
                     AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
             List<User> entourage = YieldsApplication.getUser().getEntourage();
@@ -209,6 +210,20 @@ public class CreateGroupActivity extends AppCompatActivity {
                             mUsers.add(entourage.get(j));
                         }
                     }
+                }
+            }*/
+
+            ArrayList<String> idList = data.getStringArrayListExtra(
+                    AddUsersFromEntourageActivity.ID_LIST_KEY);
+
+            for (int i = 0; i < idList.size(); i++) {
+                Id currentId = new Id(Long.parseLong(idList.get(i)));
+                User user = YieldsApplication.getUserFromId(currentId);
+                // Il n'est pas censé y avoir plusieurs personnes identiques dans l'entourage.
+                if (user != null) {
+                    mUsers.add(user);
+                } else {
+                    throw new IllegalStateException("Not possible to add a non existant user");
                 }
             }
 

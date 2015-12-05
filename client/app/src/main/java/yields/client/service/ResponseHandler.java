@@ -118,8 +118,6 @@ public class ResponseHandler {
     protected void handleGroupInfoResponse(Response serverResponse){
         try{
             JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
             JSONArray users = response.getJSONArray("users");
             // TODO: discuss use of nodes in groups !important
             //JSONArray nodes = response.getJSONArray("nodes");
@@ -137,9 +135,15 @@ public class ResponseHandler {
                 }
             }
 
+
+            long nid = response.getLong("nid");
+            String name = response.getString("name");
+            String image = response.getString("pic");
             Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
             group.setName(name);
-            group.setLastUpdate(new Date());
+            if (!image.equals("")) {
+                group.setImage(ImageSerialization.unSerializeImage(image));
+            }
             group.updateUsers(userList);
 
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -193,8 +197,6 @@ public class ResponseHandler {
     protected void handlePublisherInfoResponse(Response serverResponse){
         try {
             JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
             JSONArray users = response.getJSONArray("users");
             // TODO: discuss use of nodes in groups !important
             //JSONArray nodes = response.getJSONArray("nodes");
@@ -203,12 +205,24 @@ public class ResponseHandler {
             for (int i = 0 ; i < users.length() ; i ++) {
                 Id userId = new Id(users.getLong(i));
                 userList.add(userId);
+                if (YieldsApplication.getUser() == null) {
+                    User newUser = new User(userId);
+                    YieldsApplication.addNotKnown(newUser);
+                    ServiceRequest userInfo =
+                            new UserInfoRequest(YieldsApplication.getUser(), userId);
+                    mService.sendRequest(userInfo);
+                }
             }
 
-            // _KetzA : I'm not really sure what to do here ...
+
+            long nid = response.getLong("nid");
+            String name = response.getString("name");
+            String image = response.getString("pic");
             Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
             group.setName(name);
-            group.setLastUpdate(new Date());
+            if (!image.equals("")) {
+                group.setImage(ImageSerialization.unSerializeImage(image));
+            }
             group.updateUsers(userList);
 
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
