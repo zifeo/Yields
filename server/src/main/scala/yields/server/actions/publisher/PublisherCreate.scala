@@ -3,7 +3,7 @@ package yields.server.actions.publisher
 import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.{Broadcast, Result, Action}
-import yields.server.dbi.models.{User, Publisher, UID, NID}
+import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
@@ -12,7 +12,7 @@ import yields.server.mpi.Metadata
   * @param users users that can publish
   * @param nodes subscribed nodes
   */
-case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) extends Action {
+case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID], tags: Seq[String]) extends Action {
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -34,6 +34,10 @@ case class PublisherCreate(name: String, users: Seq[UID], nodes: Seq[NID]) exten
 
     if (nodes.nonEmpty) {
       publisher.addNode(nodes.toList)
+    }
+
+    if (tags.nonEmpty) {
+      publisher.addTags(tags)
     }
 
     Yields.broadcast(publisher.users.filter(_ != sender)) {

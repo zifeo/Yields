@@ -16,9 +16,10 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
 
     val users = sample[List[UID]]
     val nodes = sample[List[NID]]
+    val tags = sample[List[String]]
     user.addEntourage(users)
 
-    val action = PublisherCreate("name", users, nodes)
+    val action = PublisherCreate("name", users, nodes, tags)
 
     action.run(meta) match {
       case PublisherCreateRes(nid) =>
@@ -27,6 +28,7 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
         publisher.users should contain theSameElementsAs users.distinct
         publisher.nodes should contain theSameElementsAs nodes.distinct
         publisher.creator should be(user.uid)
+        publisher.tags should contain theSameElementsAs tags
     }
   }
 
@@ -35,7 +37,7 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
     val meta = Metadata.now(user.uid)
 
     val users = sample[List[UID]]
-    val action = new PublisherCreate("name", users, List.empty)
+    val action = new PublisherCreate("name", users, List.empty, List.empty)
 
     val error = the[UnauthorizedActionException] thrownBy action.run(meta)
     error.getMessage should be("users must be in sender's entourage")
