@@ -80,7 +80,7 @@ final class ClientHub(private val socket: ActorRef,
 
     case Received(data) => // Incoming message
       val incoming = data.utf8String
-      log.debug(s"$address [INP] $incoming")
+      log.debug(s"[INP] $incoming")
       onNext(data)
 
     case PeerClosed => // Client exited
@@ -97,7 +97,7 @@ final class ClientHub(private val socket: ActorRef,
     // ----- Default -----
 
     case unexpected =>
-      log.warning(s"unexpected letter: $unexpected")
+      log.warning(s"unexpected letter: unexpected")
 
   }
 
@@ -110,7 +110,7 @@ final class ClientHub(private val socket: ActorRef,
   override def postStop(): Unit =
     log.info("disconnected")
 
-  /** Returns the number of received request at the moment of the latest result. */
+  /** Always ask for more so the pipeline can continually work. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
     override def requestDemand(remainingRequested: Int): Int = 1
   }
@@ -138,7 +138,7 @@ final class ClientHub(private val socket: ActorRef,
         dispatcher ! InitConnection(uid)
 
         val newState = state(buffer)
-        newState(data)
+        newState(OnNext(data))
         context become newState
 
       case _ =>
