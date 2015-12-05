@@ -1,22 +1,22 @@
 package yields.server
 
 import akka.stream.scaladsl.{Sink, Source, Tcp}
-import akka.util.ByteString
 import org.scalatest.{BeforeAndAfterAll, Matchers}
-import org.slf4j.LoggerFactory
-import spray.json._
 import yields.server.actions.groups._
-import yields.server.actions.nodes.NodeMessage
-import yields.server.actions.users.{UserUpdateRes, UserUpdate, UserConnect, UserConnectRes}
+import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
 import yields.server.io._
-import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
+import yields.server.mpi.{MessagesGenerators, Metadata, Response}
+import yields.server.pipeline.blocks.SerializationModule
+import yields.server.tests.{FakeClient, _}
 import yields.server.utils.Config
 
 import scala.language.implicitConversions
 
 class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
+
+  import SerializationModule._
 
   val connection = Tcp().outgoingConnection(Config.getString("addr"), Config.getInt("port"))
 
@@ -28,7 +28,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   }
 
   override def afterAll(): Unit = {
-    server.close()
+    server.stop()
   }
 
   /**
@@ -49,15 +49,12 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
 
     val metadata = Metadata.now(1)
     val (actions, expected) = acting.toList.unzip
-    val requests = actions.map { action =>
-      val json = Request(action, metadata).toJson.toString
-      ByteString(s"$json\n")
-    }
+    val requests = actions.map(serialize[Action](_))
 
     val results = await {
       Source(requests)
         .via(connection)
-        .map(_.utf8String.parseJson.convertTo[Response].result)
+        .map(deserialize[Response](_).result)
         .grouped(expected.size)
         .runWith(Sink.head)
     }.toList
@@ -108,7 +105,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   "The system" should "not generate error caused too many requests" in {
 
     val client = new FakeClient(1)
-    val tries = 100
+    val tries = 50
 
     client.send(UserConnect("client@yields.im"))
     await(client.receive()).result should be (UserConnectRes(client.uid, returning = false))

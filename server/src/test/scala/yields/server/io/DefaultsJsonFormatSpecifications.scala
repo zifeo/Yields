@@ -3,7 +3,8 @@ package yields.server.io
 import java.time.OffsetDateTime
 
 import org.scalacheck.{Prop, Properties}
-import yields.server._
+import yields.server.tests._
+import yields.server.tests.DefaultsGenerators
 
 object DefaultsJsonFormatSpecifications extends Properties("DefaultsJsonFormat") with DefaultsGenerators {
 

@@ -12,7 +12,7 @@ import akka.util.ByteString
 class LoggerModule[C, G](logger: LoggingAdapter) extends Module[C, C, G, G] {
 
   /** Logs incoming item. */
-  override val incoming: C => C = log("IN")
+  override val incoming: C => C = log("INP")
 
   /** Logs outgoing item. */
   override val outgoing: G => G = log("OUT")
