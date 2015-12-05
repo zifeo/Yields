@@ -8,11 +8,11 @@ import akka.stream.actor.{ActorPublisherMessage, ActorSubscriberMessage}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import akka.util.ByteString
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
-import yields.server.actions.users.{UserSearchRes, UserConnectRes, UserSearch}
-import yields.server.mpi.{Response, Metadata, Request}
+import yields.server.actions.users.{UserSearchRes, UserConnectRes}
+import yields.server.mpi.{Response, Metadata}
 import yields.server.pipeline.blocks.SerializationModule
 import yields.server.io._
-import yields.server.tests.{AllGenerators}
+import yields.server.tests.AllGenerators
 
 class ClientHubTests(sys: ActorSystem)
   extends TestKit(sys) with ImplicitSender with FlatSpecLike with Matchers with BeforeAndAfterAll with AllGenerators {

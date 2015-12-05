@@ -1,11 +1,9 @@
 package yields.server.actions.publisher
 
-import java.time.OffsetDateTime
-
 import org.scalatest.Matchers
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupMessage
-import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory}
+import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes}
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
@@ -43,12 +41,8 @@ class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
       case NodeHistoryRes(nid, dates, senders, texts, _, _) =>
         nid should be(group.nid)
         dates.length should be(3)
-        senders.length should be(3)
-        texts.length should be(3)
-
-        (senders(0), texts(0)) should be((meta1.client, "hey"))
-        (senders(1), texts(1)) should be((publisher.nid, "Welcome in 9gag's feed"))
-        (senders(2), texts(2)) should be((meta3.client, "Received 9gag's message ?"))
+        senders should contain theSameElementsInOrderAs List(meta1.client, publisher.nid, meta3.client)
+        texts should contain theSameElementsInOrderAs List("hey", "Welcome in 9gag's feed", "Received 9gag's message ?")
     }
   }
 
