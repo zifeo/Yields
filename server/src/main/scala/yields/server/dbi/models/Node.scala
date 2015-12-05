@@ -100,7 +100,7 @@ class Node protected(val nid: NID) {
   /** Users getter */
   def users: List[UID] = _users.getOrElse {
     _users = redis(_.hkeys[UID](NodeKey.users))
-    valueOrDefault(_users, List.empty)
+    valueOrException(_users)
   }
 
   /** Add user. */

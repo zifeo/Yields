@@ -35,7 +35,7 @@ final class ClientHub(private val socket: ActorRef,
   import SerializationModule._
   import Tcp._
 
-  val errorMessage = """{"kind":"error"}"""
+  val errorMessage = ByteString("""{"kind":"error"}""")
   val log: DiagnosticLoggingAdapter = Logging(this)
   val defaultMdc: Logging.MDC = Map("client" -> address)
 
@@ -76,7 +76,7 @@ final class ClientHub(private val socket: ActorRef,
       log.debug(s"[BRD] $notification")
       send(serialize(notification), buffer, identified)
 
-    case Ack(data) => // Confirm send
+    case WriteAck(data) => // Confirm send
       confirm(data, buffer, identified)
 
     // ----- TCP letters -----
@@ -119,13 +119,9 @@ final class ClientHub(private val socket: ActorRef,
   }
 
   /** Send a message to the socket if buffer empty otherwise buffer it. */
-  private def send(data: String, buffer: Queue[ByteString], identified: Boolean): Unit =
-    send(ByteString(data), buffer, identified)
-
-  /** Send a message to the socket if buffer empty otherwise buffer it. */
   private def send(data: ByteString, buffer: Queue[ByteString], identified: Boolean): Unit = {
     buffer.size match {
-      case 0 => socket ! Write(data, Ack(data))
+      case 0 => socket ! Write(data, WriteAck(data))
       case len if len > 5 => log.warning(s"queue already buffer: $len")
       case _ =>
     }
@@ -140,8 +136,7 @@ final class ClientHub(private val socket: ActorRef,
         log.mdc(defaultMdc + ("user" -> uid))
         dispatcher ! InitConnection(uid)
         val newState = state(buffer, identified = true)
-        newState(OnNext(data))
-        context become newState
+        newState(OnNext(data)) // will modify context hereafter
 
       case _ =>
         val message = data.utf8String
@@ -158,7 +153,7 @@ final class ClientHub(private val socket: ActorRef,
         Queue.empty
 
       case Success((`data`, remaining)) =>
-        socket ! Write(remaining.head, Ack(remaining.head))
+        socket ! Write(remaining.head, WriteAck(remaining.head))
         remaining
 
       case Success((expected, remaining)) =>
@@ -192,7 +187,7 @@ object ClientHub {
   private[router] case class OnPush(broadcast: Broadcast)
 
   /** Confirms a write. */
-  private[router] case class Ack(data: ByteString) extends Tcp.Event
+  private[router] case class WriteAck(data: ByteString) extends Tcp.Event
 
   /** Creates a router props with a materializer. */
   def props(socket: ActorRef, address: InetSocketAddress, dispatcher: ActorRef): Props =

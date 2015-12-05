@@ -1,7 +1,7 @@
 package yields.server
 
 import akka.stream.scaladsl.{Sink, Source, Tcp}
-import org.scalatest.{BeforeAndAfterAll, Matchers}
+import org.scalatest.{FlatSpec, BeforeAndAfterAll, Matchers}
 import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.actions.{Action, Result}
@@ -15,8 +15,6 @@ import yields.server.utils.Config
 import scala.language.implicitConversions
 
 class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
-
-  import SerializationModule._
 
   val connection = Tcp().outgoingConnection(Config.getString("addr"), Config.getInt("port"))
 
@@ -78,6 +76,8 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
 
     client.send(GroupCreate("clients", List.empty, List.empty))
     await(client.receive()).result should be (GroupCreateRes(2))
+
+    Thread.sleep(3000)
 
     for (_ <- 0 to tries) {
       client.send(GroupMessage(2, Some("hello"), None, None))
