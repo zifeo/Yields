@@ -45,7 +45,7 @@ final class ClientHub(private val socket: ActorRef,
     state(Queue.empty, identified = false)
 
   /** Casual state. It is dispatched if dispatcher has been linked. */
-  def state(buffer: Queue[ByteString], identified: Boolean = true): Receive = {
+  def state(buffer: Queue[ByteString], identified: Boolean): Receive = {
 
     // ----- Publisher letters -----
 
@@ -63,21 +63,21 @@ final class ClientHub(private val socket: ActorRef,
     case OnNext(data: ByteString) => // Outgoing message
       val outgoing = data.utf8String
       log.debug(s"[OUT] $outgoing")
-      send(data, buffer)
+      send(data, buffer, identified)
 
     case OnError(cause: Throwable) => // Processing error message
       log.error(cause, "error letter")
-      send(errorMessage, buffer)
+      send(errorMessage, buffer, identified)
 
     // ----- ClientHub letters -----
 
     case OnPush(broadcast) => // Notification
       val notification = Notification(broadcast, Metadata.now(0))
       log.debug(s"[BRD] $notification")
-      send(serialize(notification), buffer)
+      send(serialize(notification), buffer, identified)
 
     case Ack(data) => // Confirm send
-      confirm(data, buffer)
+      confirm(data, buffer, identified)
 
     // ----- TCP letters -----
 
@@ -119,17 +119,17 @@ final class ClientHub(private val socket: ActorRef,
   }
 
   /** Send a message to the socket if buffer empty otherwise buffer it. */
-  private def send(data: String, buffer: Queue[ByteString]): Unit =
-    send(ByteString(data), buffer)
+  private def send(data: String, buffer: Queue[ByteString], identified: Boolean): Unit =
+    send(ByteString(data), buffer, identified)
 
   /** Send a message to the socket if buffer empty otherwise buffer it. */
-  private def send(data: ByteString, buffer: Queue[ByteString]): Unit = {
+  private def send(data: ByteString, buffer: Queue[ByteString], identified: Boolean): Unit = {
     buffer.size match {
       case 0 => socket ! Write(data, Ack(data))
       case len if len > 5 => log.warning(s"queue already buffer: $len")
       case _ =>
     }
-    context become state(buffer.enqueue[ByteString](data))
+    context become state(buffer.enqueue[ByteString](data), identified)
   }
 
   /** Identify connection by catching [[UserConnectRes]]. */
@@ -139,20 +139,19 @@ final class ClientHub(private val socket: ActorRef,
       case Success(Response(UserConnectRes(uid, _), _)) =>
         log.mdc(defaultMdc + ("user" -> uid))
         dispatcher ! InitConnection(uid)
-
-        val newState = state(buffer)
+        val newState = state(buffer, identified = true)
         newState(OnNext(data))
         context become newState
 
       case _ =>
         val message = data.utf8String
         log.warning(s"first request was not user connect: $message")
-        send(errorMessage, buffer)
+        send(errorMessage, buffer, identified = false)
 
     }
 
   /** Confirm message sending. */
-  private def confirm(data: ByteString, buffer: Queue[ByteString]): Unit = {
+  private def confirm(data: ByteString, buffer: Queue[ByteString], identified: Boolean): Unit = {
     val newBuffer = Try(buffer.dequeue) match {
 
       case Success((`data`, Queue())) =>
@@ -175,7 +174,7 @@ final class ClientHub(private val socket: ActorRef,
         Queue.empty
 
     }
-    context become state(newBuffer)
+    context become state(newBuffer, identified)
   }
 
   /** Close client hub and stop actor. */
