@@ -337,14 +337,14 @@ public class ResponseHandler {
 
             Message message = new Message(response.getString("datetime"),
                     response.getLong("sender"), response.getString("text"),
-                    response.getString("contentType"), response.getString("content"));
+                    response.optString("contentType"), response.optString("content"));
 
             Id groupId = new Id(response.getLong("nid"));
 
             mService.receiveMessage(groupId, message);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
+                    serverResponse.object().toString() + " because of : " + e.getMessage());
         }
     }
 

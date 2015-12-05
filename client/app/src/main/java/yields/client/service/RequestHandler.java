@@ -212,13 +212,14 @@ public class RequestHandler {
      */
     protected void handleNodeHistoryRequest(NodeHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
+        Log.d("Y:" + this.getClass().getName(), serverRequest.message());
+        /*try {
             List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
                     serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
             mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeHistoryRequest correctly !");
-        }
+        }*/
 
 
         mController.sendToServer(serverRequest);
