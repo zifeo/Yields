@@ -1,17 +1,13 @@
 package yields.server.router
 
-import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor._
 import akka.util.ByteString
 import yields.server.actions.Broadcast
 import yields.server.dbi.models.UID
-import yields.server.mpi.{Metadata, Notification}
-import yields.server.pipeline.blocks.SerializationModule
+import yields.server.utils.FaultTolerance
 
-import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.util.control.NonFatal
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Try}
 
 /**
   * Actor in charge of recording connection statuses and distributing push notifications to them.
@@ -25,19 +21,9 @@ final class Dispatcher() extends Actor with ActorLogging {
   private type Pool = (Map[UID, ActorRef], Map[ActorRef, UID])
   private val uidPattern = """"uid":"""
 
-  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
-    case NonFatal(nonfatal) =>
-      val message = nonfatal.getMessage
-      log.error(nonfatal, s"non fatal: $message")
-      Resume
-    case fatal =>
-      val message = fatal.getMessage
-      log.error(fatal, s"fatal: $message")
-      Escalate
-  }
-
   /** Empty pool at start. */
-  def receive = state((Map.empty, Map.empty))
+  def receive: Receive =
+    state((Map.empty, Map.empty))
 
   /**
     * Current state of the pool.
@@ -69,9 +55,12 @@ final class Dispatcher() extends Actor with ActorLogging {
 
     // ----- Default letters -----
 
-    case unexpected => log.warning(s"unexpected letter: $unexpected")
+    case unexpected =>
+      log.warning(s"unexpected letter: $unexpected")
 
   }
+
+  override val supervisorStrategy = FaultTolerance.nonFatalResume(log)
 
   /** Parse user id from given data. */
   private def parse(data: ByteString): Try[UID] = {
@@ -100,9 +89,8 @@ final class Dispatcher() extends Actor with ActorLogging {
   }
 
   /** Filter uids by removing ones that are not present in the pool. */
-  private def filter(uids: List[UID], pool: Pool): List[ActorRef] = {
+  private def filter(uids: List[UID], pool: Pool): List[ActorRef] =
     uids.flatMap(pool._1.get)
-  }
 
 }
 
