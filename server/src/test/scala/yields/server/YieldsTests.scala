@@ -77,8 +77,6 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
     client.send(GroupCreate("clients", List.empty, List.empty))
     await(client.receive()).result should be (GroupCreateRes(2))
 
-    Thread.sleep(3000)
-
     for (_ <- 0 to tries) {
       client.send(GroupMessage(2, Some("hello"), None, None))
     }
