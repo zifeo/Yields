@@ -149,7 +149,7 @@ public class Message extends Node {
      * @return A string describing the message.
      */
     public String getPreview() {
-        return YieldsApplication.getUser(mSender).getName() + " : " + mContent.getPreview();
+        return YieldsApplication.getUserFromId(mSender).getName() + " : " + mContent.getPreview();
     }
 
     /**

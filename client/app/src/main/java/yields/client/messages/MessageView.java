@@ -60,7 +60,7 @@ public class MessageView extends LinearLayout {
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
-        User sender = YieldsApplication.getUser(mMessage.getSender());
+        User sender = YieldsApplication.getUserFromId(mMessage.getSender());
         String senderEmail = sender.getEmail();
         String currentUserEmail = YieldsApplication.getUser().getEmail();
         boolean userIsSender = senderEmail.equals(currentUserEmail);

@@ -100,7 +100,7 @@ public class RequestHandler {
     protected void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
-            mCacheHelper.addUser(YieldsApplication.getUser(serviceRequest.getUserToAdd()));
+            mCacheHelper.addUser(YieldsApplication.getUserFromId(serviceRequest.getUserToAdd()));
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserEntourageAddRequest correctly !");
         }

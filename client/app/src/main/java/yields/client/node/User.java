@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class User extends Node {
@@ -41,6 +42,32 @@ public class User extends Node {
     public User(JSONObject response) throws JSONException{
         this(response.getString("name"), new Id(response.getLong("uid")),
                 response.getString("email"), YieldsApplication.getDefaultUserImage());
+
+        if (!response.optString("pic").equals("")) {
+            this.setImg(ImageSerialization
+                    .unSerializeImage(response.getString("pic")));
+        } else {
+            this.setImg(YieldsApplication.getDefaultUserImage());
+        }
+    }
+
+    /**
+     * Updates the User from a Json response
+     *
+     * @param response the JSONObject from the response
+     * @throws JSONException In case of trouble parsing the response.
+     */
+    public void update(JSONObject response) throws JSONException{
+        // TODO : change profil pic
+        this.setName(response.getString("name"));
+        this.setEmail(response.getString("email"));
+
+        if (!response.optString("pic").equals("")) {
+            this.setImg(ImageSerialization
+                    .unSerializeImage(response.getString("pic")));
+        } else {
+            this.setImg(YieldsApplication.getDefaultUserImage());
+        }
     }
 
     /**
