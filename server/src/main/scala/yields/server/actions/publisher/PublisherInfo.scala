@@ -16,7 +16,7 @@ case class PublisherInfo(nid: NID) extends Action {
     */
   override def run(metadata: Metadata): Result = {
     val publisher = Publisher(nid)
-    PublisherInfoRes(nid, publisher.name, publisher.pic, publisher.users, publisher.nodes)
+    PublisherInfoRes(nid, publisher.name, publisher.pic, publisher.users, publisher.nodes, publisher.tags.toSeq)
   }
 }
 
@@ -28,4 +28,4 @@ case class PublisherInfo(nid: NID) extends Action {
   * @param users list of users
   * @param nodes list of nodes
   */
-case class PublisherInfoRes(nid: NID, name: String, pic: Blob, users: Seq[UID], nodes: Seq[NID]) extends Result
+case class PublisherInfoRes(nid: NID, name: String, pic: Blob, users: Seq[UID], nodes: Seq[NID], tags: Seq[String]) extends Result
