@@ -174,7 +174,7 @@ public class MessageActivity extends NotifiableActivity {
     public void onSendMessage(View v) {
         String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
-        if (inputMessage.length() > 0 || mSendImage){
+        if (!inputMessage.isEmpty() || mSendImage){
             Content content;
             if (mSendImage && mImage != null) {
                 content = new ImageContent(mImage, inputMessage);
