@@ -16,7 +16,7 @@ class SerializationModule(logger: LoggingAdapter) extends Module[ByteString, Req
   import SerializationModule._
 
   /** Incoming deserialization. */
-  override val incoming: ByteString => Request = deserialize
+  override val incoming: ByteString => Request = deserialize[Request]
 
   /** Outgoing serialization. */
   override val outgoing: Response => ByteString = serialize

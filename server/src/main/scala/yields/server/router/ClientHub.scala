@@ -12,6 +12,7 @@ import yields.server.actions.users.UserConnectRes
 import yields.server.mpi.{Metadata, Notification, Response}
 import yields.server.pipeline.blocks.SerializationModule
 import yields.server.utils.FaultTolerance
+import yields.server.io._
 
 import scala.collection.immutable.Queue
 import scala.language.postfixOps
@@ -151,7 +152,7 @@ final class ClientHub(private val socket: ActorRef,
   private def confirm(data: ByteString, buffer: Queue[ByteString]): Unit = {
     val newBuffer = Try(buffer.dequeue) match {
 
-      case Success((`data`, Queue.empty)) =>
+      case Success((`data`, Queue())) =>
         Queue.empty
 
       case Success((`data`, remaining)) =>
