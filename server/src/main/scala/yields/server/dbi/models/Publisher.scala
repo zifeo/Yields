@@ -8,10 +8,27 @@ import yields.server.utils.Temporal
   * Representation of a publisher.
   * A group is a kind of node dedicated to chat between users with eventual influx from nodes.
   * It is always public.
+  * When a user publish in one of this special node it's spread into each
+  * node that registered it as a publisher
+  *
+  * Some fields used from the Node class see their purpose change a bit
+  * List[UID]     -> List of user that can publish in it
+  * List[NID]     -> List of nodes that registered it
   *
   * @param nid Node id to build
   */
-final class Publisher private(nid: NID) extends AbstractPublisher(nid)
+final class Publisher private (nid: NID) extends Node(nid) {
+
+  /** Add message */
+  override def addMessage(content: FeedContent): Boolean = {
+    val parent = super.addMessage(content)
+    val children = for (node <- nodes if parent) yield {
+      Node(node).addMessage(content.copy(_2 = nid))
+    }
+    children.foldLeft(parent)(_ && _)
+  }
+
+}
 
 /** [[Publisher]] companion object. */
 object Publisher {

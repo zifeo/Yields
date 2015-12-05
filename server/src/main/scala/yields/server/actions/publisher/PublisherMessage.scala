@@ -22,6 +22,10 @@ import yields.server.utils.Temporal
 case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[String], content: Option[Blob])
   extends NodeMessage(nid, text, contentType, content) {
 
+  /** Get node instance. */
+  override def instance(nid: NID): Node =
+    Publisher(nid)
+
   /** Format the result. */
   override def result(datetime: OffsetDateTime): Result =
     PublisherMessageRes(nid, datetime)
