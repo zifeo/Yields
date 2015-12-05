@@ -129,6 +129,29 @@ public class CommentView extends LinearLayout {
                 caption.setText(Html.fromHtml(urlContent.getColoredCaption()));
                 caption.setTextColor(Color.BLACK);
                 caption.setTextSize((float) 18.0);
+
+                TextView title = (TextView) v.findViewById(R.id.title);
+                String contentTitle = urlContent.getTitle();
+                if (contentTitle == null){
+                    title.setText("...");
+                }
+                else{
+                    title.setText(contentTitle);
+                }
+                title.setTextSize(16.f);
+                title.setTextColor(Color.GRAY);
+
+                TextView description = (TextView) v.findViewById(R.id.description);
+                String contentDescription = urlContent.getDescription();
+                if (contentDescription == null){
+                    description.setText("...");
+                }
+                else{
+                    description.setText(urlContent.getDescription());
+                }
+                description.setTextSize(12.f);
+                description.setTextColor(Color.GRAY);
+
                 dateFormat = new SimpleDateFormat("HH:mm");
                 time = dateFormat.format(mMessage.getDate());
 
