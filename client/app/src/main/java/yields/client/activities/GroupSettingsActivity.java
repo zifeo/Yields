@@ -30,6 +30,7 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -146,25 +147,24 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 Log.d(TAG, message);
             }
         } else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK) {
-            ArrayList<String> emailList = data.getStringArrayListExtra(
-                    AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
+            ArrayList<String> idList = data.getStringArrayListExtra(
+                    AddUsersFromEntourageActivity.ID_LIST_KEY);
 
             List<User> newUsers = new ArrayList<>();
-            List<User> entourage = mUser.getEntourage();
-            for (int i = 0; i < emailList.size(); i++) {
-                for (int j = 0; j < entourage.size(); j++) {
-                    if (entourage.get(j).getEmail().equals(emailList.get(i))
-                            && !mGroup.containsUser(entourage.get(j))) {
-
-                        newUsers.add(entourage.get(j));
-                    }
+            for (int i = 0; i < idList.size(); i++) {
+                Id currentId = new Id(Long.parseLong(idList.get(i)));
+                User user = YieldsApplication.getUserFromId(currentId);
+                if (user != null && !mGroup.containsUser(user)) {
+                    newUsers.add(user);
                 }
             }
 
             String message = newUsers.size() + " user(s) added to group";
             YieldsApplication.showToast(getApplicationContext(), message);
 
-            // TODO Send request to add multiple users to server
+            ServiceRequest updateGroup = new GroupUpdateUsersRequest(YieldsApplication.getUser(), mGroup.getId(),
+                    newUsers, GroupUpdateUsersRequest.AddOrRemove.ADD);
+            YieldsApplication.getBinder().sendRequest(updateGroup);
         }
     }
 

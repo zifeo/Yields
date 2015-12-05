@@ -17,6 +17,7 @@ import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
@@ -155,6 +156,9 @@ public class ServiceRequestController {
                 break;
             case GROUP_UPDATE_IMAGE:
                 mRequestHandler.handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
+                break;
+            case GROUP_UPDATE_USERS:
+                mRequestHandler.handleGroupUpdateUsersRequest((GroupUpdateUsersRequest) serviceRequest);
                 break;
             case GROUP_ADD:
                 mRequestHandler.handleGroupAddRequest((GroupAddRequest) serviceRequest);

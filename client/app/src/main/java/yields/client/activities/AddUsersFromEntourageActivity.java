@@ -29,7 +29,7 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
     private List<Map.Entry<User, Boolean> > mEntourageChecked;
     private ListView mListView;
 
-    public static final String EMAIL_LIST_KEY = "EMAIL_LIST";
+    public static final String ID_LIST_KEY = "ID_LIST";
     public static final String EMAIL_LIST_INPUT_KEY = "EMAIL_LIST_INPUT";
 
     /**
@@ -97,16 +97,16 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        ArrayList<String> emailList = new ArrayList<>();
+        ArrayList<String> idList = new ArrayList<>();
 
         for (int i = 0; i < mEntourageChecked.size(); i++){
             if (mEntourageChecked.get(i).getValue()){
-                emailList.add(mEntourageChecked.get(i).getKey().getEmail());
+                idList.add(mEntourageChecked.get(i).getKey().getId().getId().toString());
             }
         }
 
         Intent returnIntent = new Intent();
-        returnIntent.putStringArrayListExtra(EMAIL_LIST_KEY, emailList);
+        returnIntent.putStringArrayListExtra(ID_LIST_KEY, idList);
 
         setResult(RESULT_OK, returnIntent);
         finish();

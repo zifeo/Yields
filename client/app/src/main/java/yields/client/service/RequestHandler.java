@@ -11,6 +11,7 @@ import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
@@ -115,7 +116,18 @@ public class RequestHandler {
      */
     protected void handleGroupUpdateImageRequest(GroupUpdateImageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
+        //mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
+        //TODO : Notify app
+
+        mController.sendToServer(serverRequest);
+    }
+
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
+    protected void handleGroupUpdateUsersRequest(GroupUpdateUsersRequest serviceRequest) {
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        //mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
         //TODO : Notify app
 
         mController.sendToServer(serverRequest);
@@ -126,7 +138,7 @@ public class RequestHandler {
      */
     protected void handleGroupUpdateNameRequest(GroupUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupName(serviceRequest.getGroupId(), serviceRequest.getNewGroupName());
+        //mCacheHelper.updateGroupName(serviceRequest.getGroupId(), serviceRequest.getNewGroupName());
         //TODO : Notify app
 
         mController.sendToServer(serverRequest);
@@ -137,12 +149,12 @@ public class RequestHandler {
      */
     protected void handleGroupAddRequest(GroupAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
+        /*try {
             mCacheHelper.addUserToGroup(serviceRequest.getGroupId(), serviceRequest.getUser());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle handleGroupAddRequest correctly !");
-        }
+        }*/
 
         mController.sendToServer(serverRequest);
     }

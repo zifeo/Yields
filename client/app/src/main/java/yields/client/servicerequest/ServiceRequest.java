@@ -19,7 +19,8 @@ public abstract class ServiceRequest {
         GROUP_ADD("GroupAdd"), GROUP_REMOVE("GroupRemove"), GROUP_INFO("GroupInfo"),
         NODE_MESSAGE("GroupMessage"), NODE_HISTORY("NodeHistory"), NODE_SEARCH("NodeSearch"),
         PUBLISHER_CREATE("PublisherCreate"), GROUP_MESSAGE("GroupMessage"),
-        PUBLISHER_MESSAGE("PublisherMessage"), USER_UPDATE_NAME("UserUpdate");
+        GROUP_UPDATE_USERS("GroupUpdate"), PUBLISHER_MESSAGE("PublisherMessage"),
+        USER_UPDATE_NAME("UserUpdate");
 
         private final String mName;
 
