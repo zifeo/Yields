@@ -192,6 +192,10 @@ public class YieldsApplication {
         mGroup = g;
     }
 
+    public static void nullGroup() {
+        mGroup = null;
+    }
+
     /**
      * Setter for the client user of the app.
      *

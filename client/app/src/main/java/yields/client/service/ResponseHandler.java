@@ -108,6 +108,8 @@ public class ResponseHandler {
 
     protected void handleGroupUpdateResponse(Response serverResponse){
         Log.d("ServiceRequestCtrll", "Response for Group Update.");
+        ServiceRequest groupInfo = new UserGroupListRequest(YieldsApplication.getUser());
+        mService.sendRequest(groupInfo);
         // No output.
         // TODO : decide what to do.
     }
