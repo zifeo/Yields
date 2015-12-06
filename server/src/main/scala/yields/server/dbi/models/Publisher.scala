@@ -44,7 +44,7 @@ object Publisher {
     */
   def create(name: String, creator: UID): Publisher = {
     val publisher = Publisher(newIdentity())
-    redis.withClient { r =>
+    redis { r =>
       val now = Temporal.now
       val infos = List(
         (StaticNodeKey.name, name),
