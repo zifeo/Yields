@@ -22,20 +22,24 @@ final class Tag private(val tid: TID) {
 
   private var _text: Option[String] = None
 
+  /** tag text getter */
   def text: String = _text.getOrElse {
     _text = redis.withClient(_.hget[String](TagKey.tag, TagKey.text))
     valueOrDefault(_text, "")
   }
 
+  /** tag text setter */
   def text_=(text: String): Unit = {
     redis.withClient(_.hset(TagKey.tag, TagKey.text, text))
     _text = Some(text)
   }
 
+  /** link a node to a tag */
   def addNode(nid: NID): Unit = {
     redis.withClient(_.sadd(TagKey.groups, nid))
   }
 
+  /** remove a linked node */
   def remNode(nid: NID): Unit = {
     redis.withClient(_.srem(TagKey.groups, nid))
   }

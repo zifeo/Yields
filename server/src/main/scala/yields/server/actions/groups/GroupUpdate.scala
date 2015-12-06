@@ -15,7 +15,6 @@ import yields.server.mpi.Metadata
   * @param removeUsers users to remove
   * @param addNodes nodes to add
   * @param removeNodes nodes to remove
-  *                    TODO: set picture
   */
 case class GroupUpdate(nid: NID,
                        name: Option[String],
