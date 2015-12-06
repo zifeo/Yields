@@ -35,7 +35,6 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".activities.SelectUsernameActivity"
-            android:label="@string/title_activity_select_username"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
