@@ -147,7 +147,7 @@ public class Group extends Node {
      * @throws JSONException
      */
     public Group(JSONArray jsonGroup) throws JSONException, ParseException{
-        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<Id>(), false,
+        this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<Id>(), true,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 

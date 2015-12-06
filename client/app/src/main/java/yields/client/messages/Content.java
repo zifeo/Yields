@@ -11,7 +11,7 @@ import yields.client.exceptions.ContentException;
 public abstract class Content {
 
     public enum ContentType {
-        TEXT, IMAGE;
+        TEXT, IMAGE
     }
 
     /**

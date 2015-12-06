@@ -55,6 +55,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_USER_IMAGE = "userImage";
     private static final String KEY_USER_ENTOURAGE = "userEntourage";
+    private static final String KEY_USER_LAST_REFRESH = "userRefreshDate";
 
     private static final String KEY_GROUP_NODE_ID = "nodeID";
     private static final String KEY_GROUP_NAME = "groupName";
@@ -75,7 +76,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODE_ID + " TEXT,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
-            + " BLOB, " + KEY_USER_ENTOURAGE + " BOOLEAN" + ")";
+            + " BLOB, " + KEY_USER_ENTOURAGE + " BOOLEAN," + KEY_USER_LAST_REFRESH + " TEXT" + ")";
 
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
             + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODE_ID + " TEXT,"
@@ -152,8 +153,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(groupId);
 
         mDatabase.execSQL("DELETE FROM " + TABLE_MESSAGES + " WHERE " + KEY_MESSAGE_GROUP_ID + " = ? " + "AND "
-                + KEY_MESSAGE_DATE + " = ? ", new Object[]{groupId.getId().toString(),
-                DateSerialization.dateSerializer.toStringForCache(message.getDate())});
+                + KEY_MESSAGE_DATE + " = ? AND " + KEY_MESSAGE_TEXT + " = ?", new Object[]{groupId.getId().toString(),
+                DateSerialization.dateSerializer.toStringForCache(message.getDate()),
+                message.getContent().getTextForRequest()});
 
     }
 
@@ -959,6 +961,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
         int inEntourage = entourageIds.contains(user.getId().getId().toString()) ? 1 : 0;
         values.put(KEY_USER_ENTOURAGE, inEntourage);
+        values.put(KEY_USER_LAST_REFRESH, DateSerialization.dateSerializer.toStringForCache(new Date()));
+
         return values;
     }
 

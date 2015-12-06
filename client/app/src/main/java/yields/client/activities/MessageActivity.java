@@ -174,7 +174,7 @@ public class MessageActivity extends NotifiableActivity {
     public void onSendMessage(View v) {
         String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
-        if (!inputMessage.isEmpty() || mSendImage){
+        if (!inputMessage.isEmpty() || mSendImage) {
             Content content;
             if (mSendImage && mImage != null) {
                 content = new ImageContent(mImage, inputMessage);
@@ -382,9 +382,10 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Cancel an image in a message when clicking on the thumbnail.
+     *
      * @param v The view clicked on.
      */
-    public void cancelImageSending(View v){
+    public void cancelImageSending(View v) {
         String message = "Image removed from message";
         YieldsApplication.showToast(YieldsApplication.getApplicationContext(), message);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -500,7 +501,7 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
+        if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
 
@@ -508,9 +509,10 @@ public class MessageActivity extends NotifiableActivity {
                 mGroupMessageAdapter.add(message);
             }
 
-            mGroupMessageAdapter.notifyDataSetChanged();
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
+
+        mGroupMessageAdapter.notifyDataSetChanged();
         ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                 .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
@@ -521,7 +523,7 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveCommentMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if(mCommentAdapter.getCount() < messagesTree.size()) {
+        if (mCommentAdapter.getCount() < messagesTree.size()) {
             Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
             mCommentAdapter.clear();
 
