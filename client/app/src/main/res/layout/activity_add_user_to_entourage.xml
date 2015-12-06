@@ -37,7 +37,7 @@
         android:layout_gravity="center_horizontal"
         android:hint="@string/enterEmail"
         android:maxLines="1"
-        android:inputType="textUri">
+        android:inputType="textEmailAddress">
         <requestFocus />
     </EditText>
 
