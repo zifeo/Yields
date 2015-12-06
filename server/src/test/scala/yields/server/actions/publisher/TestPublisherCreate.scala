@@ -50,8 +50,4 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
 
   }
 
-  it should "not accept adding private node" in {
-
-  }
-
 }
