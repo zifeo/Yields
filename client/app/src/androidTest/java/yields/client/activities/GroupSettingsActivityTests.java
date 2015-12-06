@@ -48,7 +48,10 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         user.addUserToEntourage(MockFactory.generateFakeClientUser("Friend", new Id(125), "a@b.d", YieldsApplication.getDefaultUserImage()));
 
         YieldsApplication.setUser(user);
-        YieldsApplication.setGroup(new Group("Group", new Id(124), new ArrayList<Id>()));
+
+        Group g = new Group("Group", new Id(124), new ArrayList<Id>());
+        g.setVisibility(Group.GroupVisibility.PUBLIC);
+        YieldsApplication.setGroup(g);
     }
 
     @Override
@@ -82,36 +85,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withText("Cancel")).perform(click());
 
         onView(withText("The new name is too short")).inRoot(withDecorView(not(is(getActivity().
-                getWindow().getDecorView())))).check(matches(isDisplayed()));
-    }
-
-    /**
-     * Test that tries to change the type of the group to private
-     * @throws InterruptedException
-     */
-    public void testChangeTypePrivate() throws InterruptedException {
-        getActivity();
-        onView(withText(R.string.changeGroupType)).perform(click());
-        onView(withText(" Private")).perform(click());
-
-        onView(withText("Ok")).perform(click());
-
-        onView(withText("Group type changed to : private")).inRoot(withDecorView(not(is(getActivity().
-                getWindow().getDecorView())))).check(matches(isDisplayed()));
-    }
-
-    /**
-     * Test that tries to change the type of the group to public
-     * @throws InterruptedException
-     */
-    public void testChangeTypePublic() throws InterruptedException {
-        getActivity();
-        onView(withText(R.string.changeGroupType)).perform(click());
-        onView(withText(" Public")).perform(click());
-
-        onView(withText("Ok")).perform(click());
-
-        onView(withText("Group type changed to : public")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 
@@ -184,6 +157,19 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withText("Ok")).perform(click());
 
         onView(withText("Tag \"nice\" added")).inRoot(withDecorView(not(is(getActivity().
+                getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that tries to leave the group
+     */
+    public void testLeaveGroup() {
+        getActivity();
+        onView(withText(R.string.leaveGroup)).perform(click());
+
+        onView(withText("Ok")).perform(click());
+
+        onView(withText("Group left !")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 }
