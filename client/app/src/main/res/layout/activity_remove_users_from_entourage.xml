@@ -6,6 +6,7 @@
     android:fitsSystemWindows="true"
     tools:context="yields.client.activities.RemoveUsersFromEntourageActivity"
     android:orientation="vertical"
+    android:background="@drawable/background"
     android:weightSum="1">
 
     <TextView

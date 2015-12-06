@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="yields.client.activities.MessageActivity"
-    android:background="#ffffff"
+    android:background="@drawable/background"
     android:orientation="vertical"
     android:weightSum="1">
 
