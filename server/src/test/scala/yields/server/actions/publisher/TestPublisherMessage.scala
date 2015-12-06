@@ -38,7 +38,7 @@ class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
     val groupHistoryAction = NodeHistory(group.nid, Temporal.now, 3)
     val meta4 = Metadata.now(user2.uid)
     groupHistoryAction.run(meta4) match {
-      case NodeHistoryRes(nid, dates, senders, texts, _, _) =>
+      case NodeHistoryRes(nid, dates, senders, texts, _, _, _) =>
         nid should be(group.nid)
         dates.length should be(3)
         senders should contain theSameElementsInOrderAs List(meta1.client, publisher.nid, meta3.client)

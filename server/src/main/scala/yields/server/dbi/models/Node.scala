@@ -100,7 +100,7 @@ class Node protected(val nid: NID) {
   /** Users getter */
   def users: List[UID] = _users.getOrElse {
     _users = redis(_.hkeys[UID](NodeKey.users))
-    valueOrDefault(_users, List.empty)
+    valueOrException(_users)
   }
 
   /** Add user. */
@@ -127,11 +127,13 @@ class Node protected(val nid: NID) {
 
   /** Add node. */
   def addNode(newNode: NID): Boolean =
-    addWithTime(NodeKey.nodes, newNode)
+    if (newNode == nid) false
+    else addWithTime(NodeKey.nodes, newNode)
 
   /** Add multiple nodes. */
   def addNode(newNodes: List[NID]): Boolean =
-    addWithTime(NodeKey.nodes, newNodes)
+    if (newNodes == List(nid)) false
+    else addWithTime(NodeKey.nodes, newNodes.filterNot(_ == nid))
 
   /** Remove node. */
   def removeNode(oldNode: NID): Boolean =

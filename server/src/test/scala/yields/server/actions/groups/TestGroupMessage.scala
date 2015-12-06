@@ -20,10 +20,11 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val action = GroupMessage(group.nid, Some(text), None, None)
 
     action.run(meta) match {
-      case GroupMessageRes(nid, datetime) =>
+      case GroupMessageRes(nid, datetime, contentNid) =>
         val group = Group(nid)
-        val feed = group.getMessagesInRange(Temporal.now, 10)
+        contentNid should be (None)
 
+        val feed = group.getMessagesInRange(Temporal.now, 10)
         feed should have size 1
         feed.head._1 should be (datetime)
         feed.head._2 should be (meta.client)
@@ -42,7 +43,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val action = GroupMessage(group.nid, None, Some(contentType), Some(content))
 
     action.run(meta) match {
-      case GroupMessageRes(nid, datetime) =>
+      case GroupMessageRes(nid, datetime, contentNid) =>
         val group = Group(nid)
         val feed = group.getMessagesInRange(Temporal.now, 5)
 
@@ -56,6 +57,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
         Media.checkFileExist(media.hash) should be (true)
         media.contentType should be (contentType)
         media.content should be (content)
+        media.nid should be (contentNid.get)
     }
   }
 
@@ -70,7 +72,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val action = GroupMessage(group.nid, Some(text), Some(contentType), Some(content))
 
     action.run(meta) match {
-      case GroupMessageRes(nid, datetime) =>
+      case GroupMessageRes(nid, datetime, contentNid) =>
         val group = Group(nid)
         val feed = group.getMessagesInRange(Temporal.now, 5)
 
@@ -84,6 +86,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
         Media.checkFileExist(media.hash) should be (true)
         media.contentType should be (contentType)
         media.content should be (content)
+        media.nid should be (contentNid.get)
     }
   }
 
