@@ -76,6 +76,10 @@ public class TextContent extends Content {
     }
 
     @Override
+    public boolean isCommentable() {
+        return false;
+    }
+
     public String getContentForRequest() {
         return null;
     }

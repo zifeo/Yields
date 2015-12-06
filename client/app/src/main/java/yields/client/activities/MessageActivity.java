@@ -413,7 +413,7 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void onClick(View v) {
                 Log.d("CommentFragment", "CommentView clicked.");
-                if (mCommentMessage.getContent().getType() == Content.ContentType.IMAGE) {
+                if (mCommentMessage.getContent().isCommentable()) {
                     YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).getImage());
                     startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
                 }
@@ -454,7 +454,7 @@ public class MessageActivity extends NotifiableActivity {
                                             View view, int position, long id) {
                         Message message = mGroupMessageAdapter.getItem(position);
                         // Only non text messages can be commented.
-                        if (message.getContent().getType() != Content.ContentType.TEXT) {
+                        if (message.getContent().isCommentable()) {
                             // First keep a reference to the message that has been clicked on.
                             mCommentMessage = message;
                             // We save the reference of the last group in the YieldsApplication class.
