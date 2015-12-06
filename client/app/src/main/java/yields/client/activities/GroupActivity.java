@@ -1,14 +1,7 @@
 package yields.client.activities;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -16,30 +9,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
-import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
-import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterGroups;
-import yields.client.messages.Message;
-import yields.client.messages.TextContent;
-import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.service.YieldServiceBinder;
-import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -96,8 +74,7 @@ public class GroupActivity extends NotifiableActivity {
         });
 
         mTextViewNoGroup = (TextView) findViewById(R.id.textViewNoGroup);
-        mTextViewNoGroup.setText("Search for publishers, RSS feed, or " +
-                "create a new group to start using Yields !");
+        mTextViewNoGroup.setText(getString(R.string.messageNoGroup));
         checkNoGroup();
 
         YieldsApplication.setResources(getResources());

@@ -20,7 +20,6 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 
 import yields.client.R;
-import yields.client.gui.GraphicTransforms;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class GoogleLoginActivity extends AppCompatActivity implements

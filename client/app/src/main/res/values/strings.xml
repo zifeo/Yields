@@ -81,5 +81,6 @@
     <string name="enterKeyword">Leave empty to allow all feeds</string>
     <string name="typeKeywords">Then, type the keywords that the feed must contain to be published.</string>
     <string name="removeUsers">Select the contacts you want to remove from your entourage</string>
-    <string name="removeFromEtourage">Remove contacts</string>
+    <string name="removeFromEntourage">Remove contacts</string>
+    <string name="messageNoGroup">Search for publishers, RSS feed, or create a new group to start using Yields !</string>
 </resources>

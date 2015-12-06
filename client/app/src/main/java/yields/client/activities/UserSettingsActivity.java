@@ -60,7 +60,7 @@ public class UserSettingsActivity extends AppCompatActivity {
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeUserName));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeUserImage));
-        itemList.add(Settings.REMOVE_ENTOURAGE.ordinal(), getResources().getString(R.string.removeFromEtourage));
+        itemList.add(Settings.REMOVE_ENTOURAGE.ordinal(), getResources().getString(R.string.removeFromEntourage));
         itemList.add(Settings.LOGOUT.ordinal(), getResources().getString(R.string.logout));
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);

@@ -1,7 +1,6 @@
 package yields.client.activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -10,14 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
-import yields.client.id.Id;
-import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -98,7 +91,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
                 String message = getString(R.string.messageRssCreated);
                 YieldsApplication.showToast(getApplicationContext(), message);
 
-                //TODO Check if request is necessary
+                //TODO Check if new request is necessary
 
                 Intent createGroupIntent = new Intent(this, GroupActivity.class);
                 createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
