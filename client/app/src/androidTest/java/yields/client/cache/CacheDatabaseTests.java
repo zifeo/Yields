@@ -200,12 +200,12 @@ public class CacheDatabaseTests {
 
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM users;", null);
             cursor.moveToFirst();
-            assertEquals(6, cursor.getCount());
-            assertEquals(7, cursor.getColumnCount());
+            assertEquals(1, cursor.getCount());
+            assertEquals(6, cursor.getColumnCount());
 
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < users.size(); i++) {
                 assertTrue(checkUserInformation(cursor, YieldsApplication.getUser(users.get(i))));
-                if (i != 5) {
+                if (i != users.size() -1) {
                     cursor.moveToNext();
                 }
             }
@@ -256,7 +256,7 @@ public class CacheDatabaseTests {
 
             List<User> usersFromDatabase = mDatabaseHelper.getAllUsers();
             assertEquals(users.size(), usersFromDatabase.size());
-            for (int i = 0; i < users.size(); i++) {
+            for (int i = users.size() -1; i != 0; i--) {
                 assertEquals(YieldsApplication.getUser(users.get(i)).getName(),
                         usersFromDatabase.get(i).getName());
                 assertEquals(YieldsApplication.getUser(users.get(i)).getEmail(),
@@ -291,7 +291,7 @@ public class CacheDatabaseTests {
 
             List<User> usersFromDatabase = mDatabaseHelper.getClientUserEntourage();
             assertEquals(users.size(), usersFromDatabase.size());
-            for (int i = 0; i < users.size(); i++) {
+            for (int i = users.size() -1; i != 0; i--) {
                 assertEquals(YieldsApplication.getUser(users.get(i)).getName(),
                         usersFromDatabase.get(i).getName());
                 assertEquals(YieldsApplication.getUser(users.get(i)).getEmail(),
@@ -347,7 +347,7 @@ public class CacheDatabaseTests {
 
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM groups;", null);
             assertEquals(7, cursor.getCount());
-            assertEquals(7, cursor.getColumnCount());
+            assertEquals(6, cursor.getColumnCount());
             cursor.moveToFirst();
 
             for (int i = 0; i < 6; i++) {
