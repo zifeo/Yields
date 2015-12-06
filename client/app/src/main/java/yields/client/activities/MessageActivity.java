@@ -508,9 +508,10 @@ public class MessageActivity extends NotifiableActivity {
                 mGroupMessageAdapter.add(message);
             }
 
-            mGroupMessageAdapter.notifyDataSetChanged();
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
+
+        mGroupMessageAdapter.notifyDataSetChanged();
         ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                 .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
@@ -528,11 +529,11 @@ public class MessageActivity extends NotifiableActivity {
             for (Message message : messagesTree.values()) {
                 mCommentAdapter.add(message);
             }
-
-            mCommentAdapter.notifyDataSetChanged();
-            ((CommentFragment) mCurrentFragment).getCommentListView()
-                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
         }
+
+        mCommentAdapter.notifyDataSetChanged();
+        ((CommentFragment) mCurrentFragment).getCommentListView()
+                .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
     }
 
     /**
