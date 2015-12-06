@@ -59,6 +59,7 @@ case class UserUpdate(email: Option[Email],
     }
 
     UserUpdateRes()
+
   }
 
 }
