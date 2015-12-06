@@ -22,6 +22,7 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
     private Context mContext;
     private List<User> mUsers;
     private int mUserLayout;
+    private boolean mShowAddUser;
 
     /**
      * Constructor for ListAdapterUsersCheckBox
@@ -29,11 +30,12 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
      * @param userLayout The id of the basic view
      * @param users The list of users
      */
-    public ListAdapterUsers(Context context, int userLayout, List<User> users) {
+    public ListAdapterUsers(Context context, int userLayout, List<User> users, boolean showAddUser) {
         super(context, userLayout, users);
         mContext = context;
         mUsers = users;
         mUserLayout = userLayout;
+        mShowAddUser = showAddUser;
     }
 
     /**
@@ -42,7 +44,10 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
      */
     @Override
     public int getCount() {
-        return mUsers.size() + 1;
+        if (mShowAddUser){
+            return mUsers.size() + 1;
+        }
+        return mUsers.size();
     }
 
     /**
