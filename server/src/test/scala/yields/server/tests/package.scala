@@ -5,6 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
 import org.scalacheck.Gen
 import spray.json._
+import org.scalatest.Matchers._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -12,7 +13,7 @@ import scala.language.postfixOps
 
 package object tests {
 
-  implicit lazy val system = ActorSystem("Yields-server-tests")
+  implicit lazy val system = ActorSystem("Yields-server-test")
   implicit lazy val materializer = ActorMaterializer()
 
   /**
@@ -33,10 +34,10 @@ package object tests {
   }
 
   /** Serialize and deserialize a given element and return true on equality. */
-  def toAndFromJson[T : JsonWriter : JsonReader](elem: T): Boolean = {
+  def checkToAndFromJson[T : JsonWriter : JsonReader](elem: T): Unit = {
     val encoded = elem.toJson.toString()
     val decoded = encoded.parseJson.convertTo[T].toJson.toString()
-    encoded == decoded
+    encoded should be (decoded)
   }
 
 }

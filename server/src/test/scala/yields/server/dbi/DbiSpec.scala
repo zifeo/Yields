@@ -2,14 +2,14 @@ package yields.server.dbi
 
 import java.io.File
 
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec}
+import org.scalatest.{BeforeAndAfter, FlatSpecLike}
 import yields.server.utils.Config
 
 /**
   * Flush the database before and after each tests.
   * Database number is already changed (see application.conf in test folder).
   */
-trait DBFlatSpec extends FlatSpec with BeforeAndAfter with BeforeAndAfterAll {
+private[server] trait DbiSpec extends FlatSpecLike with BeforeAndAfter {
 
   before {
     redis(_.flushdb)
