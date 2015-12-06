@@ -12,7 +12,7 @@ import scala.language.postfixOps
 
 package object tests {
 
-  implicit lazy val system = ActorSystem("Yields-server-test")
+  implicit lazy val system = ActorSystem("Yields-server-tests")
   implicit lazy val materializer = ActorMaterializer()
 
   /**

@@ -4,31 +4,21 @@ import java.net.InetSocketAddress
 
 import akka.actor.ActorSystem
 import akka.io.Tcp
-import akka.stream.actor.{ActorPublisherMessage, ActorSubscriberMessage}
-import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import akka.util.ByteString
-import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
-import yields.server.actions.users.{UserSearchRes, UserConnectRes}
-import yields.server.mpi.{Response, Metadata}
-import yields.server.pipeline.blocks.SerializationModule
+import akka.stream.actor.ActorSubscriberMessage
+import akka.testkit.TestActorRef
+import yields.server.actions.users.{UserConnectRes, UserSearchRes}
 import yields.server.io._
-import yields.server.tests.AllGenerators
+import yields.server.mpi.{Metadata, Response}
+import yields.server.pipeline.blocks.SerializationModule
+import yields.server.tests.YieldsAkkaSpec
 
-class ClientHubTests(sys: ActorSystem)
-  extends TestKit(sys) with ImplicitSender with FlatSpecLike with Matchers with BeforeAndAfterAll with AllGenerators {
+class ClientHubTests extends YieldsAkkaSpec {
 
-  import ActorPublisherMessage._
   import ActorSubscriberMessage._
   import ClientHub._
   import Dispatcher._
   import SerializationModule._
   import Tcp._
-
-  def this() = this(ActorSystem("Yields-tests"))
-
-  override def afterAll(): Unit = {
-    TestKit.shutdownActorSystem(system)
-  }
 
   lazy val hub = {
     val hubProps = ClientHub.props(self, InetSocketAddress.createUnresolved("", 0), self)

@@ -2,11 +2,11 @@ package yields.server.dbi
 
 import java.io.File
 
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter, FlatSpec}
-import yields.server.dbi.models.Media
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FlatSpec}
 import yields.server.utils.Config
 
-/** Flush the database before and after each tests.
+/**
+  * Flush the database before and after each tests.
   * Database number is already changed (see application.conf in test folder).
   */
 trait DBFlatSpec extends FlatSpec with BeforeAndAfter with BeforeAndAfterAll {
