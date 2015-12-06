@@ -164,6 +164,12 @@ public class UrlContentTests extends ActivityInstrumentationTestCase2<MessageAct
         }
     }
 
+    @Test
+    public void testContentShouldBeCommentable(){
+        UrlContent content = createUrlContent();
+        assertTrue(content.isCommentable());
+    }
+
     private static UrlContent createUrlContent(){
         return new UrlContent(CAPTION);
     }
