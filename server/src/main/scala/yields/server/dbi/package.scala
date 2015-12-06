@@ -18,7 +18,7 @@ package object dbi {
     val identity = "identity"
   }
 
-  private[dbi] lazy val redis = {
+  private lazy val redis = {
     val pool = new RedisClientPool(
       host = Config.getString("database.addr"),
       port = Config.getInt("database.port"),
@@ -38,7 +38,7 @@ package object dbi {
     * @tparam T return type of the query
     * @return values or status of redis query
     */
-  def redis[T](query: RedisClient => T): T =
+  private[dbi] def redis[T](query: RedisClient => T): T =
     redis.withClient(query)
 
   /**
@@ -46,7 +46,7 @@ package object dbi {
     * @param queries queries to be run on in block
     * @return list of values or status of redis queries
     */
-  def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
+  private[dbi] def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
     redis.withClient(_.pipeline(queries))
 
   /** Terminates database connection. */
