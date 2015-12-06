@@ -74,17 +74,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MESSAGE_DATE = "messageDate";
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE " + TABLE_USERS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_USER_NODE_ID + " TEXT,"
+            + "(" + KEY_USER_NODE_ID + " INTEGER PRIMARY KEY,"
             + KEY_USER_NAME + " TEXT," + KEY_USER_EMAIL + " TEXT," + KEY_USER_IMAGE
             + " BLOB, " + KEY_USER_ENTOURAGE + " BOOLEAN," + KEY_USER_LAST_REFRESH + " TEXT" + ")";
 
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_GROUP_NODE_ID + " TEXT,"
+            + "(" + KEY_GROUP_NODE_ID + " INTEGER PRIMARY KEY,"
             + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
             + " BLOB," + KEY_GROUP_VISIBILITY + " TEXT," + KEY_GROUP_VALIDATED + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " TEXT,"
+            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " INTEGER,"
             + KEY_MESSAGE_GROUP_ID + " TEXT," + KEY_MESSAGE_SENDER_ID + " TEXT,"
             + KEY_MESSAGE_TEXT + " TEXT," + KEY_MESSAGE_CONTENT_TYPE + " TEXT,"
             + KEY_MESSAGE_CONTENT + " BLOB," + KEY_MESSAGE_DATE + " TEXT,"
@@ -156,7 +156,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 + KEY_MESSAGE_DATE + " = ? AND " + KEY_MESSAGE_TEXT + " = ?", new Object[]{groupId.getId().toString(),
                 DateSerialization.dateSerializer.toStringForCache(message.getDate()),
                 message.getContent().getTextForRequest()});
-
     }
 
     /**
@@ -203,27 +202,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addUser(User user) throws CacheDatabaseException {
         Objects.requireNonNull(user);
 
-        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_NODE_ID + " = ?";
-        Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{user.getId().getId().toString()});
-        if (cursor.getCount() == 1) {
-            cursor.close();
-            updateUser(user);
-        } else if (cursor.getCount() > 1) { //There should not be several Users with the same Id.
-            deleteUser(user.getId());
-        }
-
-        if (cursor.getCount() > 1 || cursor.getCount() == 0) {
-            try {
-                ContentValues values = createContentValuesForUser(user);
-                cursor.close();
-                mDatabase.insert(TABLE_USERS, null, values);
-            } catch (CacheDatabaseException exception) {
-                Log.d(TAG, "Unable to insert User with id: "
-                        + user.getId().getId(), exception);
-                throw exception;
-            }
-        }
+        ContentValues values = createContentValuesForUser(user);
+        mDatabase.insertWithOnConflict(TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     /**
@@ -292,9 +272,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             return users;
         } else {
             do {
-                Id userId = new Id(cursor.getLong(
-                        cursor.getColumnIndex(KEY_USER_NODE_ID)));
-                users.add(getUser(userId));
+                String userName = cursor.getString(
+                        cursor.getColumnIndex(KEY_USER_NAME));
+                String userEmail = cursor.getString(
+                        cursor.getColumnIndex(KEY_USER_EMAIL));
+                Bitmap userImage = deserializeBitmap(cursor.getBlob
+                        (cursor.getColumnIndex(KEY_USER_IMAGE)));
+                Id userId = new Id(cursor.getInt(cursor.getColumnIndex(KEY_USER_NODE_ID)));
+                users.add(new User(userName, userId, userEmail, userImage));
             } while (cursor.moveToNext());
             cursor.close();
             return users;
@@ -348,7 +333,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addGroup(Group group)
             throws CacheDatabaseException {
         Objects.requireNonNull(group);
-        mDatabase.insertWithOnConflict()
 
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
                 + " WHERE " + KEY_GROUP_NODE_ID + " = ?";
