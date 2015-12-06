@@ -51,7 +51,7 @@ public abstract class Content {
 
     /**
      * Define if a content is commentable or not.
-     * @return True if the comment is commentable, false otherwise.
+     * @return True if the content is commentable, false otherwise.
      */
     public abstract boolean isCommentable();
 }
