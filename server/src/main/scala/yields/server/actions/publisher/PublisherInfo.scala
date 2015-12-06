@@ -25,7 +25,7 @@ case class PublisherInfo(nid: NID) extends Action {
       else List.empty
 
     publisher.hydrate()
-    PublisherInfoRes(nid, publisher.name, publisher.pic, publisher.users, publisher.nodes, publisher.tags)
+    PublisherInfoRes(nid, publisher.name, publisher.pic, users, publisher.nodes, publisher.tags)
   }
 
 }

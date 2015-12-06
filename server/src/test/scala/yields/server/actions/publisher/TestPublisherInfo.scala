@@ -51,7 +51,7 @@ class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
         pic should be(publisher.pic)
         currentUsers should be(empty)
         currentNodes should contain theSameElementsAs publisher.nodes
-        tags should be(empty)
+        tags should contain theSameElementsAs (publisher.tags)
     }
   }
 
