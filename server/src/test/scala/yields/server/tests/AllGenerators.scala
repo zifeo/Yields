@@ -1,7 +1,7 @@
-package yields.server
+package yields.server.tests
 
 import org.scalacheck.Arbitrary
-import yields.server.actions.{UsersGenerators, GroupsGenerators, ActionsGenerators}
+import yields.server.actions.{ActionsGenerators, GroupsGenerators, UsersGenerators}
 import yields.server.mpi.MessagesGenerators
 
 trait AllGenerators

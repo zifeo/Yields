@@ -1,4 +1,4 @@
-package yields.server
+package yields.server.tests
 
 import akka.event.LoggingAdapter
 

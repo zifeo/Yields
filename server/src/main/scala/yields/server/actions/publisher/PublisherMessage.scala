@@ -4,6 +4,8 @@ import java.time.OffsetDateTime
 
 import yields.server.Yields
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
+import yields.server.actions.groups.GroupMessageRes
+import yields.server.actions.nodes.NodeMessage
 import yields.server.actions.{Broadcast, Result, Action}
 import yields.server.dbi.models.Media.create
 import yields.server.dbi.models._
@@ -18,33 +20,19 @@ import yields.server.utils.Temporal
   * @param content content of the media
   */
 case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[String], content: Option[Blob])
-  extends Action {
-  /**
-    * Run the action given the sender.
-    * @param metadata action requester
-    * @return action result
-    */
-  override def run(metadata: Metadata): Result = {
-    val publisher = Publisher(nid)
-    val datetime = Temporal.now
-    if (!publisher.users.contains(metadata.client)) {
-      val client = metadata.client
-      throw new UnauthorizedActionException(s"evil user $client can't publish in publisher $nid")
-    }
+  extends NodeMessage(nid, text, contentType, content) {
 
-    val media = for {
-      cntType <- contentType
-      cnt <- content
-    } yield create(cntType, cnt, metadata.client)
+  /** Get node instance. */
+  override def instance(nid: NID): Node =
+    Publisher(nid)
 
-    publisher.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse("")))
-
-    Yields.broadcast(publisher.users.filter(_ != metadata.client)) {
-      PublisherMessageBrd(nid, datetime, metadata.client, text, contentType, content)
-    }
-
+  /** Format the result. */
+  override def result(datetime: OffsetDateTime): Result =
     PublisherMessageRes(nid, datetime)
-  }
+
+  /** Format the broadcast. */
+  override def broadcast(datetime: OffsetDateTime, uid: UID): Broadcast =
+    PublisherMessageBrd(nid, datetime, uid, text, contentType, content)
 
 }
 
@@ -64,4 +52,9 @@ case class PublisherMessageRes(nid: NID, datetime: OffsetDateTime) extends Resul
   * @param contentType content type if content is specified
   * @param content content if a media was specified
   */
-case class PublisherMessageBrd(nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Blob]) extends Broadcast
+case class PublisherMessageBrd(nid: NID,
+                               datetime: OffsetDateTime,
+                               sender: UID,
+                               text: Option[String],
+                               contentType: Option[String],
+                               content: Option[Blob]) extends Broadcast
