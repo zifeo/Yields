@@ -5,10 +5,10 @@ import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizedAc
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.tests.AllGenerators
+import yields.server.tests.{YieldsSpec, AllGenerators}
 import yields.server.utils.Temporal
 
-class TestNodeHistory extends DBFlatSpec with Matchers with AllGenerators {
+class TestNodeHistory extends YieldsSpec with Matchers with AllGenerators {
 
   def sendMessage(nid: NID, number: Int): List[FeedContent] = {
     val group = Group(nid)

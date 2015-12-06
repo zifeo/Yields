@@ -1,24 +1,16 @@
 package yields.server
 
-import akka.stream.scaladsl.{Sink, Source, Tcp}
-import org.scalatest.{FlatSpec, BeforeAndAfterAll, Matchers}
+import org.scalatest.BeforeAndAfterAll
 import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
-import yields.server.actions.{Action, Result}
-import yields.server.dbi._
-import yields.server.io._
-import yields.server.mpi.{MessagesGenerators, Metadata, Response}
-import yields.server.pipeline.blocks.SerializationModule
-import yields.server.tests.{FakeClient, _}
-import yields.server.utils.Config
+import yields.server.tests._
 
-import scala.language.implicitConversions
+/**
+  * Regroup all global server tests.
+  */
+class YieldsTests extends YieldsSpec with BeforeAndAfterAll {
 
-class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
-
-  val connection = Tcp().outgoingConnection(Config.getString("addr"), Config.getInt("port"))
-
-  private val server = Yields
+  private lazy val server = Yields
 
   override def beforeAll(): Unit = {
     server.start()
