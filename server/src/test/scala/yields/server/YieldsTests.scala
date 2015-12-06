@@ -1,7 +1,7 @@
 package yields.server
 
 import akka.stream.scaladsl.{Sink, Source, Tcp}
-import org.scalatest.{BeforeAndAfterAll, Matchers}
+import org.scalatest.{FlatSpec, BeforeAndAfterAll, Matchers}
 import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.actions.{Action, Result}
@@ -16,8 +16,6 @@ import scala.language.implicitConversions
 
 class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with MessagesGenerators {
 
-  import SerializationModule._
-
   val connection = Tcp().outgoingConnection(Config.getString("addr"), Config.getInt("port"))
 
   private val server = Yields
@@ -30,40 +28,6 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   override def afterAll(): Unit = {
     server.stop()
   }
-
-  /**
-    * Creates and runs some actions expecting some result.
-    * TODO : refactor this method with socket.
-    *
-    * {{{
-    * "A client without a socket" should "be able to send and retrieve message" in scenario (
-    *   GroupCreate("test group", Seq.empty, Seq(1)) -> GroupCreateRes(1),
-    *   GroupMessage(1, "test message") -> None,
-    *   GroupHistory(1, Temporal.current, 1) -> None
-    * }
-    * }}}
-    * @param acting some actions resulting in their results
-    */
-  def scenario(acting: (Action, Option[Result])*): Unit = {
-    require(acting.nonEmpty, "scenario must contains some acting")
-
-    val metadata = Metadata.now(1)
-    val (actions, expected) = acting.toList.unzip
-    val requests = actions.map(serialize[Action](_))
-
-    val results = await {
-      Source(requests)
-        .via(connection)
-        .map(deserialize[Response](_).result)
-        .grouped(expected.size)
-        .runWith(Sink.head)
-    }.toList
-
-    results should have size expected.size
-    expected.flatten foreach (results should contain (_))
-  }
-
-  implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
   "A client with a socket" should "be able to connect to the server" in {
 

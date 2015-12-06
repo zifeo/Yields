@@ -26,8 +26,9 @@ trait NodesGenerators extends DefaultsGenerators {
       senders <- arbitrary[List[UID]]
       texts <- arbitrary[List[String]]
       contentTypes <- arbitrary[List[Option[String]]]
-      content <- arbitrary[List[Option[Blob]]]
-    } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
+      contents <- arbitrary[List[Option[Blob]]]
+      contentNids <- arbitrary[List[Option[NID]]]
+    } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, contents, contentNids)
   }
 
   //

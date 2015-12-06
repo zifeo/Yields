@@ -76,9 +76,10 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
       uid <- arbitrary[UID]
       name <- arbitrary[String]
       email <- arbitrary[String]
+      pic <- arbitrary[Blob]
       entourage <- arbitrary[List[UID]]
       entourageUpdates <- arbitrary[List[OffsetDateTime]]
-    } yield UserInfoRes(uid, name, email, entourage, entourageUpdates)
+    } yield UserInfoRes(uid, name, email, pic, entourage, entourageUpdates)
   }
 
   //

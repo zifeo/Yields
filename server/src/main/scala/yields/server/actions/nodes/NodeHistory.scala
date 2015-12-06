@@ -36,15 +36,16 @@ case class NodeHistory(nid: NID, datetime: OffsetDateTime, count: Int) extends A
 
       case (date, uid, Some(mediaRef), text) =>
         val media = Media(mediaRef)
-        (date, uid, text, Some(media.contentType), Some(media.content))
+        (date, uid, text, Some(media.contentType), Some(media.content), Some(media.nid))
 
       case (date, uid, None, text) =>
-        (date, uid, text, None, None)
+        (date, uid, text, None, None, None)
 
     }
 
-    val (datetimes, senders, texts, contentTypes, content) = feed.unzip5
-    NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
+    val (datetimes, senders, texts, contentTypes, contents, contentNids) = feed.unzip6
+    NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, contents, contentNids)
+
   }
 
 }
@@ -63,4 +64,5 @@ case class NodeHistoryRes(nid: NID,
                           senders: List[Identity],
                           texts: List[String],
                           contentTypes: List[Option[String]],
-                          contents: List[Option[Blob]]) extends Result
+                          contents: List[Option[Blob]],
+                          contentNids: List[Option[NID]]) extends Result

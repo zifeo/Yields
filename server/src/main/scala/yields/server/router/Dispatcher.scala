@@ -69,16 +69,20 @@ final class Dispatcher() extends Actor with ActorLogging {
   /** Remove client from pool. */
   private def remove(client: ActorRef, pool: Pool): Pool = {
     val (index, reverseIndex) = pool
-    val uid = reverseIndex(client)
+    reverseIndex.get(client) match {
+      case Some(uid) =>
+        val newEntry = index(uid) - client
+        val clientCount = newEntry.size
+        log.debug(s"dispatch pool: - $uid (left $clientCount)")
 
-    val newEntry = index(uid) - client
-    val clientCount = newEntry.size
-    log.debug(s"dispatch pool: - $uid (left $clientCount)")
-
-    if (newEntry.isEmpty)
-      (index - uid) -> (reverseIndex - client)
-    else
-      (index + (uid -> newEntry)) -> (reverseIndex - client)
+        if (newEntry.isEmpty)
+          (index - uid) -> (reverseIndex - client)
+        else
+          (index + (uid -> newEntry)) -> (reverseIndex - client)
+      case None =>
+        log.warning(s"dispatch pool: remove non-existing $client")
+        pool
+    }
   }
 
   /** Get by filtering existing uids in the pool and flatten all connections. */
