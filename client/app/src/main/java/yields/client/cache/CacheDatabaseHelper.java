@@ -242,7 +242,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                         cursor.getColumnIndex(KEY_USER_EMAIL));
                 Bitmap userImage = ImageSerialization.unSerializeImage(cursor.getString
                         (cursor.getColumnIndex(KEY_USER_IMAGE)));
-                Id userId = new Id(cursor.getInt(cursor.getColumnIndex(KEY_USER_NODE_ID)));
+                Id userId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_USER_NODE_ID)));
                 users.add(new User(userName, userId, userEmail, userImage));
             } while (cursor.moveToNext());
 
@@ -271,7 +271,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                         cursor.getColumnIndex(KEY_USER_EMAIL));
                 Bitmap userImage = ImageSerialization.unSerializeImage(cursor.getString
                         (cursor.getColumnIndex(KEY_USER_IMAGE)));
-                Id userId = new Id(cursor.getInt(cursor.getColumnIndex(KEY_USER_NODE_ID)));
+                Id userId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_USER_NODE_ID)));
                 users.add(new User(userName, userId, userEmail, userImage));
             } while (cursor.moveToNext());
 
@@ -513,7 +513,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             return groups;
         } else {
             do {
-                Id groupId = new Id(cursor.getInt(cursor.getColumnIndex(KEY_GROUP_NODE_ID)));
+                Id groupId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_GROUP_NODE_ID)));
                 String groupName = cursor.getString(
                         cursor.getColumnIndex(KEY_GROUP_NAME));
                 Bitmap groupImage = ImageSerialization.unSerializeImage(
