@@ -191,7 +191,8 @@ public class CreateGroupActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {
 
-            /*ArrayList<String> emailList = data.getStringArrayListExtra(
+            /* TODO: To be discuss with @DelamareA
+            ArrayList<String> emailList = data.getStringArrayListExtra(
                     AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
 
             List<User> entourage = YieldsApplication.getUser().getEntourage();
@@ -219,7 +220,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             for (int i = 0; i < idList.size(); i++) {
                 Id currentId = new Id(Long.parseLong(idList.get(i)));
                 User user = YieldsApplication.getUserFromId(currentId);
-                // Il n'est pas censé y avoir plusieurs personnes identiques dans l'entourage.
+                // There shouldn't be multiple identical users in entourage
                 if (user != null) {
                     mUsers.add(user);
                 } else {
