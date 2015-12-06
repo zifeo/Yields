@@ -41,7 +41,7 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
 
-        inflater.inflate(R.menu.menu_create_rssfeed, menu);
+        inflater.inflate(R.menu.menu_add_user_to_entourage, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

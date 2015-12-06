@@ -169,7 +169,6 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
         onView(withText("Ok")).perform(click());
 
-        onView(withText("Group left !")).inRoot(withDecorView(not(is(getActivity().
-                getWindow().getDecorView())))).check(matches(isDisplayed()));
+        onView(withId(R.id.actionDiscover)).check(matches(isDisplayed()));
     }
 }
