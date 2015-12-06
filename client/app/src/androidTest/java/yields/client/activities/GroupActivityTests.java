@@ -13,10 +13,17 @@ import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupActivity> {
     public GroupActivityTests() {
@@ -196,5 +203,24 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         if (!found) {
             fail("Error group not found");
         }
+    }
+
+    /**
+     * Test that runs through all activities related to group creation,
+     * and creating a rss feed with a malformed url
+     */
+    public void testGroupCreationRSSMalformed() {
+        onView(withId(R.id.actionCreate)).perform(click());
+
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("RSS !"), closeSoftKeyboard());
+
+        onView(withId(R.id.radioButtonRss)).perform(click());
+        onView(withId(R.id.actionDoneSelectName)).perform(click());
+
+        onView(withId(R.id.editTextUrl)).perform(clearText(), typeText("rss"), closeSoftKeyboard());
+        onView(withId(R.id.actionDoneCreateRss)).perform(click());
+
+        onView(withText(R.string.messageUrlHttp)).inRoot(withDecorView(not(is(getActivity().
+                getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 }
