@@ -113,6 +113,7 @@ public class GroupInfoActivity extends NotifiableActivity {
                 Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
                 String title = "Users of " + mGroup.getName();
                 intent.putExtra(UserListActivity.TITLE_KEY, title);
+                intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, false);
                 startActivity(intent);
             }
         });

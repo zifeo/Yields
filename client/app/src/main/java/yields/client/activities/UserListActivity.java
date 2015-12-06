@@ -28,6 +28,7 @@ public class UserListActivity extends AppCompatActivity {
     private ListAdapterUsers mArrayAdapter;
 
     public final static String TITLE_KEY = "TITLE";
+    public final static String SHOW_ADD_ENTOURAGE_KEY = "SHOW_ADD_ENTOURAGE";
 
     /**
      * Method automatically called on the creation of the activity
@@ -53,17 +54,20 @@ public class UserListActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(intent.getStringExtra(TITLE_KEY));
 
-
+        if (!intent.hasExtra(SHOW_ADD_ENTOURAGE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Show add entourage extra is missing from intent in UserListActivity");
+        }
 
         final List<User> userList = YieldsApplication.getUserList();
 
-        Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
+        Objects.requireNonNull(YieldsApplication.getUserList(),
                 "The user list in YieldsApplication cannot be null when UserListActivity is created");
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
 
         mArrayAdapter = new ListAdapterUsers(getApplicationContext(),
-                R.layout.user_layout, userList);
+                R.layout.user_layout, userList, intent.getBooleanExtra(SHOW_ADD_ENTOURAGE_KEY, false));
 
         listView.setAdapter(mArrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -130,6 +130,7 @@ public class GroupActivity extends NotifiableActivity {
                 intent = new Intent(this, UserListActivity.class);
                 String title = "Entourage";
                 intent.putExtra(UserListActivity.TITLE_KEY, title);
+                intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, true);
 
                 YieldsApplication.setUserList(YieldsApplication.getUser().getEntourage());
             break;
