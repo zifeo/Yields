@@ -1,10 +1,9 @@
 package yields.client.activities;
 
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +18,6 @@ import java.util.Map;
 import yields.client.R;
 import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.User;
-import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
 import yields.client.yieldsapplication.YieldsApplication;

@@ -89,13 +89,13 @@ public class UserSettingsActivityTests extends ActivityInstrumentationTestCase2<
      */
     public void testRemoveEntourage() {
         getActivity();
-        onView(withText(R.string.removeFromEtourage)).perform(click());
+        onView(withText(R.string.removeFromEntourage)).perform(click());
 
         onView(withId(R.id.checkboxUser)).perform(click());
         onView(withId(R.id.actionDoneRemoveUsers)).perform(click());
 
         onView(withText("Ok")).perform(click());
 
-        onView(withText(R.string.removeFromEtourage)).check(matches(isDisplayed()));
+        onView(withText(R.string.removeFromEntourage)).check(matches(isDisplayed()));
     }
 }
