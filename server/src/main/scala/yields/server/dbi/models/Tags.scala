@@ -3,33 +3,28 @@ package yields.server.dbi.models
 import yields.server.dbi._
 import com.redis.serialization.Parse.Implicits._
 
+/**
+  * Tag management for nodes
+  */
 trait Tags {
 
-  val nidTag: NID
+  val NodeTagKey: String
+  val nodeID: NID
   private var _tags: Option[Set[TID]] = None
 
   /** add tags to publisher */
   def addTags(tags: Seq[String]): Unit = {
-
-    // TODO find better way to pass nid and store key
-    val key = s"nodes:$nidTag:tags"
-
-    /** Create or get tags id */
     getOrCreateTags(tags).foreach { x =>
-      redis.withClient(_.sadd(key, x))
-      val t = Tag(x)
-      t.addNode(nidTag)
+      redis.withClient(_.sadd(NodeTagKey, x))
+      Tag(x).addNode(nodeID)
     }
   }
 
+  /** remove tags from publisher */
   def remTags(tags: Seq[String]): Unit = {
-    // TODO find better way to pass nid and store key
-    val key = s"nodes:$nidTag:tags"
-
     getOrCreateTags(tags).foreach { x =>
-      redis.withClient(_.srem(key, x))
-      val t = Tag(x)
-      t.addNode(nidTag)
+      redis.withClient(_.srem(NodeTagKey, x))
+      Tag(x).addNode(nodeID)
     }
   }
 
@@ -47,13 +42,10 @@ trait Tags {
     }.toList
   }
 
-  /** get the tags of a publisher */
+  /** get the tags of a node */
   def tags: Set[String] = {
-    // TODO find better way to pass nid and store key
-    val key = s"nodes:$nidTag:tags"
-
     val t: Set[TID] = _tags.getOrElse {
-      val mem: Option[Set[Option[TID]]] = redis.withClient(_.smembers[TID](key))
+      val mem: Option[Set[Option[TID]]] = redis.withClient(_.smembers[TID](NodeTagKey))
       val t: Set[TID] = mem match {
         case Some(x: Set[Option[TID]]) =>
           val defined: Set[Option[TID]] = x.filter(_.isDefined)
@@ -67,8 +59,7 @@ trait Tags {
 
     for {
       tid <- t
-      tag = Tag(tid)
-    } yield tag.text
+    } yield Tag(tid).text
   }
 
 }

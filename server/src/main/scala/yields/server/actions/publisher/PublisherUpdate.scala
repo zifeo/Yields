@@ -45,7 +45,7 @@ case class PublisherUpdate(nid: NID,
     }
 
     for (newPic <- pic) {
-      publisher.picSetter(newPic, sender)
+      publisher.pic(newPic, sender)
     }
 
     if (addUsers.nonEmpty) {

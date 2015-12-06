@@ -15,7 +15,7 @@ class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
     val publisher = Publisher.create("name", meta.client)
     publisher.addUser(List[UID](3, 4, 5))
     publisher.addNode(List[NID](13, 14, 15))
-    publisher.picSetter("12", meta.client)
+    publisher.pic("12", meta.client)
     publisher.addTags(List("tennis", "foot"))
 
     val action = PublisherInfo(publisher.nid)
@@ -39,7 +39,7 @@ class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
     val publisher = Publisher.create("name", uid)
     publisher.addUser(List[UID](3, 4, 5))
     publisher.addNode(List[NID](13, 14, 15))
-    publisher.picSetter("12", uid)
+    publisher.pic("12", uid)
     publisher.addTags(List("tennis", "foot"))
 
     val action = PublisherInfo(publisher.nid)
@@ -51,7 +51,7 @@ class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
         pic should be(publisher.pic)
         currentUsers should be(empty)
         currentNodes should contain theSameElementsAs publisher.nodes
-        tags should contain theSameElementsAs (publisher.tags)
+        tags should contain theSameElementsAs publisher.tags
     }
   }
 
