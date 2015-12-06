@@ -13,7 +13,4 @@ object Config {
   /** Gets an Int from the key. */
   def getInt(e: String): Int = config.getInt(e)
 
-  /** Gets a Long from the key. */
-  def getLong(e: String): Long = config.getLong(e)
-
 }
