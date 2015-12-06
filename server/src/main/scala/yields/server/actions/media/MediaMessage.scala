@@ -9,12 +9,15 @@ import yields.server.dbi.models._
 case class MediaMessage(nid: NID, text: Option[String], contentType: Option[String], content: Option[Blob])
   extends NodeMessage(nid, text, contentType, content) {
   /** Format the result. */
-  override def result(datetime: OffsetDateTime): Result =
+  override def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result =
     MediaMessageRes(nid, datetime)
 
   /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID): Broadcast =
+  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast =
     MediaMessageBrd(nid, datetime, uid, text, contentType, content)
+
+  /** Get node instance. */
+  override def instance(nid: NID): Node = Media(nid)
 }
 
 /**
