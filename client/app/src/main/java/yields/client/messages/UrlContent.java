@@ -12,16 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import yields.client.exceptions.ContentException;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -53,7 +48,7 @@ public class UrlContent extends Content {
      */
     public UrlContent(String caption) {
         mCaption = Objects.requireNonNull(caption);
-        mUrl = extractUrlsFromCaption(caption);
+        mUrl = extractUrlFromCaption(caption);
         if (mUrl.length() == 0) {
             throw new ContentException("Error in URL content constructor, caption does not contain any URL.");
         }
@@ -132,7 +127,7 @@ public class UrlContent extends Content {
             }
         }
         else if (addWww){
-            url = "https://" + url.substring(7, url.length());
+            url = "https://www." + url.substring(8, url.length());
         }
         Log.d("UrlContent", "valid URL = " + url);
         return url;
@@ -175,7 +170,7 @@ public class UrlContent extends Content {
      * @return True if the text indeed contains an URL, False otherwise.
      */
     public static boolean containsUrl(String text) {
-        return extractUrlsFromCaption(text).length() != 0;
+        return extractUrlFromCaption(text).length() != 0;
     }
 
     /**
@@ -184,8 +179,8 @@ public class UrlContent extends Content {
      * @param caption The caption.
      * @return An array list containing the URLs in order.
      */
-    private static String extractUrlsFromCaption(String caption) {
-        Log.d("UrlContent", "extractUrlsFromCaption : " + caption);
+    public static String extractUrlFromCaption(String caption) {
+        Log.d("UrlContent", "extractUrlFromCaption : " + caption);
         String words[] = caption.split(" ");
         for (String word : words) {
             Log.d("UrlContent", "Word : " + word);
