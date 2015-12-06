@@ -11,7 +11,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +24,7 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static junit.framework.Assert.assertEquals;
@@ -188,16 +188,15 @@ public class CacheDatabaseTests {
 
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM users;", null);
         cursor.moveToFirst();
-        assertEquals(1, cursor.getCount());
+        assertEquals(6, cursor.getCount());
         assertEquals(6, cursor.getColumnCount());
 
-        for (int i = 0; i < users.size(); i++) {
+        for (int i = users.size() - 1; i >= 0; i--) {
             assertTrue(checkUserInformation(cursor, YieldsApplication.getUser(users.get(i))));
-            if (i != users.size() - 1) {
-                cursor.moveToNext();
-            }
+            cursor.moveToNext();
         }
     }
+
 
     /**
      * Tests if it can retrieve a User.
@@ -531,15 +530,20 @@ public class CacheDatabaseTests {
      */
 
     private boolean checkUserInformation(Cursor cursor, User user) {
-        boolean idIsCorrect = user.getId().getId().equals(Long.parseLong(cursor.getString(cursor
-                .getColumnIndex("nodeID"))));
-        boolean userNameIsCorrect = user.getName().equals(
-                cursor.getString(cursor.getColumnIndex("userName")));
-        boolean userEmailIsCorrect = user.getEmail().equals(cursor.getString(
-                cursor.getColumnIndex("userEmail")));
-        byte[] imageFromCache = cursor.getBlob(cursor.getColumnIndex("userImage"));
-        boolean userImageIsCorrect = compareImages(user.getImg(),
-                BitmapFactory.decodeByteArray(imageFromCache, 0, imageFromCache.length));
+        boolean idIsCorrect =
+                user.getId().getId().equals(cursor.getLong(cursor.getColumnIndex("nodeID")));
+
+        boolean userNameIsCorrect =
+                user.getName().equals(cursor.getString(cursor.getColumnIndex("userName")));
+
+        boolean userEmailIsCorrect =
+                user.getEmail().equals(cursor.getString(cursor.getColumnIndex("userEmail")));
+
+        Bitmap imageFromCache =
+                ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex("userImage")));
+        boolean userImageIsCorrect =
+                compareImages(user.getImg(), imageFromCache);
+
         return idIsCorrect && userNameIsCorrect && userEmailIsCorrect && userImageIsCorrect;
     }
 
@@ -621,12 +625,9 @@ public class CacheDatabaseTests {
      * @return True if the images are the same, false otherwise.
      */
     private boolean compareImages(Bitmap originalImage, Bitmap imageFromCache) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        originalImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
-        byte[] bytesOriginalImage = stream.toByteArray();
-        Bitmap reconstructedOriginalImage = BitmapFactory.decodeByteArray(bytesOriginalImage, 0,
-                bytesOriginalImage.length);
-        return reconstructedOriginalImage.sameAs(imageFromCache);
+        String originalImageSerialized = ImageSerialization.serializeImage(originalImage, ImageSerialization.SIZE_IMAGE);
+        Bitmap originalImageDeserialized = ImageSerialization.unSerializeImage(originalImageSerialized);
+        return originalImageDeserialized.sameAs(imageFromCache);
     }
 
     /**
