@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import yields.server.actions.{Result, Broadcast}
 import yields.server.actions.nodes.NodeMessage
-import yields.server.dbi.models.{UID, Blob, NID}
+import yields.server.dbi.models._
 
 /**
   * Message related to a group.
@@ -15,6 +15,10 @@ import yields.server.dbi.models.{UID, Blob, NID}
   */
 case class GroupMessage(nid: NID, text: Option[String], contentType: Option[String], content: Option[Blob])
   extends NodeMessage(nid, text, contentType, content) {
+
+  /** Get node instance. */
+  override def instance(nid: NID): Node =
+    Group(nid)
 
   /** Format the result. */
   override def result(datetime: OffsetDateTime): Result =

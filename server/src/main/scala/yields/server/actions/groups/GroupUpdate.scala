@@ -3,7 +3,7 @@ package yields.server.actions.groups
 import yields.server.Yields
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.{Action, Broadcast, Result}
-import yields.server.dbi.models.{Blob, Group, NID, UID}
+import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
@@ -11,6 +11,10 @@ import yields.server.mpi.Metadata
   * @param nid group id
   * @param name new name
   * @param pic new profile image
+  * @param addUsers users to add
+  * @param removeUsers users to remove
+  * @param addNodes nodes to add
+  * @param removeNodes nodes to remove
   * TODO: set picture
   */
 case class GroupUpdate(nid: NID,
@@ -39,16 +43,18 @@ case class GroupUpdate(nid: NID,
     }
 
     for (newPic <- pic) {
-      group.picSetter(newPic, metadata.client)
+      group.picSetter(newPic, sender)
     }
 
     if (addUsers.nonEmpty) {
       group.addUser(addUsers)
     }
+    addUsers.foreach(User(_).addNode(group.nid))
 
     if (removeUsers.nonEmpty) {
       group.removeUser(removeUsers)
     }
+    removeUsers.foreach(User(_).removeNode(group.nid))
 
     if (addNodes.nonEmpty) {
       group.addNode(addNodes)
@@ -59,7 +65,7 @@ case class GroupUpdate(nid: NID,
     }
 
     Yields.broadcast(group.users.filter(_ != sender)) {
-      GroupUpdateBrd(group.nid, group.name, Array.empty, group.users, group.nodes)
+      GroupUpdateBrd(group.nid, group.name, group.pic, group.users, group.nodes)
     }
 
     GroupUpdateRes()

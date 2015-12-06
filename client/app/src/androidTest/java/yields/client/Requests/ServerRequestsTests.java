@@ -23,12 +23,14 @@ import yields.client.node.Group;
 
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 /**
@@ -66,16 +68,16 @@ public class ServerRequestsTests {
     public void testUserEntourageAddRequest() {
         try {
             Id senderId = new Id(11);
-            String email = "dank@pepe.jpg";
-            ServerRequest serverRequest = RequestBuilder.userEntourageAddRequest(senderId, email);
+            Id entourageId = new Id(12);
+            ServerRequest serverRequest = RequestBuilder.userEntourageAddRequest(senderId, entourageId);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USER_ENTOURAGE_ADD.getValue());
+                    ServiceRequest.RequestKind.USER_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
-                    email);
+            assertTrue(json.getJSONObject("message").getJSONArray(
+                    RequestBuilder.Fields.ADD_ENTOURAGE.getValue()).getLong(0) == entourageId.getId());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -89,18 +91,19 @@ public class ServerRequestsTests {
     public void testUserEntourageRemoveRequest() {
         try {
             Id senderId = new Id(11);
-            String email = "dank@pepe.jpg";
-            ServerRequest serverRequest = RequestBuilder.userEntourageRemoveRequest(senderId, email);
+            Id addId = new Id(12);
+            ServerRequest serverRequest = RequestBuilder.userEntourageRemoveRequest(senderId, addId);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USER_ENTOURAGE_REMOVE.getValue());
+                    ServiceRequest.RequestKind.USER_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.EMAIL.getValue()),
-                    email);
+            assertEquals(json.getJSONObject("message").getJSONArray(
+                            RequestBuilder.Fields.REMOVE_ENTOURAGE.getValue()).getLong(0),
+                    addId.getId().longValue());
         } catch (JSONException e) {
-            fail("Request was not built correctly !");
+            fail("Request was not built correctly ! " + e.getMessage());
         }
     }
 
@@ -138,16 +141,17 @@ public class ServerRequestsTests {
                     YieldsApplication.getDefaultUserImage()));
             Id senderId = new Id(11);
             String groupName = "Dank AF";
-            List<User> users = MockFactory.generateMockUsers(3);
-            List<Long> nodeIdsAsString = new ArrayList<>();
+            List<Id> users = MockFactory.generateMockUsers(3);
+            List<Long> userIdsAsString = new ArrayList<>();
+            List<Id> userIds = new ArrayList<>();
             List<Id> nodeIds = new ArrayList<>();
-            for(User user : users){
-                nodeIdsAsString.add(user.getId().getId());
-                nodeIds.add(user.getId());
+            for(Id user : users){
+                userIdsAsString.add(user.getId());
+                userIds.add(user);
             }
 
             ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId, groupName,
-                    Group.GroupVisibility.PRIVATE, nodeIds);
+                    Group.GroupVisibility.PRIVATE, userIds, nodeIds);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -157,7 +161,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NAME
                             .getValue()), groupName);
             assertEquals(json.getJSONObject("message").getJSONArray(RequestBuilder.Fields.USERS
-                            .getValue()).toString(), new JSONArray(nodeIdsAsString).toString());
+                    .getValue()).toString(), new JSONArray(userIdsAsString).toString());
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -192,46 +196,6 @@ public class ServerRequestsTests {
     }
 
     /**
-     * Tests if a GroupUpdateVisibilityRequest is correctly built.
-     * (Test for groupUpdateVisibilityRequest(Id sender, Id groupId, Group.GroupVisibility newVisibility))
-     */
-    @Test
-    public void testGroupUpdateVisibilityRequest() {
-        try {
-            Id groupId = new Id(12);
-            Id senderId = new Id(11);
-
-            ServerRequest serverRequest = RequestBuilder.groupUpdateVisibilityRequest(senderId, groupId,
-                    Group.GroupVisibility.PRIVATE);
-            JSONObject json = new JSONObject(serverRequest.message());
-
-            assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
-                    .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
-                    Group.GroupVisibility.PRIVATE.getValue().toLowerCase());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
-                    groupId.getId().toString());
-
-            serverRequest = RequestBuilder.groupUpdateVisibilityRequest(senderId, groupId,
-                    Group.GroupVisibility.PUBLIC);
-            json = new JSONObject(serverRequest.message());
-
-            assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
-                    .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.VISIBILITY.getValue()),
-                    Group.GroupVisibility.PUBLIC.getValue().toLowerCase());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
-                    groupId.getId().toString());
-        } catch (JSONException e) {
-            fail("Request was not built correctly !");
-        }
-    }
-
-    /**
      * Tests if a GroupUpdateImageRequest is correctly built.
      * (Test for groupUpdateImageRequest(Id sender, Id groupId, ImageContent newImage))
      */
@@ -242,9 +206,8 @@ public class ServerRequestsTests {
             Id senderId = new Id(11);
 
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
-            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+            String imageEncoded = ImageSerialization.serializeImage(newImage,
+                    ImageSerialization.SIZE_IMAGE_NODE);
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateImageRequest(senderId, groupId,
                     newImage);
@@ -280,7 +243,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUP_ADD.getValue());
+                    ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             /* // TODO: Définir pour la request le field correct
@@ -309,7 +272,7 @@ public class ServerRequestsTests {
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.GROUP_REMOVE.getValue());
+                    ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             /* // TODO: Définir pour la request le field correct
@@ -336,12 +299,11 @@ public class ServerRequestsTests {
             Content textContent = new TextContent(text);
             Content imageContent = new ImageContent(YieldsApplication.getDefaultGroupImage(), text);
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
-            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+            String imageEncoded = ImageSerialization.serializeImage(newImage,
+                    ImageSerialization.SIZE_IMAGE_NODE);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
-                    textContent, new Date());
+                    Group.GroupVisibility.PRIVATE, textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -356,7 +318,7 @@ public class ServerRequestsTests {
                     text);
 
             serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
-                    imageContent, new Date());
+                    Group.GroupVisibility.PRIVATE, imageContent, new Date());
             json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -389,7 +351,7 @@ public class ServerRequestsTests {
             TextContent textContent = new TextContent(text);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
-                    textContent, new Date());
+                    Group.GroupVisibility.PRIVATE, textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -415,20 +377,20 @@ public class ServerRequestsTests {
     public void testGroupImageMessageRequest() {
         try {
             Id groupId = new Id(12);
+            Group g = new Group("", groupId, new ArrayList<Id>(), YieldsApplication.getDefaultGroupImage());
             Id senderId = new Id(11);
             String text = "Apple pie is best pie !";
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            newImage.compress(Bitmap.CompressFormat.PNG, 0, stream);
             ImageContent imageContent = new ImageContent(newImage, text);
-            String imageEncoded = Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
+            String imageEncoded = ImageSerialization.serializeImage(newImage,
+                    ImageSerialization.SIZE_IMAGE);
 
             ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
-                    imageContent, new Date());
+                    Group.GroupVisibility.PRIVATE, imageContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.NODE_MESSAGE.getValue());
+                    ServiceRequest.RequestKind.GROUP_MESSAGE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
@@ -445,18 +407,18 @@ public class ServerRequestsTests {
     }
 
     /**
-     * Tests if a GroupHistoryRequest is correctly built.
-     * (Test for groupHistoryRequest(Id senderId, Id groupId, Date last, int messageCount))
+     * Tests if a nodeHistoryRequest is correctly built.
+     * (Test for nodeHistoryRequest(Id senderId, Id groupId, Date last, int messageCount))
      */
     @Test
-    public void testGroupHistoryRequest() {
+    public void testNodeHistoryRequest() {
         try {
             Id groupId = new Id(12);
             Id senderId = new Id(11);
             Date date = new Date();
             int messageCount = 10;
 
-            ServerRequest serverRequest = RequestBuilder.groupHistoryRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.nodeHistoryRequest(senderId, groupId,
                     date, messageCount);
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -470,30 +432,6 @@ public class ServerRequestsTests {
                     ()), messageCount);
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
                     groupId.getId().toString());
-        } catch (JSONException e) {
-            fail("Request was not built correctly !");
-        }
-    }
-
-    /**
-     * Tests if a pingRequest is correctly built.
-     * (Test for pingRequest(Id senderId, String content))
-     */
-    @Test
-    public void testPingRequest() {
-        try {
-            Id senderId = new Id(11);
-            String text = "Apple pie is best pie !";
-
-            ServerRequest serverRequest = RequestBuilder.pingRequest(senderId, text);
-            JSONObject json = new JSONObject(serverRequest.message());
-
-            assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.PING.getValue());
-            assertEquals(json.getJSONObject("metadata").getString("client"), senderId
-                    .getId().toString());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
-                    text);
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }

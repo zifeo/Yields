@@ -31,9 +31,9 @@ class TestUserUpdate extends DBFlatSpec with Matchers {
 
     val start = User.create("email12344321@email.com")
     val meta = Metadata.now(start.uid)
-    start.pic = Array[Byte](2, 1)
+    start.pic = "21"
 
-    val newPic = Array[Byte](1, 2)
+    val newPic = "12"
     val action = UserUpdate(None, None, Some(newPic), List.empty, List.empty)
     action.run(meta)
 

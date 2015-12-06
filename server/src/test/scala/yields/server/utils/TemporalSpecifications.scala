@@ -3,7 +3,7 @@ package yields.server.utils
 import java.util.Date
 
 import org.scalacheck.{Prop, Properties}
-import yields.server.DefaultsGenerators
+import yields.server.tests.DefaultsGenerators
 
 object TemporalSpecifications extends Properties("TemporalUtils") with DefaultsGenerators {
 

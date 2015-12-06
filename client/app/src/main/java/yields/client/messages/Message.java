@@ -1,8 +1,11 @@
 package yields.client.messages;
 
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.wifi.WifiConfiguration;
+import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +21,7 @@ import yields.client.id.Id;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 
@@ -75,8 +79,8 @@ public class Message extends Node {
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, User sender, Content content, Date date) {
-        this(nodeName, nodeID, sender.getId(), content, date, MessageStatus.NOT_SENT);
+    public Message(String nodeName, Id nodeID, Id sender, Content content, Date date) {
+        this(nodeName, nodeID, sender, content, date, MessageStatus.NOT_SENT);
     }
 
     /**
@@ -85,27 +89,27 @@ public class Message extends Node {
      * @param senderID The is of the sender in String format.
      * @param text The text of the message (if it is a text message, null otherwise).
      * @param contentType The content type of the message.
-     * @param contents The actual content of the message.
+     * @param content The content of the message.
      * @throws ParseException In case of parse exception with the date serialization.
      */
-    public Message(String dateTime, Long senderID, String text, String contentType, Byte[]
-            contents)
+    public Message(String dateTime, Long senderID, String text, String contentType, String content)
             throws ParseException {
         super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)
         ).getTime()));
 
         this.mSender = new Id(senderID);
 
-        if (text != null){
-            contentType = "text";
+        if (contentType.equals("image")){
+            Bitmap img = ImageSerialization.unSerializeImage(content);
+            if (img == null){
+                Log.d("Y:"+ this.getClass().getName(), "We have no image with contentType image");
+                mContent = new TextContent(text);
+            }else {
+                mContent = new ImageContent(img, text);
+            }
         }
-
-        if (contentType.equals("text")){
+        else {
             this.mContent = new TextContent(text);
-        }
-        else{
-            // TODO : Images, waiting for the problem in server side to be solved.
-            throw new UnsupportedOperationException();
         }
 
         this.mDate = DateSerialization.dateSerializer.toDate(dateTime);

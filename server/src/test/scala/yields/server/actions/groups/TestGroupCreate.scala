@@ -7,6 +7,7 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
@@ -16,8 +17,8 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
     val user = User.create("email@email.com")
     val meta = Metadata.now(user.uid)
 
-    val users = sample[List[UID]]
-    val nodes = sample[List[NID]]
+    val users = List[UID](4, 5, 6)
+    val nodes = List[NID](7, 8, 9)
     user.addEntourage(users)
 
     val action = GroupCreate("GroupName", users, nodes)
@@ -29,7 +30,10 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
         group.users should contain theSameElementsAs (user.uid :: users).distinct
         group.nodes should contain theSameElementsAs nodes.distinct
         group.creator should be(user.uid)
-        user.groups should contain only nid
+        user.nodes should contain only nid
+        users.foreach { uid =>
+          User(uid).nodes should contain (nid)
+        }
     }
   }
 
@@ -38,7 +42,7 @@ class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
     val user = User.create("email@email.com")
     val meta = Metadata.now(user.uid)
 
-    val users = sample[List[UID]]
+    val users = List[UID](4, 5, 6)
     val action = new GroupCreate("GroupName", users, List.empty)
 
     val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)

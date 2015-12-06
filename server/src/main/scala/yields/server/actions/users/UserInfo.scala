@@ -32,6 +32,9 @@ case class UserInfo(uid: UID) extends Action {
       case sender if user.entourage.contains(sender) =>
         UserInfoRes(user.uid, user.name, user.email, Seq.empty, Seq.empty)
 
+      case sender if user.nodes.intersect(User(sender).nodes).nonEmpty =>
+        UserInfoRes(user.uid, user.name, "", Seq.empty, Seq.empty)
+
       case _ =>
         throw new UnauthorizedActionException(s"client not related to uid: $uid")
     }

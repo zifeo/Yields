@@ -42,7 +42,7 @@ public class UserUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userUpdateRequest(mUser.getId(), mUser.getName());
+        return RequestBuilder.userUpdateNameRequest(mUser.getId(), mUser.getName());
     }
 
     /**

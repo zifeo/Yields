@@ -1,19 +1,19 @@
-package yields.server
+package yields.server.tests
 
 import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
 import java.net.Socket
 import java.time.OffsetDateTime
 
 import spray.json._
-import yields.server.io._
-import yields.server.actions.{Broadcast, Action}
+import yields.server.actions.Action
 import yields.server.dbi.models.UID
-import yields.server.mpi.{Notification, Metadata, Request, Response}
+import yields.server.io._
+import yields.server.mpi.{Metadata, Notification, Request, Response}
 import yields.server.utils.Config
 
 import scala.collection.mutable
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /** Fakes a client connection through a socket. */
 class FakeClient(val uid: UID) {

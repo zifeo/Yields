@@ -1,7 +1,7 @@
 package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
-import yields.server._
+import yields.server.tests._
 import yields.server.actions.{Broadcast, Result, Action, ActionsGenerators}
 
 object ActionsJsonFormatSpecifications extends Properties("ActionsJsonFormat") with ActionsGenerators {

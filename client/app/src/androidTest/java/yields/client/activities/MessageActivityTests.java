@@ -45,7 +45,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<User>());
+    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
 
     public MessageActivityTests() {
         super(MessageActivity.class);
@@ -274,5 +274,22 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         });
         Thread.sleep(1000);
         assertEquals(MessageActivity.ContentType.GROUP_MESSAGES, messageActivity.getType());
+    }
+
+    @Test
+    public void testCannotSendEmptyTextMessage(){
+        final MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        onView(withId(R.id.sendButton)).perform(click());
+        assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
+    }
+
+    @Test
+    public void testCaptionForImageIsNotMandatory(){
+        final MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        messageActivity.simulateImageMessage();
+        onView(withId(R.id.sendButton)).perform(click());
+        assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
     }
 }

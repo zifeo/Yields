@@ -68,9 +68,9 @@ UserInfo
 	output	(1) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq[UID], entourageUpdatedAt: Seq[OffsetDateTime]
 	output	(2) uid: UID, email: String, name: String, pic: Array[Byte], entourage: Seq.empty, entourageUpdatedAt: Seq.empty
 	rules	uid == client (1) | uid in entourage (2)
-UserGroupList
+UserNodeList
 	input	()
-	output	groups: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
+	output	nodes: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	email: String
 	output	uid: UID
@@ -118,12 +118,12 @@ GroupMessage
 
 ```
 PublisherCreate
-	input	name: String, users: Seq[UID], nodes: Seq[NID]
+	input	name: String, users: Seq[UID], nodes: Seq[NID], tags: Seq[String]
 	output	nid: NID
 	rules	users in entourage & (nodes "public" | nodes in groups)
 	bcast	nid: NID, name: String, users: Seq[UID], nodes: Seq[NID]
 PublisherUpdate
-	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID]
+	input nid: NID, name: Option[String], pic: Option[Array[Byte]], addUsers: Seq[UID], removeUsers: Seq[UID], addNodes: Seq[NID], removeNodes: Seq[NID], addTags: Seq[String], removeTags: Seq[String]
 	output	()
 	rules	uid in users
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
@@ -136,6 +136,8 @@ PublisherMessage
 	rules	nid in nodes
 	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 ```
+
+Publishers is very similar to groups and even share some of its structures but most the request are separated for allowing further differences to appears.
 
 ### RSS actions
 
