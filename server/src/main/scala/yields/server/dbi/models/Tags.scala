@@ -8,22 +8,25 @@ import com.redis.serialization.Parse.Implicits._
   */
 trait Tags {
 
-  val NodeTagKey: String
+  object TagKey {
+    val tags: String = s"nodes:$nodeID:tags"
+  }
+
   val nodeID: NID
   private var _tags: Option[Set[TID]] = None
 
   /** add tags to publisher */
   def addTags(tags: Seq[String]): Unit = {
-    getOrCreateTags(tags).foreach { x =>
-      redis.withClient(_.sadd(NodeTagKey, x))
+    tagOrCreate(tags).foreach { x =>
+      redis.withClient(_.sadd(TagKey.tags, x))
       Tag(x).addNode(nodeID)
     }
   }
 
   /** remove tags from publisher */
   def remTags(tags: Seq[String]): Unit = {
-    getOrCreateTags(tags).foreach { x =>
-      redis.withClient(_.srem(NodeTagKey, x))
+    tagOrCreate(tags).foreach { x =>
+      redis.withClient(_.srem(TagKey.tags, x))
       Tag(x).addNode(nodeID)
     }
   }
@@ -33,7 +36,7 @@ trait Tags {
     * @param tags tags to get id or create
     * @return list of TID corresponding to tags
     */
-  def getOrCreateTags(tags: Seq[String]): List[TID] = {
+  def tagOrCreate(tags: Seq[String]): List[TID] = {
     tags.map { text =>
       Tag.getIdFromText(text) match {
         case Some(x) => x
@@ -45,7 +48,7 @@ trait Tags {
   /** get the tags of a node */
   def tags: Set[String] = {
     val t: Set[TID] = _tags.getOrElse {
-      val mem: Option[Set[Option[TID]]] = redis.withClient(_.smembers[TID](NodeTagKey))
+      val mem: Option[Set[Option[TID]]] = redis.withClient(_.smembers[TID](TagKey.tags))
       val t: Set[TID] = mem match {
         case Some(x: Set[Option[TID]]) =>
           val defined: Set[Option[TID]] = x.filter(_.isDefined)

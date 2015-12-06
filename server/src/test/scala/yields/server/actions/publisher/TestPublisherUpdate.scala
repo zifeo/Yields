@@ -16,7 +16,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     val start = Publisher.create("name1", meta.client)
 
     val newName = "newName"
-    val action = new PublisherUpdate(start.nid, Some(newName), None, List.empty, List.empty, List.empty, List.empty,
+    val action = PublisherUpdate(start.nid, Some(newName), None, List.empty, List.empty, List.empty, List.empty,
       List.empty, List.empty)
     action.run(meta)
 
@@ -36,7 +36,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     start.pic("21", meta.client)
 
     val newPic = "12"
-    val action = new PublisherUpdate(start.nid, None, Some(newPic), List.empty, List.empty, List.empty, List.empty,
+    val action = PublisherUpdate(start.nid, None, Some(newPic), List.empty, List.empty, List.empty, List.empty,
       List.empty, List.empty)
     action.run(meta)
 
@@ -55,7 +55,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     val start = Publisher.create("name1", meta.client)
 
     val newUsers = List[UID](2, 3, 4)
-    val addAction = new PublisherUpdate(start.nid, None, None, newUsers, List.empty, List.empty, List.empty,
+    val addAction = PublisherUpdate(start.nid, None, None, newUsers, List.empty, List.empty, List.empty,
       List.empty, List.empty)
     addAction.run(meta)
 
@@ -70,7 +70,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     middle.tags should be(start.tags)
 
     val oldUsers = List[UID](3)
-    val removeAction = new PublisherUpdate(start.nid, None, None, List.empty, oldUsers, List.empty, List.empty,
+    val removeAction = PublisherUpdate(start.nid, None, None, List.empty, oldUsers, List.empty, List.empty,
       List.empty, List.empty)
     removeAction.run(meta)
 
@@ -92,7 +92,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     val start = Publisher.create("name1", meta.client)
 
     val newNodes = List[NID](2, 3, 4)
-    val addAction = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, newNodes, List.empty,
+    val addAction = PublisherUpdate(start.nid, None, None, List.empty, List.empty, newNodes, List.empty,
       List.empty, List.empty)
     addAction.run(meta)
 
@@ -104,7 +104,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     middle.tags should be(start.tags)
 
     val oldNodes = List[NID](3)
-    val removeAction = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, oldNodes,
+    val removeAction = PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, oldNodes,
       List.empty, List.empty)
     removeAction.run(meta)
 
@@ -121,7 +121,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     val start = Publisher.create("name1", meta.client)
 
     val newTags = List("tennis", "foot", "volley")
-    val addAction = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty,
+    val addAction = PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty,
       newTags, List.empty)
     addAction.run(meta)
 
@@ -133,7 +133,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     middle.tags should contain theSameElementsAs newTags
 
     val oldTags = List("foot")
-    val removeAction = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty,
+    val removeAction = PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty,
       List.empty, oldTags)
     removeAction.run(meta)
 
@@ -149,7 +149,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val start = Group.create("name1", meta.client + 1)
-    val action = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty,
+    val action = PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty,
       List.empty, List.empty)
 
     val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)

@@ -146,13 +146,8 @@ class Node protected(val nid: NID) {
   /** Picture getter. */
   def pic: Blob = _pic.map(_.content).getOrElse {
     val nid = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
-    if (nid.isDefined) {
-      val media = Media(nid.get)
-      _pic = Some(media)
-      media.content
-    } else {
-      ""
-    }
+    _pic = nid.map(Media(_))
+    _pic.map(_.content).getOrElse("")
   }
 
   /**
@@ -161,11 +156,11 @@ class Node protected(val nid: NID) {
     */
   def pic(content: Blob, creator: UID): Unit = {
     if (_pic.isDefined) {
-      Media.deleteContentOnDisk(_pic.get.nid)
+      Media.deleteContentOnDisk(valueOrException(_pic.map(_.nid)))
     }
     val newPic = Media.create("image", content, creator)
     val nid = update(StaticNodeKey.node_pic, newPic.nid)
-    _pic = Some(Media(nid.get))
+    _pic = nid.map(Media(_))
   }
 
   /** Get n messages starting from some point */

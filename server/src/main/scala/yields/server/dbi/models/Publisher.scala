@@ -21,7 +21,6 @@ final class Publisher private(nid: NID) extends Node(nid) with Tags {
 
   val nodeKey = NodeKey.node
   override val nodeID = nid
-  override val NodeTagKey = s"$nodeKey:tags"
 
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {

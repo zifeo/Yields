@@ -27,7 +27,6 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     val exists = Media.checkFileExist(img.hash)
     exists should be(true)
 
-    Media.deleteContentOnDisk(img.nid)
   }
 
   "file path" should "respect pattern storage/media/date_hash.bin" in {
@@ -36,7 +35,6 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     val path = Media.buildPathFromName(hash)
     path should be(img.path)
 
-    Media.deleteContentOnDisk(img.nid)
   }
 
   it should "return the image with the same content" in {
@@ -45,7 +43,6 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
 
     img2.content should be(img.content)
 
-    Media.deleteContentOnDisk(img.nid)
   }
 
   "saving a file on disk" should "have the same content" in {
@@ -60,7 +57,6 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     mediaBefore.creator should be(0)
     mediaAfter.creator should be(0)
 
-    Media.deleteContentOnDisk(mediaBefore.nid)
   }
 
 }
