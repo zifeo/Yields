@@ -39,7 +39,7 @@ public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2
     public void testCannotEnterTooShortUsername(){
         getActivity();
         onView(withId(R.id.editTextCreateAccount)).perform(typeText(""), closeSoftKeyboard());
-        onView(withId(R.id.buttonCreateAccount)).perform(click());
+        onView(withId(R.id.actionDoneEnterUsername)).perform(click());
 
         onView(withText(R.string.messageUsernameTooShort)).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
@@ -49,7 +49,7 @@ public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2
     public void testCannotEnterSpaces() {
         getActivity();
         onView(withId(R.id.editTextCreateAccount)).perform(typeText("John Doe"), closeSoftKeyboard());
-        onView(withId(R.id.buttonCreateAccount)).perform(click());
+        onView(withId(R.id.actionDoneEnterUsername)).perform(click());
 
         onView(withText(R.string.messageUsernameContainsSpaces)).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
