@@ -72,6 +72,9 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
         mAdapterEntourage.notifyDataSetChanged();
     }
 
+    /**
+     * Automatically called when the activity is resumed
+     */
     @Override
     protected void onResume() {
         super.onResume();

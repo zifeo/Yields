@@ -1,33 +1,66 @@
 package yields.client.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import yields.client.R;
-import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserSearchRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class AddUserToEntourageActivity extends NotifiableActivity {
+    private EditText mEditTextEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user_to_entourage);
 
-        Button b = (Button) findViewById(R.id.addUserToEntourageButton);
-        b.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addUser(v);
-            }
-        });
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(null);
+
+        mEditTextEmail = (EditText) findViewById(R.id.editTextEmail);
+    }
+
+    /**
+     * Method automatically called for the tool bar items
+     * @param menu The tool bar menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+
+        inflater.inflate(R.menu.menu_add_user_to_entourage, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /** Method called when the user clicks on 'Done'
+     * @param item The tool bar item clicked
+     * @return true
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String email = mEditTextEmail.getText().toString();
+        Pattern pattern = Pattern.compile(".+@.+\\.[a-z]+");
+        Matcher matcher = pattern.matcher(email);
+        if (!matcher.matches()) {
+            String message = getString(R.string.messageWrongEmail);
+            YieldsApplication.showToast(getApplicationContext(), message);
+        }
+        else {
+            YieldsApplication.getBinder().sendRequest(
+                    new UserSearchRequest(YieldsApplication.getUser().getId(), email));
+        }
+
+        return true;
     }
 
     /**
@@ -37,10 +70,24 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
     public void notifyChange(NotifiableActivity.Change change) {
         switch (change) {
             case ADD_ENTOURAGE:
-                    finish();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String messageOk = getString(R.string.messageContactAdded);
+                        YieldsApplication.showToast(getApplicationContext(), messageOk);
+
+                        finish();
+                    }
+                });
                 break;
             case NOT_EXIST:
-                Log.d("Y:" + this.getClass().getName(), "not existing user");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String messageNoUser = getString(R.string.messageNoUser);
+                        YieldsApplication.showToast(getApplicationContext(), messageNoUser);
+                    }
+                });
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "useless notify change...");
@@ -56,19 +103,5 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
     @Override
     public void notifyOnServerDisconnected() {
         //Nothing as of now
-    }
-
-    /**
-     * Called once the button to add the User is called.
-     *
-     * @param view The view of the button.
-     */
-    public void addUser(View view) {
-        TextView v = (TextView) findViewById(R.id.emailOfUser);
-        String email = v.getText().toString();
-
-        YieldsApplication.getBinder().sendRequest(
-                new UserSearchRequest(YieldsApplication.getUser().getId(), email));
-
     }
 }

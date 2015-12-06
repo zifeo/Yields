@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="yields.client.activities.UserListActivity"
-    android:background="#ffffff"
+    android:background="@drawable/background"
     android:orientation="vertical"
     android:weightSum="1">
 
@@ -23,16 +23,5 @@
         android:layout_height="0dp"
         android:id="@+id/listViewUsers"
         android:layout_weight="1.0"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add User to entourage"
-        android:id="@+id/button"
-        android:layout_gravity="center_horizontal"
-        android:contextClickable="false"
-        android:onClick="onAddUserButton"
-        android:nestedScrollingEnabled="true"/>
-
 
 </LinearLayout>

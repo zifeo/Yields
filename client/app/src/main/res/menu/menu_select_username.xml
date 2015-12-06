@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="yields.client.activities.AddUserToEntourageActivity">
 
-      <item android:id="@+id/actionDoneEnterEmail"
-          android:title="@string/done"
-          android:layout_gravity="center"
-          app:showAsAction="withText|ifRoom"
-          />
+    <item android:id="@+id/actionDoneEnterUsername"
+        android:title="@string/done"
+        android:layout_gravity="center"
+        app:showAsAction="withText|ifRoom"
+        />
 </menu>

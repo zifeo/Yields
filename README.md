@@ -1,4 +1,4 @@
-![](./yields.jpg)
+![](./yields.png)
 
 - - -
 
