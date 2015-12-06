@@ -24,8 +24,8 @@ case class PublisherUpdate(nid: NID,
                            removeUsers: List[UID],
                            addNodes: List[NID],
                            removeNodes: List[NID],
-                           addTags: Seq[String],
-                           removeTags: Seq[String]) extends Action {
+                           addTags: List[String],
+                           removeTags: List[String]) extends Action {
 
   /**
     * Run the action given the sender.

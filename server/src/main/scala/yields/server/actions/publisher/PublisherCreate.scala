@@ -44,12 +44,11 @@ case class PublisherCreate(name: String, users: List[UID], nodes: List[NID], tag
     if (tags.nonEmpty) {
       publisher.addTags(tags)
     }
-
+    
     user.addNode(publisher.nid)
     otherUsers.foreach(User(_).addNode(publisher.nid))
 
     Yields.broadcast(otherUsers) {
-
       PublisherCreateBrd(publisher.nid, name, users, nodes)
     }
 
