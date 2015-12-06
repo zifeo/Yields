@@ -1,6 +1,8 @@
 package yields.server.router
 
 import java.net.InetSocketAddress
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 import akka.actor._
 import akka.event.{DiagnosticLoggingAdapter, Logging}
@@ -12,9 +14,10 @@ import yields.server.actions.users.UserConnectRes
 import yields.server.io._
 import yields.server.mpi.{Metadata, Notification, Response}
 import yields.server.pipeline.blocks.SerializationModule
-import yields.server.utils.FaultTolerance
+import yields.server.utils.{FaultTolerance, Temporal}
 
 import scala.collection.immutable.Queue
+import scala.collection.mutable
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
@@ -35,9 +38,10 @@ final class ClientHub(private val socket: ActorRef,
   import SerializationModule._
   import Tcp._
 
-  val errorMessage = """{"kind":"error"}"""
+  val errorMessage = ByteString("""{"kind":"error"}""")
   val log: DiagnosticLoggingAdapter = Logging(this)
   val defaultMdc: Logging.MDC = Map("client" -> address)
+  val tcpHistory = mutable.ListBuffer.empty[(String, OffsetDateTime)]
 
   log.mdc(defaultMdc)
 
@@ -63,6 +67,7 @@ final class ClientHub(private val socket: ActorRef,
     case OnNext(data: ByteString) => // Outgoing message
       val outgoing = data.utf8String
       log.debug(s"[OUT] $outgoing")
+      tcpHistory += "out" -> Temporal.now
       send(data, buffer, identified)
 
     case OnError(cause: Throwable) => // Processing error message
@@ -74,9 +79,10 @@ final class ClientHub(private val socket: ActorRef,
     case OnPush(broadcast) => // Notification
       val notification = Notification(broadcast, Metadata.now(0))
       log.debug(s"[BRD] $notification")
+      tcpHistory += "brd" -> Temporal.now
       send(serialize(notification), buffer, identified)
 
-    case Ack(data) => // Confirm send
+    case WriteAck(data) => // Confirm send
       confirm(data, buffer, identified)
 
     // ----- TCP letters -----
@@ -84,9 +90,11 @@ final class ClientHub(private val socket: ActorRef,
     case Received(data) => // Incoming message
       val incoming = data.utf8String
       log.debug(s"[INP] $incoming")
+      tcpHistory += "inp" -> Temporal.now
       onNext(data)
 
     case PeerClosed => // Client exited
+      log.info("peer closed")
       terminate()
 
     case ErrorClosed(cause) =>
@@ -107,11 +115,32 @@ final class ClientHub(private val socket: ActorRef,
   override val supervisorStrategy =
     FaultTolerance.nonFatalResume(log)
 
-  override def preStart(): Unit =
+  override def preStart(): Unit = {
     log.info("connected")
+    tcpHistory += "connected" -> Temporal.now
+  }
 
-  override def postStop(): Unit =
+  override def postStop(): Unit = {
     log.info("disconnected")
+    val totalInp = tcpHistory.count(_._1 == "inp")
+    val totalOut = tcpHistory.count(_._1 == "out")
+    val totalBrd = tcpHistory.count(_._1 == "brd")
+    val total = tcpHistory.size
+    val first = tcpHistory.last._2
+    val latest = tcpHistory.head._2
+    val length = ChronoUnit.MINUTES.between(latest, first)
+    log.info(
+      s"""
+         |stats
+         |len:$length
+         |tot:$total
+         |inp:$totalInp
+         |out:$totalOut
+         |brd:$totalBrd
+         |fir:$first
+         |lat:$latest
+       """.stripMargin)
+  }
 
   /** Always ask for more so the pipeline can continually work. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
@@ -119,13 +148,9 @@ final class ClientHub(private val socket: ActorRef,
   }
 
   /** Send a message to the socket if buffer empty otherwise buffer it. */
-  private def send(data: String, buffer: Queue[ByteString], identified: Boolean): Unit =
-    send(ByteString(data), buffer, identified)
-
-  /** Send a message to the socket if buffer empty otherwise buffer it. */
   private def send(data: ByteString, buffer: Queue[ByteString], identified: Boolean): Unit = {
     buffer.size match {
-      case 0 => socket ! Write(data, Ack(data))
+      case 0 => socket ! Write(data, WriteAck(data))
       case len if len > 5 => log.warning(s"queue already buffer: $len")
       case _ =>
     }
@@ -140,8 +165,7 @@ final class ClientHub(private val socket: ActorRef,
         log.mdc(defaultMdc + ("user" -> uid))
         dispatcher ! InitConnection(uid)
         val newState = state(buffer, identified = true)
-        newState(OnNext(data))
-        context become newState
+        newState(OnNext(data)) // will modify context hereafter
 
       case _ =>
         val message = data.utf8String
@@ -158,7 +182,7 @@ final class ClientHub(private val socket: ActorRef,
         Queue.empty
 
       case Success((`data`, remaining)) =>
-        socket ! Write(remaining.head, Ack(remaining.head))
+        socket ! Write(remaining.head, WriteAck(remaining.head))
         remaining
 
       case Success((expected, remaining)) =>
@@ -192,7 +216,7 @@ object ClientHub {
   private[router] case class OnPush(broadcast: Broadcast)
 
   /** Confirms a write. */
-  private[router] case class Ack(data: ByteString) extends Tcp.Event
+  private[router] case class WriteAck(data: ByteString) extends Tcp.Event
 
   /** Creates a router props with a materializer. */
   def props(socket: ActorRef, address: InetSocketAddress, dispatcher: ActorRef): Props =

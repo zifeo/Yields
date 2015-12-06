@@ -21,12 +21,12 @@ case class GroupMessage(nid: NID, text: Option[String], contentType: Option[Stri
     Group(nid)
 
   /** Format the result. */
-  override def result(datetime: OffsetDateTime): Result =
-    GroupMessageRes(nid, datetime)
+  override def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result =
+    GroupMessageRes(nid, datetime, contentNid)
 
   /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID): Broadcast =
-    GroupMessageBrd(nid, datetime, uid, text, contentType, content)
+  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast =
+    GroupMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
 
 }
 
@@ -35,7 +35,7 @@ case class GroupMessage(nid: NID, text: Option[String], contentType: Option[Stri
   * @param nid group id
   * @param datetime message recorded datetime
   */
-case class GroupMessageRes(nid: NID, datetime: OffsetDateTime) extends Result
+case class GroupMessageRes(nid: NID, datetime: OffsetDateTime, contentNid: Option[NID]) extends Result
 
 /**
   * [[GroupMessage]] broadcast.
@@ -51,4 +51,5 @@ case class GroupMessageBrd(nid: NID,
                            sender: UID,
                            text: Option[String],
                            contentType: Option[String],
-                           content: Option[Blob]) extends Broadcast
+                           content: Option[Blob],
+                           contentNid: Option[NID]) extends Broadcast
