@@ -22,8 +22,9 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
     public final static String GROUP_TYPE_KEY = "type";
 
     private EditText mEditText;
-    private RadioButton mRadioPublic; // maybe useful later
     private RadioButton mRadioPrivate;
+    private RadioButton mRadioPublic;
+    private RadioButton mRadioRSS;
 
     /**
      * Method automatically called on the creation of the activity
@@ -40,8 +41,9 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
         mEditText = (EditText) findViewById(R.id.editTextSelectGroupName);
 
-        mRadioPublic = (RadioButton) findViewById(R.id.radioButtonPublicGroup);
         mRadioPrivate = (RadioButton) findViewById(R.id.radioButtonPrivateGroup);
+        mRadioPublic = (RadioButton) findViewById(R.id.radioButtonPublicGroup);
+        mRadioRSS = (RadioButton) findViewById(R.id.radioButtonRss);
     }
 
     /**
@@ -70,17 +72,26 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
         }
         else {
-            Group.GroupVisibility groupType = Group.GroupVisibility.PUBLIC;
+            Group.GroupVisibility groupType;
+            Intent intent;
 
             if (mRadioPrivate.isChecked()){
                 groupType = Group.GroupVisibility.PRIVATE;
+                intent = new Intent(this, CreateGroupActivity.class);
+            }
+            else if (mRadioPublic.isChecked()){
+                groupType = Group.GroupVisibility.PUBLIC;
+                intent = new Intent(this, CreateGroupActivity.class);
+            }
+            else {
+                groupType = Group.GroupVisibility.RSS;
+                intent = new Intent(this, CreateRSSFeedActivity.class);
             }
 
-            Intent intentSelectName = new Intent(this, CreateGroupActivity.class);
-            intentSelectName.putExtra(GROUP_NAME_KEY, groupName);
-            intentSelectName.putExtra(GROUP_TYPE_KEY, groupType.toString());
+            intent.putExtra(GROUP_NAME_KEY, groupName);
+            intent.putExtra(GROUP_TYPE_KEY, groupType.toString());
 
-            startActivity(intentSelectName);
+            startActivity(intent);
         }
 
         return true;

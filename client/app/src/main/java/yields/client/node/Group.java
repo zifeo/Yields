@@ -28,7 +28,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class Group extends Node {
 
     public enum GroupVisibility {
-        PRIVATE("PRIVATE"), PUBLIC("PUBLIC");
+        PRIVATE("PRIVATE"), PUBLIC("PUBLIC"), RSS("RSS");
 
         private final String mName;
 
@@ -270,6 +270,16 @@ public class Group extends Node {
     public boolean containsUser(User user) {
         Objects.requireNonNull(user);
         return mUsers.contains(user);
+    }
+
+    /**
+     * Indicates if a node belongs to the group
+     *
+     * @param group The Group we want to test
+     */
+    public boolean containsNode(Group group) {
+        Objects.requireNonNull(group);
+        return mNodes.contains(group);
     }
 
     /**

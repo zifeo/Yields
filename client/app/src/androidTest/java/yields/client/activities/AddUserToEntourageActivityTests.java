@@ -1,10 +1,11 @@
 package yields.client.activities;
 
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.test.ActivityInstrumentationTestCase2;
 
 import yields.client.R;
+import yields.client.generalhelpers.ServiceTestConnection;
+import yields.client.id.Id;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -19,39 +20,38 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2<SelectUsernameActivity> {
-    public SelectUsernameActivityTest() {
-        super(SelectUsernameActivity.class);
+/**
+ * Tests for AddUserToEntourageActivity
+ */
+public class AddUserToEntourageActivityTests extends ActivityInstrumentationTestCase2<AddUserToEntourageActivity> {
+    public AddUserToEntourageActivityTests() {
+        super(AddUserToEntourageActivity.class);
+
+        ServiceTestConnection.connectActivityToService();
     }
 
+    /**
+     * Set up for the tests
+     */
     @Override
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-        YieldsApplication.cancelToast();
+
+        YieldsApplication.setUser(MockFactory.generateFakeClientUser("Arnaud", new Id(1), "aa",
+                YieldsApplication.getDefaultUserImage()));
     }
 
-    @Override
-    public void tearDown(){
-        YieldsApplication.cancelToast();
-    }
-
-    public void testCannotEnterTooShortUsername(){
+    /**
+     * Test that the incorrect email is not sent
+     */
+    public void testIncorrectEmail(){
         getActivity();
-        onView(withId(R.id.editTextCreateAccount)).perform(typeText(""), closeSoftKeyboard());
-        onView(withId(R.id.actionDoneEnterUsername)).perform(click());
 
-        onView(withText(R.string.messageUsernameTooShort)).inRoot(withDecorView(not(is(getActivity().
-                getWindow().getDecorView())))).check(matches(isDisplayed()));
+        onView(withId(R.id.editTextEmail)).perform(typeText("a"), closeSoftKeyboard());
+        onView(withId(R.id.actionDoneEnterEmail)).perform(click());
 
-    }
-
-    public void testCannotEnterSpaces() {
-        getActivity();
-        onView(withId(R.id.editTextCreateAccount)).perform(typeText("John Doe"), closeSoftKeyboard());
-        onView(withId(R.id.actionDoneEnterUsername)).perform(click());
-
-        onView(withText(R.string.messageUsernameContainsSpaces)).inRoot(withDecorView(not(is(getActivity().
+        onView(withText(R.string.messageWrongEmail)).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 }

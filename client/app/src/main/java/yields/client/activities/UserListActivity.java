@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +23,10 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class UserListActivity extends AppCompatActivity {
 
+    private ListAdapterUsers mArrayAdapter;
+
     public final static String TITLE_KEY = "TITLE";
+    public final static String SHOW_ADD_ENTOURAGE_KEY = "SHOW_ADD_ENTOURAGE";
 
     /**
      * Method automatically called on the creation of the activity
@@ -51,39 +52,48 @@ public class UserListActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(intent.getStringExtra(TITLE_KEY));
 
-
+        if (!intent.hasExtra(SHOW_ADD_ENTOURAGE_KEY)) {
+            throw new MissingIntentExtraException(
+                    "Show add entourage extra is missing from intent in UserListActivity");
+        }
 
         final List<User> userList = YieldsApplication.getUserList();
 
-        Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
+        Objects.requireNonNull(YieldsApplication.getUserList(),
                 "The user list in YieldsApplication cannot be null when UserListActivity is created");
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
 
-        ListAdapterUsers arrayAdapter = new ListAdapterUsers(getApplicationContext(),
-                R.layout.user_layout, userList);
+        mArrayAdapter = new ListAdapterUsers(getApplicationContext(),
+                R.layout.user_layout, userList, intent.getBooleanExtra(SHOW_ADD_ENTOURAGE_KEY, false));
 
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(mArrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                YieldsApplication.setUserSearched(userList.get(position));
+                if (position < userList.size()) {
+                    YieldsApplication.setUserSearched(userList.get(position));
 
-                Intent intent = new Intent(UserListActivity.this, UserInfoActivity.class);
-                startActivity(intent);
+                    Intent intent = new Intent(UserListActivity.this, UserInfoActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(UserListActivity.this, AddUserToEntourageActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         listView.setItemsCanFocus(true);
     }
 
     /**
-     * Called once the button to add a user to the enoutrage is pressed.
-     *
-     * @param view The view of the button.
+     * Automatically called when the activity is resumed after another
+     * activity was displayed.
      */
-    public void onAddUserButton(View view) {
-        Intent intent = new Intent(this, AddUserToEntourageActivity.class);
-        startActivity(intent);
+    @Override
+    public void onResume(){
+        super.onResume();
+        mArrayAdapter.notifyDataSetChanged();
     }
 
     /**

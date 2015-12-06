@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     tools:context="yields.client.activities.GroupInfoActivity"
     android:orientation="vertical"
+    android:background="@drawable/background"
     android:weightSum="1">
 
     <android.support.v7.widget.Toolbar
@@ -71,8 +72,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="@string/joinGroup"
-        android:id="@+id/buttonJoinGroup"
+        android:text="@string/subscribeGroup"
+        android:id="@+id/buttonSubscribeGroup"
         android:layout_gravity="center_horizontal"
         android:visibility="gone" />
 
@@ -81,8 +82,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:text="@string/leaveGroup"
-        android:id="@+id/buttonLeaveGroup"
+        android:text="@string/unsubscribeGroup"
+        android:id="@+id/buttonUnsubscribeGroup"
         android:layout_gravity="center_horizontal"
         android:visibility="gone" />
 

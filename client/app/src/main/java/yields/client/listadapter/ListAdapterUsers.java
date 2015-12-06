@@ -1,6 +1,7 @@
 package yields.client.listadapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
     private Context mContext;
     private List<User> mUsers;
     private int mUserLayout;
+    private boolean mShowAddUser;
 
     /**
      * Constructor for ListAdapterUsersCheckBox
@@ -28,11 +30,24 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
      * @param userLayout The id of the basic view
      * @param users The list of users
      */
-    public ListAdapterUsers(Context context, int userLayout, List<User> users) {
+    public ListAdapterUsers(Context context, int userLayout, List<User> users, boolean showAddUser) {
         super(context, userLayout, users);
         mContext = context;
         mUsers = users;
         mUserLayout = userLayout;
+        mShowAddUser = showAddUser;
+    }
+
+    /**
+     * Return the number of item in this adapter
+     * @return the number of item in this adapter
+     */
+    @Override
+    public int getCount() {
+        if (mShowAddUser){
+            return mUsers.size() + 1;
+        }
+        return mUsers.size();
     }
 
     /**
@@ -44,19 +59,41 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View userView = inflater.inflate(mUserLayout, parent, false);
+        if (position < mUsers.size()){
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            View userView = inflater.inflate(mUserLayout, parent, false);
 
-        TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
-        ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
+            TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
+            ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
 
-        User user = mUsers.get(position);
+            User user = mUsers.get(position);
 
-        textViewUserName.setText(user.getName());
+            textViewUserName.setText(user.getName());
 
-        imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
-                mContext.getResources().getInteger(R.integer.groupImageDiameter)));
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+                    mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
-        return userView;
+            return userView;
+        }
+        else {
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            View view = inflater.inflate(R.layout.group_settings_layout, parent, false);
+
+            ImageView image = (ImageView) view.findViewById(R.id.imageSetting);
+
+            int idDrawable = R.drawable.ic_person_add_black_24dp;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                image.setImageDrawable(mContext.getResources().getDrawable(idDrawable,
+                        mContext.getTheme()));
+            } else {
+                image.setImageDrawable(mContext.getResources().getDrawable(idDrawable));
+            }
+
+            TextView textView = (TextView) view.findViewById(R.id.textViewSetting);
+
+            textView.setText("Add a new contact");
+
+            return view;
+        }
     }
 }
