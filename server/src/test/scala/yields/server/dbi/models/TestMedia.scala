@@ -13,7 +13,7 @@ import yields.server.utils.{Temporal, Config}
   */
 class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
 
-  val contentTypeTest = "Image"
+  val contentTypeTest = "image"
   val contentTest =
     """
       |this is an impossible content for a normal image so it can be used for testing and
@@ -22,24 +22,11 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
 
   val pathForContentTest = Media.buildPathFromName(Media.createHash(contentTest, Temporal.now))
 
-  before {
-    val file = new File(pathForContentTest)
-    if (file.exists) {
-      file.delete()
-    }
-  }
-
-  after {
-    val file = new File(pathForContentTest)
-    if (file.exists) {
-      file.delete()
-    }
-  }
-
   it should "exists on disk" in {
     val img = Media.create(contentTypeTest, contentTest, 1)
     val exists = Media.checkFileExist(img.hash)
     exists should be(true)
+
   }
 
   "file path" should "respect pattern storage/media/date_hash.bin" in {
@@ -47,6 +34,7 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     val hash = img.hash
     val path = Media.buildPathFromName(hash)
     path should be(img.path)
+
   }
 
   it should "return the image with the same content" in {
@@ -54,6 +42,7 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     val img2 = Media(img.nid)
 
     img2.content should be(img.content)
+
   }
 
   "saving a file on disk" should "have the same content" in {
@@ -67,6 +56,7 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
     mediaAfter.contentType should be(contentType)
     mediaBefore.creator should be(0)
     mediaAfter.creator should be(0)
+
   }
 
 }

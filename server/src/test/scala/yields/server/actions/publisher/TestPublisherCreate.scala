@@ -17,9 +17,10 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
 
     val users = List[UID](4, 5, 6)
     val nodes = List[NID](7, 8, 9)
+    val tags = List("a", "b", "c")
     user.addEntourage(users)
 
-    val action = PublisherCreate("name", users, nodes)
+    val action = PublisherCreate("name", users, nodes, tags)
 
     action.run(meta) match {
       case PublisherCreateRes(nid) =>
@@ -30,8 +31,9 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
         publisher.creator should be(user.uid)
         user.nodes should contain only nid
         users.foreach { uid =>
-          User(uid).nodes should contain (nid)
+          User(uid).nodes should contain(nid)
         }
+        publisher.tags should contain theSameElementsAs tags
     }
   }
 
@@ -41,14 +43,10 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
     val meta = Metadata.now(user.uid)
 
     val users = List[UID](4, 5, 6)
-    val action = new PublisherCreate("name", users, List.empty)
+    val action = new PublisherCreate("name", users, List.empty, List.empty)
 
     val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)
     thrown.getMessage should include(user.uid.toString)
-
-  }
-
-  it should "not accept adding private node" in {
 
   }
 

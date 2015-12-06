@@ -15,7 +15,7 @@ import yields.server.mpi.Metadata
   * @param removeUsers users to remove
   * @param addNodes nodes to add
   * @param removeNodes nodes to remove
-  * TODO: set picture
+  *                    TODO: set picture
   */
 case class PublisherUpdate(nid: NID,
                            name: Option[String],
@@ -23,7 +23,10 @@ case class PublisherUpdate(nid: NID,
                            addUsers: List[UID],
                            removeUsers: List[UID],
                            addNodes: List[NID],
-                           removeNodes: List[NID]) extends Action {
+                           removeNodes: List[NID],
+                           addTags: List[String],
+                           removeTags: List[String]) extends Action {
+
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -42,7 +45,7 @@ case class PublisherUpdate(nid: NID,
     }
 
     for (newPic <- pic) {
-      publisher.picSetter(newPic, sender)
+      publisher.pic(newPic, sender)
     }
 
     if (addUsers.nonEmpty) {
@@ -61,6 +64,14 @@ case class PublisherUpdate(nid: NID,
 
     if (removeNodes.nonEmpty) {
       publisher.removeNode(removeNodes)
+    }
+
+    if (addTags.nonEmpty) {
+      publisher.addTags(addTags)
+    }
+
+    if (removeTags.nonEmpty) {
+      publisher.remTags(removeTags)
     }
 
     Yields.broadcast(publisher.users.filter(_ != sender)) {
