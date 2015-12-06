@@ -171,9 +171,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
-        deleteMessage(message, groupId);
-        addUser(YieldsApplication.getUser(message.getSender()));
-
         try {
             mDatabase.insert(TABLE_MESSAGES, null,
                     createContentValuesForMessage(message, groupId));
@@ -351,6 +348,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addGroup(Group group)
             throws CacheDatabaseException {
         Objects.requireNonNull(group);
+        mDatabase.insertWithOnConflict()
 
         String selectQuery = "SELECT * FROM " + TABLE_GROUPS
                 + " WHERE " + KEY_GROUP_NODE_ID + " = ?";
@@ -367,12 +365,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             try {
                 ContentValues values = createContentValuesForGroup(group);
                 mDatabase.insert(TABLE_GROUPS, null, values);
-                for (User user : group.getUsers()) {
-                    addUser(user);
-                }
-                for (Message message : group.getLastMessages().values()) {
-                    addMessage(message, group.getId());
-                }
                 cursor.close();
             } catch (CacheDatabaseException exception) {
                 Log.d(TAG, "Unable to add Group with id: "
