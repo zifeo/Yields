@@ -51,6 +51,8 @@ public class CacheDatabaseTests {
         mDatabaseHelper = new CacheDatabaseHelper();
         mDatabase = mDatabaseHelper.getWritableDatabase();
         mDatabaseHelper.clearDatabase();
+        YieldsApplication.setUser(new ClientUser("Johny", new Id(999999), "topKeke@gmail.com",
+                YieldsApplication.getDefaultUserImage()));
     }
 
     /**
@@ -197,9 +199,9 @@ public class CacheDatabaseTests {
             }
 
             Cursor cursor = mDatabase.rawQuery("SELECT * FROM users;", null);
-            assertEquals(6, cursor.getCount());
-            assertEquals(6, cursor.getColumnCount());
             cursor.moveToFirst();
+            assertEquals(6, cursor.getCount());
+            assertEquals(7, cursor.getColumnCount());
 
             for (int i = 0; i < 6; i++) {
                 assertTrue(checkUserInformation(cursor, YieldsApplication.getUser(users.get(i))));
