@@ -1,4 +1,4 @@
-package yields
+package yields.server
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-package object server {
+package object tests {
 
   implicit lazy val system = ActorSystem("Yields-server-test")
   implicit lazy val materializer = ActorMaterializer()

@@ -275,4 +275,21 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         Thread.sleep(1000);
         assertEquals(MessageActivity.ContentType.GROUP_MESSAGES, messageActivity.getType());
     }
+
+    @Test
+    public void testCannotSendEmptyTextMessage(){
+        final MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        onView(withId(R.id.sendButton)).perform(click());
+        assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
+    }
+
+    @Test
+    public void testCaptionForImageIsNotMandatory(){
+        final MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        messageActivity.simulateImageMessage();
+        onView(withId(R.id.sendButton)).perform(click());
+        assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
+    }
 }

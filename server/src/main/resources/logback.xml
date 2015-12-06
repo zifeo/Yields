@@ -2,18 +2,48 @@
 
 <configuration>
 
+    <!-- standard out -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <encoder>
-            <pattern>%date{ISO8601} %-5level %-30logger{30} %replace(%msg){'\\r\\n', ' '} %throwable{short}%n</pattern>
+            <pattern>
+                %date{ISO8601} %-5level %-30logger{30} %+3X{user} %replace(%.-300msg){'\\r\\n', ' '} %ex{short}%n
+            </pattern>
         </encoder>
     </appender>
 
+    <!-- logstash -->
     <appender name="STASH" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
         <appender class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
             <destination>91.121.7.102:25000</destination>
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
             <keepAliveDuration>5 minutes</keepAliveDuration>
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp/>
+                    <version/>
+                    <stackTrace/>
+                    <callerData/>
+                    <logLevel/>
+                    <loggerName/>
+                    <pattern>
+                        <pattern>
+                            {
+                            "message": "%.-500message",
+                            "akkaSource": "%X{akkaSource}",
+                            "akkaTimestamp": "%X{akkaTimestamp}",
+                            "client": "%X{client}",
+                            "user": "%X{user}"
+                            }
+                        </pattern>
+                    </pattern>
+                </providers>
+            </encoder>
         </appender>
+        <includeCallerData>true</includeCallerData>
     </appender>
 
     <root level="ALL">

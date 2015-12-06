@@ -5,11 +5,11 @@ import java.net.InetSocketAddress
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor._
 import akka.io.{IO, Tcp}
-import akka.stream.{OverflowStrategy, ActorMaterializer}
+import akka.stream.ActorMaterializer
 import akka.stream.actor.{ActorPublisher, ActorSubscriber}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import akka.util.ByteString
-import yields.server.utils.Config
+import yields.server.utils.{FaultTolerance, Config}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -27,34 +27,15 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
   import Tcp._
   import context.system
 
-  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
-    case NonFatal(nonfatal) =>
-      val message = nonfatal.getMessage
-      log.error(nonfatal, s"non fatal: $message")
-      Resume
-    case fatal =>
-      val message = fatal.getMessage
-      log.error(fatal, s"fatal: $message")
-      Escalate
-  }
-
-  override def preStart(): Unit = {
-    IO(Tcp) ! Bind(
-      handler = self,
-      localAddress = new InetSocketAddress(Config.getString("addr"), Config.getInt("port")),
-      options = List(SO.KeepAlive(on = false), SO.TcpNoDelay(on = true)),
-      backlog = 100,
-      pullMode = false
-    )
-  }
-
   def receive: Receive = {
 
     // ----- TCP letters -----
 
-    case Bound(_) => log.info("system ready")
+    case Bound(_) =>
+      log.info("system ready")
 
-    case CommandFailed(Bind(_, _, _, _, _)) => context stop self
+    case CommandFailed(Bind(_, _, _, _, _)) =>
+      context stop self
 
     case Connected(clientAddr, _) =>
 
@@ -63,7 +44,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
       val pub = ActorPublisher[ByteString](bindings)
       val sub = ActorSubscriber[ByteString](bindings)
-      Source(pub).buffer(1000, OverflowStrategy.fail).via(stream).to(Sink(sub)).run()
+      Source(pub).via(stream).to(Sink(sub)).run()
 
       socket ! Register(
         handler = bindings,
@@ -73,9 +54,22 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
 
     // ----- Default letters -----
 
-    case unexpected => log.warning(s"unexpected letter: $unexpected")
+    case unexpected =>
+      log.warning(s"unexpected letter: $unexpected")
 
   }
+
+  override def preStart(): Unit =
+    IO(Tcp) ! Bind(
+      handler = self,
+      localAddress = new InetSocketAddress(Config.getString("addr"), Config.getInt("port")),
+      options = List(SO.KeepAlive(on = true), SO.TcpNoDelay(on = true)),
+      backlog = Config.getInt("backlog"),
+      pullMode = false
+    )
+
+  override val supervisorStrategy =
+    FaultTolerance.nonFatalResume(log)
 
 }
 
