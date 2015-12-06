@@ -10,7 +10,9 @@ import yields.server.utils.Temporal
   */
 final class Rss private(nid: NID) extends Node(nid) with Tags {
 
-  override val nidTag = nid
+  val nodeKey = NodeKey.node
+  override val nodeID = nid
+  override val NodeTagKey = s"$nodeKey:tags"
 
   object RSSKey {
     val url = "rss_url"

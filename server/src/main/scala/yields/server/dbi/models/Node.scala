@@ -38,7 +38,7 @@ class Node protected(val nid: NID) {
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
-  private var _pic: Option[NID] = None
+  private var _pic: Option[Media] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -144,11 +144,12 @@ class Node protected(val nid: NID) {
     remWithTime(NodeKey.nodes, oldNode)
 
   /** Picture getter. */
-  def pic: Blob = {
-    _pic = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
-    if (_pic.isDefined) {
-      val m = Media(_pic.get)
-      m.content
+  def pic: Blob = _pic.map(_.content).getOrElse {
+    val nid = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
+    if (nid.isDefined) {
+      val media = Media(nid.get)
+      _pic = Some(media)
+      media.content
     } else {
       ""
     }
@@ -158,12 +159,13 @@ class Node protected(val nid: NID) {
     * Picture setter.
     * Delete old picture if there is one and create new media on disk
     */
-  def picSetter(content: Blob, creator: UID): Unit = {
+  def pic(content: Blob, creator: UID): Unit = {
     if (_pic.isDefined) {
-      Media.deleteContentOnDisk(_pic.get)
+      Media.deleteContentOnDisk(_pic.get.nid)
     }
     val newPic = Media.create("image", content, creator)
-    _pic = update(StaticNodeKey.node_pic, newPic.nid)
+    val nid = update(StaticNodeKey.node_pic, newPic.nid)
+    _pic = Some(Media(nid.get))
   }
 
   /** Get n messages starting from some point */

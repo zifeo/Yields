@@ -6,6 +6,13 @@ import yields.server.actions.{Result, Broadcast}
 import yields.server.actions.nodes.NodeMessage
 import yields.server.dbi.models._
 
+/**
+  * Add message (comment) on a media
+  * @param nid group id
+  * @param text message text
+  * @param contentType message content type
+  * @param content message content
+  */
 case class MediaMessage(nid: NID, text: Option[String], contentType: Option[String], content: Option[Blob])
   extends NodeMessage(nid, text, contentType, content) {
   /** Format the result. */
