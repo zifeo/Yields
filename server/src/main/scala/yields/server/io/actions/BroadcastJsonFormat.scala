@@ -33,10 +33,6 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
 
       case x: UserUpdateBrd => packWithKind(x)
 
-      case x: PublisherCreateBrd => packWithKind(x)
-      case x: PublisherUpdateBrd => packWithKind(x)
-      case x: PublisherMessageBrd => packWithKind(x)
-
       case _ => serializationError(s"unregistered broadcast kind: $kind")
     }
   }
@@ -65,10 +61,6 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
           case "PublisherMessageBrd" => message.convertTo[PublisherMessageBrd]
 
           case "UserUpdateBrd" => message.convertTo[UserUpdateBrd]
-
-          case "PublisherCreateBrd" => message.convertTo[PublisherCreateBrd]
-          case "PublisherUpdateBrd" => message.convertTo[PublisherUpdateBrd]
-          case "PublisherMessageBrd" => message.convertTo[PublisherMessageBrd]
 
           case _ => deserializationError(s"unregistered broadcast kind: $kind")
         }

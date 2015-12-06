@@ -17,7 +17,9 @@ import yields.server.utils.Temporal
   *
   * @param nid Node id to build
   */
-final class Publisher private (nid: NID) extends Node(nid) {
+final class Publisher private (nid: NID) extends Node(nid) with Tags {
+
+  override val nidTag = nid
 
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {

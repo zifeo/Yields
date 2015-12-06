@@ -46,23 +46,6 @@ package object io {
   implicit lazy val groupMessageResJF = jsonFormat3(GroupMessageRes)
   implicit lazy val groupMessageBrdJF = jsonFormat7(GroupMessageBrd)
 
-  // Publishers
-
-  implicit lazy val publisherCreateJF = jsonFormat3(PublisherCreate)
-  implicit lazy val publisherCreateResJF = jsonFormat1(PublisherCreateRes)
-  implicit lazy val publisherCreateBrdJF = jsonFormat4(PublisherCreateBrd)
-
-  implicit lazy val publisherUpdateJF = jsonFormat7(PublisherUpdate)
-  implicit lazy val publisherUpdateResJF = jsonFormat0(PublisherUpdateRes)
-  implicit lazy val publisherUpdateBrdF = jsonFormat5(PublisherUpdateBrd)
-
-  implicit lazy val publisherInfoJF = jsonFormat1(PublisherInfo)
-  implicit lazy val publisherInfoResJF = jsonFormat5(PublisherInfoRes)
-
-  implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
-  implicit lazy val publisherMessageResJF = jsonFormat3(PublisherMessageRes)
-  implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
-
   // Nodes
 
   implicit lazy val groupSearchJF = jsonFormat1(NodeSearch)
@@ -89,22 +72,22 @@ package object io {
   implicit lazy val userSearchJF = jsonFormat1(UserSearch)
   implicit lazy val userSearchResJF = jsonFormat1(UserSearchRes)
 
-  // Publisher
+  // Publishers
 
   implicit lazy val publisherCreateJF = jsonFormat4(PublisherCreate)
   implicit lazy val publisherCreateResJF = jsonFormat1(PublisherCreateRes)
   implicit lazy val publisherCreateBrdJF = jsonFormat4(PublisherCreateBrd)
 
+  implicit lazy val publisherUpdateJF = jsonFormat9(PublisherUpdate)
+  implicit lazy val publisherUpdateResJF = jsonFormat0(PublisherUpdateRes)
+  implicit lazy val publisherUpdateBrdF = jsonFormat5(PublisherUpdateBrd)
+
   implicit lazy val publisherInfoJF = jsonFormat1(PublisherInfo)
   implicit lazy val publisherInfoResJF = jsonFormat6(PublisherInfoRes)
 
   implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
-  implicit lazy val publisherMessageResJF = jsonFormat2(PublisherMessageRes)
-  implicit lazy val publisherMessageBrdJF = jsonFormat6(PublisherMessageBrd)
-
-  implicit lazy val publisherUpdateJF = jsonFormat9(PublisherUpdate)
-  implicit lazy val publisherUpdateResJF = jsonFormat0(PublisherUpdateRes)
-  implicit lazy val publisherUpdateBrdJF = jsonFormat5(PublisherUpdateBrd)
+  implicit lazy val publisherMessageResJF = jsonFormat3(PublisherMessageRes)
+  implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
 
   /** *** Message passing interface *****/
 
