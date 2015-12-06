@@ -76,7 +76,7 @@ public class Group extends Node {
         mNodes = new ArrayList<>();
 
         for (Id uId : users) {
-            mUsers.add(YieldsApplication.getUser(uId));
+            mUsers.add(YieldsApplication.getUserFromId(uId));
         }
     }
 
@@ -229,7 +229,7 @@ public class Group extends Node {
      */
     public void addUser(Id user) {
         Objects.requireNonNull(user);
-        mUsers.add(YieldsApplication.getUser(user));
+        mUsers.add(YieldsApplication.getUserFromId(user));
     }
 
     /**
@@ -240,7 +240,7 @@ public class Group extends Node {
     public void updateUsers(ArrayList<Id> userList) {
         mUsers.clear();
         for (Id uId : userList) {
-            mUsers.add(YieldsApplication.getUser(uId));
+            mUsers.add(YieldsApplication.getUserFromId(uId));
         }
     }
 
