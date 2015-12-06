@@ -218,11 +218,11 @@ public class GroupActivity extends NotifiableActivity {
      * textView depending on the number of groups
      */
     private void checkNoGroup(){
-        if (mGroups.size() > 0){
-            mTextViewNoGroup.setVisibility(View.GONE);
+        if (mGroups.isEmpty()){
+            mTextViewNoGroup.setVisibility(View.VISIBLE);
         }
         else {
-            mTextViewNoGroup.setVisibility(View.VISIBLE);
+            mTextViewNoGroup.setVisibility(View.GONE);
         }
     }
 }

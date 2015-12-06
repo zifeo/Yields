@@ -273,6 +273,16 @@ public class Group extends Node {
     }
 
     /**
+     * Indicates if a node belongs to the group
+     *
+     * @param group The Group we want to test
+     */
+    public boolean containsNode(Group group) {
+        Objects.requireNonNull(group);
+        return mNodes.contains(group);
+    }
+
+    /**
      * Add a new message to the group messages.
      *
      * @param newMessage Message to be added
