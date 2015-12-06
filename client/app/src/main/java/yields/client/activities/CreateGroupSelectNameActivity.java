@@ -23,7 +23,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
     private EditText mEditText;
     private RadioButton mRadioPrivate;
-    private RadioButton mRadioPublic; // maybe useful later
+    private RadioButton mRadioPublic;
     private RadioButton mRadioRSS;
 
     /**

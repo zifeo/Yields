@@ -207,12 +207,10 @@ public class GroupInfoActivity extends NotifiableActivity {
             boolean alreadySubscribed = false;
             Group foundGroup = null;
             ClientUser user = YieldsApplication.getUser();
-            for (int i = 0; i < user.getUserGroups().size(); i++){
-                // TODO Check if a group has only one user (the current clientuser) and one node, mGroup
-
-                if (user.getUserGroups().get(i).getName().equals(mGroup.getName())){
+            for (Group group : user.getUserGroups()){
+                if (group.containsNode(mGroup)){
                     alreadySubscribed = true;
-                    foundGroup = user.getUserGroups().get(i);
+                    foundGroup = group;
                 }
             }
             final Group subscriptionGroup = foundGroup;
