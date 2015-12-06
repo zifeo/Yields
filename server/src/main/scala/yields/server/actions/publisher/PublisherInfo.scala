@@ -25,8 +25,7 @@ case class PublisherInfo(nid: NID) extends Action {
       else List.empty
 
     publisher.hydrate()
-    PublisherInfoRes(nid, publisher.name, publisher.pic, users, publisher.nodes)
-
+    PublisherInfoRes(nid, publisher.name, publisher.pic, users, publisher.nodes, publisher.tags)
   }
 
 }
@@ -39,4 +38,4 @@ case class PublisherInfo(nid: NID) extends Action {
   * @param users list of users
   * @param nodes list of nodes
   */
-case class PublisherInfoRes(nid: NID, name: String, pic: Blob, users: List[UID], nodes: List[NID]) extends Result
+case class PublisherInfoRes(nid: NID, name: String, pic: Blob, users: List[UID], nodes: List[NID], tags: Set[String]) extends Result

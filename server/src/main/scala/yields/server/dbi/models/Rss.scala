@@ -8,7 +8,10 @@ import yields.server.utils.Temporal
   * Rss publisher node class
   * @param nid nid of publisher
   */
-final class Rss private(nid: NID) extends Node(nid) {
+final class Rss private(nid: NID) extends Node(nid) with Tags {
+
+  val nodeKey = NodeKey.node
+  override val nodeID = nid
 
   object RSSKey {
     val url = "rss_url"
