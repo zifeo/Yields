@@ -82,7 +82,7 @@ UserSearch
 ```
 NodeHistory
 	input	nid: NID, datetime: OffsetDateTime, count: Int
-	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[String], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]]
+	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[String], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]], contentNids: List[Option[NID]]
 	rules	count > 0 & nid in nodes & senders in entourage
 NodeSearch
 	input	pattern: String
@@ -108,10 +108,10 @@ GroupInfo
 	output	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 	rules	nid in nodes
 GroupMessage
-	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 	output	nid: NID, datetime: OffsetDateTime
 	rules	nid in nodes
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 ```
 
 ### Publisher actions
@@ -131,10 +131,10 @@ PublisherInfo
 	input	nid: NID
 	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
 PublisherMessage
-	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 	output	nid: NID, datetime: OffsetDateTime
 	rules	nid in nodes
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 ```
 
 Publishers is very similar to groups and even share some of its structures but most the request are separated for allowing further differences to appears.

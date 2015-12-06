@@ -97,7 +97,8 @@ trait GroupsGenerators extends DefaultsGenerators {
     for {
       nid <- arbitrary[NID]
       datetime <- arbitrary[OffsetDateTime]
-    } yield GroupMessageRes(nid, datetime)
+      contentNid <- arbitrary[Option[NID]]
+    } yield GroupMessageRes(nid, datetime, contentNid)
   }
 
   implicit lazy val groupMessageBrdArb: Arbitrary[GroupMessageBrd] = Arbitrary {
@@ -108,7 +109,8 @@ trait GroupsGenerators extends DefaultsGenerators {
       text <- arbitrary[Option[String]]
       contentType <- arbitrary[Option[String]]
       content <- arbitrary[Option[Blob]]
-    } yield GroupMessageBrd(nid, datetime, sender, text, contentType, content)
+      contentNid <- arbitrary[Option[NID]]
+    } yield GroupMessageBrd(nid, datetime, sender, text, contentType, content, contentNid)
   }
 
 }
