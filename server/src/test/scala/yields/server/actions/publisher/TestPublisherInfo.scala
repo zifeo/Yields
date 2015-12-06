@@ -40,16 +40,18 @@ class TestPublisherInfo extends DBFlatSpec with Matchers with AllGenerators {
     publisher.addUser(List[UID](3, 4, 5))
     publisher.addNode(List[NID](13, 14, 15))
     publisher.picSetter("12", uid)
+    publisher.addTags(List("tennis", "foot"))
 
     val action = PublisherInfo(publisher.nid)
 
     action.run(meta) match {
-      case PublisherInfoRes(nid, name, pic, currentUsers, currentNodes) =>
+      case PublisherInfoRes(nid, name, pic, currentUsers, currentNodes, tags) =>
         nid should be(publisher.nid)
         name should be(publisher.name)
         pic should be(publisher.pic)
-        currentUsers should be (empty)
+        currentUsers should be(empty)
         currentNodes should contain theSameElementsAs publisher.nodes
+        tags should be(empty)
     }
   }
 

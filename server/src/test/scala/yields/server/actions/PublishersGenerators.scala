@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
 import yields.server.actions.publisher._
-import yields.server.dbi.models.{Blob, UID, NID}
+import yields.server.dbi.models.{TID, Blob, UID, NID}
 import yields.server.tests.DefaultsGenerators
 
 trait PublishersGenerators extends DefaultsGenerators {
@@ -16,7 +16,8 @@ trait PublishersGenerators extends DefaultsGenerators {
       name <- arbitrary[String]
       nodes <- arbitrary[List[NID]]
       users <- arbitrary[List[UID]]
-    } yield PublisherCreate(name, users, nodes)
+      tags <- arbitrary[List[String]]
+    } yield PublisherCreate(name, users, nodes, tags)
   }
 
   implicit lazy val publisherCreateResArb: Arbitrary[PublisherCreateRes] = Arbitrary {
@@ -45,7 +46,9 @@ trait PublishersGenerators extends DefaultsGenerators {
       removeUser <- arbitrary[List[UID]]
       addNode <- arbitrary[List[NID]]
       removeNode <- arbitrary[List[NID]]
-    } yield PublisherUpdate(nid, name, image, addUser, removeUser, addNode, removeNode)
+      addTags <- arbitrary[List[String]]
+      removeTags <- arbitrary[List[String]]
+    } yield PublisherUpdate(nid, name, image, addUser, removeUser, addNode, removeNode, addTags, removeTags)
   }
 
   implicit lazy val publisherUpdateResArb: Arbitrary[PublisherUpdateRes] = Arbitrary {
@@ -77,7 +80,8 @@ trait PublishersGenerators extends DefaultsGenerators {
       image <- arbitrary[Blob]
       users <- arbitrary[List[UID]]
       nodes <- arbitrary[List[NID]]
-    } yield PublisherInfoRes(nid, name, image, users, nodes)
+      tags <- arbitrary[Set[String]]
+    } yield PublisherInfoRes(nid, name, image, users, nodes, tags)
   }
 
   //
