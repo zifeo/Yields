@@ -17,7 +17,7 @@ class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
 
     val users = List[UID](4, 5, 6)
     val nodes = List[NID](7, 8, 9)
-    val tags = sample[List[String]]
+    val tags = List("a", "b", "c")
     user.addEntourage(users)
 
     val action = PublisherCreate("name", users, nodes, tags)
