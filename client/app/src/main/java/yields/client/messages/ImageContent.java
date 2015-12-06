@@ -123,6 +123,11 @@ public class ImageContent extends Content {
         return mCaption;
     }
 
+    @Override
+    public boolean isCommentable() {
+        return true;
+    }
+
     public String getContentForRequest() {
         return ImageSerialization.serializeImage(mImage, ImageSerialization.SIZE_IMAGE);
     }

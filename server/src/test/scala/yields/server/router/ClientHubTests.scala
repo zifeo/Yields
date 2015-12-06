@@ -39,25 +39,25 @@ class ClientHubTests(sys: ActorSystem)
 
     val searchResponse = serialize(Response(UserSearchRes(0), Metadata.now(0)))
     val connectResponse = serialize(Response(UserConnectRes(0, returning = true), Metadata.now(0)))
-    val errorMessage = ByteString(hub.underlyingActor.errorMessage)
+    val errorMessage = hub.underlyingActor.errorMessage
 
     hub ! OnNext(searchResponse)
-    expectMsg(Write(errorMessage, Ack(errorMessage)))
-    hub ! Ack(errorMessage)
+    expectMsg(Write(errorMessage, WriteAck(errorMessage)))
+    hub ! WriteAck(errorMessage)
 
     hub ! OnNext(searchResponse)
-    expectMsg(Write(errorMessage, Ack(errorMessage)))
-    hub ! Ack(errorMessage)
+    expectMsg(Write(errorMessage, WriteAck(errorMessage)))
+    hub ! WriteAck(errorMessage)
 
     hub ! OnNext(connectResponse)
     expectMsgAllOf(
-      Write(connectResponse, Ack(connectResponse)),
+      Write(connectResponse, WriteAck(connectResponse)),
       InitConnection(0)
     )
-    hub ! Ack(connectResponse)
+    hub ! WriteAck(connectResponse)
 
     hub ! OnNext(searchResponse)
-    expectMsg(Write(searchResponse, Ack(searchResponse)))
+    expectMsg(Write(searchResponse, WriteAck(searchResponse)))
 
   }
 
