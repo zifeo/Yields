@@ -148,7 +148,7 @@ class Node protected(val nid: NID) {
       val m = Media(_pic.get)
       m.content
     } else {
-      Array.empty
+      ""
     }
   }
 

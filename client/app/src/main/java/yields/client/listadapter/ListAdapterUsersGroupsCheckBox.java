@@ -1,6 +1,7 @@
 package yields.client.listadapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,8 +91,8 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
         TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
         ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
-        CheckBox checkBox = (CheckBox) userView.findViewById(R.id.checkboxUser);
 
+        CheckBox checkBox = (CheckBox) userView.findViewById(R.id.checkboxUser);
         textViewUserName.setText(user.getName());
 
         imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),

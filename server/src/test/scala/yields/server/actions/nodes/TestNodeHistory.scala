@@ -1,11 +1,11 @@
 package yields.server.actions.nodes
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizedActionException}
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestNodeHistory extends DBFlatSpec with Matchers with AllGenerators {

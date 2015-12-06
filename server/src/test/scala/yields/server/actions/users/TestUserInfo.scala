@@ -51,6 +51,30 @@ class TestUserInfo extends DBFlatSpec with Matchers {
     }
   }
 
+  it should "get only name if sharing at least one node with him" in {
+
+    val user = User.create("e1@email.com")
+    val contact = User.create("e2@email.com")
+    contact.name = "name"
+
+    val group = Group.create("share", user.uid)
+    group.addUser(contact.uid)
+    user.addNode(group.nid)
+    contact.addNode(group.nid)
+
+    val action = UserInfo(contact.uid)
+    val meta = Metadata.now(user.uid)
+
+    action.run(meta) match {
+      case UserInfoRes(uid, name, email, entourage, entourageUpdates) =>
+        uid should be (contact.uid)
+        name should be (contact.name)
+        email should be (empty)
+        entourage should be (empty)
+        entourageUpdates should be (empty)
+    }
+  }
+
   it should "not access info if the contact did not add him" in {
 
     val user = User.create("e1@email.com")

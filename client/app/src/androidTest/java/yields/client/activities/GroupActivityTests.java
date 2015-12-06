@@ -7,6 +7,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import yields.client.R;
+import yields.client.generalhelpers.MockModel;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -31,6 +32,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+        new MockModel();
         getActivity();
     }
 

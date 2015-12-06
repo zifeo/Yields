@@ -79,4 +79,8 @@ public class TextContent extends Content {
     public boolean isCommentable() {
         return false;
     }
+
+    public String getContentForRequest() {
+        return null;
+    }
 }

@@ -26,7 +26,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     */
   override final def run(metadata: Metadata): Result = {
 
-    val node = Node(nid)
+    val node = instance(nid)
     val sender = metadata.client
 
     if (! node.users.contains(sender))
@@ -54,6 +54,9 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
 
     result(datetime)
   }
+
+  /** Get node instance. */
+  def instance(nid: NID): Node
 
   /**
     * Allow to enlarge restriction using the metadata and throwing an [[UnauthorizedActionException]].

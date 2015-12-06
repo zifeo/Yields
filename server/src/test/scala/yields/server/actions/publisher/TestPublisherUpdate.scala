@@ -1,16 +1,17 @@
 package yields.server.actions.publisher
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupUpdate
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 
 class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
-  it should "change only the name" in {
+  "PublisherUpdate" should "change only the name" in {
+
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
 
@@ -30,9 +31,9 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
-    start.picSetter(Array[Byte](2, 1), meta.client)
+    start.picSetter("21", meta.client)
 
-    val newPic = Array[Byte](1, 2)
+    val newPic = "12"
     val action = new PublisherUpdate(start.nid, None, Some(newPic), List.empty, List.empty, List.empty, List.empty)
     action.run(meta)
 
@@ -45,6 +46,7 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
   }
 
   it should "only change users" in {
+
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
 
@@ -57,6 +59,9 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     middle.pic should be(start.pic)
     middle.users should be(meta.client :: newUsers)
     middle.nodes should be(start.nodes)
+    newUsers.foreach { uid =>
+      User(uid).nodes should contain (middle.nid)
+    }
 
     val oldUsers = List[UID](3)
     val removeAction = new PublisherUpdate(start.nid, None, None, List.empty, oldUsers, List.empty, List.empty)
@@ -67,10 +72,14 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
     end.pic should be(start.pic)
     end.users should be(meta.client :: newUsers.diff(oldUsers))
     end.nodes should be(start.nodes)
+    oldUsers.foreach { uid =>
+      User(uid).nodes should not contain end.nid
+    }
 
   }
 
   it should "only change nodes" in {
+
     val meta = Metadata.now(0)
     val start = Publisher.create("name1", meta.client)
 
@@ -96,11 +105,13 @@ class TestPublisherUpdate extends DBFlatSpec with Matchers with AllGenerators {
   }
 
   it should "not be updated by someone who cannot publish" in {
+
     val meta = Metadata.now(0)
     val start = Group.create("name1", meta.client + 1)
     val action = new PublisherUpdate(start.nid, None, None, List.empty, List.empty, List.empty, List.empty)
 
-    an[UnauthorizedActionException] should be thrownBy action.run(meta)
+    val thrown = the [UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include (meta.client.toString)
 
   }
 

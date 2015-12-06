@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,6 +29,7 @@ public class UserListActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -48,7 +51,11 @@ public class UserListActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(intent.getStringExtra(TITLE_KEY));
 
-        final List<User> userList = Objects.requireNonNull(YieldsApplication.getUserList(),
+
+
+        final List<User> userList = YieldsApplication.getUserList();
+
+        Objects.requireNonNull(YieldsApplication.getUser().getEntourage(),
                 "The user list in YieldsApplication cannot be null when UserListActivity is created");
 
         ListView listView = (ListView) findViewById(R.id.listViewUsers);
@@ -69,7 +76,18 @@ public class UserListActivity extends AppCompatActivity {
         listView.setItemsCanFocus(true);
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Called once the button to add a user to the enoutrage is pressed.
+     *
+     * @param view The view of the button.
+     */
+    public void onAddUserButton(View view) {
+        Intent intent = new Intent(this, AddUserToEntourageActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
