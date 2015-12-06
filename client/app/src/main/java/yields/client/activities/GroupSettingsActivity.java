@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
