@@ -221,7 +221,7 @@ public class YieldService extends Service {
      * @param message The message in question.
      */
     synchronized public void receiveMessage(Id groupId, Message message) {
-        if (mCurrentNotifiableActivity == null ||
+        if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             Group group = YieldsApplication.getUser().modifyGroup(groupId);
             group.addMessage(message);
@@ -276,7 +276,7 @@ public class YieldService extends Service {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.send_icon)
                         .setContentTitle("Message from " + YieldsApplication
-                                .getUser(message.getSender()).getName())
+                                .getUserFromId(message.getSender()).getName())
                         .setContentText(message.getContent().toString().substring(0, 50));
 
         // Creates an explicit intent for an Activity in your app

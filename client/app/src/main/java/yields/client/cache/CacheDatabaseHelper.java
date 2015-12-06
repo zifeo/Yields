@@ -175,7 +175,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
-        addUser(YieldsApplication.getUser(message.getSender()));
+        addUser(YieldsApplication.getUserFromId(message.getSender()));
 
         try {
             deleteMessage(message, groupId);
