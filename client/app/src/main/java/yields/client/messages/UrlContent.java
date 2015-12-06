@@ -33,7 +33,6 @@ public class UrlContent extends Content {
 
     private static final String URL_REGEX = "(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
     private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
-    private static final String URL_COLOR = "#00BFFF";
 
     private static final String ERROR_INVALID_URL = "Unknown page";
     private static final String NO_DESCRIPTION = "No description";
@@ -90,24 +89,45 @@ public class UrlContent extends Content {
         return text;
     }
 
+    /**
+     * Getter for the colored caption (link colored in blue).
+     * @return The caption in html format.
+     */
     public String getColoredCaption() {
         String coloredCaption = mCaption;
         coloredCaption = coloredCaption.replace(mUrl, "<font color='#00BFFF'>" + mUrl + "</font>");
         return coloredCaption;
     }
 
+    /**
+     * Getter for the url contained in this content, that is the first URL foun in the caption.
+     * @return The original URL (not the valid format).
+     */
     public String getUrl() {
         return mValidUrl;
     }
 
+    /**
+     * Getter for the description of the page having the current URL stored in this content.
+     * @return The description of the page comming from the metadata of the html body.
+     */
     public String getDescription() {
         return mDescription;
     }
 
+    /**
+     * Getter for the title of the page having the current URL stored in this content.
+     * @return The Title of the page contained in the metadata of the html body.
+     */
     public String getTitle() {
         return mTitle;
     }
 
+    /**
+     * Build a valid format for the URL passed in parameter, that is adding https:// and www. if needed.
+     * @param url The URL we want to convert into valid format.
+     * @return The valid format of url.
+     */
     public static String makeUrlValid(String url){
         boolean addHttp = false;
         boolean addWww = false;
@@ -194,6 +214,11 @@ public class UrlContent extends Content {
         return "";
     }
 
+    /**
+     * Convert an InputStream into a String format.
+     * @param stream The stream to convert.
+     * @return The corresponding String.
+     */
     private String inputStreamToString(InputStream stream) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder sb = new StringBuilder();
@@ -211,6 +236,11 @@ public class UrlContent extends Content {
         return sb.toString();
     }
 
+    /**
+     * Extract the title and the description of the page from its html body.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     private void getTitleAndDescrition() throws ExecutionException, InterruptedException {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -235,6 +265,11 @@ public class UrlContent extends Content {
         task.execute();
     }
 
+    /**
+     * Extract the title of the page from its html body.
+     * @param pageBody The html body of the page.
+     * @return The Title of the page.
+     */
     private static String getTitleFromMetadata(String pageBody) {
         int posTitleOpen = pageBody.indexOf("<title>");
         int lengthTitleField = new String("<title>").length();
@@ -247,6 +282,11 @@ public class UrlContent extends Content {
         return title;
     }
 
+    /**
+     * Extract the description of the page from its html body.
+     * @param pageBody The html body of the page.
+     * @return The description of the page.
+     */
     private static String getDescriptionFromMetadata(String pageBody) {
         int posMetaDescr = pageBody.indexOf("meta name=\"description\" content=\"");
         int lengthMetaDescrField = new String("meta name=\"description\" content=\"").length();
