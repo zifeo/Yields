@@ -18,10 +18,18 @@ trait DBFlatSpec extends FlatSpec with BeforeAndAfter with BeforeAndAfterAll {
   after {
     redis(_.flushdb)
 
-    val dir = new File(Config.getString("ressource.media.folder"))
-    for {
-      file <- dir.listFiles
-    } yield file.delete
+    deleteDirectory(new File(Config.getString("ressource.media.folder")))
+
+  }
+
+  def deleteDirectory(path: File): Unit = {
+    if (path.exists) {
+      val files = path.listFiles
+      for {
+        f <- files
+        if f.isFile
+      } yield f.delete
+    }
   }
 
 }
