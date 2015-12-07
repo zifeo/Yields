@@ -2,12 +2,12 @@ package yields.server.actions
 
 import java.time.OffsetDateTime
 
-import org.scalacheck.Arbitrary
+import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import yields.server.actions.media.{MediaMessageBrd, MediaMessageRes, MediaMessage}
 import yields.server.dbi.models._
 import yields.server.tests.DefaultsGenerators
-import com.redis.serialization.Parse.Implicits._
+import yields.server.io._
 
 trait MediaGenerators extends DefaultsGenerators {
 
