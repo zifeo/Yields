@@ -126,6 +126,18 @@ package object dbi {
     case e :: es => valueOrException(redis(_.hdel(key, e, es: _*))) == elements.size
   }
 
-
+  /**
+    * Update a field in key addressed redis hash map as well as included time.
+    * @param key hash map key
+    * @param field hash map field
+    * @param value hash map value
+    * @tparam T type of the value
+    * @return Some of the set value
+    */
+  private[dbi] def update[T](key: String, field: String, value: T): Option[T] = {
+    val updates = List((field, value), (Key.updates, Temporal.now))
+    redis(_.hmset(key, updates))
+    Some(value)
+  }
 
 }
