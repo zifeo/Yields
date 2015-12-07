@@ -44,7 +44,7 @@ package object dbi {
     redis.withClient(_.pipeline(queries))
 
   /** Terminates database connection. */
-  def close(): Unit =
+  private[server] def close(): Unit =
     redis.close
 
   /**
