@@ -46,4 +46,12 @@
         android:maxLines="1"
     />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageViewPastille"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_check_circle_black_24dp"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>
