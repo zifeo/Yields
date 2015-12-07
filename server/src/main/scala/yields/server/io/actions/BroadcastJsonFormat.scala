@@ -4,6 +4,7 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
+import yields.server.actions.media.MediaMessageBrd
 import yields.server.actions.nodes.NodeHistoryRes
 import yields.server.actions.publisher.{PublisherMessageBrd, PublisherUpdateBrd, PublisherMessage, PublisherCreateBrd}
 import yields.server.actions.users._
@@ -33,6 +34,8 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
 
       case x: UserUpdateBrd => packWithKind(x)
 
+      case x: MediaMessageBrd => packWithKind(x)
+
       case _ => serializationError(s"unregistered broadcast kind: $kind")
     }
   }
@@ -61,6 +64,8 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
           case "PublisherMessageBrd" => message.convertTo[PublisherMessageBrd]
 
           case "UserUpdateBrd" => message.convertTo[UserUpdateBrd]
+
+          case "MediaMessageBrd" => message.convertTo[MediaMessageBrd]
 
           case _ => deserializationError(s"unregistered broadcast kind: $kind")
         }
