@@ -51,7 +51,7 @@ class TestGroupMessage extends YieldsSpec {
         feed.head._4 should be(empty)
 
         val media = Media(feed.head._3.get)
-        Media.checkFileExist(media.filename) should be(true)
+        Media.checkFileExist(Media.buildPathFromName(media.filename)) should be(true)
         media.contentType should be(contentType)
         media.content should be(content)
         media.nid should be(contentNid.get)
@@ -82,7 +82,7 @@ class TestGroupMessage extends YieldsSpec {
         feed.head._4 should be(text)
 
         val media = Media(feed.head._3.get)
-        Media.checkFileExist(media.filename) should be(true)
+        Media.checkFileExist(Media.buildPathFromName(media.filename)) should be(true)
         media.contentType should be(contentType)
         media.content should be(content)
         media.nid should be(contentNid.get)

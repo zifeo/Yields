@@ -21,16 +21,8 @@ class TestMedia extends YieldsSpec {
 
   it should "exists on disk" in {
     val img = Media.create(contentTypeTest, contentTest, 1)
-    val exists = Media.checkFileExist(img.filename)
+    val exists = Media.checkFileExist(Media.buildPathFromName(img.filename))
     exists should be(true)
-
-  }
-
-  "file path" should "respect pattern storage/media/date_hash.bin" in {
-    val img = Media.create(contentTypeTest, contentTest, 1)
-    val hash = img.filename
-    val path = Media.buildPathFromName(hash)
-    path should be(img.path)
 
   }
 

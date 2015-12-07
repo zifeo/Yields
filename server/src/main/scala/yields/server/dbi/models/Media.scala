@@ -17,8 +17,8 @@ import scala.io._
   *
   * @param nid media id
   *
-  * Special field :
-  * nodes:[nid]   -> hash  hash / path / contentType
+  *            Special field :
+  *            nodes:[nid]   -> hash  hash / path / contentType
   *
   */
 class Media private(nid: NID) extends Node(nid) {
@@ -31,7 +31,7 @@ class Media private(nid: NID) extends Node(nid) {
 
   private var _filename: Option[String] = None
   private var _contentType: Option[String] = None
-  private var _path: Option[String] = None
+  // private var _path: Option[String] = None
 
   /** Media content getter */
   def content: Blob = {
@@ -39,8 +39,8 @@ class Media private(nid: NID) extends Node(nid) {
     if (_filename.isEmpty) {
       filename
     }
-    path = _filename.get
-    getContentFromDisk(path).getOrElse(throw new MediaException("Content doesn't exist on disk"))
+    getContentFromDisk(_filename.getOrElse(throw new MediaException("filename doesn't exist")))
+      .getOrElse(throw new MediaException("Content doesn't exist on disk"))
   }
 
   /** Media content setter on disk */
@@ -49,12 +49,8 @@ class Media private(nid: NID) extends Node(nid) {
     if (_filename.isEmpty) {
       filename
     }
-    path = _filename.get
 
-    if (_path.isEmpty)
-      throw new MediaException("Cannot write in non-existent path")
-
-    writeContentOnDisk(_path.get, content)
+    writeContentOnDisk(_filename.getOrElse(throw new MediaException("name is empty")), content)
   }
 
   def filename: String = _filename.getOrElse {
@@ -74,16 +70,6 @@ class Media private(nid: NID) extends Node(nid) {
   def contentType: String = _contentType.getOrElse {
     _contentType = redis(_.hget[String](NodeKey.node, MediaKey.contentType))
     valueOrDefault(_contentType, "")
-  }
-
-  def path: String = _path.getOrElse {
-    _path = redis(_.hget[String](NodeKey.node, MediaKey.path))
-    valueOrException(_path)
-  }
-
-  private def path_=(hash: String): Unit = {
-    val path = buildPathFromName(hash)
-    _path = update(NodeKey.node, MediaKey.path, path)
   }
 
 }
@@ -130,31 +116,19 @@ object Media {
 
   /**
     * Check if a file exists on disk with full name
-    * @param name name of the file to test (name format: date_hash
+    * @param filename name of the file to test (name format: date_hash
     * @return
     */
-  def checkFileExist(name: String): Boolean = {
-    Files.exists(Paths.get(buildPathFromName(name)))
+  def checkFileExist(filename: String): Boolean = {
+    models.checkFileExist(filename)
   }
 
-  /**
-    * Build a path from a file name
-    * @param name filename
-    * @return path
-    */
-  def buildPathFromName(name: String): String = {
-    Config.getString("ressource.media.folder") + name + Config.getString("ressource.media.extension")
-  }
-
-  /**
-    * Delete a file on disk
-    * @param nid
-    */
   def deleteContentOnDisk(nid: NID): Unit = {
-    val media = Media(nid)
-    val file = new File(media.path)
-    if (file.exists) {
-      file.delete()
-    }
+    models.deleteContentOnDisk(nid)
   }
+
+  def buildPathFromName(name: String): String = {
+    models.buildPathFromName(name)
+  }
+
 }
