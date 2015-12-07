@@ -19,11 +19,13 @@
         <activity
             android:name=".activities.MessageActivity"
             android:parentActivityName=".activities.GroupActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.GoogleLoginActivity"
-            android:label="@string/app_name" >
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,66 +33,96 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.SelectUsernameActivity"
-            android:label="@string/title_activity_select_username" >
+            android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.CreatingAccountActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.LoggingInActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.CreateGroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.CreateGroupSelectNameActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.AddUsersFromEntourageActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.GroupSettingsActivity"
             android:parentActivityName=".activities.MessageActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.SearchGroupActivity"
             android:parentActivityName=".activities.GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.GroupInfoActivity"
             android:parentActivityName=".activities.SearchGroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.UserListActivity"
             android:parentActivityName=".activities.GroupInfoActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.UserInfoActivity"
             android:parentActivityName=".activities.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.ImageShowPopUp"
             android:label="@string/title_activity_image_show_pop_up" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name=".activities.UserSettingsActivity"
             android:parentActivityName=".activities.GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activities.CreateRSSFeedActivity"
+            android:parentActivityName=".activities.CreateGroupSelectNameActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activities.AddUserToEntourageActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activities.RemoveUsersFromEntourageActivity"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <service
@@ -98,11 +130,5 @@
             android:enabled="true"
             android:exported="true" >
         </service>
-
-        <activity
-            android:name=".activities.AddUserToEntourageActivity"
-            android:label="@string/title_activity_add_user_to_entourage" >
-        </activity>
     </application>
-
 </manifest>

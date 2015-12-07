@@ -11,14 +11,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import yields.client.R;
 import yields.client.exceptions.IllegalIntentExtraException;
 import yields.client.exceptions.MissingIntentExtraException;
+import yields.client.id.Id;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.servicerequest.GroupAddRequest;
+import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -107,6 +110,7 @@ public class GroupInfoActivity extends NotifiableActivity {
                 Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
                 String title = "Users of " + mGroup.getName();
                 intent.putExtra(UserListActivity.TITLE_KEY, title);
+                intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, false);
                 startActivity(intent);
             }
         });
@@ -136,12 +140,12 @@ public class GroupInfoActivity extends NotifiableActivity {
     @Override
     public void notifyChange(Change change) {
         switch (change) {
-            case GROUP_JOIN:
+            case GROUP_LIST:
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         checkButtons();
-                        YieldsApplication.showToast(getApplicationContext(), "Group joined !");
+                        YieldsApplication.showToast(getApplicationContext(), "Subscription added !");
                     }
                 });
                 break;
@@ -182,39 +186,60 @@ public class GroupInfoActivity extends NotifiableActivity {
         if (mMode == SearchGroupActivity.Mode.SEARCH){
             YieldsApplication.setUserList(mGroup.getUsers());
 
-            final Button joinButton = (Button) findViewById(R.id.buttonJoinGroup);
+            final Button subscribeButton = (Button) findViewById(R.id.buttonSubscribeGroup);
 
-            joinButton.setOnClickListener(new View.OnClickListener() {
+            subscribeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ServiceRequest request = new GroupAddRequest(YieldsApplication.getUser(),
-                            mGroup.getId(), YieldsApplication.getUser());
+                    List<Id> userList = new ArrayList<>();
+                    userList.add(YieldsApplication.getUser().getId());
+                    Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
+
+                    //TODO Add the publisher in the new group
+
+                    ServiceRequest request =new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
                     YieldsApplication.getBinder().sendRequest(request);
 
-                    joinButton.setEnabled(false);
+                    subscribeButton.setEnabled(false);
                 }
             });
 
-            final Button leaveButton = (Button) findViewById(R.id.buttonLeaveGroup);
+            boolean alreadySubscribed = false;
+            Group foundGroup = null;
+            ClientUser user = YieldsApplication.getUser();
+            for (Group group : user.getUserGroups()){
+                if (group.containsNode(mGroup)){
+                    alreadySubscribed = true;
+                    foundGroup = group;
+                }
+            }
+            final Group subscriptionGroup = foundGroup;
 
-            leaveButton.setOnClickListener(new View.OnClickListener() {
+            final Button unsubscribeButton = (Button) findViewById(R.id.buttonUnsubscribeGroup);
+
+            unsubscribeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    assert subscriptionGroup != null : "subscriptionGroup should " +
+                            "never be null when unsubscribeButton is clickable";
+
                     ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
-                            mGroup.getId(), YieldsApplication.getUser().getId());
+                            subscriptionGroup.getId(), YieldsApplication.getUser().getId());
                     YieldsApplication.getBinder().sendRequest(request);
 
-                    leaveButton.setEnabled(false);
+                    unsubscribeButton.setEnabled(false);
                 }
             });
 
-            if (mGroup.containsUser(YieldsApplication.getUser())){
-                joinButton.setVisibility(View.GONE);
-                leaveButton.setVisibility(View.VISIBLE);
+
+
+            if (alreadySubscribed){
+                subscribeButton.setVisibility(View.GONE);
+                unsubscribeButton.setVisibility(View.VISIBLE);
             }
             else {
-                joinButton.setVisibility(View.VISIBLE);
-                leaveButton.setVisibility(View.GONE);
+                subscribeButton.setVisibility(View.VISIBLE);
+                unsubscribeButton.setVisibility(View.GONE);
             }
         }
         else {

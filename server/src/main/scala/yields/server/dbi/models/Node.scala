@@ -38,7 +38,7 @@ class Node protected(val nid: NID) {
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
-  private var _pic: Option[NID] = None
+  private var _pic: Option[Media] = None
 
   /** Name getter. */
   def name: String = _name.getOrElse {
@@ -100,7 +100,7 @@ class Node protected(val nid: NID) {
   /** Users getter */
   def users: List[UID] = _users.getOrElse {
     _users = redis(_.hkeys[UID](NodeKey.users))
-    valueOrDefault(_users, List.empty)
+    valueOrException(_users)
   }
 
   /** Add user. */
@@ -127,11 +127,13 @@ class Node protected(val nid: NID) {
 
   /** Add node. */
   def addNode(newNode: NID): Boolean =
-    addWithTime(NodeKey.nodes, newNode)
+    if (newNode == nid) false
+    else addWithTime(NodeKey.nodes, newNode)
 
   /** Add multiple nodes. */
   def addNode(newNodes: List[NID]): Boolean =
-    addWithTime(NodeKey.nodes, newNodes)
+    if (newNodes == List(nid)) false
+    else addWithTime(NodeKey.nodes, newNodes.filterNot(_ == nid))
 
   /** Remove node. */
   def removeNode(oldNode: NID): Boolean =
@@ -142,26 +144,23 @@ class Node protected(val nid: NID) {
     remWithTime(NodeKey.nodes, oldNode)
 
   /** Picture getter. */
-  def pic: Blob = {
-    _pic = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
-    if (_pic.isDefined) {
-      val m = Media(_pic.get)
-      m.content
-    } else {
-      Array.empty
-    }
+  def pic: Blob = _pic.map(_.content).getOrElse {
+    val nid = redis(_.hget[NID](NodeKey.node, StaticNodeKey.node_pic))
+    _pic = nid.map(Media(_))
+    _pic.map(_.content).getOrElse("")
   }
 
   /**
     * Picture setter.
     * Delete old picture if there is one and create new media on disk
     */
-  def picSetter(content: Blob, creator: UID): Unit = {
+  def pic(content: Blob, creator: UID): Unit = {
     if (_pic.isDefined) {
-      Media.deleteContentOnDisk(_pic.get)
+      Media.deleteContentOnDisk(valueOrException(_pic.map(_.nid)))
     }
     val newPic = Media.create("image", content, creator)
-    _pic = update(StaticNodeKey.node_pic, newPic.nid)
+    val nid = update(StaticNodeKey.node_pic, newPic.nid)
+    _pic = nid.map(Media(_))
   }
 
   /** Get n messages starting from some point */

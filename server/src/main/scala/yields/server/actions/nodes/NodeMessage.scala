@@ -26,7 +26,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     */
   override final def run(metadata: Metadata): Result = {
 
-    val node = Node(nid)
+    val node = instance(nid)
     val sender = metadata.client
 
     if (! node.users.contains(sender))
@@ -45,15 +45,20 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
       cnt <- content
     } yield Media.create(cntType, cnt, sender)
     val datetime = Temporal.now
+    val mediaNid = media.map(_.nid)
 
-    node.addMessage((datetime, metadata.client, media.map(_.nid), text.getOrElse("")))
+    node.addMessage((datetime, metadata.client, mediaNid, text.getOrElse("")))
 
     Yields.broadcast(node.users.filter(_ != sender)) {
-      broadcast(datetime, sender)
+      broadcast(datetime, sender, mediaNid)
     }
 
-    result(datetime)
+    result(datetime, mediaNid)
+
   }
+
+  /** Get node instance. */
+  def instance(nid: NID): Node
 
   /**
     * Allow to enlarge restriction using the metadata and throwing an [[UnauthorizedActionException]].
@@ -63,10 +68,10 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
   def authorize(metadata: Metadata): Unit = ()
 
   /** Format the result. */
-  def result(datetime: OffsetDateTime): Result
+  def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result
 
   /** Format the broadcast. */
-  def broadcast(datetime: OffsetDateTime, uid: UID): Broadcast
+  def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast
 
 }
 

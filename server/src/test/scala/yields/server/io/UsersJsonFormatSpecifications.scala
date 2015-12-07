@@ -1,7 +1,7 @@
 package yields.server.io
 
 import org.scalacheck.{Prop, Properties}
-import yields.server._
+import yields.server.tests._
 import yields.server.actions.UsersGenerators
 import yields.server.actions.users._
 
@@ -33,21 +33,21 @@ object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with 
 
   //
 
-  property("UserGroupList") = forAll { (x: UserGroupList) =>
+  property("UserGroupList") = forAll { (x: UserNodeList) =>
     toAndFromJson(x)
   }
 
-  property("UserGroupListRes") = forAll { (x: UserGroupListRes) =>
+  property("UserGroupListRes") = forAll { (x: UserNodeListRes) =>
     toAndFromJson(x)
   }
 
   //
 
-  property("UserInfo") = forAll { (x: UserGroupListRes) =>
+  property("UserInfo") = forAll { (x: UserNodeListRes) =>
     toAndFromJson(x)
   }
 
-  property("UserInfoRes") = forAll { (x: UserGroupListRes) =>
+  property("UserInfoRes") = forAll { (x: UserNodeListRes) =>
     toAndFromJson(x)
   }
 

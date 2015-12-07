@@ -1,6 +1,7 @@
 package yields.server.pipeline
 
 import akka.actor.ActorSystem
+import akka.stream.OverflowStrategy
 import akka.stream.io.Framing
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
@@ -18,17 +19,18 @@ object Pipeline {
 
   val parallelism = Config.getInt("pipeline.parallelism")
   val framesize = Config.getInt("pipeline.framesize")
+  val buffersize = Config.getInt("pipeline.buffersize")
 
   /**
     * Creates a pipeline including the following steps:
     *
     * {{{
-    *                                         execute
-    *          log     serialize     log     +dispatch
-    *        +-----+    +-----+    +-----+    +-----+
-    *  In ~> |     | ~> |     | ~> |     | ~> |     |
-    * Out <~ |     | <~ |     | <~ |     | <~ |     |
-    *        +-----+    +-----+    +-----+    +-----+
+    *                              execute
+    *       serialize     log     +dispatch
+    *        +-----+    +-----+    +-----+
+    *  In ~> |     | ~> |     | ~> |     |
+    * Out <~ |     | <~ |     | <~ |     |
+    *        +-----+    +-----+    +-----+
     * }}}
     *
     * @param system implicit actor system
@@ -51,6 +53,7 @@ object Pipeline {
     }
 
     Flow[ByteString]
+      .buffer(buffersize, OverflowStrategy.fail)
       .via(frame)
       .via(
         serialize

@@ -6,6 +6,7 @@ import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 
 class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
@@ -30,15 +31,15 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val start = Group.create("name1", meta.client)
-    start.picSetter(Array[Byte](2, 1), meta.client)
+    start.pic("21", meta.client)
 
-    val newPic = Array[Byte](1, 2)
+    val newPic = "12"
     val action = new GroupUpdate(start.nid, None, Some(newPic), List.empty, List.empty, List.empty, List.empty)
     action.run(meta)
 
     val end = Group(start.nid)
     end.name should be (start.name)
-    end.pic should be (start.pic)
+    end.pic should be (newPic)
     end.users should be (start.users)
     end.nodes should be (start.nodes)
 
@@ -58,6 +59,9 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
     middle.pic should be (start.pic)
     middle.users should be (meta.client :: newUsers)
     middle.nodes should be (start.nodes)
+    newUsers.foreach { uid =>
+      User(uid).nodes should contain (middle.nid)
+    }
 
     val oldUsers = List[UID](3)
     val removeAction = new GroupUpdate(start.nid, None, None, List.empty, oldUsers, List.empty, List.empty)
@@ -68,6 +72,9 @@ class TestGroupUpdate extends DBFlatSpec with Matchers with AllGenerators {
     end.pic should be (start.pic)
     end.users should be (meta.client :: newUsers.diff(oldUsers))
     end.nodes should be (start.nodes)
+    oldUsers.foreach { uid =>
+      User(uid).nodes should not contain end.nid
+    }
 
   }
 

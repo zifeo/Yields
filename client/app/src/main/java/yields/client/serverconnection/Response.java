@@ -17,7 +17,7 @@ public class Response {
         NODE_HISTORY_RESPONSE("NodeHistoryRes"), NODE_MESSAGE_RESPONSE("NodeMessageRes"),
         USER_CONNECT_RESPONSE("UserConnectRes"), USER_GROUP_LIST_RESPONSE("UserNodeListRes"),
         USER_INFO_RESPONSE("UserInfoRes"), GROUP_CREATE_RESPONSE("GroupCreateRes"),
-        USER_UPDATE_RESPONSE("UserUpdateres"), USER_SEARCH_RESPONSE("UserSearchRes"),
+        USER_UPDATE_RESPONSE("UserUpdateRes"), USER_SEARCH_RESPONSE("UserSearchRes"),
         NODE_SEARCH_RESPONSE("NodeSearchRes"), GROUP_UPDATE_RESPONSE("GroupUpdateRes"),
         GROUP_INFO_RESPONSE("GroupInfoRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes"),
         PUBLISHER_CREATE_RESPONSE("PublisherCreateRes"), PUBLISHER_UPDATE_RESPONSE
