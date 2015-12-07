@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import yields.client.activities.MessageActivity;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
@@ -26,6 +27,7 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -104,7 +106,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         this(YieldsApplication.getApplicationContext());
     }
 
-
     /**
      * Called when the database is created for the first time. This is where the
      * creation of tables and the initial population of the tables should happen.
@@ -119,7 +120,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Description copied from class: SQLiteOpenHelper Called when the database
+     * Description copied from class: SQLiteOpenHelper. Called when the database
      * needs to be upgraded. The implementation should use this method to drop
      * tables, add tables, or do anything else it needs to upgrade to the new
      * schema version.
@@ -148,9 +149,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(groupId);
 
         mDatabase.execSQL("DELETE FROM " + TABLE_MESSAGES + " WHERE " + KEY_MESSAGE_GROUP_ID + " = ? " + "AND "
-                + KEY_MESSAGE_DATE + " = ? AND " + KEY_MESSAGE_TEXT + " = ?", new Object[]{groupId.getId().toString(),
-                DateSerialization.dateSerializer.toStringForCache(message.getDate()),
-                message.getContent().getTextForRequest()});
+                        + KEY_MESSAGE_DATE + " = ? AND " + KEY_MESSAGE_TEXT + " = ? AND " + KEY_MESSAGE_SENDER_ID + " = ?",
+                new Object[]{
+                        groupId.getId().toString(),
+                        DateSerialization.dateSerializer.toStringForCache(message.getDate()),
+                        message.getContent().getTextForRequest(),
+                        message.getSender().getId().toString()});
     }
 
     /**
@@ -175,12 +179,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void deleteUser(Id userId) {
         Objects.requireNonNull(userId);
 
-        mDatabase.delete(TABLE_USERS, KEY_USER_NODE_ID + " = ?",
-                new String[]{String.valueOf(userId.getId())});
+        mDatabase.delete(TABLE_USERS, KEY_USER_NODE_ID + " = ?", new String[]{String.valueOf(userId.getId())});
     }
 
     /**
-     * Adds the User to the database or replaces it if it's already in it.
+     * Adds the User to the database or updates it if it's already in it.
      *
      * @param user The User to be added.
      */
@@ -192,9 +195,40 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Updates the name of a User in the database.
+     *
+     * @param userId      The Id field of the User that will have it's name changed.
+     * @param newUserName The new name of the User.
+     */
+    public void updateUserName(Id userId, String newUserName) {
+        Objects.requireNonNull(userId);
+        Objects.requireNonNull(newUserName);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_NAME, newUserName);
+        mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
+                new String[]{userId.getId().toString()});
+    }
+
+    /**
+     * Updates the image of a User in the database.
+     *
+     * @param userId       The Id field of the User that will have it's image changed.
+     * @param newUserImage The new image of the User.
+     */
+    public void updateUserImage(Id userId, Bitmap newUserImage) {
+        Objects.requireNonNull(userId);
+        Objects.requireNonNull(newUserImage);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_IMAGE, ImageSerialization.serializeImage(newUserImage, ImageSerialization.SIZE_IMAGE));
+        mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
+                new String[]{userId.getId().toString()});
+    }
+
+    /**
      * Retrieves a User according to its Id, returns null if such a User is not
-     * in the database. Also returns null if the User could not be correctly
-     * extracted from the database.
+     * in the database.
      *
      * @param userID The Id of the wanted User.
      * @return The User which has userID as its Id or null if there is no such
@@ -203,20 +237,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public User getUser(Id userID) {
         Objects.requireNonNull(userID);
 
-        String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE "
-                + KEY_USER_NODE_ID + " = ?";
-        Cursor userCursor = mDatabase.rawQuery(selectUserQuery,
-                new String[]{userID.getId().toString()});
+        String selectUserQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_USER_NODE_ID + " = ?";
+        Cursor userCursor = mDatabase.rawQuery(selectUserQuery, new String[]{userID.getId().toString()});
+
         if (!userCursor.moveToFirst()) {
             userCursor.close();
             return null;
         } else {
-            String userName = userCursor.getString(
-                    userCursor.getColumnIndex(KEY_USER_NAME));
-            String userEmail = userCursor.getString(
-                    userCursor.getColumnIndex(KEY_USER_EMAIL));
+            String userName = userCursor.getString(userCursor.getColumnIndex(KEY_USER_NAME));
+            String userEmail = userCursor.getString(userCursor.getColumnIndex(KEY_USER_EMAIL));
             Bitmap userImage = ImageSerialization.unSerializeImage(userCursor.getString(
-                    (userCursor.getColumnIndex(KEY_USER_IMAGE))));
+                    userCursor.getColumnIndex(KEY_USER_IMAGE)));
 
             userCursor.close();
             return new User(userName, userID, userEmail, userImage);
@@ -306,6 +337,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addGroup(Group group) {
         Objects.requireNonNull(group);
 
+        //TODO: Check if adding Users is necessary !
         List<User> usersInGroup = group.getUsers();
         for (User user : usersInGroup) {
             ContentValues userValues = createContentValuesForUser(user);
@@ -400,6 +432,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
+        //TODO: CHECK CONCURRENCY ISSUES
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
@@ -418,7 +451,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Adds Users to a Group in the database.
+     * Adds Users to a Group in the database, and also adds the user to the database if it isn't
+     * in it already.
      *
      * @param groupId The Id of the Group to which the User shall be added.
      * @param users   Users that will be added to the Group.
@@ -430,7 +464,9 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         for (User user : users) {
             Objects.requireNonNull(user);
 
+            //TODO : Check if adding the user is necessary
             addUser(user);
+            //TODO: CHECK CONCURRENCY ISSUES
             List<Id> ids = getUserIdsFromGroup(groupId);
             ids.add(user.getId());
             ContentValues values = new ContentValues();
@@ -467,8 +503,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
     /**
      * Retrieves a Group according to its Id, returns null if such a Group is
-     * not in the database. Also returns null if the Group could not be
-     * correctly extracted from the database.
+     * not in the database.
      *
      * @param groupId The Id of the wanted Group.
      * @return The Group which has groupId as its Id or null if there is no
@@ -486,17 +521,19 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
             return null;
         } else {
-            String groupName = cursor.getString(
-                    cursor.getColumnIndex(KEY_GROUP_NAME));
-            Bitmap groupImage = ImageSerialization.unSerializeImage(
-                    cursor.getString(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
-            Group.GroupVisibility groupVisibility = Group.GroupVisibility.valueOf(
-                    cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+            String groupName = cursor.getString(cursor.getColumnIndex(KEY_GROUP_NAME));
+
+            Bitmap groupImage =
+                    ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
+
+            Group.GroupVisibility groupVisibility =
+                    Group.GroupVisibility.valueOf(cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+
             int validated = cursor.getInt(cursor.getColumnIndex(KEY_GROUP_VALIDATED));
             boolean groupValidated = (1 == validated);
 
-            String allUsers = cursor.getString(
-                    cursor.getColumnIndex(KEY_GROUP_USERS));
+            String allUsers =
+                    cursor.getString(cursor.getColumnIndex(KEY_GROUP_USERS));
             List<Id> groupUsers = getIdListFromString(allUsers);
             cursor.close();
 
@@ -521,12 +558,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         } else {
             do {
                 Id groupId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_GROUP_NODE_ID)));
-                String groupName = cursor.getString(
-                        cursor.getColumnIndex(KEY_GROUP_NAME));
-                Bitmap groupImage = ImageSerialization.unSerializeImage(
-                        cursor.getString(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
-                Group.GroupVisibility groupVisibility = Group.GroupVisibility.valueOf(
-                        cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+                String groupName = cursor.getString(cursor.getColumnIndex(KEY_GROUP_NAME));
+
+                Bitmap groupImage =
+                        ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
+
+                Group.GroupVisibility groupVisibility =
+                        Group.GroupVisibility.valueOf(cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+
                 int validated = cursor.getInt(cursor.getColumnIndex(KEY_GROUP_VALIDATED));
                 boolean groupValidated = (1 == validated);
 
@@ -618,7 +657,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                             + group.getId().getId());
                 }
                 counter++;
-            } while (cursor.moveToNext() && counter < 10);
+            } while (cursor.moveToNext() && counter < NodeHistoryRequest.MESSAGE_COUNT);
+
             cursor.close();
             return messages;
         }
