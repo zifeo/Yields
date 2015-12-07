@@ -4,6 +4,9 @@ import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.tests._
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 /**
   * Regroup all global server tests.
   */
@@ -55,6 +58,23 @@ class YieldsTests extends YieldsSpec {
 
     clientA.close()
     clientB.close()
+
+  }
+
+  it should "not close the connection for 20s" in {
+
+    val client = new FakeClient(1)
+
+    client.send(UserConnect("clientA@yields.im"))
+    await(client.receive()).result should be (UserConnectRes(client.uid, returning = false))
+
+    client.send(UserUpdate(None, None, None, List(client.uid), List.empty))
+    await(client.receive()).result should be (UserUpdateRes())
+
+    Thread.sleep(20 * 1000)
+
+    val refCreate = client.send(GroupCreate("clients", List(client.uid, client.uid), List.empty))
+    await(client.receive()).metadata.ref should be (refCreate)
 
   }
 
