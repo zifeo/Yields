@@ -164,6 +164,7 @@ public class MessageActivity extends NotifiableActivity {
     protected void onDestroy() {
         super.onDestroy();
         YieldsApplication.nullGroup();
+        YieldsApplication.getBinder().unsetMessageActivity();
     }
 
     /**

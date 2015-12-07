@@ -66,6 +66,15 @@ public class LoggingInActivity extends NotifiableActivity {
         startActivity(intent);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (YieldsApplication.getBinder() != null) {
+            unbindService(mConnection);
+            YieldsApplication.nullBinder();
+        }
+    }
+
     /**
      * Method call when the connection response has been received
      *
