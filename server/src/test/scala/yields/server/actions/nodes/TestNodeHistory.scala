@@ -11,7 +11,7 @@ class TestNodeHistory extends YieldsSpec {
   def sendMessage(nid: NID, number: Int): List[FeedContent] = {
     val group = Group(nid)
     for (i <- (0 to number).toList) yield {
-      val message = sample[FeedContent]
+      val message: FeedContent = (Temporal.now, sample[Int], None, sample[String])
       assert(group.addMessage(message))
       message
     }
