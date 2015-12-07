@@ -162,7 +162,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
-        mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId));
+        mDatabase.insertWithOnConflict(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId), SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     /**
@@ -187,6 +187,20 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = createContentValuesForUser(user);
         mDatabase.insertWithOnConflict(TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
+
+    /**
+     * Updates a User in the database.
+     *
+     * @param user The new values of the User.
+     */
+    public void updateUser(User user) {
+        Objects.requireNonNull(user);
+
+        ContentValues values = createContentValuesForUser(user);
+        mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
+                new String[]{user.getId().getId().toString()});
+    }
+
 
     /**
      * Updates the name of a User in the database.
@@ -221,6 +235,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Updates the email of a User in the database.
+     *
+     * @param userId   The Id field of the User that will have it's email changed.
+     * @param newEmail The new email of the User.
+     */
+    public void updateUserEmail(Id userId, String newEmail) {
+        Objects.requireNonNull(userId);
+        Objects.requireNonNull(newEmail);
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_EMAIL, newEmail);
+        mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
+                new String[]{userId.getId().toString()});
+    }
+
+    /**
      * Updates a Users entourage field in the cache.
      *
      * @param userId      The Id field of the User that will have it's entourage membership changed.
@@ -231,7 +261,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         int entourageMembership = inEntourage ? 1 : 0;
-        values.put(KEY_USER_ENTOURAGE, inEntourage);
+        values.put(KEY_USER_ENTOURAGE, entourageMembership);
         mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
                 new String[]{userId.getId().toString()});
     }
@@ -356,6 +386,19 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues groupValues = createContentValuesForGroup(group);
         mDatabase.insertWithOnConflict(TABLE_GROUPS, null, groupValues, SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    /**
+     * Updates a Group in the database.
+     *
+     * @param group The new values of the Group.
+     */
+    public void updateGroup(Group group) {
+        Objects.requireNonNull(group);
+
+        ContentValues values = createContentValuesForGroup(group);
+        mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
+                new String[]{group.getId().getId().toString()});
     }
 
     /**
@@ -616,7 +659,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUP_ID + " = ? " + " ORDER BY "
-                + KEY_MESSAGE_DATE + " DESC" + " LIMIT " +  messageCount;
+                + KEY_MESSAGE_DATE + " DESC" + " LIMIT " + messageCount;
 
         Cursor cursor = mDatabase.rawQuery(selectQuery,
                 new String[]{nodeId.getId().toString()});

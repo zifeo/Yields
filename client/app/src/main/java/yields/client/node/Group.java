@@ -1,7 +1,6 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
-import android.graphics.YuvImage;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -191,16 +190,22 @@ public class Group extends Node {
 
     /**
      * Validates a message received at a certain date and changes the date to the server side date.
+     * @param date The old Date of the Message.
+     * @param newDate The newDate of the Message.
+     * @return The Message updated.
      */
-    public void validateMessage(Date date, Date newDate){
-        Message message = mMessages.remove(date);
+    public Message validateMessage(Date date, Date newDate){
+        Message message =  mMessages.remove(date);
 
         if (message != null){
-            message.setStatus(Message.MessageStatus.SENT, newDate);
+            message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
+            message.recomputeView();
             mMessages.put(newDate, message);
+            return message;
         } else {
             Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant in " +
                     mMessages.firstKey().getTime() + "or " + mMessages.lastKey().getTime());
+            return null;
         }
     }
 

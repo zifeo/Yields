@@ -183,9 +183,6 @@ public class ServiceRequestController {
             case NODE_HISTORY_RESPONSE:
                 mResponseHandler.handleNodeHistoryResponse(serverResponse); /* Done */
                 break;
-            case NODE_MESSAGE_RESPONSE:
-                mResponseHandler.handleNodeMessageResponse(serverResponse); /* DONE */
-                break;
             case USER_CONNECT_RESPONSE:
                 mResponseHandler.handleUserConnectResponse(serverResponse); /* DONE */
                 break;
@@ -198,17 +195,11 @@ public class ServiceRequestController {
             case GROUP_CREATE_RESPONSE:
                 mResponseHandler.handleGroupCreateResponse(serverResponse); /* DONE */
                 break;
-            case USER_UPDATE_RESPONSE:
-                mResponseHandler.handleUserUpdateResponse(serverResponse);
-                break;
             case USER_SEARCH_RESPONSE:
                 mResponseHandler.handleUserSearchResponse(serverResponse);
                 break;
             case NODE_SEARCH_RESPONSE:
                 mResponseHandler.handleNodeSearchResponse(serverResponse);
-                break;
-            case GROUP_UPDATE_RESPONSE:
-                mResponseHandler.handleGroupUpdateResponse(serverResponse);
                 break;
             case GROUP_INFO_RESPONSE:
                 mResponseHandler.handleGroupInfoResponse(serverResponse);

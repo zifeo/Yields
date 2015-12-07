@@ -119,6 +119,7 @@ public class ClientUser extends User {
      * @param id The id of the group to activate.
      */
     //TODO: to be changed when response from server changed
+    //TODO: use ref to know which Group to activate
     public void activateGroup(Id id) {
         for (Group group : mGroups) {
             if (!group.isValidated()) {
@@ -129,14 +130,14 @@ public class ClientUser extends User {
     }
 
     /**
-     * Get group to be modified.
+     * Getter for a Group by it's ID, returns null if there is no group for
+     * the given Id.
      *
-     * @param groupId The group Id.
-     * @return The group to be modified
+     * @param groupId The Id of the wanted Group.
+     * @return The Group or null if there is no such Group.
      */
-    public Group modifyGroup(Id groupId) {
-        for (Group group :
-                mGroups) {
+    public Group getGroup(Id groupId) {
+        for (Group group : mGroups) {
             if (group.getId().equals(groupId)) {
                 return group;
             }
