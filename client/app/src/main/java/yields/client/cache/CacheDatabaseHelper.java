@@ -43,8 +43,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_MESSAGES = "messages";
     private static final String TABLE_INTERNAL = "internal";
 
-    private static final String KEY_ID = "id";
-
     private static final String KEY_USER_NODE_ID = "nodeID";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_USER_EMAIL = "userEmail";
@@ -79,11 +77,10 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             + " TEXT," + KEY_GROUP_VISIBILITY + " TEXT," + KEY_GROUP_VALIDATED + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
-            + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " INTEGER,"
+            + "(" + KEY_MESSAGE_DATE + " TEXT PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " INTEGER,"
             + KEY_MESSAGE_GROUP_ID + " TEXT," + KEY_MESSAGE_SENDER_ID + " TEXT,"
             + KEY_MESSAGE_TEXT + " TEXT," + KEY_MESSAGE_CONTENT_TYPE + " TEXT,"
-            + KEY_MESSAGE_CONTENT + " TEXT," + KEY_MESSAGE_DATE + " TEXT,"
-            + KEY_MESSAGE_STATUS + " TEXT" + ")";
+            + KEY_MESSAGE_CONTENT + " TEXT," + KEY_MESSAGE_STATUS + " TEXT" + ")";
 
     private final SQLiteDatabase mDatabase;
 
@@ -165,7 +162,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
-        deleteMessage(message, groupId);
         mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId));
     }
 
@@ -220,6 +216,22 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_USER_IMAGE, ImageSerialization.serializeImage(newUserImage, ImageSerialization.SIZE_IMAGE));
+        mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
+                new String[]{userId.getId().toString()});
+    }
+
+    /**
+     * Updates a Users entourage field in the cache.
+     *
+     * @param userId      The Id field of the User that will have it's entourage membership changed.
+     * @param inEntourage True if the User should be in it's entourage and false if shouldn't.
+     */
+    public void updateEntourage(Id userId, boolean inEntourage) {
+        Objects.requireNonNull(userId);
+
+        ContentValues values = new ContentValues();
+        int entourageMembership = inEntourage ? 1 : 0;
+        values.put(KEY_USER_ENTOURAGE, inEntourage);
         mDatabase.update(TABLE_USERS, values, KEY_USER_NODE_ID + " = ?",
                 new String[]{userId.getId().toString()});
     }
@@ -417,14 +429,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * the group is deleted in the database.
      *
      * @param groupId The Id of the Group form which the User shall be removed.
-     * @param userIds The Ids of the Users that will be removed from the Group.
+     * @param users   The Users that will be removed from the Group.
      */
-    public void removeUsersFromGroup(Id groupId, List<Id> userIds) {
+    public void removeUsersFromGroup(Id groupId, List<User> users) {
         Objects.requireNonNull(groupId);
-        Objects.requireNonNull(userIds);
+        Objects.requireNonNull(users);
 
-        for (Id id : userIds) {
-            if (id.equals(YieldsApplication.getUser().getId())) {
+        for (User user : users) {
+            if (user.getId().equals(YieldsApplication.getUser().getId())) {
                 deleteGroup(groupId);
                 return;
             }
@@ -435,8 +447,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
             Id nextId = idIterator.next();
-            for (Id id : userIds) {
-                if (id.equals(nextId)) {
+            for (User user : users) {
+                if (user.getId().equals(nextId)) {
                     idIterator.remove();
                 }
             }
@@ -581,45 +593,39 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Retrieves all Messages from a specified Group which are older than the Date
+     * Retrieves all Messages from a specified Node which are older than the Date
      * passed as an argument. Only messageCount Messages are retrieves, or less if
      * there aren't as many.
      *
-     * @param group        The Group from which we want to retrieve the Messages.
+     * @param nodeId       The Id of the Node from which we want to retrieve the Messages.
      * @param furthestDate The Date boundary.
      * @param messageCount The number of Messages that should be retrieved..
      * @return The list of Messages from the Group.
      * @throws CacheDatabaseException If the database was unable to fetch some
      *                                information.
      */
-    public List<Message> getMessagesForGroup(Group group, Date furthestDate, int messageCount)
+    public List<Message> getMessagesForGroup(Id nodeId, Date furthestDate, int messageCount)
             throws CacheDatabaseException {
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(nodeId);
         Objects.requireNonNull(furthestDate);
 
-        addGroup(group);
-
-        if (messageCount < 0) {
+        if (messageCount <= 0) {
             throw new IllegalArgumentException("Illegal messageCount ! The number of messages must" +
-                    "be equal or grater than 0 !");
+                    "be greater than 0 !");
         }
 
         String selectQuery = "SELECT * FROM " + TABLE_MESSAGES + " WHERE "
                 + KEY_MESSAGE_GROUP_ID + " = ? " + " ORDER BY "
-                + "strftime('%Y-%m-%d %H:%M:%f', " + KEY_MESSAGE_DATE + ") DESC";
+                + KEY_MESSAGE_DATE + " DESC" + " LIMIT " +  messageCount;
 
         Cursor cursor = mDatabase.rawQuery(selectQuery,
-                new String[]{group.getId().getId().toString()});
+                new String[]{nodeId.getId().toString()});
 
         List<Message> messages = new ArrayList<>();
         if (!cursor.moveToFirst()) {
             cursor.close();
             return new ArrayList<>();
-        } else if (!goToFirstOccurrenceOfEarlierDate(cursor, furthestDate)) {
-            cursor.close();
-            return new ArrayList<>();
         } else {
-            int counter = 0;
             do {
                 Id messageId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
                 String nodeName = ""; //TODO: Define message's Node name attribute
@@ -631,16 +637,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 Message.MessageStatus messageStatus = Message.MessageStatus.valueOf(messageStatusAsString);
                 try {
                     Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
-                    counter++;
                     messages.add(new Message(nodeName, messageId, senderId, content, date, messageStatus));
                 } catch (ParseException exception) {
                     exception.printStackTrace();
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
-                            + group.getId().getId(), exception);
+                            + nodeId.getId(), exception);
                     throw new CacheDatabaseException("Unable to retrieve Messages from Group "
-                            + group.getId().getId());
+                            + nodeId.getId());
                 }
-            } while (cursor.moveToNext() && counter < messageCount);
+            } while (cursor.moveToNext());
 
             cursor.close();
             return messages;

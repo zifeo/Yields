@@ -3,7 +3,7 @@ package yields.client.servicerequest;
 import java.util.Date;
 import java.util.Objects;
 
-import yields.client.node.Group;
+import yields.client.id.Id;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -15,23 +15,23 @@ public class NodeHistoryRequest extends ServiceRequest {
 
     public static final int MESSAGE_COUNT = 10;
 
-    private final Group mGroup;
+    private final Id mGroupId;
     private final Date mFurthestDate;
 
     /**
      * Main constructor for this type of ServiceRequest (retrieving Messages from a Group).
      *
-     * @param group        The Group from which the Messages should be retrieved.
+     * @param groupId      The Id of the Group from which the Messages should be retrieved.
      * @param furthestDate The furthest Date from which Messages will be retrieved.
      */
-    public NodeHistoryRequest(Group group, Date furthestDate) {
+    public NodeHistoryRequest(Id groupId, Date furthestDate) {
         super();
 
-        Objects.requireNonNull(group);
+        Objects.requireNonNull(groupId);
         Objects.requireNonNull(furthestDate);
 
         mFurthestDate = new Date(furthestDate.getTime());
-        mGroup = group;
+        mGroupId = groupId;
     }
 
     /**
@@ -52,7 +52,7 @@ public class NodeHistoryRequest extends ServiceRequest {
     @Override
     public ServerRequest parseRequestForServer() {
         return RequestBuilder.nodeHistoryRequest(YieldsApplication.getUser().getId(),
-                getGroup().getId(), getDate(), MESSAGE_COUNT);
+                getGroup(), getDate(), MESSAGE_COUNT);
     }
 
     /**
@@ -65,11 +65,11 @@ public class NodeHistoryRequest extends ServiceRequest {
     }
 
     /**
-     * Getter method for the Group of this ServiceRequest.
+     * Getter method for the Id of the Group of this ServiceRequest.
      *
-     * @return The Group of this ServiceRequest.
+     * @return The Id Group of this ServiceRequest.
      */
-    public Group getGroup() {
-        return mGroup;
+    public Id getGroup() {
+        return mGroupId;
     }
 }

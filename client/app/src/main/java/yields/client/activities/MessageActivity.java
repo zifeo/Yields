@@ -111,7 +111,7 @@ public class MessageActivity extends NotifiableActivity {
         mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
 
-        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
@@ -436,7 +436,7 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        NodeHistoryRequest request = new NodeHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest request = new NodeHistoryRequest(mGroup.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
 

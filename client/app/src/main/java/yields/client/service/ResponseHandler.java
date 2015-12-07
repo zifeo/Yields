@@ -114,7 +114,6 @@ public class ResponseHandler {
     }
 
     protected void handleGroupUpdateResponse(Response serverResponse) {
-        Log.d("ServiceRequestCtrll", "Response for Group Update.");
         ServiceRequest groupInfo = new UserGroupListRequest(YieldsApplication.getUser());
         mService.sendRequest(groupInfo);
         // No output.
@@ -540,7 +539,6 @@ public class ResponseHandler {
                 } else {
                     if (user == null) {
                         user = new User(response);
-
                         YieldsApplication.getUser().addUserToEntourage(user);
                     } else {
                         user.update(response);
@@ -572,7 +570,7 @@ public class ResponseHandler {
                 ServiceRequest groupInfo =
                         new GroupInfoRequest(YieldsApplication.getUser().getId(), group.getId());
                 mService.sendRequest(groupInfo);
-                ServiceRequest historyRequest = new NodeHistoryRequest(group, new Date());
+                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
                 mService.sendRequest(historyRequest);
             }
 
@@ -617,7 +615,7 @@ public class ResponseHandler {
             String time = metadata.getString("ref");
             Date date = DateSerialization.dateSerializer.toDate(time);
             Group group = mCacheHelper.getGroup(new Id(Long.valueOf(metadata.getString("client"))));
-            Message message = mCacheHelper.getMessagesForGroup(group, date, 1).get(0);
+            Message message = mCacheHelper.getMessagesForGroup(group.getId(), date, 1).get(0);
             mCacheHelper.deleteMessage(message, group.getId());
             Message updatedMessage = new Message("", new Id(-1), message.getSender(), message.getContent(),
                     DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
