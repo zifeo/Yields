@@ -1,22 +1,13 @@
 package yields.server.router
 
-import akka.actor.ActorSystem
-import akka.testkit.{TestProbe, ImplicitSender, TestActorRef, TestKit}
-import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
+import akka.testkit.{TestActorRef, TestProbe}
 import yields.server.actions.groups.GroupMessageBrd
 import yields.server.router.ClientHub.OnPush
-import yields.server.tests.AllGenerators
+import yields.server.tests._
 
-class DispatcherTests(sys: ActorSystem)
-  extends TestKit(sys) with ImplicitSender with FlatSpecLike with Matchers with BeforeAndAfterAll with AllGenerators {
+class DispatcherTests extends YieldsAkkaSpec {
 
   import Dispatcher._
-
-  def this() = this(ActorSystem("Yields-tests"))
-
-  override def afterAll(): Unit = {
-    TestKit.shutdownActorSystem(system)
-  }
 
   "Dispatcher" should "should manage push to one client on one connection" in {
 
