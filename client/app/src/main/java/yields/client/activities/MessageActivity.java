@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class MessageActivity extends NotifiableActivity {
     private boolean mSendImage;
     private static EditText mInputField;
     private static ActionBar mActionBar;
+    private static TextView mTextTitle;
     private Menu mMenu;
     private ImageButton mSendButton;
 
@@ -88,6 +90,20 @@ public class MessageActivity extends NotifiableActivity {
 
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setTitle(null);
+
+        mTextTitle = (TextView) findViewById(R.id.toolbarTitle);
+
+        mTextTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YieldsApplication.setGroup(mGroup);
+
+                Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
+                intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+                startActivity(intent);
+            }
+        });
 
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
@@ -408,7 +424,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mActionBar.setTitle("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
+        mTextTitle.setText("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
@@ -449,7 +465,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.GROUP_MESSAGES);
-        mActionBar.setTitle(mGroup.getName());
+        mTextTitle.setText(mGroup.getName());
         mCurrentFragment = new GroupMessageFragment();
         ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
         ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
@@ -560,9 +576,9 @@ public class MessageActivity extends NotifiableActivity {
         if (mUser == null || mGroup == null) {
             String message = "Couldn't get group information.";
             YieldsApplication.showToast(getApplicationContext(), message);
-            mActionBar.setTitle("Unknown group");
+            mTextTitle.setText("Unknown group");
         } else {
-            mActionBar.setTitle(mGroup.getName());
+            mTextTitle.setText(mGroup.getName());
         }
     }
 }
