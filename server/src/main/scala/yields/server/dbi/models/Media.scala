@@ -17,8 +17,8 @@ import scala.io._
   *
   * @param nid media id
   *
-  *            Special field :
-  *            nodes:[nid]   -> hash  hash / path / contentType
+  * Special field :
+  * nodes:[nid]   -> hash  hash / path / contentType
   *
   */
 class Media private(nid: NID) extends Node(nid) {
@@ -35,15 +35,26 @@ class Media private(nid: NID) extends Node(nid) {
 
   /** Media content getter */
   def content: Blob = {
-    getContentFromDisk(hash).getOrElse(throw new MediaException("Content doesn't exist on disk")
+    // hydrate hash
+    if (_hash.isEmpty) {
+      hash
+    }
+    path = _hash.get
+    getContentFromDisk(path).getOrElse(throw new MediaException("Content doesn't exist on disk"))
   }
 
   /** Media content setter on disk */
   def content_=(content: Blob) = {
+    // hydrate the hash
+    if (_hash.isEmpty) {
+      hash
+    }
+    path = _hash.get
+
     if (_path.isEmpty)
       throw new MediaException("Cannot write in non-existent path")
 
-    writeContentOnDisk(hash, content)
+    writeContentOnDisk(_path.get, content)
   }
 
   def hash: String = _hash.getOrElse {
@@ -53,14 +64,11 @@ class Media private(nid: NID) extends Node(nid) {
 
   /** Store the hash in the database to easily retrieve the content from the disk */
   private def hash_=(hash: String): Unit = {
-    _hash = redis(_.hset(NodeKey.node, MediaKey.hash, hash))
-    _hash = Some(hash)
-    path = _hash.get
+    _hash = update(NodeKey.node, MediaKey.hash, hash)
   }
 
   private def contentType_=(contentType: String): Unit = {
-    redis(_.hset(NodeKey.node, MediaKey.contentType, contentType))
-    _contentType = Some(contentType)
+    _contentType = update(NodeKey.node, MediaKey.contentType, contentType)
   }
 
   def contentType: String = _contentType.getOrElse {
@@ -75,15 +83,7 @@ class Media private(nid: NID) extends Node(nid) {
 
   private def path_=(hash: String): Unit = {
     val path = buildPathFromName(hash)
-    redis(_.hset(NodeKey.node, MediaKey.path, path))
-    _path = Some(path)
-  }
-
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (StaticKey.updated_at, Temporal.now))
-    redis(_.hmset(Key.user, updates))
-    Some(value)
+    _path = update(NodeKey.node, MediaKey.path, path)
   }
 
 }
