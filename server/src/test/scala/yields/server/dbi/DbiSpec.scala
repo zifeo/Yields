@@ -1,9 +1,6 @@
 package yields.server.dbi
 
-import java.io.File
-
 import org.scalatest.{BeforeAndAfter, FlatSpecLike}
-import yields.server.utils.Config
 
 /**
   * Flush the database before and after each tests.
@@ -17,19 +14,6 @@ private[server] trait DbiSpec extends FlatSpecLike with BeforeAndAfter {
 
   after {
     redis(_.flushdb)
-
-    deleteDirectory(new File(Config.getString("ressource.media.folder")))
-
-  }
-
-  def deleteDirectory(path: File): Unit = {
-    if (path.exists) {
-      val files = path.listFiles
-      for {
-        f <- files
-        if f.isFile
-      } yield f.delete
-    }
   }
 
 }

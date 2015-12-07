@@ -18,7 +18,7 @@ trait Tags {
   /** add tags to publisher */
   def addTags(tags: Seq[String]): Unit = {
     tagOrCreate(tags).foreach { x =>
-      redis.withClient(_.sadd(TagKey.tags, x))
+      redis(_.sadd(TagKey.tags, x))
       Tag(x).addNode(nodeID)
     }
   }
@@ -26,7 +26,7 @@ trait Tags {
   /** remove tags from publisher */
   def remTags(tags: Seq[String]): Unit = {
     tagOrCreate(tags).foreach { x =>
-      redis.withClient(_.srem(TagKey.tags, x))
+      redis(_.srem(TagKey.tags, x))
       Tag(x).addNode(nodeID)
     }
   }
@@ -48,7 +48,7 @@ trait Tags {
   /** get the tags of a node */
   def tags: Set[String] = {
     val t: Set[TID] = _tags.getOrElse {
-      val mem: Option[Set[Option[TID]]] = redis.withClient(_.smembers[TID](TagKey.tags))
+      val mem: Option[Set[Option[TID]]] = redis(_.smembers[TID](TagKey.tags))
       val t: Set[TID] = mem match {
         case Some(x: Set[Option[TID]]) =>
           val defined: Set[Option[TID]] = x.filter(_.isDefined)

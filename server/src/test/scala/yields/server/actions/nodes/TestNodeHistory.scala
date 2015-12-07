@@ -1,14 +1,12 @@
 package yields.server.actions.nodes
 
-import org.scalatest.Matchers
 import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizedActionException}
-import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.tests.{YieldsSpec, AllGenerators}
+import yields.server.tests.YieldsSpec
 import yields.server.utils.Temporal
 
-class TestNodeHistory extends YieldsSpec with Matchers with AllGenerators {
+class TestNodeHistory extends YieldsSpec {
 
   def sendMessage(nid: NID, number: Int): List[FeedContent] = {
     val group = Group(nid)
