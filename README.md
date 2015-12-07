@@ -146,8 +146,6 @@ RSSCreate
 	input	name: String, url: String, tags: Seq[String]
 	output	nid: NID
 	bcast	nid: NID, name: String, url: String
-RSSMessage
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 RSSInfo
 	input 	nid: NID
 	output	name: String, url: String, tags: Seq[String]
