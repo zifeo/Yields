@@ -63,8 +63,8 @@ public class RequestBuilder {
      * @return The appropriate ServerRequest.
      */
     private static ServerRequest userUpdateRequest(Id sender, String name, String email,
-                                                   Bitmap image, List<Id> addEntourage,
-                                                   List<Id> remEntourage) {
+                                                       Bitmap image, List<Id> addEntourage,
+                                                       List<Id> remEntourage) {
         Objects.requireNonNull(sender);
 
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.USER_UPDATE, sender);
@@ -117,8 +117,8 @@ public class RequestBuilder {
     /**
      * ServerRequest for adding a 'contact' to the user entourage list.
      *
-     * @param sender    The sender of the request.
-     * @param userAdded Id of the new contact to add.
+     * @param sender The sender of the request.
+     * @param userAdded  Id of the new contact to add.
      * @return The appropriate ServerRequest.
      */
     public static ServerRequest userEntourageAddRequest(Id sender, Id userAdded) {
@@ -133,8 +133,8 @@ public class RequestBuilder {
     /**
      * ServerRequest for removing a 'contact' from the user entourage list.
      *
-     * @param sender     The sender of the request.
-     * @param userRemove Id of the contact to remove.
+     * @param sender The sender of the request.
+     * @param userRemove  Id of the contact to remove.
      * @return The appropriate ServerRequest.
      */
     public static ServerRequest userEntourageRemoveRequest(Id sender, Id userRemove) {
@@ -219,7 +219,7 @@ public class RequestBuilder {
     /**
      * Created a User information request.
      *
-     * @param sender The Id of the sender of the request.
+     * @param sender   The Id of the sender of the request.
      * @param userId The Id of the User from which information shall be retrieved.
      * @return The appropriate ServerRequest.
      */
@@ -236,7 +236,6 @@ public class RequestBuilder {
 
 
     //TODO : See with server why no public/private
-
     /**
      * Creates a Group create request.
      *
@@ -262,7 +261,8 @@ public class RequestBuilder {
 
         if (visibility == Group.GroupVisibility.PRIVATE) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
-        } else {
+        }
+        else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
         }
 
@@ -283,9 +283,9 @@ public class RequestBuilder {
      * @return The request.
      */
     private static ServerRequest groupUpdateRequest(Id sender, Id groupId, String newName,
-                                                    Bitmap image, List<Id> addusers,
-                                                    List<Id> remUsers, List<Id> addNodes,
-                                                    List<Id> remNodes) {
+                                                   Bitmap image, List<Id> addusers,
+                                                   List<Id> remUsers, List<Id> addNodes,
+                                                   List<Id> remNodes) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
 
@@ -323,7 +323,7 @@ public class RequestBuilder {
     /**
      * ServerRequest for updating the group image.
      *
-     * @param senderId Sender of the request.
+     * @param senderId   Sender of the request.
      * @param groupId  Id of the group having its image changed.
      * @param newImage The new Image
      * @return The request.
@@ -339,9 +339,9 @@ public class RequestBuilder {
     /**
      * ServerRequest for adding a new user to a group.
      *
-     * @param senderId The sender of the request.
-     * @param groupId  Id of the group.
-     * @param newUser  The user to add in this group.
+     * @param senderId  The sender of the request.
+     * @param groupId Id of the group.
+     * @param newUser The user to add in this group.
      * @return The request.
      */
     public static ServerRequest groupAddRequest(Id senderId, Id groupId,
@@ -360,9 +360,9 @@ public class RequestBuilder {
     /**
      * ServerRequest for adding a new user to a group.
      *
-     * @param senderId The sender of the request.
-     * @param groupId  Id of the group.
-     * @param newUser  The user to add in this group.
+     * @param senderId  The sender of the request.
+     * @param groupId Id of the group.
+     * @param newUser The user to add in this group.
      * @return The request.
      */
     public static ServerRequest groupAddRequest(Id senderId, Id groupId,
@@ -377,7 +377,7 @@ public class RequestBuilder {
     /**
      * ServerRequest for removing a user from a group.
      *
-     * @param senderId     The sender of the request.
+     * @param senderId       The sender of the request.
      * @param groupId      Id of the group.
      * @param userToRemove The user to remove from  this group.
      * @return The request.
@@ -398,7 +398,7 @@ public class RequestBuilder {
     /**
      * ServerRequest for removing a user from a group.
      *
-     * @param senderId     The sender of the request.
+     * @param senderId       The sender of the request.
      * @param groupId      Id of the group.
      * @param userToRemove The user to remove from  this group.
      * @return The request.
@@ -416,9 +416,9 @@ public class RequestBuilder {
      * Builds a message request for the server.
      *
      * @param senderId The sender Id.
-     * @param groupId  The group to send to.
-     * @param content  The content of the message
-     * @param date     The reference date for the message (Id)
+     * @param groupId The group to send to.
+     * @param content The content of the message
+     * @param date The reference date for the message (Id)
      * @return The request for the server
      */
     public static ServerRequest nodeMessageRequest(Id senderId, Id groupId,
@@ -433,7 +433,8 @@ public class RequestBuilder {
 
         if (visibility.equals(Group.GroupVisibility.PRIVATE)) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_MESSAGE, senderId);
-        } else {
+        }
+        else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_MESSAGE, senderId);
         }
 
@@ -450,12 +451,6 @@ public class RequestBuilder {
                 builder.addField(Fields.CONTENT_TYPE, "image");
                 builder.addField(Fields.CONTENT, content.getContentForRequest());
                 break;
-
-            case URL:
-                builder.addField(Fields.CONTENT_TYPE, "url");
-                builder.addField(Fields.CONTENT, content.getContentForRequest());
-                break;
-
             default:
                 throw new ContentException("No such ContentType exists ! " + content.getType().toString());
         }
@@ -493,7 +488,7 @@ public class RequestBuilder {
      * Creates a node search request.
      *
      * @param senderId The sender Id.
-     * @param pattern  The pattern to search for.
+     * @param pattern The pattern to search for.
      * @return The nodeSearch request.
      */
     public static ServerRequest nodeSearchRequest(Id senderId, String pattern) {
@@ -531,7 +526,7 @@ public class RequestBuilder {
      * Adds a field and initialise it to null if it is null.
      *
      * @param fieldType The field type.
-     * @param field     The field to add
+     * @param field The field to add
      * @return true if the field was null
      */
     private boolean addNullIfNullField(Fields fieldType, Object field) {
@@ -547,7 +542,7 @@ public class RequestBuilder {
      * Adds a field and initialise it to empty list if it is null.
      *
      * @param fieldType The field type.
-     * @param field     The field to add
+     * @param field The field to add
      * @return true if the field was null
      */
     private <T> boolean addNullIfNullField(Fields fieldType, List<T> field) {
@@ -612,7 +607,7 @@ public class RequestBuilder {
 
         Date ref = new Date();
         try {
-            Object date = mConstructingMap.get(Fields.DATE.getValue());
+            Object date =  mConstructingMap.get(Fields.DATE.getValue());
             if (date != null) {
                 ref = DateSerialization.dateSerializer.toDate((String) mConstructingMap.get(Fields.DATE.getValue()));
             } else {
