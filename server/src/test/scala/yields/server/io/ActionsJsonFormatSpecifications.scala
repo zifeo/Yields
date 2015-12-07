@@ -1,23 +1,26 @@
 package yields.server.io
 
-import org.scalacheck.{Prop, Properties}
+import yields.server.actions.{Action, Broadcast, Result}
 import yields.server.tests._
-import yields.server.actions.{Broadcast, Result, Action, ActionsGenerators}
 
-object ActionsJsonFormatSpecifications extends Properties("ActionsJsonFormat") with ActionsGenerators {
+class ActionsJsonFormatSpecifications extends YieldsPropsSpec {
 
-  import Prop.forAll
-
-  property("Action") = forAll { (x: Action) =>
-    toAndFromJson(x)
+  property("Action") {
+    forAll() { (x: Action) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("Result") = forAll { (x: Result) =>
-    toAndFromJson(x)
+  property("Result") {
+    forAll() { (x: Result) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("Broadcast") = forAll { (x: Broadcast) =>
-    toAndFromJson(x)
+  property("Broadcast") {
+    forAll() { (x: Broadcast) =>
+      checkToAndFromJson(x)
+    }
   }
 
 }

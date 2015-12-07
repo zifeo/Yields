@@ -16,21 +16,15 @@ package object dbi {
 
   object Key {
     val identity = "identity"
+    val updates = "updated_at"
   }
 
-  private[dbi] lazy val redis = {
-    val pool = new RedisClientPool(
-      host = Config.getString("database.addr"),
-      port = Config.getInt("database.port"),
-      secret = Some(Config.getString("database.pass"))
-    )
-    /* TODO: upgrade to newest scala redis client where selecting
-     * database when creating the pool is supported. Current version
-     * has sadly the "select" query executed before "auth" one...
-     */
-    pool.withClient(_.select(Config.getInt("database.id")))
-    pool
-  }
+  private lazy val redis = new RedisClientPool(
+    host = Config.getString("database.addr"),
+    port = Config.getInt("database.port"),
+    secret = Some(Config.getString("database.pass")),
+    database = Config.getInt("database.id")
+  )
 
   /**
     * Public accessor to database via local redis object.
@@ -38,7 +32,7 @@ package object dbi {
     * @tparam T return type of the query
     * @return values or status of redis query
     */
-  def redis[T](query: RedisClient => T): T =
+  private[dbi] def redis[T](query: RedisClient => T): T =
     redis.withClient(query)
 
   /**
@@ -46,7 +40,7 @@ package object dbi {
     * @param queries queries to be run on in block
     * @return list of values or status of redis queries
     */
-  def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
+  private[dbi] def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
     redis.withClient(_.pipeline(queries))
 
   /** Terminates database connection. */
@@ -130,6 +124,20 @@ package object dbi {
     case Nil => throw new IllegalArgumentException("elements cannot be empty")
     case e :: Nil => remWithTime(key, e)
     case e :: es => valueOrException(redis(_.hdel(key, e, es: _*))) == elements.size
+  }
+
+  /**
+    * Update a field in key addressed redis hash map as well as included time.
+    * @param key hash map key
+    * @param field hash map field
+    * @param value hash map value
+    * @tparam T type of the value
+    * @return Some of the set value
+    */
+  private[dbi] def update[T](key: String, field: String, value: T): Option[T] = {
+    val updates = List((field, value), (Key.updates, Temporal.now))
+    redis(_.hmset(key, updates))
+    Some(value)
   }
 
 }

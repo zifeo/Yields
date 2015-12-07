@@ -3,13 +3,12 @@ package yields.server.pipeline.blocks
 import akka.stream.scaladsl.Flow
 import akka.stream.testkit.scaladsl.TestSink
 import akka.util.ByteString
-import org.scalatest.FlatSpec
 import spray.json._
 import yields.server.io._
-import yields.server.mpi.{MessagesGenerators, Request}
+import yields.server.mpi.Request
 import yields.server.tests.{FakeLogger, _}
 
-class SerializationModuleTests extends FlatSpec with MessagesGenerators {
+class SerializationModuleTests extends YieldsSpec {
 
   val logger = new FakeLogger
   val module = SerializationModule()(logger)

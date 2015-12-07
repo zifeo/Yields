@@ -1,10 +1,9 @@
 package yields.server.dbi.models
 
-import org.scalatest.Matchers
-import yields.server.dbi._
+import yields.server.tests.YieldsSpec
 import yields.server.utils.Temporal
 
-class TestGroup extends DBFlatSpec with Matchers {
+class TestGroup extends YieldsSpec {
 
   val testName = "Group Test"
 
