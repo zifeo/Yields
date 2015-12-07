@@ -2,7 +2,7 @@ package yields.server.io.models
 
 import spray.json.DefaultJsonProtocol._
 import spray.json._
-import yields.server.dbi.models.{Group, Node}
+import yields.server.dbi.models.{Media, Publisher, Group, Node}
 import yields.server.io._
 
 /** Json format for [[Node]]. */

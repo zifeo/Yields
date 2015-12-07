@@ -36,7 +36,7 @@ public class UserInfoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         User user = Objects.requireNonNull(YieldsApplication.getUserSearched(),
-                "getUserSearched() in YieldsApplication cannot be null when this activity is created");
+                "getUserSearched() in YieldsApplication cannot be null when UserInfoActivity is created");
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewUser);
         int size = getResources().getInteger(R.integer.largeGroupImageDiameter);
@@ -44,6 +44,9 @@ public class UserInfoActivity extends AppCompatActivity {
 
         TextView textViewName = (TextView) findViewById(R.id.textViewUserName);
         textViewName.setText(user.getName());
+
+        TextView textViewEmail = (TextView) findViewById(R.id.textViewEmail);
+        textViewEmail.setText(user.getEmail());
     }
 
     /** Method used to take care of clicks on the tool bar

@@ -1,14 +1,7 @@
 package yields.client.activities;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -16,27 +9,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import yields.client.R;
-import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
-import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterGroups;
-import yields.client.messages.Message;
-import yields.client.messages.TextContent;
-import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.service.YieldServiceBinder;
-import yields.client.service.YieldService;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -46,6 +27,8 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class GroupActivity extends NotifiableActivity {
     private ListAdapterGroups mAdapterGroups;
     private List<Group> mGroups;
+
+    private TextView mTextViewNoGroup;
 
     /* String used for debug log */
     private static final String TAG = "GroupActivity";
@@ -90,6 +73,10 @@ public class GroupActivity extends NotifiableActivity {
             }
         });
 
+        mTextViewNoGroup = (TextView) findViewById(R.id.textViewNoGroup);
+        mTextViewNoGroup.setText(getString(R.string.messageNoGroup));
+        checkNoGroup();
+
         YieldsApplication.setResources(getResources());
         YieldsApplication.setApplicationContext(getApplicationContext());
     }
@@ -120,6 +107,7 @@ public class GroupActivity extends NotifiableActivity {
                 intent = new Intent(this, UserListActivity.class);
                 String title = "Entourage";
                 intent.putExtra(UserListActivity.TITLE_KEY, title);
+                intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, true);
 
                 YieldsApplication.setUserList(YieldsApplication.getUser().getEntourage());
             break;
@@ -167,6 +155,8 @@ public class GroupActivity extends NotifiableActivity {
                         mGroups.clear();
                         mGroups.addAll(YieldsApplication.getUser().getUserGroups());
                         mAdapterGroups.notifyDataSetChanged();
+
+                        checkNoGroup();
                     }
                 });
                 break;
@@ -219,5 +209,20 @@ public class GroupActivity extends NotifiableActivity {
         mGroups.clear();
         mGroups.addAll(YieldsApplication.getUser().getUserGroups());
         mAdapterGroups.notifyDataSetChanged();
+
+        checkNoGroup();
+    }
+
+    /**
+     * Method that sets the right visibility to the
+     * textView depending on the number of groups
+     */
+    private void checkNoGroup(){
+        if (mGroups.isEmpty()){
+            mTextViewNoGroup.setVisibility(View.VISIBLE);
+        }
+        else {
+            mTextViewNoGroup.setVisibility(View.GONE);
+        }
     }
 }

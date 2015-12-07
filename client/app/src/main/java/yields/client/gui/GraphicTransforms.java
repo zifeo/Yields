@@ -30,7 +30,10 @@ public class GraphicTransforms {
     public static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter){
         Objects.requireNonNull(inputImage);
         if (inputImage.getWidth() != inputImage.getHeight()) {
-            throw new IllegalArgumentException("Image should be squared.");
+            int a = inputImage.getWidth() > inputImage.getHeight() ?
+                    inputImage.getHeight() : inputImage.getWidth();
+            inputImage = Bitmap.createBitmap(inputImage, 0,0,a, a);
+            //throw new IllegalArgumentException("Image should be squared.");
         }
 
         Bitmap scaledInputImage;

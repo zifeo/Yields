@@ -1,16 +1,25 @@
 package yields.server.router
 
 import java.net.InetSocketAddress
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
-import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor._
+import akka.event.{DiagnosticLoggingAdapter, Logging}
 import akka.io.Tcp
 import akka.stream.actor._
 import akka.util.ByteString
+import yields.server.actions.Broadcast
+import yields.server.actions.users.UserConnectRes
+import yields.server.io._
+import yields.server.mpi.{Metadata, Notification, Response}
+import yields.server.pipeline.blocks.SerializationModule
+import yields.server.utils.{FaultTolerance, Temporal}
 
-import scala.concurrent.duration._
+import scala.collection.immutable.Queue
+import scala.collection.mutable
 import scala.language.postfixOps
-import scala.util.control.NonFatal
+import scala.util.{Failure, Success, Try}
 
 /**
   * Actor in charge of handling a **single** client request and answering with corresponding response.
@@ -20,96 +29,176 @@ import scala.util.control.NonFatal
 final class ClientHub(private val socket: ActorRef,
                       private val address: InetSocketAddress,
                       private val dispatcher: ActorRef
-                     ) extends Actor with ActorLogging with ActorPublisher[ByteString] with ActorSubscriber {
+                     ) extends Actor with ActorPublisher[ByteString] with ActorSubscriber {
 
   import ActorPublisherMessage._
   import ActorSubscriberMessage._
   import ClientHub._
   import Dispatcher._
+  import SerializationModule._
   import Tcp._
 
-  override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 1 minute) {
-    case NonFatal(nonfatal) =>
-      val message = nonfatal.getMessage
-      log.error(nonfatal, s"$address non fatal: $message")
-      Resume
-    case fatal =>
-      val message = fatal.getMessage
-      log.error(fatal, s"$address fatal: $message")
-      Escalate
-  }
+  val errorMessage = ByteString("""{"kind":"error"}""")
+  val log: DiagnosticLoggingAdapter = Logging(this)
+  val defaultMdc: Logging.MDC = Map("client" -> address)
+  val tcpHistory = mutable.ListBuffer.empty[(String, OffsetDateTime)]
 
-  override def preStart(): Unit = {
-    log.info(s"connected $address.")
-  }
+  log.mdc(defaultMdc)
 
-  override def postStop(): Unit = {
-    log.info(s"disconnected $address.")
-  }
-
-  def receive: Receive = state(dispatched = false)
+  def receive: Receive =
+    state(Queue.empty, identified = false)
 
   /** Casual state. It is dispatched if dispatcher has been linked. */
-  def state(dispatched: Boolean): Receive = {
+  def state(buffer: Queue[ByteString], identified: Boolean): Receive = {
 
     // ----- Publisher letters -----
 
-    case Request(n: Long) => // Stream subscriber requests more elements.
+    case Request(n: Long) => // Stream subscriber requests more elements
 
-    case Cancel => // Stream subscriber cancels the subscription.
-      log.error(s"$address hub detected pipeline error")
+    case Cancel => // Stream subscriber cancels the subscription
+      log.error("hub detected pipeline error")
       terminate()
 
     // ----- Subscriber letters -----
 
-    case OnNext(data: ByteString) =>
+    case OnNext(data: ByteString) if ! identified => // First outgoing message
+      identify(data, buffer)
+
+    case OnNext(data: ByteString) => // Outgoing message
       val outgoing = data.utf8String
-      log.debug(s"$address [OUT] $outgoing")
-      socket ! Write(data)
+      log.debug(s"[OUT] $outgoing")
+      tcpHistory += "out" -> Temporal.now
+      send(data, buffer, identified)
 
-    case OnNext(element) => log.warning(s"$address unexpected onNext letter: $element")
-
-    case OnComplete => log.warning(s"$address unexpected completed letter")
-
-    case OnError(cause: Throwable) =>
-      val message = cause.getMessage
-      log.error(cause, s"$address error letter: $message")
-      socket ! Write(ByteString("""{"kind":"error"}"""))
+    case OnError(cause: Throwable) => // Processing error message
+      log.error(cause, "error letter")
+      send(errorMessage, buffer, identified)
 
     // ----- ClientHub letters -----
 
-    case OnPush(data) => // Notification
-      val outgoing = data.utf8String
-      log.debug(s"$address [BRD] $outgoing")
-      socket ! Write(data)
+    case OnPush(broadcast) => // Notification
+      val notification = Notification(broadcast, Metadata.now(0))
+      log.debug(s"[BRD] $notification")
+      tcpHistory += "brd" -> Temporal.now
+      send(serialize(notification), buffer, identified)
+
+    case WriteAck(data) => // Confirm send
+      confirm(data, buffer, identified)
 
     // ----- TCP letters -----
 
-    case Received(data) =>
+    case Received(data) => // Incoming message
       val incoming = data.utf8String
-      log.debug(s"$address [INP] $incoming")
+      log.debug(s"[INP] $incoming")
+      tcpHistory += "inp" -> Temporal.now
       onNext(data)
-      if (! dispatched) {
-        dispatcher ! InitConnection(data)
-        context.become(state(dispatched = true))
-      }
 
-    case PeerClosed =>
+    case PeerClosed => // Client exited
+      log.info("peer closed")
       terminate()
 
     case ErrorClosed(cause) =>
-      log.error(cause, s"$address error closed letter: $cause")
+      log.error(cause, s"error closed letter")
       terminate()
+
+    case CommandFailed(Write(data, event)) =>
+      val failing = data.utf8String
+      log.error(s"write failed: $event $failing")
 
     // ----- Default -----
 
-    case unexpected => log.warning(s"$address unexpected letter: $unexpected")
+    case unexpected =>
+      log.warning(s"unexpected letter: unexpected")
 
   }
 
-  /** Returns the number of received request at the moment of the latest result. */
+  override val supervisorStrategy =
+    FaultTolerance.nonFatalResume(log)
+
+  override def preStart(): Unit = {
+    log.info("connected")
+    tcpHistory += "connected" -> Temporal.now
+  }
+
+  override def postStop(): Unit = {
+    log.info("disconnected")
+    val totalInp = tcpHistory.count(_._1 == "inp")
+    val totalOut = tcpHistory.count(_._1 == "out")
+    val totalBrd = tcpHistory.count(_._1 == "brd")
+    val total = tcpHistory.size
+    val first = tcpHistory.last._2
+    val latest = tcpHistory.head._2
+    val length = ChronoUnit.MINUTES.between(latest, first)
+    log.info(
+      s"""
+         |stats
+         |len:$length
+         |tot:$total
+         |inp:$totalInp
+         |out:$totalOut
+         |brd:$totalBrd
+         |fir:$first
+         |lat:$latest
+       """.stripMargin)
+  }
+
+  /** Always ask for more so the pipeline can continually work. */
   override protected def requestStrategy: RequestStrategy = new RequestStrategy {
     override def requestDemand(remainingRequested: Int): Int = 1
+  }
+
+  /** Send a message to the socket if buffer empty otherwise buffer it. */
+  private def send(data: ByteString, buffer: Queue[ByteString], identified: Boolean): Unit = {
+    buffer.size match {
+      case 0 => socket ! Write(data, WriteAck(data))
+      case len if len > 5 => log.warning(s"queue already buffer: $len")
+      case _ =>
+    }
+    context become state(buffer.enqueue[ByteString](data), identified)
+  }
+
+  /** Identify connection by catching [[UserConnectRes]]. */
+  private def identify(data: ByteString, buffer: Queue[ByteString]): Unit =
+    Try(deserialize[Response](data)) match {
+
+      case Success(Response(UserConnectRes(uid, _), _)) =>
+        log.mdc(defaultMdc + ("user" -> uid))
+        dispatcher ! InitConnection(uid)
+        val newState = state(buffer, identified = true)
+        newState(OnNext(data)) // will modify context hereafter
+
+      case _ =>
+        val message = data.utf8String
+        log.warning(s"first request was not user connect: $message")
+        send(errorMessage, buffer, identified = false)
+
+    }
+
+  /** Confirm message sending. */
+  private def confirm(data: ByteString, buffer: Queue[ByteString], identified: Boolean): Unit = {
+    val newBuffer = Try(buffer.dequeue) match {
+
+      case Success((`data`, Queue())) =>
+        Queue.empty
+
+      case Success((`data`, remaining)) =>
+        socket ! Write(remaining.head, WriteAck(remaining.head))
+        remaining
+
+      case Success((expected, remaining)) =>
+        val receivedMessage = data.utf8String
+        val expectedMessage = expected.utf8String
+        log.warning(s"ack message not in the buffer, received: $receivedMessage")
+        log.warning(s"ack message not in the buffer, expected: $expectedMessage")
+        remaining
+
+      case Failure(_) =>
+        val message = data.utf8String
+        log.warning(s"unexpected buffer empty on Ack for: $message")
+        Queue.empty
+
+    }
+    context become state(newBuffer, identified)
   }
 
   /** Close client hub and stop actor. */
@@ -124,7 +213,10 @@ final class ClientHub(private val socket: ActorRef,
 object ClientHub {
 
   /** Handle a notification. */
-  private[router] case class OnPush(data: ByteString)
+  private[router] case class OnPush(broadcast: Broadcast)
+
+  /** Confirms a write. */
+  private[router] case class WriteAck(data: ByteString) extends Tcp.Event
 
   /** Creates a router props with a materializer. */
   def props(socket: ActorRef, address: InetSocketAddress, dispatcher: ActorRef): Props =

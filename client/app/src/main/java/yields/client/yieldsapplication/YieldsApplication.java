@@ -23,6 +23,7 @@ public class YieldsApplication {
     private static ClientUser mUser;
     private static User mUserSearched;
     private static List<User> mUserList;
+    private static List<User> mNotKnown = new ArrayList<>();
     private static Group mGroup;
 
     private static List<Group> mGroupsSearched = new ArrayList<>();
@@ -59,6 +60,11 @@ public class YieldsApplication {
      */
     public static Group getGroup() {
         return mGroup;
+    }
+
+
+    public static void addNotKnown(User notKnown) {
+        mNotKnown.add(notKnown);
     }
 
     /**
@@ -190,6 +196,10 @@ public class YieldsApplication {
     public static void setGroup(Group g) {
         Objects.requireNonNull(g);
         mGroup = g;
+    }
+
+    public static void nullGroup() {
+        mGroup = null;
     }
 
     /**
@@ -356,12 +366,20 @@ public class YieldsApplication {
      * @param userId The id of the user needed.
      * @return The user to be modified.
      */
-    public static User getUser(Id userId) {
+    public static User getUserFromId(Id userId) {
         if (userId.equals(mUser.getId())) {
             return mUser;
         }
 
         User user = mUser.modifyEntourage(userId);
+
+        if (user == null) {
+            for (User userN : mNotKnown) {
+                if (userId.equals(userN.getId())) {
+                    return userN;
+                }
+            }
+        }
 
         return user;
     }

@@ -111,7 +111,7 @@ public class CommentView extends LinearLayout {
                 dateFormat = new SimpleDateFormat("HH:mm");
                 time = dateFormat.format(mMessage.getDate());
 
-                messageInfos.setText("Sent by " + YieldsApplication.getUser(
+                messageInfos.setText("Sent by " + YieldsApplication.getUserFromId(
                         mMessage.getSender()).getName() + " at " +
                         time);
                 messageInfos.setTextColor(Color.BLUE);
@@ -155,7 +155,7 @@ public class CommentView extends LinearLayout {
                 dateFormat = new SimpleDateFormat("HH:mm");
                 time = dateFormat.format(mMessage.getDate());
 
-                messageInfos.setText("Sent by " + YieldsApplication.getUser(
+                messageInfos.setText("Sent by " + YieldsApplication.getUserFromId(
                         mMessage.getSender()).getName() + " at " +
                         time);
                 messageInfos.setTextColor(Color.BLUE);

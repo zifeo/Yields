@@ -11,12 +11,14 @@ import yields.client.node.Group;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -24,6 +26,7 @@ import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserSearchRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
+import yields.client.servicerequest.UserUpdateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class RequestHandler {
@@ -99,11 +102,11 @@ public class RequestHandler {
      */
     protected void handleUserEntourageAddRequest(UserEntourageAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
-            mCacheHelper.addUser(YieldsApplication.getUser(serviceRequest.getUserToAdd()));
+        /*try {
+            mCacheHelper.addUser(YieldsApplication.getUserFromId(serviceRequest.getUserToAdd()));
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserEntourageAddRequest correctly !");
-        }
+        }*/
 
         mController.sendToServer(serverRequest);
     }
@@ -113,7 +116,18 @@ public class RequestHandler {
      */
     protected void handleGroupUpdateImageRequest(GroupUpdateImageRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
+        //mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
+        //TODO : Notify app
+
+        mController.sendToServer(serverRequest);
+    }
+
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
+    protected void handleGroupUpdateUsersRequest(GroupUpdateUsersRequest serviceRequest) {
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        //mCacheHelper.updateGroupImage(serviceRequest.getGroupId(), serviceRequest.getNewGroupImage());
         //TODO : Notify app
 
         mController.sendToServer(serverRequest);
@@ -124,7 +138,7 @@ public class RequestHandler {
      */
     protected void handleGroupUpdateNameRequest(GroupUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        mCacheHelper.updateGroupName(serviceRequest.getGroupId(), serviceRequest.getNewGroupName());
+        //mCacheHelper.updateGroupName(serviceRequest.getGroupId(), serviceRequest.getNewGroupName());
         //TODO : Notify app
 
         mController.sendToServer(serverRequest);
@@ -135,12 +149,12 @@ public class RequestHandler {
      */
     protected void handleGroupAddRequest(GroupAddRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
+        /*try {
             mCacheHelper.addUserToGroup(serviceRequest.getGroupId(), serviceRequest.getUser());
             //TODO : Notify app
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle handleGroupAddRequest correctly !");
-        }
+        }*/
 
         mController.sendToServer(serverRequest);
     }
@@ -159,7 +173,22 @@ public class RequestHandler {
     /**
      * Handles a ServiceRequest which is given to it by argument.
      */
-    protected void handleUserUpdateRequest(UserUpdateNameRequest serviceRequest) {
+    protected void handleUserUpdateRequest(UserUpdateRequest serviceRequest) {
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        try {
+            mCacheHelper.updateUser(serviceRequest.getUser());
+            //TODO : Notify app
+        } catch (CacheDatabaseException e) {
+            Log.d("Y:" + this.getClass().getName(), "Couldn't handle UserUpdateNameRequest correctly !");
+        }
+
+        mController.sendToServer(serverRequest);
+    }
+
+    /**
+     * Handles a ServiceRequest which is given to it by argument.
+     */
+    protected void handleUserUpdateNameRequest(UserUpdateNameRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         try {
             mCacheHelper.updateUser(serviceRequest.getUser());
@@ -212,13 +241,14 @@ public class RequestHandler {
      */
     protected void handleNodeHistoryRequest(NodeHistoryRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
-        try {
+        Log.d("Y:" + this.getClass().getName(), serverRequest.message());
+        /*try {
             List<Message> messages = mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(),
                     serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
             mService.receiveMessages(serviceRequest.getGroup().getId(), messages);
         } catch (CacheDatabaseException e) {
             Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeHistoryRequest correctly !");
-        }
+        }*/
 
 
         mController.sendToServer(serverRequest);
@@ -232,6 +262,10 @@ public class RequestHandler {
     }
 
     public void handleUserSearchRequest(UserSearchRequest serviceRequest) {
+        mController.sendToServer(serviceRequest.parseRequestForServer());
+    }
+
+    public void handleNodeSearchRequest(NodeSearchRequest serviceRequest) {
         mController.sendToServer(serviceRequest.parseRequestForServer());
     }
 }

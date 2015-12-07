@@ -1,17 +1,15 @@
 package yields.server
 
 import akka.stream.scaladsl.{Sink, Source, Tcp}
-import akka.util.ByteString
-import org.scalatest.{BeforeAndAfterAll, Matchers}
-import org.slf4j.LoggerFactory
-import spray.json._
+import org.scalatest.{FlatSpec, BeforeAndAfterAll, Matchers}
 import yields.server.actions.groups._
-import yields.server.actions.nodes.NodeMessage
-import yields.server.actions.users.{UserUpdateRes, UserUpdate, UserConnect, UserConnectRes}
+import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.actions.{Action, Result}
 import yields.server.dbi._
 import yields.server.io._
-import yields.server.mpi.{MessagesGenerators, Metadata, Request, Response}
+import yields.server.mpi.{MessagesGenerators, Metadata, Response}
+import yields.server.pipeline.blocks.SerializationModule
+import yields.server.tests.{FakeClient, _}
 import yields.server.utils.Config
 
 import scala.language.implicitConversions
@@ -28,45 +26,8 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   }
 
   override def afterAll(): Unit = {
-    server.close()
+    server.stop()
   }
-
-  /**
-    * Creates and runs some actions expecting some result.
-    * TODO : refactor this method with socket.
-    *
-    * {{{
-    * "A client without a socket" should "be able to send and retrieve message" in scenario (
-    *   GroupCreate("test group", Seq.empty, Seq(1)) -> GroupCreateRes(1),
-    *   GroupMessage(1, "test message") -> None,
-    *   GroupHistory(1, Temporal.current, 1) -> None
-    * }
-    * }}}
-    * @param acting some actions resulting in their results
-    */
-  def scenario(acting: (Action, Option[Result])*): Unit = {
-    require(acting.nonEmpty, "scenario must contains some acting")
-
-    val metadata = Metadata.now(1)
-    val (actions, expected) = acting.toList.unzip
-    val requests = actions.map { action =>
-      val json = Request(action, metadata).toJson.toString
-      ByteString(s"$json\n")
-    }
-
-    val results = await {
-      Source(requests)
-        .via(connection)
-        .map(_.utf8String.parseJson.convertTo[Response].result)
-        .grouped(expected.size)
-        .runWith(Sink.head)
-    }.toList
-
-    results should have size expected.size
-    expected.flatten foreach (results should contain (_))
-  }
-
-  implicit def results2OptionResults(result: Result): Option[Result] = Some(result)
 
   "A client with a socket" should "be able to connect to the server" in {
 
@@ -108,7 +69,7 @@ class YieldsTests extends DBFlatSpec with Matchers with BeforeAndAfterAll with M
   "The system" should "not generate error caused too many requests" in {
 
     val client = new FakeClient(1)
-    val tries = 100
+    val tries = 50
 
     client.send(UserConnect("client@yields.im"))
     await(client.receive()).result should be (UserConnectRes(client.uid, returning = false))

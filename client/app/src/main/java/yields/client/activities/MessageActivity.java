@@ -112,13 +112,6 @@ public class MessageActivity extends NotifiableActivity {
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
-        if (mUser == null || mGroup == null) {
-            String message = "Couldn't get group information.";
-            YieldsApplication.showToast(getApplicationContext(), message);
-            mActionBar.setTitle("Unknown group");
-        } else {
-            setHeaderBar();
-        }
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
 
         // By default, we show the messages of the group.
@@ -136,6 +129,9 @@ public class MessageActivity extends NotifiableActivity {
     @Override
     public void onResume() {
         super.onResume();
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
+        setHeaderBar();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -145,13 +141,22 @@ public class MessageActivity extends NotifiableActivity {
     }
 
     /**
-     * what to do when the activity is no more visible
+     * what to do when the activity is no more visible.
      */
     @Override
     public void onPause() {
         super.onPause();
         mCommentAdapter.clear();
         mGroupMessageAdapter.clear();
+    }
+
+    /**
+     * What to do when activity shuts down.
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        YieldsApplication.nullGroup();
     }
 
     /**
@@ -182,46 +187,45 @@ public class MessageActivity extends NotifiableActivity {
     public void onSendMessage(View v) {
         String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
-        Content content;
-        Log.d("MessageActivity", "Input message = " + inputMessage);
-        if (mSendImage && mImage != null) {
-            Log.d("MessageActivity", "Create image content");
-            content = new ImageContent(mImage, inputMessage);
-            mSendImage = false;
-            mImage = null;
-            mImageThumbnail.setImageBitmap(null);
-            mImageThumbnail.setPadding(0, 0, 0, 0);
-        } else if (UrlContent.containsUrl(inputMessage)) {
-            Log.d("MessageActivity", "Create URL content.");
-            content = new UrlContent(inputMessage);
-            Log.d("MessageActivity", "URL content created.");
-        } else {
-            Log.d("MessageActivity", "Create text content");
-            content = new TextContent(inputMessage);
-        }
+        if (!inputMessage.isEmpty() || mSendImage){
+            Content content;
+            if (mSendImage && mImage != null) {
+                Log.d("MessageActivity", "Create image content");
+                content = new ImageContent(mImage, inputMessage);
+                mSendImage = false;
+                mImage = null;
+                mImageThumbnail.setImageBitmap(null);
+                mImageThumbnail.setPadding(0, 0, 0, 0);
+            } else if (UrlContent.containsUrl(inputMessage)) {
+                Log.d("MessageActivity", "Create URL content.");
+                content = new UrlContent(inputMessage);
+                Log.d("MessageActivity", "URL content created.");
+            } else {
+                Log.d("MessageActivity", "Create text content");
+                content = new TextContent(inputMessage);
+            }
+            Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
+            if (mType == ContentType.GROUP_MESSAGES) {
+                Log.d("MessageActivity", "Send group message");
+                mGroupMessageAdapter.add(message);
+                mGroupMessageAdapter.notifyDataSetChanged();
+                ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                        .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+                NodeMessageRequest request = new NodeMessageRequest(message, mGroup.getId(),
+                        mGroup.getVisibility());
+                YieldsApplication.getBinder().sendRequest(request);
+            } else {
+                mCommentAdapter.add(message);
+                mCommentAdapter.notifyDataSetChanged();
+                ((CommentFragment) mCurrentFragment).getCommentListView()
+                        .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+                NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage.getId(),
+                        Group.GroupVisibility.PRIVATE);
+                YieldsApplication.getBinder().sendRequest(request);
+            }
 
-        Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
-        if (mType == ContentType.GROUP_MESSAGES) {
-            Log.d("MessageActivity", "Send group message");
-            mGroupMessageAdapter.add(message);
-            mGroupMessageAdapter.notifyDataSetChanged();
-            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
-            NodeMessageRequest request = new NodeMessageRequest(message, mGroup.getId(),
-                    mGroup.getVisibility());
-            YieldsApplication.getBinder().sendRequest(request);
-        } else {
-            Log.d("MessageActivity", "Send comment");
-            mCommentAdapter.add(message);
-            mCommentAdapter.notifyDataSetChanged();
-            ((CommentFragment) mCurrentFragment).getCommentListView()
-                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-            NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage.getId(),
-                    Group.GroupVisibility.PRIVATE);
-            YieldsApplication.getBinder().sendRequest(request);
+            YieldsApplication.getGroup().addMessage(message);
         }
-
-        YieldsApplication.getGroup().addMessage(message);
     }
 
     /**
@@ -418,7 +422,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mActionBar.setTitle("Message from " + YieldsApplication.getUser(mCommentMessage.getSender())
+        mActionBar.setTitle("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
@@ -534,18 +538,20 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
-            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
+        if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
+            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
 
             for (Message message : messagesTree.values()) {
                 mGroupMessageAdapter.add(message);
             }
 
-            mGroupMessageAdapter.notifyDataSetChanged();
-            ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                    .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
+
+        mGroupMessageAdapter.notifyDataSetChanged();
+        ((GroupMessageFragment) mCurrentFragment).getMessageListView()
+                .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
 
     /**
@@ -561,11 +567,11 @@ public class MessageActivity extends NotifiableActivity {
             for (Message message : messagesTree.values()) {
                 mCommentAdapter.add(message);
             }
-
-            mCommentAdapter.notifyDataSetChanged();
-            ((CommentFragment) mCurrentFragment).getCommentListView()
-                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
         }
+
+        mCommentAdapter.notifyDataSetChanged();
+        ((CommentFragment) mCurrentFragment).getCommentListView()
+                .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
     }
 
     /**
@@ -584,6 +590,12 @@ public class MessageActivity extends NotifiableActivity {
      * Sets the correct information on the header.
      */
     private void setHeaderBar() {
-        mActionBar.setTitle(mGroup.getName());
+        if (mUser == null || mGroup == null) {
+            String message = "Couldn't get group information.";
+            YieldsApplication.showToast(getApplicationContext(), message);
+            mActionBar.setTitle("Unknown group");
+        } else {
+            mActionBar.setTitle(mGroup.getName());
+        }
     }
 }

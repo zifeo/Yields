@@ -1,4 +1,4 @@
-package yields.server
+package yields.server.tests
 
 import java.time.OffsetDateTime
 import java.util.Date

@@ -1,11 +1,11 @@
 package yields.server.actions.nodes
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizedActionException}
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestNodeHistory extends DBFlatSpec with Matchers with AllGenerators {
@@ -31,15 +31,17 @@ class TestNodeHistory extends DBFlatSpec with Matchers with AllGenerators {
     val action = NodeHistory(group.nid, Temporal.maximum, number / 2)
 
     action.run(meta.replied) match {
-      case NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content) =>
+      case NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, contents, contentNids) =>
         val medias = kept.map(_._3.map(Media(_)))
 
         nid should be (group.nid)
         datetimes should contain theSameElementsInOrderAs kept.map(_._1)
         senders should contain theSameElementsInOrderAs kept.map(_._2)
         texts should contain theSameElementsInOrderAs kept.map(_._4)
-        content should contain theSameElementsInOrderAs medias.map(_.map(_.content))
         contentTypes should contain theSameElementsInOrderAs medias.map(_.map(_.contentType))
+        contents should contain theSameElementsInOrderAs medias.map(_.map(_.content))
+        contentNids should contain theSameElementsInOrderAs medias.map(_.map(_.nid))
+
     }
 
   }

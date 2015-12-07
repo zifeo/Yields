@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Email, UID, User}
+import yields.server.dbi.models.{Blob, Email, UID, User}
 import yields.server.mpi.Metadata
 
 /**
@@ -27,10 +27,13 @@ case class UserInfo(uid: UID) extends Action {
     metadata.client match {
       case `uid` =>
         val (entourage, entourageUpdates) = user.entourageWithUpdates.unzip
-        UserInfoRes(user.uid, user.name, user.email, entourage, entourageUpdates)
+        UserInfoRes(user.uid, user.name, user.email, user.pic, entourage, entourageUpdates)
 
       case sender if user.entourage.contains(sender) =>
-        UserInfoRes(user.uid, user.name, user.email, Seq.empty, Seq.empty)
+        UserInfoRes(user.uid, user.name, user.email, user.pic, Seq.empty, Seq.empty)
+
+      case sender if user.nodes.intersect(User(sender).nodes).nonEmpty =>
+        UserInfoRes(user.uid, user.name, "", user.pic, Seq.empty, Seq.empty)
 
       case _ =>
         throw new UnauthorizedActionException(s"client not related to uid: $uid")
@@ -51,5 +54,6 @@ case class UserInfo(uid: UID) extends Action {
 case class UserInfoRes(uid: UID,
                        name: String,
                        email: Email,
+                       pic: Blob,
                        entourage: Seq[UID],
                        entourageUpdatedAt: Seq[OffsetDateTime]) extends Result

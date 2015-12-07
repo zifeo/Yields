@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     tools:context="yields.client.activities.UserInfoActivity"
     android:orientation="vertical"
+    android:background="@drawable/background"
     android:weightSum="1">
 
     <android.support.v7.widget.Toolbar
@@ -22,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:layout_marginBottom="60dp"
         >
 
         <ImageView
@@ -47,5 +49,13 @@
             android:layout_toEndOf="@+id/imageViewUser" />
 
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/textViewEmail"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

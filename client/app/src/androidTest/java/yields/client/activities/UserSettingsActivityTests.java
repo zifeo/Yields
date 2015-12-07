@@ -46,6 +46,7 @@ public class UserSettingsActivityTests extends ActivityInstrumentationTestCase2<
 
         ClientUser user = MockFactory.generateFakeClientUser("User", new Id(123), "a@b.c",
                 YieldsApplication.getDefaultUserImage());
+        user.addUserToEntourage(new ClientUser("Poto", new Id(2), "p@g.com", YieldsApplication.getDefaultUserImage()));
         YieldsApplication.setUser(user);
     }
 
@@ -81,5 +82,20 @@ public class UserSettingsActivityTests extends ActivityInstrumentationTestCase2<
 
         onView(withText("The username is too short")).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that removes a friend from the entourage
+     */
+    public void testRemoveEntourage() {
+        getActivity();
+        onView(withText(R.string.removeFromEntourage)).perform(click());
+
+        onView(withId(R.id.checkboxUser)).perform(click());
+        onView(withId(R.id.actionDoneRemoveUsers)).perform(click());
+
+        onView(withText("Ok")).perform(click());
+
+        onView(withText(R.string.removeFromEntourage)).check(matches(isDisplayed()));
     }
 }
