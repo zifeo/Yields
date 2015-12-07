@@ -2,6 +2,7 @@ package yields.server.dbi.tags
 
 import yields.server.dbi._
 import yields.server.dbi.models._
+import com.redis.serialization.Parse.Implicits._
 
 /**
   * Class representing tags and actions on tag
