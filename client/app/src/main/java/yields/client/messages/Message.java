@@ -2,24 +2,16 @@ package yields.client.messages;
 
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.wifi.WifiConfiguration;
-import android.util.Base64;
 import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
 
-import yields.client.R;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.node.Node;
-import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -48,7 +40,7 @@ public class Message extends Node {
     private final Content mContent;
     private Date mDate;
     private MessageStatus mStatus;
-    private final MessageView mView;
+    private MessageView mView;
 
     /**
      * Main constructor for a Message.
@@ -87,30 +79,28 @@ public class Message extends Node {
 
     /**
      * Constructor of a message from the JSON fields received from the server.
-     * @param dateTime The date in String format.
-     * @param senderID The is of the sender in String format.
-     * @param text The text of the message (if it is a text message, null otherwise).
+     *
+     * @param dateTime    The date in String format.
+     * @param senderID    The is of the sender in String format.
+     * @param text        The text of the message (if it is a text message, null otherwise).
      * @param contentType The content type of the message.
-     * @param content The content of the message.
+     * @param content     The content of the message.
      * @throws ParseException In case of parse exception with the date serialization.
      */
-    public Message(String dateTime, Long senderID, String text, String contentType, String content)
-            throws ParseException {
-        super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)
-        ).getTime()));
+    public Message(String dateTime, Long senderID, String text, String contentType, String content) throws ParseException {
+        super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)).getTime()));
 
         this.mSender = new Id(senderID);
 
-        if (contentType.equals("image")){
+        if (contentType.equals("image")) {
             Bitmap img = ImageSerialization.unSerializeImage(content);
-            if (img == null){
-                Log.d("Y:"+ this.getClass().getName(), "We have no image with contentType image");
+            if (img == null) {
+                Log.d("Y:" + this.getClass().getName(), "We have no image with contentType image");
                 mContent = new TextContent(text);
-            }else {
+            } else {
                 mContent = new ImageContent(img, text);
             }
-        }
-        else {
+        } else {
             this.mContent = new TextContent(text);
         }
 
@@ -174,13 +164,22 @@ public class Message extends Node {
     }
 
     /**
-     * Sets the MessageStatus of the message.
+     * Sets the MessageStatus of the message and updated it's date.
      *
      * @param messageStatus The MessageStatus of the message.
+     * @param timeStamp     The updated Date of the message
      */
-    public void setStatus(MessageStatus messageStatus, Date timeStamp) {
+    public void setStatusAndUpdateDate(MessageStatus messageStatus, Date timeStamp) {
         setStatus(messageStatus);
         mDate = timeStamp;
+    }
+
+    /**
+     * Recomputes the MessageView for this Message.
+     * This is used to recompute the view, if it has been updated.
+     */
+    public void recomputeView() {
+        mView = new MessageView(YieldsApplication.getApplicationContext(), this);
     }
 
     /**
@@ -188,7 +187,7 @@ public class Message extends Node {
      *
      * @return The MessageView associated to this message.
      */
-    public MessageView getView(){
+    public MessageView getView() {
         return mView;
     }
 }

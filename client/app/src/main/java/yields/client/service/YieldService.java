@@ -223,7 +223,7 @@ public class YieldService extends Service {
     synchronized public void receiveMessage(Id groupId, Message message) {
         if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
-            Group group = YieldsApplication.getUser().modifyGroup(groupId);
+            Group group = YieldsApplication.getUser().getGroup(groupId);
             group.addMessage(message);
             group.setLastUpdate(message.getDate());
             sendMessageNotification(group, message);
@@ -251,7 +251,7 @@ public class YieldService extends Service {
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
-            YieldsApplication.getUser().modifyGroup(groupId).addMessages(messages);
+            YieldsApplication.getUser().getGroup(groupId).addMessages(messages);
         }
     }
 

@@ -100,6 +100,8 @@ public class CacheDatabaseTests {
     @Test
     public void testDatabaseCanAddMessage() {
         for (int i = 0; i < 5; i++) {
+            User user = new User("John" + i, new Id(-i), "lol@jpg", YieldsApplication.getDefaultUserImage());
+            YieldsApplication.addNotKnown(user);
             Message message = new Message("Node " + i, new Id(i), new Id(-i),
                     MockFactory.generateFakeTextContent(i), new Date(), Message.MessageStatus.NOT_SENT);
             mDatabaseHelper.addMessage(message, new Id(666));

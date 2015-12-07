@@ -86,26 +86,28 @@ public class RequestHandler {
      */
     protected void handleUserInfoRequest(UserInfoRequest serviceRequest) {
         User userFromCache = mCacheHelper.getUser(serviceRequest.getUserInfoId());
-        User userInApp = YieldsApplication.getUserFromId(userFromCache.getId());
+        if (userFromCache != null) {
+            User userInApp = YieldsApplication.getUserFromId(userFromCache.getId());
 
-        List<User> entourage = mCacheHelper.getClientUserEntourage();
-        boolean inEntourageOrClientUser =
-                entourage.contains(userFromCache) || userFromCache.equals(YieldsApplication.getUser());
+            List<User> entourage = mCacheHelper.getClientUserEntourage();
+            boolean inEntourageOrClientUser =
+                    entourage.contains(userFromCache) || userFromCache.equals(YieldsApplication.getUser());
 
-        if (!inEntourageOrClientUser) {
-            if (userInApp != null) {
-                userInApp.update(userFromCache);
-            } else {
-                YieldsApplication.addNotKnown(userFromCache);
-            }
-        } else {
-            if (YieldsApplication.getUser().equals(userFromCache)) {
-                YieldsApplication.getUser().update(userFromCache);
-            } else {
-                if (userInApp == null) {
-                    YieldsApplication.getUser().addUserToEntourage(userFromCache);
-                } else {
+            if (!inEntourageOrClientUser) {
+                if (userInApp != null) {
                     userInApp.update(userFromCache);
+                } else {
+                    YieldsApplication.addNotKnown(userFromCache);
+                }
+            } else {
+                if (YieldsApplication.getUser().equals(userFromCache)) {
+                    YieldsApplication.getUser().update(userFromCache);
+                } else {
+                    if (userInApp == null) {
+                        YieldsApplication.getUser().addUserToEntourage(userFromCache);
+                    } else {
+                        userInApp.update(userFromCache);
+                    }
                 }
             }
         }
@@ -211,7 +213,7 @@ public class RequestHandler {
         mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNodeId());
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
 
-        YieldsApplication.getUser().modifyGroup(serviceRequest.getReceivingNodeId())
+        YieldsApplication.getUser().getGroup(serviceRequest.getReceivingNodeId())
                 .setLastUpdate(serviceRequest.getMessage().getDate());
 
         mController.sendToServer(serverRequest);
