@@ -53,7 +53,7 @@ final class User private(val uid: UID) {
 
   /** Name setter. */
   def name_=(newName: String): Unit =
-    _name = update(StaticKey.name, newName)
+    _name = update(Key.user, StaticKey.name, newName)
 
   /** Email getter. */
   def email: Email = _email.getOrElse {
@@ -63,7 +63,7 @@ final class User private(val uid: UID) {
 
   /** Email setter. */
   def email_=(newEmail: Email): Unit =
-    _email = update(StaticKey.email, newEmail)
+    _email = update(Key.user, StaticKey.email, newEmail)
 
   /** Picture getter. */
   def pic: Blob = {
@@ -85,7 +85,7 @@ final class User private(val uid: UID) {
       Media.deleteContentOnDisk(_pic.get)
     }
     val newPic = Media.create("image", content, uid)
-    _pic = update(StaticKey.pic, newPic.nid)
+    _pic = update(Key.user, StaticKey.pic, newPic.nid)
   }
 
   /** Creation datetime getter. */
@@ -108,7 +108,7 @@ final class User private(val uid: UID) {
 
   /** Updates connection datetime. */
   def connected(): Unit =
-    _connected_at = update(StaticKey.connected_at, Temporal.now)
+    _connected_at = update(Key.user, StaticKey.connected_at, Temporal.now)
 
   /** Groups getter. */
   def nodes: List[NID] = _nodes.getOrElse {
@@ -190,13 +190,6 @@ final class User private(val uid: UID) {
     _email = values.get(StaticKey.email)
     _created_at = values.get(StaticKey.created_at).map(OffsetDateTime.parse)
     _updated_at = values.get(StaticKey.updated_at).map(OffsetDateTime.parse)
-  }
-
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (StaticKey.updated_at, Temporal.now))
-    redis(_.hmset(Key.user, updates))
-    Some(value)
   }
 
 }
