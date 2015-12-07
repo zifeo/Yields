@@ -11,6 +11,9 @@ import yields.server.mpi.{Metadata, Response}
 import yields.server.pipeline.blocks.SerializationModule
 import yields.server.tests.YieldsAkkaSpec
 
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 class ClientHubTests extends YieldsAkkaSpec {
 
   import ActorSubscriberMessage._
@@ -45,6 +48,33 @@ class ClientHubTests extends YieldsAkkaSpec {
 
     hub ! OnNext(searchResponse)
     socket.expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+
+  }
+
+  it should "keep stay open for 20s" in {
+
+    val socket = TestProbe()
+    val dispatcher = TestProbe()
+    val hubProps = ClientHub.props(socket.ref, InetSocketAddress.createUnresolved("", 0), dispatcher.ref)
+    val hub = TestActorRef[ClientHub](hubProps)
+
+    val searchResponse = serialize(Response(UserSearchRes(0), Metadata.now(0)))
+    val connectResponse = serialize(Response(UserConnectRes(0, returning = true), Metadata.now(0)))
+
+    hub ! OnNext(connectResponse)
+    socket.expectMsg(Write(connectResponse, WriteAck(connectResponse)))
+    dispatcher.expectMsg(InitConnection(0))
+    hub ! WriteAck(connectResponse)
+
+    hub ! OnNext(searchResponse)
+    socket.expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+    hub ! WriteAck(connectResponse)
+
+    socket.expectNoMsg(20 seconds)
+
+    hub ! OnNext(searchResponse)
+    socket.expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+    hub ! WriteAck(connectResponse)
 
   }
 
