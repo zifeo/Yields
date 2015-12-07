@@ -44,6 +44,8 @@ public class YieldsApplication {
 
     private static Bitmap mShownImage;
 
+    private static Bitmap mDefaultThumbnail;
+
     /**
      * Getter for the user of the application.
      *
@@ -382,5 +384,13 @@ public class YieldsApplication {
         }
 
         return user;
+    }
+
+    public static void setDefaultTheumbnail(Bitmap thumbnail){
+        mDefaultThumbnail = thumbnail;
+    }
+
+    public static Bitmap getDefaultThumbnail(){
+        return mDefaultThumbnail;
     }
 }
