@@ -135,7 +135,14 @@ public class MessageActivity extends NotifiableActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                retrieveGroupMessages();
+                switch (MessageActivity.this.getType()) {
+                    case MESSAGE_COMMENTS:
+                        retrieveCommentMessages();
+                        break;
+                    case GROUP_MESSAGES:
+                        retrieveGroupMessages();
+                        break;
+                }
             }
         });
     }
