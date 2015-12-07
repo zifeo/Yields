@@ -36,6 +36,7 @@ public class YieldsSocketProvider implements SocketProvider {
 
         Socket socket = new Socket(mDstAddress, DST_PORT);
         socket.setKeepAlive(true);
+        socket.setSoTimeout(300000);
         return socket;
     }
 }
