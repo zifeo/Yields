@@ -80,6 +80,8 @@ public class YieldService extends Service {
                 YieldsApplication.setUser(new ClientUser(email));
             }
 
+            mWasConnected = false;
+
             /*if (mServiceRequestController.isConnected()) {
                 ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
                 sendRequest(connectReq);
@@ -216,6 +218,8 @@ public class YieldService extends Service {
             } else {
                 //TODO : getUser from cache
             }
+
+            mWasConnected = true;
 
         }
         if (mCurrentNotifiableActivity != null) {
