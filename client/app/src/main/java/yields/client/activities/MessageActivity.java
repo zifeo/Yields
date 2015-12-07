@@ -545,7 +545,7 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
+        if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
 
@@ -556,9 +556,15 @@ public class MessageActivity extends NotifiableActivity {
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
 
+        ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
+
+        if (mGroupMessageAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
+            listView.setSelection(mGroupMessageAdapter.getCount() - 1);
+        } else {
+            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+        }
+
         mGroupMessageAdapter.notifyDataSetChanged();
-        ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
 
     /**
@@ -576,9 +582,15 @@ public class MessageActivity extends NotifiableActivity {
             }
         }
 
+        ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();
+
+        if (mCommentAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
+            listView.setSelection(mCommentAdapter.getCount() - 1);
+        } else {
+            listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+        }
+
         mCommentAdapter.notifyDataSetChanged();
-        ((CommentFragment) mCurrentFragment).getCommentListView()
-                .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
     }
 
     /**
