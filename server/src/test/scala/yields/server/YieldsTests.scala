@@ -1,6 +1,5 @@
 package yields.server
 
-import org.scalatest.BeforeAndAfterAll
 import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.tests._
@@ -8,7 +7,7 @@ import yields.server.tests._
 /**
   * Regroup all global server tests.
   */
-class YieldsTests extends YieldsSpec with BeforeAndAfterAll {
+class YieldsTests extends YieldsSpec {
 
   private lazy val server = Yields
 
@@ -19,6 +18,7 @@ class YieldsTests extends YieldsSpec with BeforeAndAfterAll {
 
   override def afterAll(): Unit = {
     server.stop()
+    super.afterAll()
   }
 
   "A client with a socket" should "be able to connect to the server" in {

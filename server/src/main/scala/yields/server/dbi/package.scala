@@ -16,6 +16,7 @@ package object dbi {
 
   object Key {
     val identity = "identity"
+    val updates = "updated_at"
   }
 
   private lazy val redis = new RedisClientPool(
@@ -124,5 +125,7 @@ package object dbi {
     case e :: Nil => remWithTime(key, e)
     case e :: es => valueOrException(redis(_.hdel(key, e, es: _*))) == elements.size
   }
+
+
 
 }
