@@ -24,14 +24,10 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.SortedMap;
 
 import yields.client.R;
 import yields.client.exceptions.MessageActivityException;
-import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -43,12 +39,8 @@ import yields.client.messages.TextContent;
 import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
-import yields.client.service.YieldService;
-import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
-import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -164,7 +156,7 @@ public class MessageActivity extends NotifiableActivity {
     protected void onDestroy() {
         super.onDestroy();
         YieldsApplication.nullGroup();
-        YieldsApplication.getBinder().unsetMessageActivity();
+        YieldsApplication.getBinder().unsetNotifiableActivity();
     }
 
     /**

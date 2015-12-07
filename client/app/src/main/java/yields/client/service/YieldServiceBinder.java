@@ -28,29 +28,9 @@ public class YieldServiceBinder extends Binder {
         mService.setNotifiableActivity(activity);
     }
 
-    public void unsetMessageActivity(){
-        mService.unsetMessageActivity();
+    public void unsetNotifiableActivity(){
+        mService.unsetNotifiableActivity();
     }
-
-    /**
-     * Creates a group on the server
-     *
-     * @param group the group to create
-     */
-    // TODO: Note done yet but good base
-    /*public void createNewGroup(Group group) {
-        Objects.requireNonNull(group);
-        List<Id> memberIDs = new ArrayList<>();
-        List<User> members = group.getUsers();
-        for (User u : members){
-            memberIDs.add(u.getId());
-        }
-        ServerRequest groupAddServerRequest = RequestBuilder
-                .groupCreateRequest(group.getUsers().get(0).getId(), group.getName(),
-                        group.getVisibility(), memberIDs);
-        Log.d("REQUEST", "Add new group");
-        mService.sendRequest(groupAddServerRequest);
-    }*/
 
     /**
      * Can be used to know if the server is connected to the server

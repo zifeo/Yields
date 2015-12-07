@@ -40,7 +40,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
     public void onPause(){
         super.onPause();
         if (YieldsApplication.getBinder() != null) {
-            YieldsApplication.getBinder().unsetMessageActivity();
+            YieldsApplication.getBinder().unsetNotifiableActivity();
         }
     }
 
