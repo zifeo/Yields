@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     tools:context="yields.client.activities.SearchGroupActivity"
     android:orientation="vertical"
+    android:background="@drawable/background"
     android:weightSum="1">
 
     <android.support.v7.widget.Toolbar

@@ -14,7 +14,7 @@ class TestGroupInfo extends DBFlatSpec with Matchers {
     val group = Group.create("GroupName", meta.client)
     group.addUser(List[UID](3, 4, 5))
     group.addNode(List[NID](13, 14, 15))
-    group.picSetter(Array[Byte](1, 2), meta.client)
+    group.pic("12", meta.client)
 
     val action = GroupInfo(group.nid)
 

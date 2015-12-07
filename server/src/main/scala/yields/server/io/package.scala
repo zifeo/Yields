@@ -3,6 +3,7 @@ package yields.server
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
 import yields.server.actions.nodes._
+import yields.server.actions.publisher._
 import yields.server.actions.users._
 import yields.server.io.actions.{BroadcastJsonFormat, ActionJsonFormat, ResultJsonFormat}
 import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
@@ -42,8 +43,8 @@ package object io {
   implicit lazy val groupInfoResJF = jsonFormat5(GroupInfoRes)
 
   implicit lazy val groupMessageJF = jsonFormat4(GroupMessage)
-  implicit lazy val groupMessageResJF = jsonFormat2(GroupMessageRes)
-  implicit lazy val groupMessageBrdJF = jsonFormat6(GroupMessageBrd)
+  implicit lazy val groupMessageResJF = jsonFormat3(GroupMessageRes)
+  implicit lazy val groupMessageBrdJF = jsonFormat7(GroupMessageBrd)
 
   // Nodes
 
@@ -51,25 +52,42 @@ package object io {
   implicit lazy val groupSearchResJF = jsonFormat3(NodeSearchRes)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
-  implicit lazy val nodeHistoryResJF = jsonFormat6(NodeHistoryRes)
+  implicit lazy val nodeHistoryResJF = jsonFormat7(NodeHistoryRes)
 
   // Users
 
   implicit lazy val userConnectJF = jsonFormat1(UserConnect)
   implicit lazy val userConnectResJF = jsonFormat2(UserConnectRes)
 
-  implicit lazy val userGroupListJF = jsonFormat0(UserGroupList)
-  implicit lazy val userGroupListResJF = jsonFormat3(UserGroupListRes)
+  implicit lazy val userGroupListJF = jsonFormat0(UserNodeList)
+  implicit lazy val userGroupListResJF = jsonFormat3(UserNodeListRes)
 
   implicit lazy val userUpdateJF = jsonFormat5(UserUpdate)
   implicit lazy val userUpdateResJF = jsonFormat0(UserUpdateRes)
   implicit lazy val userUpdateBrdJF = jsonFormat4(UserUpdateBrd)
 
   implicit lazy val userInfoJF = jsonFormat1(UserInfo)
-  implicit lazy val userInfoResJF = jsonFormat5(UserInfoRes)
+  implicit lazy val userInfoResJF = jsonFormat6(UserInfoRes)
 
   implicit lazy val userSearchJF = jsonFormat1(UserSearch)
   implicit lazy val userSearchResJF = jsonFormat1(UserSearchRes)
+
+  // Publishers
+
+  implicit lazy val publisherCreateJF = jsonFormat4(PublisherCreate)
+  implicit lazy val publisherCreateResJF = jsonFormat1(PublisherCreateRes)
+  implicit lazy val publisherCreateBrdJF = jsonFormat4(PublisherCreateBrd)
+
+  implicit lazy val publisherUpdateJF = jsonFormat9(PublisherUpdate)
+  implicit lazy val publisherUpdateResJF = jsonFormat0(PublisherUpdateRes)
+  implicit lazy val publisherUpdateBrdF = jsonFormat5(PublisherUpdateBrd)
+
+  implicit lazy val publisherInfoJF = jsonFormat1(PublisherInfo)
+  implicit lazy val publisherInfoResJF = jsonFormat6(PublisherInfoRes)
+
+  implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
+  implicit lazy val publisherMessageResJF = jsonFormat3(PublisherMessageRes)
+  implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
 
   /** *** Message passing interface *****/
 

@@ -49,5 +49,11 @@ public abstract class Content {
      */
     public abstract String getTextForRequest();
 
+    /**
+     * Define if a content is commentable or not.
+     * @return True if the content is commentable, false otherwise.
+     */
+    public abstract boolean isCommentable();
+
     public abstract String getContentForRequest();
 }

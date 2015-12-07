@@ -56,10 +56,6 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
                 idDrawable = R.drawable.ic_mode_edit_black_24dp;
                 break;
 
-            case TYPE:
-                idDrawable = R.drawable.ic_lock_black_24dp;
-                break;
-
             case IMAGE:
                 idDrawable = R.drawable.ic_photo_camera_black_24dp;
                 break;
@@ -70,6 +66,10 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
 
             case ADD_NODE:
                 idDrawable = R.drawable.ic_group_work_black_24dp;
+                break;
+
+            case LEAVE_GROUP:
+                idDrawable = R.drawable.ic_exit_to_app_black_24dp;
                 break;
 
             default:

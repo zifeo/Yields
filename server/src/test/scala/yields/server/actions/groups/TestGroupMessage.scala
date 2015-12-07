@@ -1,12 +1,12 @@
 package yields.server.actions.groups
 
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
 import yields.server.actions.nodes.NodeMessage
 import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
@@ -20,15 +20,16 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val action = GroupMessage(group.nid, Some(text), None, None)
 
     action.run(meta) match {
-      case GroupMessageRes(nid, datetime) =>
+      case GroupMessageRes(nid, datetime, contentNid) =>
         val group = Group(nid)
-        val feed = group.getMessagesInRange(Temporal.now, 10)
+        contentNid should be(None)
 
+        val feed = group.getMessagesInRange(Temporal.now, 10)
         feed should have size 1
-        feed.head._1 should be (datetime)
-        feed.head._2 should be (meta.client)
-        feed.head._3 should be (None)
-        feed.head._4 should be (text)
+        feed.head._1 should be(datetime)
+        feed.head._2 should be(meta.client)
+        feed.head._3 should be(None)
+        feed.head._4 should be(text)
     }
   }
 
@@ -36,26 +37,29 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val contentType = "image"
-    val content = Array[Byte](1, 2)
+    val content = "12"
 
     val group = Group.create("name", meta.client)
     val action = GroupMessage(group.nid, None, Some(contentType), Some(content))
 
     action.run(meta) match {
-      case GroupMessageRes(nid, datetime) =>
+      case GroupMessageRes(nid, datetime, contentNid) =>
         val group = Group(nid)
         val feed = group.getMessagesInRange(Temporal.now, 5)
 
         feed should have size 1
-        feed.head._1 should be (datetime)
-        feed.head._2 should be (meta.client)
-        feed.head._3 should be (defined)
-        feed.head._4 should be (empty)
+        feed.head._1 should be(datetime)
+        feed.head._2 should be(meta.client)
+        feed.head._3 should be(defined)
+        feed.head._4 should be(empty)
 
         val media = Media(feed.head._3.get)
-        Media.checkFileExist(media.hash) should be (true)
-        media.contentType should be (contentType)
-        media.content should be (content)
+        Media.checkFileExist(media.hash) should be(true)
+        media.contentType should be(contentType)
+        media.content should be(content)
+        media.nid should be(contentNid.get)
+
+        Media.deleteContentOnDisk(media.nid)
     }
   }
 
@@ -64,26 +68,27 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val meta = Metadata.now(0)
     val text = "A message"
     val contentType = "image"
-    val content = Array[Byte](1, 2)
+    val content = "12"
 
     val group = Group.create("name", meta.client)
     val action = GroupMessage(group.nid, Some(text), Some(contentType), Some(content))
 
     action.run(meta) match {
-      case GroupMessageRes(nid, datetime) =>
+      case GroupMessageRes(nid, datetime, contentNid) =>
         val group = Group(nid)
         val feed = group.getMessagesInRange(Temporal.now, 5)
 
         feed should have size 1
-        feed.head._1 should be (datetime)
-        feed.head._2 should be (meta.client)
-        feed.head._3 should be (defined)
-        feed.head._4 should be (text)
+        feed.head._1 should be(datetime)
+        feed.head._2 should be(meta.client)
+        feed.head._3 should be(defined)
+        feed.head._4 should be(text)
 
         val media = Media(feed.head._3.get)
-        Media.checkFileExist(media.hash) should be (true)
-        media.contentType should be (contentType)
-        media.content should be (content)
+        Media.checkFileExist(media.hash) should be(true)
+        media.contentType should be(contentType)
+        media.content should be(content)
+        media.nid should be(contentNid.get)
     }
   }
 
@@ -91,11 +96,11 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
 
     val meta = Metadata.now(0)
     val group = Group.create("name", meta.client)
-    val action = GroupMessage(group.nid, None, None, Some(Array[Byte](1, 2)))
+    val action = GroupMessage(group.nid, None, None, Some("12"))
     val actionInverse = GroupMessage(group.nid, None, Some("type"), None)
 
-    the [ActionArgumentException] thrownBy action.run(meta)
-    the [ActionArgumentException] thrownBy actionInverse.run(meta)
+    the[ActionArgumentException] thrownBy action.run(meta)
+    the[ActionArgumentException] thrownBy actionInverse.run(meta)
 
   }
 
@@ -105,8 +110,8 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val group = Group.create("name", meta.client + 1)
     val action = GroupMessage(group.nid, Some("text"), None, None)
 
-    val thrown = the [UnauthorizedActionException] thrownBy action.run(meta)
-    thrown.getMessage should include (meta.client.toString)
+    val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)
+    thrown.getMessage should include(meta.client.toString)
 
   }
 
@@ -116,7 +121,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
     val group = Group.create("name", meta.client)
     val action = GroupMessage(group.nid, None, None, None)
 
-    the [ActionArgumentException] thrownBy action.run(meta)
+    the[ActionArgumentException] thrownBy action.run(meta)
 
   }
 

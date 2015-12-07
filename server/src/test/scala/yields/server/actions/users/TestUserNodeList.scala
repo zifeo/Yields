@@ -6,16 +6,16 @@ import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
-class TestUserGroupList extends DBFlatSpec with Matchers {
+class TestUserNodeList extends DBFlatSpec with Matchers {
 
-  "UserGroupList" should "return empty list when the group list is empty" in {
+  "UserNodeList" should "return empty list when the group list is empty" in {
 
     val meta = Metadata.now(0)
-    val action = UserGroupList()
+    val action = UserNodeList()
 
     action.run(meta) match {
-      case UserGroupListRes(groups, updates, refreshes) =>
-        groups should be (empty)
+      case UserNodeListRes(nodes, updates, refreshes) =>
+        nodes should be (empty)
         updates should be (empty)
         refreshes should be (empty)
     }
@@ -27,16 +27,16 @@ class TestUserGroupList extends DBFlatSpec with Matchers {
     val meta = Metadata.now(user.uid)
     val group1 = Group.create("g1", user.uid)
     val group2 = Group.create("g2", user.uid)
-    user.addGroup(group1.nid)
-    user.addGroup(group2.nid)
-    val action = UserGroupList()
+    user.addNode(group1.nid)
+    user.addNode(group2.nid)
+    val action = UserNodeList()
 
     action.run(meta) match {
-      case UserGroupListRes(groups, updates, refreshes) =>
-        groups should have size 2
+      case UserNodeListRes(nodes, updates, refreshes) =>
+        nodes should have size 2
         updates should have size 2
         refreshes should have size 2
-        groups should contain theSameElementsAs List(group1.nid, group2.nid)
+        nodes should contain theSameElementsAs List(group1.nid, group2.nid)
     }
   }
 

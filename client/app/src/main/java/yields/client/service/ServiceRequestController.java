@@ -20,8 +20,10 @@ import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -29,6 +31,7 @@ import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.servicerequest.UserSearchRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
+import yields.client.servicerequest.UserUpdateRequest;
 
 import static java.lang.Thread.sleep;
 
@@ -122,7 +125,10 @@ public class ServiceRequestController {
                 mRequestHandler.handleUserConnectRequest(serviceRequest);
                 break;
             case USER_UPDATE:
-                mRequestHandler.handleUserUpdateRequest((UserUpdateNameRequest) serviceRequest);
+                mRequestHandler.handleUserUpdateRequest((UserUpdateRequest) serviceRequest);
+                break;
+            case USER_UPDATE_NAME:
+                mRequestHandler.handleUserUpdateNameRequest((UserUpdateNameRequest) serviceRequest);
                 break;
             case USER_GROUP_LIST:
                 mRequestHandler.handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
@@ -148,6 +154,9 @@ public class ServiceRequestController {
             case GROUP_UPDATE_IMAGE:
                 mRequestHandler.handleGroupUpdateImageRequest((GroupUpdateImageRequest) serviceRequest);
                 break;
+            case GROUP_UPDATE_USERS:
+                mRequestHandler.handleGroupUpdateUsersRequest((GroupUpdateUsersRequest) serviceRequest);
+                break;
             case GROUP_ADD:
                 mRequestHandler.handleGroupAddRequest((GroupAddRequest) serviceRequest);
                 break;
@@ -162,6 +171,9 @@ public class ServiceRequestController {
                 break;
             case USER_SEARCH:
                 mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
+                break;
+            case NODE_SEARCH:
+                mRequestHandler.handleNodeSearchRequest((NodeSearchRequest) serviceRequest);
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "No such ServiceRequest type ! : " +

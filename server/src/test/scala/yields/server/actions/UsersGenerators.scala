@@ -3,9 +3,9 @@ package yields.server.actions
 import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
-import yields.server.DefaultsGenerators
 import yields.server.actions.users._
 import yields.server.dbi.models._
+import yields.server.tests.DefaultsGenerators
 
 trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
 
@@ -51,16 +51,16 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
 
   //
 
-  implicit lazy val userGroupListArb: Arbitrary[UserGroupList] = Arbitrary {
-    UserGroupList()
+  implicit lazy val userGroupListArb: Arbitrary[UserNodeList] = Arbitrary {
+    UserNodeList()
   }
 
-  implicit lazy val userGroupListResArb: Arbitrary[UserGroupListRes] = Arbitrary {
+  implicit lazy val userGroupListResArb: Arbitrary[UserNodeListRes] = Arbitrary {
     for {
       groups <- arbitrary[List[NID]]
       updates <- arbitrary[List[OffsetDateTime]]
       refreshes <- arbitrary[List[OffsetDateTime]]
-    } yield UserGroupListRes(groups, updates, refreshes)
+    } yield UserNodeListRes(groups, updates, refreshes)
   }
 
   //
@@ -76,9 +76,10 @@ trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
       uid <- arbitrary[UID]
       name <- arbitrary[String]
       email <- arbitrary[String]
+      pic <- arbitrary[Blob]
       entourage <- arbitrary[List[UID]]
       entourageUpdates <- arbitrary[List[OffsetDateTime]]
-    } yield UserInfoRes(uid, name, email, entourage, entourageUpdates)
+    } yield UserInfoRes(uid, name, email, pic, entourage, entourageUpdates)
   }
 
   //

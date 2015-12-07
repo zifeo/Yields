@@ -15,6 +15,7 @@ import yields.client.R;
 import yields.client.exceptions.NodeException;
 import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
+import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.Response;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -79,18 +80,6 @@ public class ClientUser extends User {
     public List<Group> getUserGroups() {
         Collections.sort(mGroups, mComparator);
         return Collections.unmodifiableList(mGroups);
-    }
-
-    /**
-     * Updates the User from a Json response
-     *
-     * @param response the JSONObject from the response
-     * @throws JSONException In case of trouble parsing the response.
-     */
-    public void update(JSONObject response) throws JSONException{
-        // TODO : change profil pic
-        this.setName(response.getString("name"));
-        this.setEmail(response.getString("email"));
     }
 
     /**

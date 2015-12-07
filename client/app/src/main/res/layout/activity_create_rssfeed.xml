@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="yields.client.activities.CreateRSSFeedActivity"
+    android:orientation="vertical"
+    android:background="@drawable/background"
+    android:weightSum="1">
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.15" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/typeUrl"
+        android:id="@+id/textViewTypeUrl"
+        android:layout_gravity="center_horizontal" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.10" />
+
+    <EditText
+        android:layout_width="313dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextUrl"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/enterUrl"
+        android:maxLines="1"
+        android:inputType="textUri"
+        android:text="http://">
+        <requestFocus />
+    </EditText>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.25" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/typeKeywords"
+        android:id="@+id/textViewTypeKeywords"
+        android:layout_gravity="center_horizontal"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:gravity="center"/>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.10" />
+
+    <EditText
+        android:layout_width="313dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextKeyWords"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/enterKeyword"
+        android:maxLines="1">
+    </EditText>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.40" />
+
+    <yields.client.gui.CenteredToolBar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="#44CC99"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="0sp"
+        android:paddingRight="10sp"
+        >
+    </yields.client.gui.CenteredToolBar>
+
+</LinearLayout>

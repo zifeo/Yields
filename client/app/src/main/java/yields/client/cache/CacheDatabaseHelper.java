@@ -163,6 +163,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(message);
         Objects.requireNonNull(groupId);
 
+        deleteMessage(message, groupId);
         mDatabase.insert(TABLE_MESSAGES, null, createContentValuesForMessage(message, groupId));
     }
 
@@ -403,7 +404,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
             Id nextId = idIterator.next();
-            for(Id id : userIds){
+            for (Id id : userIds) {
                 if (id.equals(nextId)) {
                     idIterator.remove();
                 }

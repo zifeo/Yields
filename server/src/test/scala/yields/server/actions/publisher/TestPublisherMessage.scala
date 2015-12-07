@@ -1,15 +1,13 @@
 package yields.server.actions.publisher
 
-import java.time.OffsetDateTime
-
 import org.scalatest.Matchers
-import yields.server.AllGenerators
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupMessage
-import yields.server.actions.nodes.{NodeHistoryRes, NodeHistory}
+import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes}
 import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.AllGenerators
 import yields.server.utils.Temporal
 
 class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
@@ -40,22 +38,18 @@ class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
     val groupHistoryAction = NodeHistory(group.nid, Temporal.now, 3)
     val meta4 = Metadata.now(user2.uid)
     groupHistoryAction.run(meta4) match {
-      case NodeHistoryRes(nid, dates, senders, texts, _, _) =>
+      case NodeHistoryRes(nid, dates, senders, texts, _, _, _) =>
         nid should be(group.nid)
         dates.length should be(3)
-        senders.length should be(3)
-        texts.length should be(3)
-
-        (senders(0), texts(0)) should be((meta1.client, "hey"))
-        (senders(1), texts(1)) should be((publisher.nid, "Welcome in 9gag's feed"))
-        (senders(2), texts(2)) should be((meta3.client, "Received 9gag's message ?"))
+        senders should contain theSameElementsInOrderAs List(meta1.client, publisher.nid, meta3.client)
+        texts should contain theSameElementsInOrderAs List("hey", "Welcome in 9gag's feed", "Received 9gag's message ?")
     }
   }
 
   it should "not be allowed to a non-registered user to publish in a publisher" in {
     val user1 = User.create("email@email.com")
     val user2 = User.create("email2@email.com")
-    PublisherCreate("name", List(), List()).run(Metadata.now(user1.uid)) match {
+    PublisherCreate("name", List(), List(), List()).run(Metadata.now(user1.uid)) match {
       case PublisherCreateRes(nid) =>
         val action = PublisherMessage(nid, Some("some text"), None, None)
         an[UnauthorizedActionException] should be thrownBy action.run(Metadata.now(user2.uid))
