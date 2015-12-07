@@ -1,30 +1,34 @@
 package yields.server.io
 
-import org.scalacheck.{Prop, Properties}
-import yields.server.tests._
-import yields.server.actions.NodesGenerators
 import yields.server.actions.nodes._
+import yields.server.tests._
 
-object NodesJsonFormatSpecifications extends Properties("NodesJsonFormat") with NodesGenerators {
+class NodesJsonFormatSpecifications extends YieldsPropsSpec {
 
-  import Prop.forAll
-
-  property("NodeHistory") = forAll { (x: NodeHistory) =>
-    toAndFromJson(x)
+  property("NodeHistory") {
+    forAll() { (x: NodeHistory) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("NodeHistoryRes") = forAll { (x: NodeHistoryRes) =>
-    toAndFromJson(x)
+  property("NodeHistoryRes") {
+    forAll() { (x: NodeHistoryRes) =>
+      checkToAndFromJson(x)
+    }
   }
 
   //
 
-  property("NodeSearch") = forAll { (x: NodeSearch) =>
-    toAndFromJson(x)
+  property("NodeSearch") {
+    forAll() { (x: NodeSearch) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("NodeSearchRes") = forAll { (x: NodeSearchRes) =>
-    toAndFromJson(x)
+  property("NodeSearchRes") {
+    forAll() { (x: NodeSearchRes) =>
+      checkToAndFromJson(x)
+    }
   }
 
 }

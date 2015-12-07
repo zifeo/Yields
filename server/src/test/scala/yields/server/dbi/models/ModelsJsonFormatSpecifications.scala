@@ -1,7 +1,7 @@
 package yields.server.dbi.models
 
-import org.scalacheck.Properties
+import yields.server.tests.YieldsPropsSpec
 
-object ModelsJsonFormatSpecifications extends Properties("ModelsJsonFormat") with ModelsGenerators {
+class ModelsJsonFormatSpecifications extends YieldsPropsSpec {
 
 }

@@ -465,10 +465,8 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        /* TODO : Uncomment this to load comments.
-        GroupHistoryRequest request = new GroupHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest request = new NodeHistoryRequest(mGroup, new Date());
         YieldsApplication.getBinder().sendRequest(request);
-        */
     }
 
     /**

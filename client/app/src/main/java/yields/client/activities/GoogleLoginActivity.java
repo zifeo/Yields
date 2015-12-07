@@ -92,9 +92,14 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         Bitmap defaultUserImage = BitmapFactory.decodeResource(getResources(),
                 R.drawable.default_user_image);
 
+        Bitmap defaultThumbnail = BitmapFactory.decodeResource(getResources(),
+                R.drawable.default_web_page_icon);
+
         YieldsApplication.setDefaultGroupImage(defaultGroupImage);
 
         YieldsApplication.setDefaultUserImage(defaultUserImage);
+
+        YieldsApplication.setDefaultTheumbnail(defaultThumbnail);
     }
 
     /**

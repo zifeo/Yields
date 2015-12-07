@@ -1,12 +1,11 @@
 package yields.server.actions.groups
 
-import org.scalatest.Matchers
 import yields.server.actions.exceptions.UnauthorizedActionException
-import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.YieldsSpec
 
-class TestGroupInfo extends DBFlatSpec with Matchers {
+class TestGroupInfo extends YieldsSpec {
 
   "GroupInfo" should "get group info" in {
 

@@ -1,17 +1,14 @@
 package yields.server.dbi.models
 
 import java.io.File
-import java.nio.file.{Paths, Files}
 
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.utils.{Temporal, Config}
+import yields.server.tests.YieldsSpec
+import yields.server.utils.Temporal
 
 /**
-  * Test class for image model
-  *
-  * TODO implement test
+  * Test class for image model.
   */
-class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
+class TestMedia extends YieldsSpec {
 
   val contentTypeTest = "image"
   val contentTest =
