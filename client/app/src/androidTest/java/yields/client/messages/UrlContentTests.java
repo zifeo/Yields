@@ -24,10 +24,6 @@ public class UrlContentTests extends ActivityInstrumentationTestCase2<MessageAct
         super(MessageActivity.class);
     }
 
-    public UrlContentTests(Class<MessageActivity> activityClass) {
-        super(activityClass);
-    }
-
     /**
      * Set up for the tests.
      */
