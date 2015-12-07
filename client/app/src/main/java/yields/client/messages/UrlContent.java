@@ -1,5 +1,7 @@
 package yields.client.messages;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.Html;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -30,6 +33,7 @@ public class UrlContent extends Content {
     private String mValidUrl;
     private String mTitle;
     private String mDescription;
+    private Bitmap mThumbnail;
 
     private static final String URL_REGEX = "(https?:\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w \\.-]*)*\\/?$";
     private static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX);
@@ -54,7 +58,7 @@ public class UrlContent extends Content {
         Log.d("UrlContent", "Caption : " + caption + "  contains url : " + mUrl);
         mValidUrl = makeUrlValid(mUrl);
         try {
-            getTitleAndDescrition();
+            getTitleDescriptionAndThumbnail();
         } catch (ExecutionException | InterruptedException e) {
             mTitle = ERROR_INVALID_URL;
             mDescription = ERROR_INVALID_URL;
@@ -91,6 +95,7 @@ public class UrlContent extends Content {
 
     /**
      * Getter for the colored caption (link colored in blue).
+     *
      * @return The caption in html format.
      */
     public String getColoredCaption() {
@@ -101,6 +106,7 @@ public class UrlContent extends Content {
 
     /**
      * Getter for the url contained in this content, that is the first URL foun in the caption.
+     *
      * @return The original URL (not the valid format).
      */
     public String getUrl() {
@@ -109,6 +115,7 @@ public class UrlContent extends Content {
 
     /**
      * Getter for the description of the page having the current URL stored in this content.
+     *
      * @return The description of the page comming from the metadata of the html body.
      */
     public String getDescription() {
@@ -117,6 +124,7 @@ public class UrlContent extends Content {
 
     /**
      * Getter for the title of the page having the current URL stored in this content.
+     *
      * @return The Title of the page contained in the metadata of the html body.
      */
     public String getTitle() {
@@ -125,28 +133,27 @@ public class UrlContent extends Content {
 
     /**
      * Build a valid format for the URL passed in parameter, that is adding https:// and www. if needed.
+     *
      * @param url The URL we want to convert into valid format.
      * @return The valid format of url.
      */
-    public static String makeUrlValid(String url){
+    public static String makeUrlValid(String url) {
         boolean addHttp = false;
         boolean addWww = false;
-        if (!url.startsWith("https://")){
+        if (!url.startsWith("https://")) {
             addHttp = true;
         }
-        if (!url.contains("www.")){
+        if (!url.contains("www.")) {
             addWww = true;
         }
 
-        if (addHttp){
+        if (addHttp) {
             if (addWww) {
                 url = "https://www." + url;
-            }
-            else{
+            } else {
                 url = "https://" + url;
             }
-        }
-        else if (addWww){
+        } else if (addWww) {
             url = "https://www." + url.substring(8, url.length());
         }
         Log.d("UrlContent", "valid URL = " + url);
@@ -215,7 +222,60 @@ public class UrlContent extends Content {
     }
 
     /**
+     * Getter for the thumbnail of the web page.
+     *
+     * @return The thumbnail.
+     */
+    public Bitmap getThumbnail() {
+        return mThumbnail;
+    }
+
+    /**
+     * Get the thumbnail from the page body.
+     *
+     * @param pageBody The HTML body of the page.
+     * @return A thumbnail for the page. If no thumbnail can be found, returns the defaultThumbnail defined in the
+     * YieldsApplication class.
+     */
+    public Bitmap getThumbnailFromMetadata(String pageBody) {
+        // 2 tests :
+        // _ If there is a property="og:image" available we take it.
+        // _ Else we take the first image that appears in the page body.
+
+        int propertyPos = pageBody.indexOf("property=\"og:image\"");
+        int imgBlockPos = pageBody.indexOf("<img");
+        boolean found = false;
+        String path;
+        if (propertyPos != -1) {
+            // There is the property in the body.
+            int contentPos = pageBody.indexOf("content=\"");
+            if (contentPos != -1) {
+                int pathBegin = contentPos + 9;
+                int pathEnd = pageBody.indexOf("\"", pathBegin);
+                path = pageBody.substring(pathBegin, pathEnd);
+                found = true;
+            } else {
+                // Need to take the first image.
+                found = false;
+            }
+        }
+
+        if (!found && imgBlockPos != -1) {
+            int srcBegin = pageBody.indexOf("src=\"");
+            int srcEnd = pageBody.indexOf("\"", srcBegin + 5);
+            path = pageBody.substring(srcBegin + 5, srcEnd);
+        } else {
+            return YieldsApplication.getDefaultThumbnail();
+        }
+        Log.d("UrlContent", "imgBlock = " + imgBlockPos);
+        Log.d("UrlContent", "propertyPos = " + propertyPos);
+        Log.d("UrlContent", "Image path : " + path);
+        return YieldsApplication.getDefaultThumbnail();
+    }
+
+    /**
      * Convert an InputStream into a String format.
+     *
      * @param stream The stream to convert.
      * @return The corresponding String.
      */
@@ -230,7 +290,7 @@ public class UrlContent extends Content {
                 line = reader.readLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            return "";
         }
 
         return sb.toString();
@@ -238,26 +298,46 @@ public class UrlContent extends Content {
 
     /**
      * Extract the title and the description of the page from its html body.
+     *
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    private void getTitleAndDescrition() throws ExecutionException, InterruptedException {
+    private void getTitleDescriptionAndThumbnail() throws ExecutionException, InterruptedException {
         AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 URL url = null;
                 try {
+                    String pageBody;
+                    boolean done = false;
+                    HttpURLConnection connection;
                     url = new URL(mValidUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setInstanceFollowRedirects(true);
                     connection.setConnectTimeout(1000);
-                    String pageBody = inputStreamToString(connection.getInputStream());
-                    Log.d("UrlContent", "Page body = " + pageBody);
+                    if (connection.getResponseCode() / 100 == 3) {
+                        // Code 3XX mean redirect, we need to follow them.
+                        String redirect = connection.getHeaderField("Location");
+                        Log.d("UrlContent", "Redirect for the page " + mValidUrl + " => " + redirect);
+                        mValidUrl = redirect;
+                        URL redirectURL = new URL(redirect);
+                        connection = (HttpURLConnection) redirectURL.openConnection();
+                        connection.setConnectTimeout(1000);
+                    }
+                    pageBody = inputStreamToString(connection.getInputStream());
                     mTitle = getTitleFromMetadata(pageBody);
                     mDescription = getDescriptionFromMetadata(pageBody);
+                    mThumbnail = getThumbnailFromMetadata(pageBody);
+                } catch (MalformedURLException e) {
+                    Log.d("UrlContent", "Cannot get page infos.");
+                    mTitle = ERROR_INVALID_URL;
+                    mDescription = ERROR_INVALID_URL;
+                    mThumbnail = YieldsApplication.getDefaultThumbnail();
                 } catch (IOException e) {
                     Log.d("UrlContent", "Cannot get page infos.");
                     mTitle = CONNECTION_ERROR;
                     mDescription = CONNECTION_ERROR;
+                    mThumbnail = YieldsApplication.getDefaultThumbnail();
                 }
                 return null;
             }
@@ -267,10 +347,11 @@ public class UrlContent extends Content {
 
     /**
      * Extract the title of the page from its html body.
+     *
      * @param pageBody The html body of the page.
      * @return The Title of the page.
      */
-    private static String getTitleFromMetadata(String pageBody) {
+    public static String getTitleFromMetadata(String pageBody) {
         int posTitleOpen = pageBody.indexOf("<title>");
         int lengthTitleField = new String("<title>").length();
         int posTitleClose = pageBody.indexOf("</title>");
@@ -284,18 +365,18 @@ public class UrlContent extends Content {
 
     /**
      * Extract the description of the page from its html body.
+     *
      * @param pageBody The html body of the page.
      * @return The description of the page.
      */
-    private static String getDescriptionFromMetadata(String pageBody) {
+    public static String getDescriptionFromMetadata(String pageBody) {
         int posMetaDescr = pageBody.indexOf("meta name=\"description\" content=\"");
         int lengthMetaDescrField = new String("meta name=\"description\" content=\"").length();
         int posMetaDescrClose = pageBody.indexOf("\"", posMetaDescr + lengthMetaDescrField);
         if (posMetaDescr == -1 || posMetaDescrClose == -1) {
             // No description.
             return NO_DESCRIPTION;
-        }
-        else{
+        } else {
             String description = pageBody.substring(posMetaDescr + lengthMetaDescrField, posMetaDescrClose);
             return description;
         }
