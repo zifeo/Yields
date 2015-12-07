@@ -110,8 +110,6 @@ public class LoggingInActivity extends NotifiableActivity {
     @Override
     synchronized public void notifyOnServerConnected() {
         if (!wasConnected) {
-            ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
-            YieldsApplication.getBinder().sendRequest(connectReq);
             wasConnected = true;
         }
     }
