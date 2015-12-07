@@ -155,9 +155,6 @@ class Node protected(val nid: NID) {
     * Delete old picture if there is one and create new media on disk
     */
   def pic(content: Blob, creator: UID): Unit = {
-    if (_pic.isDefined) {
-      Media.deleteContentOnDisk(valueOrException(_pic.map(_.nid)))
-    }
     val newPic = Media.create("image", content, creator)
     val nid = update(StaticNodeKey.node_pic, newPic.nid)
     _pic = nid.map(Media(_))
