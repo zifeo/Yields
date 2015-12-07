@@ -29,27 +29,27 @@ class Media private(nid: NID) extends Node(nid) {
     val path = "path"
   }
 
-  private var _hash: Option[String] = None
+  private var _filename: Option[String] = None
   private var _contentType: Option[String] = None
   private var _path: Option[String] = None
 
   /** Media content getter */
   def content: Blob = {
     // hydrate hash
-    if (_hash.isEmpty) {
-      hash
+    if (_filename.isEmpty) {
+      filename
     }
-    path = _hash.get
+    path = _filename.get
     getContentFromDisk(path).getOrElse(throw new MediaException("Content doesn't exist on disk"))
   }
 
   /** Media content setter on disk */
   def content_=(content: Blob) = {
     // hydrate the hash
-    if (_hash.isEmpty) {
-      hash
+    if (_filename.isEmpty) {
+      filename
     }
-    path = _hash.get
+    path = _filename.get
 
     if (_path.isEmpty)
       throw new MediaException("Cannot write in non-existent path")
@@ -57,14 +57,14 @@ class Media private(nid: NID) extends Node(nid) {
     writeContentOnDisk(_path.get, content)
   }
 
-  def hash: String = _hash.getOrElse {
-    _hash = redis(_.hget[String](NodeKey.node, MediaKey.hash))
-    valueOrException(_hash)
+  def filename: String = _filename.getOrElse {
+    _filename = redis(_.hget[String](NodeKey.node, MediaKey.hash))
+    valueOrException(_filename)
   }
 
   /** Store the hash in the database to easily retrieve the content from the disk */
-  private def hash_=(hash: String): Unit = {
-    _hash = update(NodeKey.node, MediaKey.hash, hash)
+  private def filename_=(filename: String): Unit = {
+    _filename = update(NodeKey.node, MediaKey.hash, filename)
   }
 
   private def contentType_=(contentType: String): Unit = {
@@ -103,7 +103,7 @@ object Media {
     val media = Media(newIdentity())
 
     // set values
-    media.hash = createHash(content, Temporal.now)
+    media.filename = createHash(content, Temporal.now)
     media.content = content
     media.contentType = contentType
     media.creator = creator
