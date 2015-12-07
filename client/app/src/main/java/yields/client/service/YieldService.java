@@ -188,7 +188,7 @@ public class YieldService extends Service {
     /**
      * Unset the current messageActivity
      */
-    synchronized public void unsetMessageActivity() {
+    synchronized public void unsetNotifiableActivity() {
         Log.d("Y:" + this.getClass().getName(), "remove activity");
         mCurrentNotifiableActivity = null;
         mCurrentGroup = null;
