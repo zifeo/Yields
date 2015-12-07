@@ -24,17 +24,17 @@ final class Tag private(val tid: TID) {
   private var _text: Option[String] = None
 
   def text: String = _text.getOrElse {
-    _text = redis.withClient(_.hget[String](TagKey.tag, TagKey.text))
+    _text = redis(_.hget[String](TagKey.tag, TagKey.text))
     valueOrDefault(_text, "")
   }
 
   def text_=(text: String): Unit = {
-    redis.withClient(_.hset(TagKey.tag, TagKey.text, text))
+    redis(_.hset(TagKey.tag, TagKey.text, text))
     _text = Some(text)
   }
 
   def addGroup(nid: NID): Unit = {
-    redis.withClient(_.sadd(TagKey.groups, nid))
+    redis(_.sadd(TagKey.groups, nid))
   }
 
 }
@@ -49,10 +49,10 @@ object Tag {
 
   /** add a tag */
   def createTag(newTag: String): Tag = {
-    val tid = valueOrException(redis.withClient(_.incr(StaticKey.tid)))
+    val tid = valueOrException(redis(_.incr(StaticKey.tid)))
     val tag = Tag(tid)
     tag.text = newTag
-    redis.withClient(_.hset(StaticKey.index, newTag, tid))
+    redis(_.hset(StaticKey.index, newTag, tid))
     tag
   }
 
@@ -62,6 +62,6 @@ object Tag {
 
   /** get an id corresponding to the tag if it exists, None otherwise */
   def getIdFromText(tag: String): Option[TID] = {
-    redis.withClient(_.hget[TID](StaticKey.index, tag))
+    redis(_.hget[TID](StaticKey.index, tag))
   }
 }

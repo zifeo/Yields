@@ -2,11 +2,9 @@ package yields.server.pipeline.blocks
 
 import akka.stream.scaladsl.{Flow, Sink}
 import akka.stream.testkit.scaladsl.TestSink
-import org.scalatest.{FlatSpec, Matchers}
-import yields.server.tests._
-import yields.server.tests.{DefaultsGenerators, FakeLogger}
+import yields.server.tests.{FakeLogger, _}
 
-class LoggerModuleTests extends FlatSpec with Matchers with DefaultsGenerators {
+class LoggerModuleTests extends YieldsSpec {
 
   val logger = new FakeLogger
   val module = LoggerModule[String, String]()(logger)

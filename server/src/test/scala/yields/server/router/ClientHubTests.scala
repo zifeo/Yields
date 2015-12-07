@@ -2,62 +2,79 @@ package yields.server.router
 
 import java.net.InetSocketAddress
 
-import akka.actor.ActorSystem
 import akka.io.Tcp
-import akka.stream.actor.{ActorPublisherMessage, ActorSubscriberMessage}
-import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import akka.util.ByteString
-import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
-import yields.server.actions.users.{UserSearchRes, UserConnectRes}
-import yields.server.mpi.{Response, Metadata}
-import yields.server.pipeline.blocks.SerializationModule
+import akka.stream.actor.ActorSubscriberMessage
+import akka.testkit.{TestActorRef, TestProbe}
+import yields.server.actions.users.{UserConnectRes, UserSearchRes}
 import yields.server.io._
-import yields.server.tests.AllGenerators
+import yields.server.mpi.{Metadata, Response}
+import yields.server.pipeline.blocks.SerializationModule
+import yields.server.tests.YieldsAkkaSpec
 
-class ClientHubTests(sys: ActorSystem)
-  extends TestKit(sys) with ImplicitSender with FlatSpecLike with Matchers with BeforeAndAfterAll with AllGenerators {
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
-  import ActorPublisherMessage._
+class ClientHubTests extends YieldsAkkaSpec {
+
   import ActorSubscriberMessage._
   import ClientHub._
   import Dispatcher._
   import SerializationModule._
   import Tcp._
 
-  def this() = this(ActorSystem("Yields-tests"))
-
-  override def afterAll(): Unit = {
-    TestKit.shutdownActorSystem(system)
-  }
-
-  lazy val hub = {
-    val hubProps = ClientHub.props(self, InetSocketAddress.createUnresolved("", 0), self)
-    TestActorRef[ClientHub](hubProps)
-  }
-
   "ClientHub" should "refuse answering until user is connected" in {
+
+    val socket = TestProbe()
+    val dispatcher = TestProbe()
+    val hubProps = ClientHub.props(socket.ref, InetSocketAddress.createUnresolved("", 0), dispatcher.ref)
+    val hub = TestActorRef[ClientHub](hubProps)
 
     val searchResponse = serialize(Response(UserSearchRes(0), Metadata.now(0)))
     val connectResponse = serialize(Response(UserConnectRes(0, returning = true), Metadata.now(0)))
     val errorMessage = hub.underlyingActor.errorMessage
 
     hub ! OnNext(searchResponse)
-    expectMsg(Write(errorMessage, WriteAck(errorMessage)))
+    socket.expectMsg(Write(errorMessage, WriteAck(errorMessage)))
     hub ! WriteAck(errorMessage)
 
     hub ! OnNext(searchResponse)
-    expectMsg(Write(errorMessage, WriteAck(errorMessage)))
+    socket.expectMsg(Write(errorMessage, WriteAck(errorMessage)))
     hub ! WriteAck(errorMessage)
 
     hub ! OnNext(connectResponse)
-    expectMsgAllOf(
-      Write(connectResponse, WriteAck(connectResponse)),
-      InitConnection(0)
-    )
+    socket.expectMsg(Write(connectResponse, WriteAck(connectResponse)))
+    dispatcher.expectMsg(InitConnection(0))
     hub ! WriteAck(connectResponse)
 
     hub ! OnNext(searchResponse)
-    expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+    socket.expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+
+  }
+
+  it should "keep stay open for 20s" in {
+
+    val socket = TestProbe()
+    val dispatcher = TestProbe()
+    val hubProps = ClientHub.props(socket.ref, InetSocketAddress.createUnresolved("", 0), dispatcher.ref)
+    val hub = TestActorRef[ClientHub](hubProps)
+
+    val searchResponse = serialize(Response(UserSearchRes(0), Metadata.now(0)))
+    val connectResponse = serialize(Response(UserConnectRes(0, returning = true), Metadata.now(0)))
+
+    hub ! OnNext(connectResponse)
+    socket.expectMsg(Write(connectResponse, WriteAck(connectResponse)))
+    dispatcher.expectMsg(InitConnection(0))
+    hub ! WriteAck(connectResponse)
+
+    hub ! OnNext(searchResponse)
+    socket.expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+    hub ! WriteAck(connectResponse)
+
+    socket.expectNoMsg(20 seconds)
+
+    hub ! OnNext(searchResponse)
+    socket.expectMsg(Write(searchResponse, WriteAck(searchResponse)))
+    hub ! WriteAck(connectResponse)
 
   }
 

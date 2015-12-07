@@ -54,7 +54,7 @@ object Yields {
     * @param bcast result to be broacasted
     * @return result broadcasted
     */
-  def broadcast(uids: List[UID])(bcast: Broadcast): Unit = {
+  private[server] def broadcast(uids: List[UID])(bcast: Broadcast): Unit = {
     import Dispatcher._
     if (uids.nonEmpty) {
       Yields.dispatcher ! Notify(uids, bcast)

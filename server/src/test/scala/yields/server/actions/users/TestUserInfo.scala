@@ -1,13 +1,11 @@
 package yields.server.actions.users
 
-import org.scalatest.Matchers
-import yields.server._
 import yields.server.actions.exceptions.UnauthorizedActionException
-import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.YieldsSpec
 
-class TestUserInfo extends DBFlatSpec with Matchers {
+class TestUserInfo extends YieldsSpec {
 
   "UserInfo" should "get client info" in {
 

@@ -24,24 +24,24 @@ final class Tag private(val tid: TID) {
 
   /** tag text getter */
   def text: String = _text.getOrElse {
-    _text = redis.withClient(_.hget[String](TagKey.tag, TagKey.text))
+    _text = redis(_.hget[String](TagKey.tag, TagKey.text))
     valueOrDefault(_text, "")
   }
 
   /** tag text setter */
   def text_=(text: String): Unit = {
-    redis.withClient(_.hset(TagKey.tag, TagKey.text, text))
+    redis(_.hset(TagKey.tag, TagKey.text, text))
     _text = Some(text)
   }
 
   /** link a node to a tag */
   def addNode(nid: NID): Unit = {
-    redis.withClient(_.sadd(TagKey.groups, nid))
+    redis(_.sadd(TagKey.groups, nid))
   }
 
   /** remove a linked node */
   def remNode(nid: NID): Unit = {
-    redis.withClient(_.srem(TagKey.groups, nid))
+    redis(_.srem(TagKey.groups, nid))
   }
 }
 
@@ -55,10 +55,10 @@ object Tag {
 
   /** add a tag */
   def create(newTag: String): Tag = {
-    val tid = valueOrException(redis.withClient(_.incr(StaticKey.tid)))
+    val tid = valueOrException(redis(_.incr(StaticKey.tid)))
     val tag = Tag(tid)
     tag.text = newTag
-    redis.withClient(_.hset(StaticKey.index, newTag, tid))
+    redis(_.hset(StaticKey.index, newTag, tid))
     tag
   }
 
@@ -68,6 +68,6 @@ object Tag {
 
   /** get an id corresponding to the tag if it exists, None otherwise */
   def getIdFromText(tag: String): Option[TID] = {
-    redis.withClient(_.hget[TID](StaticKey.index, tag))
+    redis(_.hget[TID](StaticKey.index, tag))
   }
 }

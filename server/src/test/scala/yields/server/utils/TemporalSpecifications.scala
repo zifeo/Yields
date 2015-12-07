@@ -2,16 +2,15 @@ package yields.server.utils
 
 import java.util.Date
 
-import org.scalacheck.{Prop, Properties}
-import yields.server.tests.DefaultsGenerators
+import yields.server.tests.YieldsPropsSpec
+import yields.server.utils.Temporal._
 
-object TemporalSpecifications extends Properties("TemporalUtils") with DefaultsGenerators {
+class TemporalSpecifications extends YieldsPropsSpec {
 
-  import Temporal._
-  import Prop.forAll
-
-  property("OffsetDateTime") = forAll { (x: Date) =>
-    offsetDateTime2Date(date2OffsetDateTime(x)) == x
+  property("OffsetDateTime") {
+    forAll() { (x: Date) =>
+      offsetDateTime2Date(date2OffsetDateTime(x)) == x
+    }
   }
 
 }

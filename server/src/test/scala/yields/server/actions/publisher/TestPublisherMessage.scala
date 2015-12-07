@@ -1,16 +1,14 @@
 package yields.server.actions.publisher
 
-import org.scalatest.Matchers
 import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.actions.groups.GroupMessage
 import yields.server.actions.nodes.{NodeHistory, NodeHistoryRes}
-import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.tests.AllGenerators
+import yields.server.tests.YieldsSpec
 import yields.server.utils.Temporal
 
-class TestPublisherMessage extends DBFlatSpec with Matchers with AllGenerators {
+class TestPublisherMessage extends YieldsSpec {
 
   "a group with publisher" should "receive messages from user and publisher" in {
     val user1 = User.create("email1@email.com")

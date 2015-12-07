@@ -1,12 +1,10 @@
 package yields.server.actions.users
 
-import org.scalatest._
-import yields.server._
-import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.YieldsSpec
 
-class TestUserNodeList extends DBFlatSpec with Matchers {
+class TestUserNodeList extends YieldsSpec {
 
   "UserNodeList" should "return empty list when the group list is empty" in {
 
