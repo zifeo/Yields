@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
+import android.util.Log;
 
 import org.junit.After;
 import org.junit.Before;
@@ -98,14 +99,15 @@ public class CacheDatabaseTests {
      */
     @Test
     public void testDatabaseCanAddMessage() {
-        List<Message> messages = MockFactory.generateMockMessages(3);
-        for (Message message : messages) {
+        for (int i = 0; i < 5; i++) {
+            Message message = new Message("Node " + i, new Id(i), new Id(-i),
+                    MockFactory.generateFakeTextContent(i), new Date(), Message.MessageStatus.NOT_SENT);
             mDatabaseHelper.addMessage(message, new Id(666));
         }
 
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
-        assertEquals(3, cursor.getCount());
-        assertEquals(9, cursor.getColumnCount());
+        assertEquals(5, cursor.getCount());
+        assertEquals(8, cursor.getColumnCount());
         cursor.close();
     }
 
@@ -121,7 +123,7 @@ public class CacheDatabaseTests {
             group.addUser(message.getSender());
             mDatabaseHelper.addMessage(message, group.getId());
 
-            Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group,
+            Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group.getId(),
                     new Date(), 10).get(0);
 
             assertTrue(compareMessages(message, messageFromCache));
@@ -144,7 +146,7 @@ public class CacheDatabaseTests {
             group.addUser(message.getSender());
             mDatabaseHelper.addMessage(message, group.getId());
 
-            Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group,
+            Message messageFromCache = mDatabaseHelper.getMessagesForGroup(group.getId(),
                     new Date(), 10).get(0);
 
             assertTrue(compareMessages(message, messageFromCache));
@@ -489,8 +491,8 @@ public class CacheDatabaseTests {
     public void testDatabaseCanRemoveUserFromGroup() {
         Group group = MockFactory.generateMockGroups(3).get(2);
         mDatabaseHelper.addGroup(group);
-        ArrayList<Id> usersToRemove = new ArrayList<>();
-        usersToRemove.add(group.getUsers().get(0).getId());
+        ArrayList<User> usersToRemove = new ArrayList<>();
+        usersToRemove.add(group.getUsers().get(0));
         mDatabaseHelper.removeUsersFromGroup(group.getId(), usersToRemove);
         Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
 
@@ -609,7 +611,7 @@ public class CacheDatabaseTests {
                 Thread.sleep(15);
             }
 
-            List<Message> messagesFromDatabase = mDatabaseHelper.getMessagesForGroup(group,
+            List<Message> messagesFromDatabase = mDatabaseHelper.getMessagesForGroup(group.getId(),
                     new Date(), 10);
             assertEquals(10, messagesFromDatabase.size());
             for (int i = 0; i < 10; i++) {
