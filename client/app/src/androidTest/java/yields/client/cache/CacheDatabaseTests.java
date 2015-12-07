@@ -45,14 +45,14 @@ public class CacheDatabaseTests {
     public void setUp() {
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getTargetContext());
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
-        YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bobby", new Id(123),
-                "lol@gmail.com", YieldsApplication.getDefaultGroupImage()));
+        YieldsApplication.setUser(MockFactory.generateFakeClientUser(
+                "Bobby", new Id(123), "lol@gmail.com", YieldsApplication.getDefaultGroupImage()));
         CacheDatabaseHelper.deleteDatabase();
         mDatabaseHelper = new CacheDatabaseHelper();
         mDatabase = mDatabaseHelper.getWritableDatabase();
         mDatabaseHelper.clearDatabase();
-        YieldsApplication.setUser(new ClientUser("Johny", new Id(999999), "topKeke@gmail.com",
-                YieldsApplication.getDefaultUserImage()));
+        YieldsApplication.setUser(
+                new ClientUser("Johny", new Id(999999), "topKeke@gmail.com", YieldsApplication.getDefaultUserImage()));
     }
 
     /**
@@ -199,6 +199,66 @@ public class CacheDatabaseTests {
     }
 
     /**
+     * Tests if it can rename valid Users and if the the Users are correctly renamed in the database.
+     * (Test for CacheDatabaseHelper.updateUserName(Id userId, String newUserName))
+     */
+    @Test
+    public void testDatabaseCanUpdtaeUserName() {
+        List<Id> users = MockFactory.generateMockUsers(6);
+        for (Id user : users) {
+            mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
+        }
+
+        Id userToRename = users.get(3);
+        String newName = "New username YAY !";
+        mDatabaseHelper.updateUserName(userToRename, newName);
+
+        User userFromDatabase = mDatabaseHelper.getUser(userToRename);
+
+        assertEquals(newName,
+                userFromDatabase.getName());
+
+        assertEquals(YieldsApplication.getUserFromId(userToRename).getEmail(),
+                userFromDatabase.getEmail());
+
+        assertEquals(userToRename.getId(),
+                userFromDatabase.getId().getId());
+
+        assertTrue(compareImages(YieldsApplication.getUserFromId(userToRename).getImg(),
+                userFromDatabase.getImg()));
+    }
+
+    /**
+     * Tests if it can update valid Users image and if the the Users are correctly updated in the database.
+     * (Test for CacheDatabaseHelper.updateUserName(Id userId, String newUserName))
+     */
+    @Test
+    public void testDatabaseCanUpdateUserImage() {
+        List<Id> users = MockFactory.generateMockUsers(6);
+        for (Id user : users) {
+            mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
+        }
+
+        Id userToUpdateImage = users.get(3);
+        Bitmap newImage = YieldsApplication.getDefaultGroupImage();
+        mDatabaseHelper.updateUserImage(userToUpdateImage, newImage);
+
+        User userFromDatabase = mDatabaseHelper.getUser(userToUpdateImage);
+
+        assertEquals(YieldsApplication.getUserFromId(userToUpdateImage).getName(),
+                userFromDatabase.getName());
+
+        assertEquals(YieldsApplication.getUserFromId(userToUpdateImage).getEmail(),
+                userFromDatabase.getEmail());
+
+        assertEquals(userToUpdateImage.getId(),
+                userFromDatabase.getId().getId());
+
+        assertTrue(compareImages(newImage,
+                userFromDatabase.getImg()));
+    }
+
+    /**
      * Tests if it can retrieve a User.
      * (Test for CacheDatabaseHelper.getUser(ID userID))
      */
@@ -326,7 +386,7 @@ public class CacheDatabaseTests {
         assertEquals(6, cursor.getColumnCount());
         cursor.moveToFirst();
 
-        for (int i = groups.size() -1 ; i >= 0; i--) {
+        for (int i = groups.size() - 1; i >= 0; i--) {
             assertTrue(checkGroupInformation(cursor, groups.get(i)));
             cursor.moveToNext();
         }
@@ -557,10 +617,8 @@ public class CacheDatabaseTests {
                 assertEquals(Long.valueOf(2), message.getSender().getId());
                 assertEquals("Mock message #" + (59 - i), ((TextContent) message.getContent()).getText());
             }
-        } catch (CacheDatabaseException exception) {
+        } catch (CacheDatabaseException | InterruptedException exception) {
             fail(exception.getMessage());
-        } catch (InterruptedException e) {
-            fail(e.getMessage());
         }
     }
 
@@ -614,15 +672,15 @@ public class CacheDatabaseTests {
         }
 
         List<Id> idsOriginal = new ArrayList<>();
-        for(User user : group.getUsers()){
+        for (User user : group.getUsers()) {
             idsOriginal.add(user.getId());
         }
 
         boolean groupUserIDsAreCorrect = true;
-        for(Id idOriginal : idsOriginal){
+        for (Id idOriginal : idsOriginal) {
             boolean hasId = false;
-            for(Id idCache : idsOfCache){
-                if(idCache.equals(idOriginal)){
+            for (Id idCache : idsOfCache) {
+                if (idCache.equals(idOriginal)) {
                     hasId = true;
                 }
             }

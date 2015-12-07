@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import yields.client.activities.MessageActivity;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
@@ -27,7 +26,6 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
-import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -623,41 +621,26 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         } else {
             int counter = 0;
             do {
-                Id id = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
+                Id messageId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
                 String nodeName = ""; //TODO: Define message's Node name attribute
-
-                List<User> users = group.getUsers();
-                Iterator<User> iterator = users.iterator();
-                User messageSender = null;
-                boolean foundUser = false;
-                while (iterator.hasNext() && !foundUser) {
-                    User tmpUser = iterator.next();
-
-                    Long userID = tmpUser.getId().getId();
-                    if (userID.equals(Long.parseLong(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID))))) {
-                        messageSender = tmpUser;
-                        foundUser = true;
-                    }
-                }
-
+                Id senderId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID)));
+                String contentType = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
+                Content content = deserializeContent(cursor, Content.ContentType.valueOf(contentType));
+                String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
+                String messageStatusAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_STATUS));
+                Message.MessageStatus messageStatus = Message.MessageStatus.valueOf(messageStatusAsString);
                 try {
-                    String contentType = cursor.getString(
-                            cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
-                    Content content = deserializeContent(cursor,
-                            Content.ContentType.valueOf(contentType));
-                    String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
                     Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
-                    if (messageSender != null && content != null) {
-                        messages.add(new Message(nodeName, id, messageSender.getId(), content, date));
-                    }
+                    counter++;
+                    messages.add(new Message(nodeName, messageId, senderId, content, date, messageStatus));
                 } catch (ParseException exception) {
+                    exception.printStackTrace();
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
                             + group.getId().getId(), exception);
                     throw new CacheDatabaseException("Unable to retrieve Messages from Group "
                             + group.getId().getId());
                 }
-                counter++;
-            } while (cursor.moveToNext() && counter < NodeHistoryRequest.MESSAGE_COUNT);
+            } while (cursor.moveToNext() && counter < messageCount);
 
             cursor.close();
             return messages;
@@ -677,6 +660,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private boolean goToFirstOccurrenceOfEarlierDate(Cursor cursor, Date furthestDate) throws CacheDatabaseException {
         boolean done = false;
         boolean retValue = false;
+
         while (!done) {
             try {
                 String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
