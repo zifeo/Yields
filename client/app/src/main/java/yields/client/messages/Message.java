@@ -85,12 +85,11 @@ public class Message extends Node {
 
     /**
      * Constructor of a message from the JSON fields received from the server.
-     *
-     * @param dateTime    The date in String format.
-     * @param senderID    The is of the sender in String format.
-     * @param text        The text of the message (if it is a text message, null otherwise).
+     * @param dateTime The date in String format.
+     * @param senderID The is of the sender in String format.
+     * @param text The text of the message (if it is a text message, null otherwise).
      * @param contentType The content type of the message.
-     * @param content     The content of the message.
+     * @param content The content of the message.
      * @throws ParseException In case of parse exception with the date serialization.
      */
     public Message(String dateTime, Long senderID, String text, String contentType, String content)
@@ -100,17 +99,14 @@ public class Message extends Node {
 
         this.mSender = new Id(senderID);
 
-        if (contentType.equals("image")) {
+        if (contentType.equals("image")){
             Bitmap img = ImageSerialization.unSerializeImage(content);
-            if (img == null) {
-                Log.d("Y:" + this.getClass().getName(), "We have no image with contentType image");
+            if (img == null){
+                Log.d("Y:"+ this.getClass().getName(), "We have no image with contentType image");
                 mContent = new TextContent(text);
-            } else {
+            }else {
                 mContent = new ImageContent(img, text);
             }
-        }
-        else if (contentType.equals("url")){
-            this.mContent = new UrlContent(text);
         }
         else {
             this.mContent = new TextContent(text);
