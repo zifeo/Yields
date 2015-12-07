@@ -48,6 +48,7 @@ public class Message extends Node {
     private final Content mContent;
     private Date mDate;
     private MessageStatus mStatus;
+    private final MessageView mView;
 
     /**
      * Main constructor for a Message.
@@ -67,6 +68,7 @@ public class Message extends Node {
         this.mContent = Objects.requireNonNull(content);
         this.mDate = new Date(date.getTime());
         this.mStatus = status;
+        this.mView = new MessageView(YieldsApplication.getApplicationContext(), this);
     }
 
     /**
@@ -114,6 +116,7 @@ public class Message extends Node {
 
         this.mDate = DateSerialization.dateSerializer.toDate(dateTime);
         mStatus = MessageStatus.SENT;
+        this.mView = new MessageView(YieldsApplication.getApplicationContext(), this);
     }
 
     /**
@@ -178,5 +181,14 @@ public class Message extends Node {
     public void setStatus(MessageStatus messageStatus, Date timeStamp) {
         setStatus(messageStatus);
         mDate = timeStamp;
+    }
+
+    /**
+     * Returns the MessageView associated to this message.
+     *
+     * @return The MessageView associated to this message.
+     */
+    public MessageView getView(){
+        return mView;
     }
 }

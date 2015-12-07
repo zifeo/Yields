@@ -2,12 +2,16 @@ package yields.client.service;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+
 import java.util.List;
 
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
+import yields.client.id.Id;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupInfoRequest;
@@ -81,7 +85,31 @@ public class RequestHandler {
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleUserInfoRequest(UserInfoRequest serviceRequest) {
-        //TODO : see with Trofleb
+        User userFromCache = mCacheHelper.getUser(serviceRequest.getUserInfoId());
+        User userInApp = YieldsApplication.getUserFromId(userFromCache.getId());
+
+        List<User> entourage = mCacheHelper.getClientUserEntourage();
+        boolean inEntourageOrClientUser =
+                entourage.contains(userFromCache) || userFromCache.equals(YieldsApplication.getUser());
+
+        if (!inEntourageOrClientUser) {
+            if (userInApp != null) {
+                userInApp.update(userFromCache);
+            } else {
+                YieldsApplication.addNotKnown(userFromCache);
+            }
+        } else {
+            if (YieldsApplication.getUser().equals(userFromCache)) {
+                YieldsApplication.getUser().update(userFromCache);
+            } else {
+                if (userInApp == null) {
+                    YieldsApplication.getUser().addUserToEntourage(userFromCache);
+                } else {
+                    userInApp.update(userFromCache);
+                }
+            }
+        }
+
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }
@@ -193,13 +221,11 @@ public class RequestHandler {
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleNodeHistoryRequest(NodeHistoryRequest serviceRequest) {
-        /*try {
-            Log.d("HELLO", "START");
-           // mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(), serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
-            Log.d("HELLO", "STOP");
+        try {
+            mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(), serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
         } catch (CacheDatabaseException e) {
             e.printStackTrace();
-        }*/
+        }
 
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
