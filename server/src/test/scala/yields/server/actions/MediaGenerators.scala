@@ -3,7 +3,6 @@ package yields.server.actions
 import java.time.OffsetDateTime
 
 import org.scalacheck._
-import org.scalacheck.Arbitrary._
 import yields.server.actions.media.{MediaMessageBrd, MediaMessageRes, MediaMessage}
 import yields.server.dbi.models._
 import yields.server.tests.DefaultsGenerators
