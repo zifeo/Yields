@@ -189,6 +189,7 @@ public class YieldService extends Service {
     synchronized public void unsetMessageActivity() {
         Log.d("Y:" + this.getClass().getName(), "remove activity");
         mCurrentNotifiableActivity = null;
+        mCurrentGroup = null;
     }
 
     /**
@@ -205,9 +206,17 @@ public class YieldService extends Service {
      * Called when the server is connected
      */
     synchronized public void onServerConnected() {
-        if (mWasConnected) {
-            ServiceRequest request = new UserConnectRequest(YieldsApplication.getUser());
-            this.sendRequest(request);
+        if (!mWasConnected) {
+
+            ServiceRequest request = null;
+
+            if (YieldsApplication.getUser() != null) {
+                request = new UserConnectRequest(YieldsApplication.getUser());
+                this.sendRequest(request);
+            } else {
+                //TODO : getUser from cache
+            }
+
         }
         if (mCurrentNotifiableActivity != null) {
             mCurrentNotifiableActivity.notifyOnServerConnected();
@@ -221,8 +230,12 @@ public class YieldService extends Service {
      * @param message The message in question.
      */
     synchronized public void receiveMessage(Id groupId, Message message) {
+        Log.d("sfdugfaguzfguag", "Group id : " + groupId.getId().toString());
+        if (mCurrentGroup != null)
+            Log.d("sfdugfaguzfguag", "current group id : " + mCurrentGroup.getId().getId().toString());
+
         if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
-                !mCurrentGroup.getId().getId().equals(groupId.getId())) {
+                !mCurrentGroup.getId().equals(groupId)) {
             Group group = YieldsApplication.getUser().modifyGroup(groupId);
             group.addMessage(message);
             group.setLastUpdate(message.getDate());
@@ -274,11 +287,15 @@ public class YieldService extends Service {
     private void sendMessageNotification(Group group, Message message) {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.send_icon)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setLargeIcon(group.getImage())
                         .setContentTitle("Message from " + YieldsApplication
                                 .getUserFromId(message.getSender()).getName())
-                        .setContentText(message.getContent().toString().substring(0, 50));
+                        .setContentText(message.getContent().toString().substring(0,
+                                message.getContent().getTextForRequest().length() > 50 ?
+                                        50 : message.getContent().getTextForRequest().length()));
 
+        Log.d("notify", "jfshgiohsadofhojfojasioahdsoi");
         // Creates an explicit intent for an Activity in your app
         YieldsApplication.setGroup(group);
         Intent resultIntent = new Intent(this, MessageActivity.class);
@@ -294,10 +311,10 @@ public class YieldService extends Service {
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
         notificationBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
         mIdLastNotification++;
-        mNotificationManager.notify(mIdLastNotification, notificationBuilder.build());
+        notificationManager.notify(mIdLastNotification, notificationBuilder.build());
     }
 
     /**
