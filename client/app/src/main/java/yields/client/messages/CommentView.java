@@ -132,10 +132,9 @@ public class CommentView extends LinearLayout {
 
                 TextView title = (TextView) v.findViewById(R.id.title);
                 String contentTitle = urlContent.getTitle();
-                if (contentTitle == null){
+                if (contentTitle == null) {
                     title.setText("...");
-                }
-                else{
+                } else {
                     title.setText(contentTitle);
                 }
                 title.setTextSize(16.f);
@@ -143,10 +142,9 @@ public class CommentView extends LinearLayout {
 
                 TextView description = (TextView) v.findViewById(R.id.description);
                 String contentDescription = urlContent.getDescription();
-                if (contentDescription == null){
+                if (contentDescription == null) {
                     description.setText("...");
-                }
-                else{
+                } else {
                     description.setText(urlContent.getDescription());
                 }
                 description.setTextSize(12.f);
@@ -160,6 +158,9 @@ public class CommentView extends LinearLayout {
                         time);
                 messageInfos.setTextColor(Color.BLUE);
                 messageInfos.setTextSize((float) 10.0);
+
+                ImageView icon = (ImageView) v.findViewById(R.id.pageicon);
+                icon.setImageBitmap(urlContent.getThumbnail());
 
                 break;
 
