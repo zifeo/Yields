@@ -305,13 +305,14 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addGroup(Group group) {
         Objects.requireNonNull(group);
 
-        ContentValues values = createContentValuesForGroup(group);
         List<User> usersInGroup = group.getUsers();
         for (User user : usersInGroup) {
-            mDatabase.insertWithOnConflict(TABLE_USERS, null, createContentValuesForUser(user),
-                    SQLiteDatabase.CONFLICT_REPLACE);
+            ContentValues userValues = createContentValuesForUser(user);
+            mDatabase.insertWithOnConflict(TABLE_USERS, null, userValues, SQLiteDatabase.CONFLICT_REPLACE);
         }
-        mDatabase.insertWithOnConflict(TABLE_GROUPS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+        ContentValues groupValues = createContentValuesForGroup(group);
+        mDatabase.insertWithOnConflict(TABLE_GROUPS, null, groupValues, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     /**
@@ -391,16 +392,21 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(userIds);
 
-        if (userIds.contains(YieldsApplication.getUser().getId())) {
-            deleteGroup(groupId);
-            return;
+        for (Id id : userIds) {
+            if (id.equals(YieldsApplication.getUser().getId())) {
+                deleteGroup(groupId);
+                return;
+            }
         }
 
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
-            if (userIds.contains(idIterator.next())) {
-                idIterator.remove();
+            Id nextId = idIterator.next();
+            for(Id id : userIds){
+                if (id.equals(nextId)) {
+                    idIterator.remove();
+                }
             }
         }
 
@@ -526,7 +532,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 String allUsers = cursor.getString(
                         cursor.getColumnIndex(KEY_GROUP_USERS));
                 List<Id> groupUsers = getIdListFromString(allUsers);
-                cursor.close();
 
                 groups.add(new Group(groupName, groupId, groupUsers, groupImage, groupVisibility, groupValidated,
                         new Date()));
@@ -796,11 +801,11 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_IMAGE, ImageSerialization.serializeImage(user.getImg(), ImageSerialization.SIZE_IMAGE));
 
         List<User> entourage = YieldsApplication.getUser().getEntourage();
-        List<String> entourageIds = new ArrayList<>();
+        List<Id> entourageIds = new ArrayList<>();
         for (User entourageUser : entourage) {
-            entourageIds.add(entourageUser.getId().getId().toString());
+            entourageIds.add(entourageUser.getId());
         }
-        int inEntourage = entourageIds.contains(user.getId().getId().toString()) ? 1 : 0;
+        int inEntourage = entourageIds.contains(user.getId()) ? 1 : 0;
         values.put(KEY_USER_ENTOURAGE, inEntourage);
         values.put(KEY_USER_LAST_REFRESH, DateSerialization.dateSerializer.toStringForCache(new Date()));
 
@@ -844,8 +849,12 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static List<Id> getIdListFromString(String idsAsString) {
         Objects.requireNonNull(idsAsString);
 
-        String[] idsAsArray = idsAsString.split(",");
         List<Id> ids = new ArrayList<>();
+        if (idsAsString.isEmpty()) {
+            return ids;
+        }
+
+        String[] idsAsArray = idsAsString.split(",");
         for (String string : idsAsArray) {
             ids.add(new Id(Long.parseLong(string)));
         }
