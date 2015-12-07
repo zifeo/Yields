@@ -139,7 +139,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
                     mGroup.setImage(Bitmap.createScaledBitmap(image, diameter, diameter, false));
 
-                    ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(), image);
+                    ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(),
+                            mGroup.getImage());
                     YieldsApplication.getBinder().sendRequest(request);
                 } else {
                     String message = "Could not retrieve image";
