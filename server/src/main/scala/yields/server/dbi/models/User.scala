@@ -21,7 +21,6 @@ import yields.server.utils.Temporal
   * users:[uid] Map[String, String] - name / email / pic / created_at / updated_at / connected_at
   * users:[uid]:nodes Map[NID, OffsetDateTime]
   * users:[uid]:entourage Map[UID, OffsetDateTime]
-  * users:indexes:email Map[Email, UID] - email
   *
   * TODO: improve setters by only settings if the value is different.
   *
@@ -216,16 +215,14 @@ object User {
     if (!redis(_.hexists(StaticKey.emailIndex, email))) {
       val uid = newIdentity()
       val user = User(uid)
-      redis { r =>
-        val now = Temporal.now
-        val infos = List(
-          (StaticKey.email, email),
-          (StaticKey.created_at, now),
-          (StaticKey.updated_at, now)
-        )
-        r.hmset(user.Key.user, infos)
-        r.hset(StaticKey.emailIndex, email, uid)
-      }
+      val now = Temporal.now
+      val infos = List(
+        (StaticKey.email, email),
+        (StaticKey.created_at, now),
+        (StaticKey.updated_at, now)
+      )
+      redis(_.hmset(user.Key.user, infos))
+      assert(Indexes.userEmailRegister(email, uid))
       user._email = Some(email)
       user
     } else throw new NewUserExistException("email already registered")
