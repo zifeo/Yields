@@ -108,7 +108,11 @@ public class Message extends Node {
             } else {
                 mContent = new ImageContent(img, text);
             }
-        } else {
+        }
+        else if (contentType.equals("url")){
+            this.mContent = new UrlContent(text);
+        }
+        else {
             this.mContent = new TextContent(text);
         }
 
