@@ -11,15 +11,17 @@ public class Id implements IdInterface<Long> {
 
     /**
      * Constructor for the Id taking a long in parameter.
+     *
      * @param value The id in Long.
      */
-    public Id(long value){
+    public Id(long value) {
         mId = value;
     }
 
     /**
      * Return the value of the id.
-     * @return
+     *
+     * @return The Long value of the id.
      */
     @Override
     public Long getId() {
@@ -28,6 +30,7 @@ public class Id implements IdInterface<Long> {
 
     /**
      * Perform equality test between ids.
+     *
      * @param other The id we wnat to compare.
      * @return True if they are the same, false otherwise.
      */
