@@ -1,9 +1,8 @@
 package yields.server.actions.nodes
 
-import org.scalatest.Matchers
-import yields.server.dbi._
+import yields.server.tests.YieldsSpec
 
-class TestGroupSearch extends DBFlatSpec with Matchers {
+class TestGroupSearch extends YieldsSpec {
 
   "GroupSearch" should "find some results with tags" in {
 
