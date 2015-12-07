@@ -8,7 +8,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,10 +24,8 @@ import java.util.TimerTask;
 import yields.client.R;
 import yields.client.exceptions.IllegalIntentExtraException;
 import yields.client.exceptions.MissingIntentExtraException;
-import yields.client.id.Id;
 import yields.client.listadapter.ListAdapterSearchedGroups;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -42,8 +39,6 @@ public class SearchGroupActivity extends NotifiableActivity{
 
     public final static String MODE_KEY = "MODE";
 
-    private MenuItem mMenuSearch;
-    private MenuItem mMenuClose;
     private EditText mEditTextSearch;
     private ActionBar mActionBar;
     private List<Group> mCurrentGroups;
@@ -124,25 +119,9 @@ public class SearchGroupActivity extends NotifiableActivity{
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        mMenuSearch = menu.findItem(R.id.actionSearch);
-        mMenuSearch.setVisible(false);
-
-        mMenuClose = menu.findItem(R.id.actionCloseSearch);
-
         openSearch();
 
         return super.onPrepareOptionsMenu(menu);
-    }
-
-    /**
-     * Method automatically called for the tool bar items
-     * @param menu The tool bar menu
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_search_group, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
     /** Method used to take care of clicks on the tool bar
@@ -153,14 +132,6 @@ public class SearchGroupActivity extends NotifiableActivity{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.actionSearch:
-                openSearch();
-                return true;
-
-            case R.id.actionCloseSearch:
-                closeSearch();
-                return true;
-
             case android.R.id.home:
                 onBackPressed();
                 return true;
@@ -175,9 +146,6 @@ public class SearchGroupActivity extends NotifiableActivity{
      * Called when the user clicks on the 'Search' button
      */
     private void openSearch(){
-        mMenuSearch.setVisible(false);
-        mMenuClose.setVisible(true);
-
         mActionBar.setDisplayShowCustomEnabled(true);
         mActionBar.setCustomView(R.layout.search_bar_layout);
 
@@ -213,16 +181,6 @@ public class SearchGroupActivity extends NotifiableActivity{
         });
 
         mEditTextSearch.requestFocus();
-    }
-
-    /**
-     * Called when the user clicks on the 'Close Search' button
-     */
-    private void closeSearch(){
-        mMenuSearch.setVisible(true);
-        mMenuClose.setVisible(false);
-
-        mActionBar.setDisplayShowCustomEnabled(false);
     }
 
     /**

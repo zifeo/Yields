@@ -6,20 +6,19 @@ import yields.server.utils.Temporal
 import com.redis.serialization.Parse.Implicits._
 
 /**
-  * Representation of a group
-  * A group is a kind of node dedicated to chat between users
+  * Representation of a group.
+  * A group is a kind of node dedicated to chat between users with eventual influx from nodes.
+  * It is always private.
   *
   * @param nid Node id to build
   */
 final class Group private (nid: NID) extends Node(nid)
 
-/**
-  * Companion object for Group
-  */
+/** [[Group]] companion object. */
 object Group {
 
   /**
-    * Create a new group with the given name
+    * Create a new group with the given name.
     * @param name name of the new group
     * @param creator group creator
     * @return the newly created group
@@ -42,6 +41,7 @@ object Group {
     group
   }
 
+  /** [[Group]] constructor. */
   def apply(nid: NID): Group = {
     new Group(nid)
   }

@@ -32,7 +32,7 @@ public class UserUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USER_UPDATE;
+        return RequestKind.USER_UPDATE_NAME;
     }
 
     /**

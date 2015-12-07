@@ -3,9 +3,9 @@ package yields.server.actions
 import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
-import yields.server.DefaultsGenerators
 import yields.server.actions.nodes._
 import yields.server.dbi.models._
+import yields.server.tests.DefaultsGenerators
 
 trait NodesGenerators extends DefaultsGenerators {
 
@@ -26,8 +26,9 @@ trait NodesGenerators extends DefaultsGenerators {
       senders <- arbitrary[List[UID]]
       texts <- arbitrary[List[String]]
       contentTypes <- arbitrary[List[Option[String]]]
-      content <- arbitrary[List[Option[Blob]]]
-    } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, content)
+      contents <- arbitrary[List[Option[Blob]]]
+      contentNids <- arbitrary[List[Option[NID]]]
+    } yield NodeHistoryRes(nid, datetimes, senders, texts, contentTypes, contents, contentNids)
   }
 
   //

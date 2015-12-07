@@ -28,8 +28,10 @@ import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -38,7 +40,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * where the admin can change its name, image, add users and nodes ...
  */
 public class GroupSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, TYPE, IMAGE, USERS, ADD_NODE, ADD_TAG}
+    public enum Settings {NAME, IMAGE, USERS, ADD_NODE, LEAVE_GROUP, ADD_TAG}
 
     private Group mGroup;
     private ClientUser mUser;
@@ -65,14 +67,23 @@ public class GroupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Group Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
+        mGroup = YieldsApplication.getGroup();
+        mUser = YieldsApplication.getUser();
+
+        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
+        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created";
+
         List<String> itemList = new ArrayList<>(Settings.values().length);
 
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeGroupName));
-        itemList.add(Settings.TYPE.ordinal(), getResources().getString(R.string.changeGroupType));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeGroupImage));
         itemList.add(Settings.USERS.ordinal(), getResources().getString(R.string.addUsers));
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
-        itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
+        itemList.add(Settings.LEAVE_GROUP.ordinal(), getResources().getString(R.string.leaveGroup));
+
+        if (mGroup.getVisibility() != Group.GroupVisibility.PRIVATE){
+            itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
+        }
 
         ListView listView = (ListView) findViewById(R.id.listViewSettings);
 
@@ -82,12 +93,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new CustomListener());
         listView.setItemsCanFocus(true);
-
-        mGroup = YieldsApplication.getGroup();
-        mUser = YieldsApplication.getUser();
-
-        assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
-        assert mUser != null : "The user in YieldsApplication cannot be null when this activity is created";
     }
 
     /**
@@ -146,25 +151,24 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 Log.d(TAG, message);
             }
         } else if (requestCode == REQUEST_ADD_USERS && resultCode == RESULT_OK) {
-            ArrayList<String> emailList = data.getStringArrayListExtra(
-                    AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
+            ArrayList<String> idList = data.getStringArrayListExtra(
+                    AddUsersFromEntourageActivity.ID_LIST_KEY);
 
             List<User> newUsers = new ArrayList<>();
-            List<User> entourage = mUser.getEntourage();
-            for (int i = 0; i < emailList.size(); i++) {
-                for (int j = 0; j < entourage.size(); j++) {
-                    if (entourage.get(j).getEmail().equals(emailList.get(i))
-                            && !mGroup.containsUser(entourage.get(j))) {
-
-                        newUsers.add(entourage.get(j));
-                    }
+            for (int i = 0; i < idList.size(); i++) {
+                Id currentId = new Id(Long.parseLong(idList.get(i)));
+                User user = YieldsApplication.getUserFromId(currentId);
+                if (user != null && !mGroup.containsUser(user)) {
+                    newUsers.add(user);
                 }
             }
 
             String message = newUsers.size() + " user(s) added to group";
             YieldsApplication.showToast(getApplicationContext(), message);
 
-            // TODO Send request to add multiple users to server
+            ServiceRequest updateGroup = new GroupUpdateUsersRequest(YieldsApplication.getUser(), mGroup.getId(),
+                    newUsers, GroupUpdateUsersRequest.AddOrRemove.ADD);
+            YieldsApplication.getBinder().sendRequest(updateGroup);
         }
     }
 
@@ -207,10 +211,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     changeNameListener();
                     break;
 
-                case TYPE:
-                    changeTypeListener();
-                    break;
-
                 case IMAGE:
                     changeImageListener();
                     break;
@@ -221,6 +221,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
                 case ADD_NODE:
                     addNodeListener();
+                    break;
+
+                case LEAVE_GROUP:
+                    leaveGroupListener();
                     break;
 
                 default:
@@ -279,48 +283,6 @@ public class GroupSettingsActivity extends AppCompatActivity {
         }
 
         /**
-         * Listener for the "Change group type" item.
-         */
-        private void changeTypeListener() {
-            final CharSequence[] types = {" Public", " Private"};
-            final int[] itemSelected = {0}; // used as a pointer
-            AlertDialog groupTypeDialog;
-
-            // Creating and Building the Dialog
-            AlertDialog.Builder builder = new AlertDialog.Builder(GroupSettingsActivity.this)
-                    .setTitle("Change group type")
-                    .setSingleChoiceItems(types, 0, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int item) {
-                            itemSelected[0] = item;
-                        }
-                    })
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            String type = "public";
-                            if (itemSelected[0] == 1) {
-                                type = "private";
-                            }
-
-                            String message = "Group type changed to : " + type;
-                            YieldsApplication.showToast(getApplicationContext(), message);
-
-                            Group.GroupVisibility visibility;
-                            if (itemSelected[0] == 1) {
-                                visibility = Group.GroupVisibility.PRIVATE;
-                            } else {
-                                visibility = Group.GroupVisibility.PUBLIC;
-                            }
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                        }
-                    });
-            groupTypeDialog = builder.create();
-            groupTypeDialog.show();
-        }
-
-        /**
          * Listener for the "Change group image" item.
          */
         private void changeImageListener() {
@@ -357,6 +319,37 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     SearchGroupActivity.Mode.ADD_NODE_EXISTING_GROUP.ordinal());
 
             startActivity(intent);
+        }
+
+        /**
+         * Listener for the "Leave group" item.
+         */
+        private void leaveGroupListener() {
+            AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
+                .setTitle("Leave group")
+                .setMessage("Are you sure you want to leave this group ?")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        YieldsApplication.getBinder().sendRequest(
+                                new GroupRemoveRequest(YieldsApplication.getUser(), mGroup.getId(),
+                                        YieldsApplication.getUser().getId()));
+
+                        YieldsApplication.showToast(getApplicationContext(), "Group left !");
+
+                        Intent intent = new Intent(GroupSettingsActivity.this, GroupActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create();
+            dialog.show();
         }
 
         /**

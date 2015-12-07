@@ -78,6 +78,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testStartingDisplay() {
         MessageActivity messageActivity = getActivity();
+        YieldsApplication.setGroup(MOCK_GROUP);
 
         //Group info
         ActionBar actionBar = (ActionBar) messageActivity.getSupportActionBar();
@@ -122,6 +123,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         ListView listView = messageActivity.getCurrentFragmentListView();
         int i = listView.getChildCount();
@@ -140,6 +142,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testIfInputFieldAutoscrolls() {
         Activity messageActivity = getActivity();
+        YieldsApplication.setGroup(MOCK_GROUP);
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" +
                 " tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, " +
@@ -157,6 +160,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testInitialTypeIsGroupMessage() {
         MessageActivity messageActivity = getActivity();
+        YieldsApplication.setGroup(MOCK_GROUP);
         assertEquals(MessageActivity.ContentType.GROUP_MESSAGES,
                 messageActivity.getType());
     }
@@ -168,6 +172,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
@@ -184,6 +189,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         YieldsApplication.setResources(messageActivity.getResources());
         messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
 
         Fragment fragment = messageActivity.getCurrentFragment();
@@ -212,6 +218,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testParentMessageIsCorrect() throws InterruptedException {
         MessageActivity messageActivity = getActivity();
+        YieldsApplication.setGroup(MOCK_GROUP);
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock comment";
         messageActivity.simulateImageMessage();
@@ -238,6 +245,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         input = "Should be flushed";
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
@@ -257,6 +265,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
@@ -280,6 +289,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testCannotSendEmptyTextMessage(){
         final MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
     }
@@ -289,6 +299,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         final MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         messageActivity.simulateImageMessage();
+        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
     }

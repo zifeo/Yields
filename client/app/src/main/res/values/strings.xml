@@ -50,11 +50,11 @@
     <string name="noGroupFound">No group found ...</string>
     <string name="groupImage">Group image</string>
     <string name="users">Users</string>
-    <string name="joinGroup">Join Group !</string>
+    <string name="subscribeGroup">Subscribe to group</string>
     <string name="noTags">No tags for this group</string>
     <string name="userImage">User image</string>
     <string name="addTag">Add tag</string>
-    <string name="leaveGroup">Leave group</string>
+    <string name="unsubscribeGroup">Unsubscribe from group</string>
     <string name="title_activity_image_show_pop_up">ImageShowPopUp</string>
     <string name="hello_world">Hello world!</string>
     <string name="connectIcon">Connect Icon</string>
@@ -67,5 +67,20 @@
     <string name="changeUserImage">Change your picture</string>
     <string name="logout">Logout</string>
     <string name="addNode">Add node</string>
-    <string name="title_activity_add_user_to_entourage">AddUserToEntourageActivity</string>
+    <string name="rss">RSS feed</string>
+    <string name="enterUrl">Enter the feed\'s url</string>
+    <string name="messageUrlHttp">The url must start with http://</string>
+    <string name="messageRssCreated">RSS feed created !</string>
+    <string name="typeUrl">Type the URL of the RSS feed !</string>
+    <string name="typeEmailEntourage">Type the email of the person to add him !</string>
+    <string name="enterEmail">name@domain.com</string>
+    <string name="messageWrongEmail">The email is malformed</string>
+    <string name="messageContactAdded">User added to your entourage !</string>
+    <string name="messageNoUser">No user exists with this email</string>
+    <string name="leaveGroup">Leave group</string>
+    <string name="enterKeyword">Leave empty to allow all feeds</string>
+    <string name="typeKeywords">Then, type the keywords that the feed must contain to be published.</string>
+    <string name="removeUsers">Select the contacts you want to remove from your entourage</string>
+    <string name="removeFromEntourage">Remove contacts</string>
+    <string name="messageNoGroup">Search for publishers, RSS feed, or create a new group to start using Yields !</string>
 </resources>

@@ -60,6 +60,10 @@ public class ListAdapterUserSettings extends ArrayAdapter<String> {
                 idDrawable = R.drawable.ic_photo_camera_black_24dp;
                 break;
 
+            case REMOVE_ENTOURAGE:
+                idDrawable = R.drawable.ic_cancel_black_24dp;
+                break;
+
             default:
                 idDrawable = R.drawable.ic_exit_to_app_black_24dp;
                 break;

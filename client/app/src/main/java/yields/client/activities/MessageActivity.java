@@ -104,13 +104,6 @@ public class MessageActivity extends NotifiableActivity {
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
-        if (mUser == null || mGroup == null) {
-            String message = "Couldn't get group information.";
-            YieldsApplication.showToast(getApplicationContext(), message);
-            mActionBar.setTitle("Unknown group");
-        } else {
-            setHeaderBar();
-        }
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
 
         // By default, we show the messages of the group.
@@ -128,6 +121,9 @@ public class MessageActivity extends NotifiableActivity {
     @Override
     public void onResume() {
         super.onResume();
+        mUser = YieldsApplication.getUser();
+        mGroup = YieldsApplication.getGroup();
+        setHeaderBar();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -137,13 +133,22 @@ public class MessageActivity extends NotifiableActivity {
     }
 
     /**
-     * what to do when the activity is no more visible
+     * what to do when the activity is no more visible.
      */
     @Override
     public void onPause() {
         super.onPause();
         mCommentAdapter.clear();
         mGroupMessageAdapter.clear();
+    }
+
+    /**
+     * What to do when activity shuts down.
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        YieldsApplication.nullGroup();
     }
 
     /**
@@ -404,7 +409,7 @@ public class MessageActivity extends NotifiableActivity {
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mActionBar.setTitle("Message from " + YieldsApplication.getUser(mCommentMessage.getSender())
+        mActionBar.setTitle("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         mCommentAdapter.clear();
@@ -414,7 +419,7 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void onClick(View v) {
                 Log.d("CommentFragment", "CommentView clicked.");
-                if (mCommentMessage.getContent().getType() == Content.ContentType.IMAGE) {
+                if (mCommentMessage.getContent().isCommentable()) {
                     YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).getImage());
                     startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
                 }
@@ -455,7 +460,7 @@ public class MessageActivity extends NotifiableActivity {
                                             View view, int position, long id) {
                         Message message = mGroupMessageAdapter.getItem(position);
                         // Only non text messages can be commented.
-                        if (message.getContent().getType() != Content.ContentType.TEXT) {
+                        if (message.getContent().isCommentable()) {
                             // First keep a reference to the message that has been clicked on.
                             mCommentMessage = message;
                             // We save the reference of the last group in the YieldsApplication class.
@@ -530,11 +535,11 @@ public class MessageActivity extends NotifiableActivity {
             for (Message message : messagesTree.values()) {
                 mCommentAdapter.add(message);
             }
-
-            mCommentAdapter.notifyDataSetChanged();
-            ((CommentFragment) mCurrentFragment).getCommentListView()
-                    .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
         }
+
+        mCommentAdapter.notifyDataSetChanged();
+        ((CommentFragment) mCurrentFragment).getCommentListView()
+                .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
     }
 
     /**
@@ -553,6 +558,12 @@ public class MessageActivity extends NotifiableActivity {
      * Sets the correct information on the header.
      */
     private void setHeaderBar() {
-        mActionBar.setTitle(mGroup.getName());
+        if (mUser == null || mGroup == null) {
+            String message = "Couldn't get group information.";
+            YieldsApplication.showToast(getApplicationContext(), message);
+            mActionBar.setTitle("Unknown group");
+        } else {
+            mActionBar.setTitle(mGroup.getName());
+        }
     }
 }

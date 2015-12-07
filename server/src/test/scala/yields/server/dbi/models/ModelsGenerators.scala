@@ -4,6 +4,7 @@ import java.time.OffsetDateTime
 
 import org.scalacheck.Arbitrary
 import yields.server._
+import yields.server.tests.DefaultsGenerators
 
 trait ModelsGenerators extends DefaultsGenerators {
 
