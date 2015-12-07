@@ -2,6 +2,7 @@ package yields.server.dbi.models
 
 import yields.server.dbi._
 import com.redis.serialization.Parse.Implicits._
+import yields.server.dbi.tags.Tag
 
 /**
   * Tag management for nodes
