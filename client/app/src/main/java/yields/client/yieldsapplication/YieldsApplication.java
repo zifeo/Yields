@@ -62,7 +62,11 @@ public class YieldsApplication {
         return mGroup;
     }
 
-
+    /**
+     * Adds a User to the app which is not in the ClientUser's entourage.
+     *
+     * @param notKnown The User that is not known from the ClientUser (not in it's entourage).
+     */
     public static void addNotKnown(User notKnown) {
         mNotKnown.add(notKnown);
     }
@@ -114,17 +118,19 @@ public class YieldsApplication {
 
     /**
      * Getter for the list of users currently displayed in the UserListActivity.
+     *
      * @return The list of users displayed.
      */
-    public static List<User> getUserList(){
+    public static List<User> getUserList() {
         return mUserList;
     }
 
     /**
      * Getter for the user currently displayed in the UserInfoActivity.
+     *
      * @return The user displayed
      */
-    public static User getUserSearched(){
+    public static User getUserSearched() {
         return mUserSearched;
     }
 
@@ -244,17 +250,19 @@ public class YieldsApplication {
 
     /**
      * Setter for the user list to be displayed in UserListActivity
+     *
      * @param users The user list.
      */
-    public static void setUserList(List<User> users){
+    public static void setUserList(List<User> users) {
         mUserList = Collections.unmodifiableList(Objects.requireNonNull(users));
     }
 
     /**
      * Setter for the user to be displayed in UserInfoActivity
+     *
      * @param user The user that will be displayed.
      */
-    public static void setUserSearched(User user){
+    public static void setUserSearched(User user) {
         mUserSearched = Objects.requireNonNull(user);
     }
 
@@ -371,7 +379,7 @@ public class YieldsApplication {
             return mUser;
         }
 
-        User user = mUser.modifyEntourage(userId);
+        User user = mUser.getUserFromEntourage(userId);
 
         if (user == null) {
             for (User userN : mNotKnown) {
