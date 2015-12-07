@@ -24,9 +24,14 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 
 import yields.client.R;
+import yields.client.exceptions.MessageActivityException;
+import yields.client.exceptions.NodeException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -35,10 +40,15 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
+import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
+import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -96,11 +106,9 @@ public class MessageActivity extends NotifiableActivity {
         mSendImage = false;
 
         mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
-                .getApplicationContext(), R.layout.messagelayoutsender,
-                new ArrayList<Message>());
+                .getApplicationContext(), R.layout.messagelayoutsender, new ArrayList<Message>());
         mCommentAdapter = new ListAdapterMessages((YieldsApplication
-                .getApplicationContext()), R.layout.messagelayoutsender, new
-                ArrayList<Message>());
+                .getApplicationContext()), R.layout.messagelayoutsender, new ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
@@ -182,15 +190,20 @@ public class MessageActivity extends NotifiableActivity {
         if (!inputMessage.isEmpty() || mSendImage){
             Content content;
             if (mSendImage && mImage != null) {
+                Log.d("MessageActivity", "Create image content");
                 content = new ImageContent(mImage, inputMessage);
                 mSendImage = false;
                 mImage = null;
                 mImageThumbnail.setImageBitmap(null);
                 mImageThumbnail.setPadding(0, 0, 0, 0);
+            } else if (UrlContent.containsUrl(inputMessage)) {
+                Log.d("MessageActivity", "Create URL content.");
+                content = new UrlContent(inputMessage);
+                Log.d("MessageActivity", "URL content created.");
             } else {
+                Log.d("MessageActivity", "Create text content");
                 content = new TextContent(inputMessage);
             }
-
             Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
                 Log.d("MessageActivity", "Send group message");
@@ -387,9 +400,10 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Cancel an image in a message when clicking on the thumbnail.
+     *
      * @param v The view clicked on.
      */
-    public void cancelImageSending(View v){
+    public void cancelImageSending(View v) {
         String message = "Image removed from message";
         YieldsApplication.showToast(YieldsApplication.getApplicationContext(), message);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -419,8 +433,24 @@ public class MessageActivity extends NotifiableActivity {
             public void onClick(View v) {
                 Log.d("CommentFragment", "CommentView clicked.");
                 if (mCommentMessage.getContent().isCommentable()) {
-                    YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).getImage());
-                    startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                    switch (mCommentMessage.getContent().getType()) {
+                        case IMAGE:
+                            YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).
+                                    getImage());
+                            startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                            break;
+
+                        case URL:
+                            String url = ((UrlContent) mCommentMessage.getContent()).getUrl();
+                            Log.d("MessageActivity", "Open URL in browser : " + url);
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(browserIntent);
+                            break;
+
+                        default:
+                            throw new MessageActivityException("Error, unsupported operation for this type" +
+                                    " of content");
+                    }
                 }
             }
         });
@@ -452,6 +482,7 @@ public class MessageActivity extends NotifiableActivity {
         mActionBar.setTitle(mGroup.getName());
         mCurrentFragment = new GroupMessageFragment();
         ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
+        retrieveGroupMessages();
         ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
                 (new AdapterView.OnItemClickListener() {
                     @Override
@@ -527,7 +558,7 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveCommentMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if(mCommentAdapter.getCount() < messagesTree.size()) {
+        if (mCommentAdapter.getCount() < messagesTree.size()) {
             Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
             mCommentAdapter.clear();
 
