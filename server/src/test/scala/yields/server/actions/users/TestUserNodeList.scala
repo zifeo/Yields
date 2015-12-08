@@ -12,10 +12,11 @@ class TestUserNodeList extends YieldsSpec {
     val action = UserNodeList()
 
     action.run(meta) match {
-      case UserNodeListRes(nodes, updates, refreshes) =>
-        nodes should be (empty)
-        updates should be (empty)
-        refreshes should be (empty)
+      case UserNodeListRes(nodes, kind, updates, refreshes) =>
+        nodes should be(empty)
+        updates should be(empty)
+        refreshes should be(empty)
+        kind should be(empty)
     }
   }
 
@@ -30,11 +31,12 @@ class TestUserNodeList extends YieldsSpec {
     val action = UserNodeList()
 
     action.run(meta) match {
-      case UserNodeListRes(nodes, updates, refreshes) =>
+      case UserNodeListRes(nodes, kind, updates, refreshes) =>
         nodes should have size 2
         updates should have size 2
         refreshes should have size 2
         nodes should contain theSameElementsAs List(group1.nid, group2.nid)
+        kind should contain theSameElementsAs List(group1.kind, group2.kind)
     }
   }
 
