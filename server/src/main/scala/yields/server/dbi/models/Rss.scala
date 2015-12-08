@@ -2,14 +2,14 @@ package yields.server.dbi.models
 
 import yields.server.dbi._
 import yields.server.dbi.models.Node.StaticNodeKey
-import yields.server.dbi.models.Rss.StaticRssKey
+import yields.server.dbi.models.RSS.StaticRssKey
 import yields.server.utils.Temporal
 
 /**
   * Rss publisher node class
   * @param nid nid of publisher
   */
-final class Rss private(nid: NID) extends Node(nid) with Tags {
+final class RSS private(nid: NID) extends Node(nid) with Tags {
 
   val nodeKey = NodeKey.node
   override val nodeID = nid
@@ -39,8 +39,8 @@ final class Rss private(nid: NID) extends Node(nid) with Tags {
 
 }
 
-/** Companion object for [[Rss]] */
-object Rss {
+/** Companion object for [[RSS]] */
+object RSS {
 
   object StaticRssKey {
     val url = "url"
@@ -54,8 +54,8 @@ object Rss {
     * @param filter terms filtering the RSS
     * @return rss object
     */
-  def create(name: String, url: String, filter: String): Rss = {
-    val rss = Rss(newIdentity())
+  def create(name: String, url: String, filter: String): RSS = {
+    val rss = RSS(newIdentity())
     val now = Temporal.now
     val infos = List(
       (StaticNodeKey.name, name),
@@ -66,12 +66,17 @@ object Rss {
       (StaticNodeKey.updated_at, now)
     )
     assert(redis(_.hmset(rss.NodeKey.node, infos)))
+    assert(Indexes.rssRegister(rss.nid))
     rss
   }
 
+  /** Returns all rss. */
+  def all: List[RSS] =
+   Indexes.rssLookup.map(RSS(_))
+
   /** Builds a RSS node. */
   def apply(nid: NID) = {
-    new Rss(nid)
+    new RSS(nid)
   }
 
 }
