@@ -63,7 +63,7 @@ private[dbi] object Indexes {
       case _ => List.empty
     }
 
-    val fetched = redisPipeline[Option[Set[Some[NID]]]](r => keys.map(r.smembers[NID](_)))
+    val fetched = redisPipeline[Option[Set[Option[NID]]]](r => keys.map(r.smembers[NID](_)))
     val res = mutable.Set.empty[NID]
     for {
       result <- fetched
