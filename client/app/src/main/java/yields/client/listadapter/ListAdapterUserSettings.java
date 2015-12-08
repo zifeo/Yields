@@ -52,6 +52,10 @@ public class ListAdapterUserSettings extends ArrayAdapter<String> {
         int idDrawable;
         UserSettingsActivity.Settings[] settings = UserSettingsActivity.Settings.values();
         switch(settings[position]){
+            case INFO:
+                idDrawable = R.drawable.ic_info_black_24dp;
+                break;
+
             case NAME:
                 idDrawable = R.drawable.ic_mode_edit_black_24dp;
                 break;
