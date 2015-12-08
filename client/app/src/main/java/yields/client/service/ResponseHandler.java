@@ -94,10 +94,8 @@ public class ResponseHandler {
             Date ref = DateSerialization
                     .dateSerializer.toDate(serverResponse.getMetadata().getString("ref"));
 
-            if (ref.getTime() == YieldsApplication.getLastDateSearch().getTime()) {
-                YieldsApplication.getGroupsSearched().clear();
-                YieldsApplication.getGroupsSearched().addAll(groupList);
-            }
+            YieldsApplication.getGroupsSearched().clear();
+            YieldsApplication.getGroupsSearched().addAll(groupList);
 
             mService.notifyChange(NotifiableActivity.Change.GROUP_SEARCH);
 
