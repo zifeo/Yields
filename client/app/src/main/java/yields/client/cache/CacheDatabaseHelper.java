@@ -878,7 +878,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         }
         int inEntourage = entourageIds.contains(user.getId()) ? 1 : 0;
         values.put(KEY_USER_ENTOURAGE, inEntourage);
-        values.put(KEY_USER_LAST_REFRESH, DateSerialization.dateSerializer.toStringForCache(new Date()));
+        //values.put(KEY_USER_LAST_REFRESH, DateSerialization.dateSerializer.toStringForCache(new Date()));
 
         return values;
     }
