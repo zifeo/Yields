@@ -13,8 +13,14 @@
         android:layout_height="wrap_content"
         android:elevation="4dp"
         android:paddingLeft="-18sp"
-        android:paddingRight="0sp"
-        >
+        android:paddingRight="0sp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/toolbarTitle" />
     </android.support.v7.widget.Toolbar>
 
     <RelativeLayout
