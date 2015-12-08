@@ -117,7 +117,7 @@ final class User private(val uid: UID) {
     val currentGroup = nodes // need to be computed before pipeline
     val query = redisPipeline { p =>
         currentGroup.map { nid =>
-          val nodeKey = Group(nid).NodeKey.node
+          val nodeKey = Node(nid).NodeKey.node
           p.hmget[String, OffsetDateTime](nodeKey, StaticNodeKey.updated_at, StaticNodeKey.refreshed_at)
         }
       }
