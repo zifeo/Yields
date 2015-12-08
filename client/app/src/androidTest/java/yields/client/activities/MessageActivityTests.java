@@ -293,14 +293,4 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.sendButton)).perform(click());
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
     }
-
-    @Test
-    public void testCaptionForImageIsNotMandatory(){
-        final MessageActivity messageActivity = getActivity();
-        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
-        messageActivity.simulateImageMessage();
-        YieldsApplication.setGroup(MOCK_GROUP);
-        onView(withId(R.id.sendButton)).perform(click());
-        assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
-    }
 }
