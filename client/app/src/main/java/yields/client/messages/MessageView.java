@@ -67,7 +67,7 @@ public class MessageView extends LinearLayout {
     private View createMessageView() throws MessageViewException {
         final User sender = YieldsApplication.getUserFromId(mMessage.getSender());
         boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
-        Context applicationContext = YieldsApplication.getApplicationContext();
+        final Context applicationContext = YieldsApplication.getApplicationContext();
 
         LayoutInflater vi;
         vi = LayoutInflater.from(applicationContext);
@@ -85,8 +85,9 @@ public class MessageView extends LinearLayout {
             public void onClick(View v) {
                 YieldsApplication.setUserSearched(sender);
 
-                Intent intent = new Intent(YieldsApplication.getApplicationContext(), UserInfoActivity.class);
+                Intent intent = new Intent(applicationContext, UserInfoActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                applicationContext.startActivity(intent);
             }
         });
 
