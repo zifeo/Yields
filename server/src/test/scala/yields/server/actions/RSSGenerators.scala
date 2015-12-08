@@ -14,8 +14,9 @@ trait RSSGenerators extends DefaultsGenerators {
     for {
       name <- arbitrary[String]
       url <- arbitrary[String]
+      filter <- arbitrary[String]
       tags <- arbitrary[List[String]]
-    } yield RSSCreate(name, url, tags)
+    } yield RSSCreate(name, url, filter, tags)
   }
 
   implicit lazy val rssCreateResArb: Arbitrary[RSSCreateRes] = Arbitrary {
@@ -34,8 +35,9 @@ trait RSSGenerators extends DefaultsGenerators {
     for {
       name <- arbitrary[String]
       url <- arbitrary[String]
+      filter <- arbitrary[String]
       tags <- arbitrary[Set[String]]
-    } yield RSSInfoRes(name, url, tags)
+    } yield RSSInfoRes(name, url, filter, tags)
   }
 
 }

@@ -206,13 +206,12 @@ public class GroupInfoActivity extends NotifiableActivity {
                 final Button subscribeButton = (Button) findViewById(R.id.buttonSubscribeGroup);
 
                 subscribeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        List<Id> userList = new ArrayList<>();
-                        userList.add(YieldsApplication.getUser().getId());
-                        Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
-
-                        //TODO Add the publisher in the new group
+                @Override
+                public void onClick(View v) {
+                    List<Id> userList = new ArrayList<>();
+                    userList.add(YieldsApplication.getUser().getId());
+                    Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
+                    newGroup.addNode(mGroup);
 
                         ServiceRequest request =new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
                         YieldsApplication.getBinder().sendRequest(request);

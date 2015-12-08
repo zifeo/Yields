@@ -69,7 +69,7 @@ final class Router(val stream: Flow[ByteString, ByteString, Unit], private val d
     )
 
   override val supervisorStrategy =
-    FaultTolerance.nonFatalResume(log)
+    FaultTolerance.nonFatalResumeOrEscalate(log)
 
 }
 

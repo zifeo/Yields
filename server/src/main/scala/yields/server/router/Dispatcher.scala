@@ -10,7 +10,7 @@ import scala.language.postfixOps
 /**
   * Actor in charge of recording connection statuses and distributing push notifications to them.
   */
-final class Dispatcher() extends Actor with ActorLogging {
+final class Dispatcher extends Actor with ActorLogging {
 
   import ClientHub._
   import Dispatcher._
@@ -50,7 +50,7 @@ final class Dispatcher() extends Actor with ActorLogging {
 
   }
 
-  override val supervisorStrategy = FaultTolerance.nonFatalResume(log)
+  override val supervisorStrategy = FaultTolerance.nonFatalResumeOrEscalate(log)
 
   /** Add uid - actor pair to pool. */
   private def add(uid: UID, client: ActorRef, pool: Pool): Pool = {

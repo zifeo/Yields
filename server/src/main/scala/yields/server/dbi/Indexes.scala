@@ -11,6 +11,7 @@ import scala.collection.mutable
   *
   * users:indexes:email Map[String, UID] - email -> user id
   * nodes:searchable:[name] Set[NID] - node ids
+  * nodes:rss Set[NID] - rss ids
   */
 private[dbi] object Indexes {
 
@@ -19,6 +20,7 @@ private[dbi] object Indexes {
   object Key {
     val usersEmails = "users:indexes:email"
     val searchable = "nodes:searchable"
+    val rss = "nodes:rss"
   }
 
   /**
@@ -74,5 +76,20 @@ private[dbi] object Indexes {
     } res += nid
     res.toSet
   }
+
+  /**
+    * Register a given rss.
+    * @param nid rss id
+    * @return true on success
+    */
+  def rssRegister(nid: NID): Boolean =
+    valueOrException(redis(_.sadd(Key.rss, nid))) == 1
+
+  /**
+    * Lookup returning all rss.
+    * @return all rss
+    */
+  def rssLookup: List[NID] =
+    valueOrException(redis(_.smembers[NID](Key.rss))).toList.flatten
 
 }
