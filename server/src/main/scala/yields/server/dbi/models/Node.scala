@@ -16,11 +16,11 @@ import yields.server.utils.Temporal
   *
   * Database structure :
   * nodes:[nid] Map[String, String] - name, kind, refreshed_at, created_at, updated_at
-  * nodes:[nid]:users Map[UID, OffsetDateTIme] with score datetime
-  * nodes:[nid]:nodes Map[NID, OffsetDateTIme] with score datetime
+  * nodes:[nid]:users Map[UID, OffsetDateTime] with score datetime
+  * nodes:[nid]:nodes Map[NID, OffsetDateTime] with score datetime
   * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
   */
-class Node protected(val nid: NID) {
+class Node protected (val nid: NID) {
 
   object NodeKey {
     val node = s"nodes:$nid"
@@ -48,14 +48,7 @@ class Node protected(val nid: NID) {
 
   /** Name setter. */
   def name_=(n: String): Unit =
-    _name = update(StaticNodeKey.name, n)
-
-  // Updates the field with given value and actualize timestamp.
-  private def update[T](field: String, value: T): Option[T] = {
-    val updates = List((field, value), (StaticNodeKey.updated_at, Temporal.now))
-    redis(_.hmset(NodeKey.node, updates))
-    Some(value)
-  }
+    _name = update(NodeKey.node, StaticNodeKey.name, n)
 
   /** Kind getter. */
   def kind: String = _kind.getOrElse {
@@ -65,7 +58,7 @@ class Node protected(val nid: NID) {
 
   /** kind setter */
   def kind_=(newKind: String): Unit = {
-    _kind = update(StaticNodeKey.kind, newKind)
+    _kind = update(NodeKey.node, StaticNodeKey.kind, newKind)
   }
 
   /** Creation datetime getter. */
@@ -94,7 +87,7 @@ class Node protected(val nid: NID) {
 
   /** creator setter */
   def creator_=(uid: UID): Unit = {
-    _creator = update(StaticNodeKey.creator, uid)
+    _creator = update(NodeKey.node, StaticNodeKey.creator, uid)
   }
 
   /** Users getter */
@@ -156,7 +149,7 @@ class Node protected(val nid: NID) {
     */
   def pic(content: Blob, creator: UID): Unit = {
     val newPic = Media.create("image", content, creator)
-    val nid = update(StaticNodeKey.node_pic, newPic.nid)
+    val nid = update(NodeKey.node, StaticNodeKey.node_pic, newPic.nid)
     _pic = nid.map(Media(_))
   }
 
@@ -179,8 +172,7 @@ class Node protected(val nid: NID) {
 
   /** Fill the model with the database content */
   def hydrate(): Unit = {
-    val values = redis(_.hgetall[String, String](NodeKey.node))
-      .getOrElse(throw new IllegalValueException("user should have some data"))
+    val values = valueOrException(redis(_.hgetall[String, String](NodeKey.node)))
     _name = values.get(StaticNodeKey.name)
     _kind = values.get(StaticNodeKey.kind)
     _created_at = values.get(StaticNodeKey.created_at).map(OffsetDateTime.parse)
@@ -202,6 +194,10 @@ object Node {
     val creator = "creator"
     val node_pic = "pic_nid"
   }
+
+  /** Return some searchable nodes. */
+  def fromName(name: String): Set[Node] =
+    Indexes.searchableFuzyLookup(name).map(Node(_))
 
   /** Node constructor. */
   def apply(nid: NID): Node = {

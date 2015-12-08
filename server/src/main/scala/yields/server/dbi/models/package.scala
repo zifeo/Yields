@@ -37,6 +37,9 @@ package object models {
 
   import Parse.Implicits._
 
+  val resourcesFolder = Config.getString("resources.media.folder")
+  val resourcesExt = Config.getString("resources.media.extension")
+
   /** Redis format for [[FeedContent]], [[OffsetDateTime]].  */
   implicit val formatFeedContent = Format {
     case (datetime, uid, Some(nid), text) => s"$datetime,$uid,$nid,$text"
@@ -114,7 +117,7 @@ package object models {
     * @return path
     */
   def buildPathFromName(name: String): String = {
-    Config.getString("ressource.media.folder") + name + Config.getString("ressource.media.extension")
+    s"$resourcesFolder/$name.$resourcesExt"
   }
 
   /**
