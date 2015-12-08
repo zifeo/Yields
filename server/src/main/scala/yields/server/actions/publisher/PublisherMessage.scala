@@ -31,8 +31,12 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
     PublisherMessageRes(nid, datetime, contentNid)
 
   /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast =
-    PublisherMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
+  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast = {
+    val bcast = PublisherMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
+    val reach = Publisher(nid).receivers.flatMap(Node(_).users)
+    Yields.broadcast(reach)(bcast)
+    bcast
+  }
 
 }
 
