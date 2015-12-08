@@ -59,7 +59,7 @@
     <yields.client.gui.CenteredToolBar
         android:id="@+id/toolbar"
         android:minHeight="?attr/actionBarSize"
-        android:background="#AAD5FF"
+        android:background="@color/barColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="-18sp"
