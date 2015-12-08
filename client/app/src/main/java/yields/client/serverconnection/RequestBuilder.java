@@ -263,6 +263,7 @@ public class RequestBuilder {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
         } else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
+            builder.addField(Fields.TAG, new ArrayList<>());
         }
 
         builder.addField(Fields.NAME, name);
