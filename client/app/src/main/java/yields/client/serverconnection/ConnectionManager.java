@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Objects;
 
 /**
@@ -73,12 +74,16 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
         String pushMessage = null;
         do {
             try {
+                pushMessage = null;
                 pushMessage = receiver.readLine();
                 if(pushMessage != null) {
                     Log.d("Y:" + this.getClass().getName(), "response : " + pushMessage);
                     Response response = new Response(pushMessage);
                     subscriber.updateOn(response);
                 }
+            } catch (SocketTimeoutException e) {
+                Log.d("Y:" + this.getClass().getName(), "socket has timed out");
+                pushMessage = "";
             } catch (IOException e) {
                 subscriber.updateOnConnectionProblem(e);
             } catch (JSONException e) {

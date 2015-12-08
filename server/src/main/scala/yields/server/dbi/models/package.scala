@@ -6,6 +6,7 @@ import java.time.OffsetDateTime
 
 import com.redis.serialization.{Format, Parse}
 import yields.server.dbi.exceptions.MediaException
+import yields.server.utils.Config
 
 import scala.io.Source
 
@@ -59,12 +60,13 @@ package object models {
 
   /**
     * write some blob on disk
-    * @param path path to write at
+    * @param filename filename to write at
     * @param content blob to write
     *
     *                TODO security verification, open door to everyone who wants to write on disk
     */
-  def writeContentOnDisk(path: String, content: Blob): Unit = {
+  def writeContentOnDisk(filename: String, content: Blob): Unit = {
+    val path = buildPathFromName(filename)
     val file = new File(path)
     if (!checkFileExist(path)) {
       file.getParentFile.mkdirs
@@ -74,21 +76,21 @@ package object models {
     if (!checkFileExist(path))
       throw new MediaException("Error creating the file on disk")
 
-    val pw = new PrintWriter(new File(path))
+    val pw = new PrintWriter(file)
     pw.write(content.toCharArray)
     pw.close()
   }
 
   /**
     * get some content from disk
-    * @param path path to content to get
+    * @param filename path to content to get
     * @return blob content
     *
     *         TODO security verification, open door to everyone who wants to get content from the disk
     */
-  def getContentFromDisk(path: String): Option[Blob] = {
+  def getContentFromDisk(filename: String): Option[Blob] = {
+    val path = buildPathFromName(filename)
     if (checkFileExist(path)) {
-
       val source = Source.fromFile(s"$path")
       val lines = try source.mkString finally source.close()
       Some(lines.toCharArray.map(_.toByte))
@@ -98,12 +100,33 @@ package object models {
   }
 
   /**
-    * Checks if a file exists on the disk
-    * @param path path to file
-    * @return true if exists false otherwise
+    * Check if a file exists on disk with full name
+    * @param path path of the file to test (name format: date_hash
+    * @return
     */
   def checkFileExist(path: String): Boolean = {
     Files.exists(Paths.get(path))
+  }
+
+  /**
+    * Build a path from a file name
+    * @param name filename
+    * @return path
+    */
+  def buildPathFromName(name: String): String = {
+    Config.getString("ressource.media.folder") + name + Config.getString("ressource.media.extension")
+  }
+
+  /**
+    * Delete a file on disk
+    * @param nid
+    */
+  def deleteContentOnDisk(nid: NID): Unit = {
+    val media = Media(nid)
+    val file = new File(buildPathFromName(media.filename))
+    if (file.exists) {
+      file.delete()
+    }
   }
 
 }

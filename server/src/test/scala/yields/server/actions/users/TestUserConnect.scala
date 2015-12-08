@@ -1,13 +1,11 @@
 package yields.server.actions.users
 
-import org.scalatest._
-import yields.server._
 import yields.server.actions.exceptions.ActionArgumentException
-import yields.server.dbi._
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
+import yields.server.tests.YieldsSpec
 
-class TestUserConnect extends DBFlatSpec with Matchers {
+class TestUserConnect extends YieldsSpec {
 
   val meta = Metadata.now(0) // uid is not important at this point
 

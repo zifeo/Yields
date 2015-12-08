@@ -1,8 +1,8 @@
 package yields.server.actions
 
-import org.scalatest.{FlatSpec, Matchers}
+import yields.server.tests.YieldsSpec
 
-class ActionsTest extends FlatSpec with Matchers {
+class ActionsTest extends YieldsSpec {
 
   "validEmail" should "accept basic emails" in {
     val emails = List(

@@ -129,7 +129,7 @@ PublisherUpdate
 	bcast	nid: NID, name: String, pic: Array[Byte], users: Seq[UID], nodes: Seq[NID]
 PublisherInfo
 	input	nid: NID
-	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID]
+	output	nid: NID, name: String, pic: Option[Array[Byte]], users: Seq[UID], nodes: Seq[NID], tags: Seq[String]
 PublisherMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 	output	nid: NID, datetime: OffsetDateTime
@@ -143,9 +143,19 @@ Publishers is very similar to groups and even share some of its structures but m
 
 ```
 RSSCreate
-	input	name: String, url: String
+	input	name: String, url: String, tags: Seq[String]
 	output	nid: NID
 	bcast	nid: NID, name: String, url: String
-RSSMessage
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+RSSInfo
+	input 	nid: NID
+	output	name: String, url: String, tags: Seq[String]
+```
+
+### Media actions
+
+```
+MediaMessage
+	input 	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
+	output 	nid: NID, datetime: OffsetDateTime
+	bcast 	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 ```

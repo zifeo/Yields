@@ -1,64 +1,82 @@
 package yields.server.io
 
-import org.scalacheck.{Prop, Properties}
-import yields.server.tests._
-import yields.server.actions.UsersGenerators
 import yields.server.actions.users._
+import yields.server.tests._
 
-object UsersJsonFormatSpecifications extends Properties("UsersJsonFormat") with UsersGenerators {
+class UsersJsonFormatSpecifications extends YieldsPropsSpec {
 
-  import Prop.forAll
-
-  property("UserConnect") = forAll { (x: UserConnect) =>
-    toAndFromJson(x)
+  property("UserConnect") {
+    forAll() { (x: UserConnect) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("UserConnectRes") = forAll { (x: UserConnectRes) =>
-    toAndFromJson(x)
-  }
-
-  //
-
-  property("UserUpdate") = forAll { (x: UserUpdate) =>
-    toAndFromJson(x)
-  }
-
-  property("UserUpdateRes") = forAll { (x: UserUpdateRes) =>
-    toAndFromJson(x)
-  }
-
-  property("UserUpdateBrd") = forAll { (x: UserUpdateBrd) =>
-    toAndFromJson(x)
+  property("UserConnectRes") {
+    forAll() { (x: UserConnectRes) =>
+      checkToAndFromJson(x)
+    }
   }
 
   //
 
-  property("UserGroupList") = forAll { (x: UserNodeList) =>
-    toAndFromJson(x)
+  property("UserUpdate") {
+    forAll() { (x: UserUpdate) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("UserGroupListRes") = forAll { (x: UserNodeListRes) =>
-    toAndFromJson(x)
+  property("UserUpdateRes") {
+    forAll() { (x: UserUpdateRes) =>
+      checkToAndFromJson(x)
+    }
+  }
+
+  property("UserUpdateBrd") {
+    forAll() { (x: UserUpdateBrd) =>
+      checkToAndFromJson(x)
+    }
   }
 
   //
 
-  property("UserInfo") = forAll { (x: UserNodeListRes) =>
-    toAndFromJson(x)
+  property("UserGroupList") {
+    forAll() { (x: UserNodeList) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("UserInfoRes") = forAll { (x: UserNodeListRes) =>
-    toAndFromJson(x)
+  property("UserGroupListRes") {
+    forAll() { (x: UserNodeListRes) =>
+      checkToAndFromJson(x)
+    }
   }
 
   //
 
-  property("UserSearch") = forAll { (x: UserSearch) =>
-    toAndFromJson(x)
+  property("UserInfo") {
+    forAll() { (x: UserNodeListRes) =>
+      checkToAndFromJson(x)
+    }
   }
 
-  property("UserSearchRes") = forAll { (x: UserSearchRes) =>
-    toAndFromJson(x)
+  property("UserInfoRes") {
+    forAll() { (x: UserNodeListRes) =>
+      checkToAndFromJson(x)
+    }
+  }
+
+  //
+
+  property("UserSearch") {
+    forAll() { (x: UserSearch) =>
+      checkToAndFromJson(x)
+    }
+  }
+
+  property("UserSearchRes") {
+    forAll() { (x: UserSearchRes) =>
+      checkToAndFromJson(x)
+    }
   }
 
 }

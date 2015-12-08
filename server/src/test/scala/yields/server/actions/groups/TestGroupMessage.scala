@@ -1,15 +1,12 @@
 package yields.server.actions.groups
 
-import org.scalatest.Matchers
-import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.actions.nodes.NodeMessage
-import yields.server.dbi._
+import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizedActionException}
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.tests.AllGenerators
+import yields.server.tests.YieldsSpec
 import yields.server.utils.Temporal
 
-class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
+class TestGroupMessage extends YieldsSpec {
 
   "GroupMessage" should "add new text message to the feed" in {
 
@@ -54,7 +51,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
         feed.head._4 should be(empty)
 
         val media = Media(feed.head._3.get)
-        Media.checkFileExist(media.hash) should be(true)
+        Media.checkFileExist(Media.buildPathFromName(media.filename)) should be(true)
         media.contentType should be(contentType)
         media.content should be(content)
         media.nid should be(contentNid.get)
@@ -85,7 +82,7 @@ class TestGroupMessage extends DBFlatSpec with Matchers with AllGenerators {
         feed.head._4 should be(text)
 
         val media = Media(feed.head._3.get)
-        Media.checkFileExist(media.hash) should be(true)
+        Media.checkFileExist(Media.buildPathFromName(media.filename)) should be(true)
         media.contentType should be(contentType)
         media.content should be(content)
         media.nid should be(contentNid.get)

@@ -126,7 +126,7 @@ public class ResponseHandler {
             for (int i = 0 ; i < users.length() ; i ++) {
                 Id userId = new Id(users.getLong(i));
                 userList.add(userId);
-                if (YieldsApplication.getUser() == null) {
+                if (YieldsApplication.getUserFromId(userId) == null) {
                     User newUser = new User(userId);
                     YieldsApplication.addNotKnown(newUser);
                     ServiceRequest userInfo =
@@ -515,8 +515,8 @@ public class ResponseHandler {
                     YieldsApplication.addNotKnown(user);
                 }
             } else {
-                if (YieldsApplication.getUser().getId().getId().equals(-1) ||
-                        YieldsApplication.getUser().getId().equals(infoId)) {
+                if (YieldsApplication.getUser().getId().equals(infoId)) {
+
                     YieldsApplication.getUser().update(response);
 
                     JSONArray entourage = response.getJSONArray("entourage");

@@ -1,17 +1,14 @@
 package yields.server.dbi.models
 
 import java.io.File
-import java.nio.file.{Paths, Files}
 
-import org.scalatest.{BeforeAndAfter, Matchers, FlatSpec}
-import yields.server.utils.{Temporal, Config}
+import yields.server.tests.YieldsSpec
+import yields.server.utils.Temporal
 
 /**
-  * Test class for image model
-  *
-  * TODO implement test
+  * Test class for image model.
   */
-class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
+class TestMedia extends YieldsSpec {
 
   val contentTypeTest = "image"
   val contentTest =
@@ -24,16 +21,8 @@ class TestMedia extends FlatSpec with Matchers with BeforeAndAfter {
 
   it should "exists on disk" in {
     val img = Media.create(contentTypeTest, contentTest, 1)
-    val exists = Media.checkFileExist(img.hash)
+    val exists = Media.checkFileExist(Media.buildPathFromName(img.filename))
     exists should be(true)
-
-  }
-
-  "file path" should "respect pattern storage/media/date_hash.bin" in {
-    val img = Media.create(contentTypeTest, contentTest, 1)
-    val hash = img.hash
-    val path = Media.buildPathFromName(hash)
-    path should be(img.path)
 
   }
 

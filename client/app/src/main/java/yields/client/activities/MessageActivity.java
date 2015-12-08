@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.SortedMap;
 
 import yields.client.R;
+import yields.client.exceptions.MessageActivityException;
 import yields.client.fragments.CommentFragment;
 import yields.client.fragments.GroupMessageFragment;
 import yields.client.id.Id;
@@ -36,6 +37,7 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
+import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.servicerequest.NodeHistoryRequest;
@@ -112,11 +114,9 @@ public class MessageActivity extends NotifiableActivity {
         mSendImage = false;
 
         mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
-                .getApplicationContext(), R.layout.messagelayoutsender,
-                new ArrayList<Message>());
+                .getApplicationContext(), R.layout.messagelayoutsender, new ArrayList<Message>());
         mCommentAdapter = new ListAdapterMessages((YieldsApplication
-                .getApplicationContext()), R.layout.messagelayoutsender, new
-                ArrayList<Message>());
+                .getApplicationContext()), R.layout.messagelayoutsender, new ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
@@ -143,7 +143,14 @@ public class MessageActivity extends NotifiableActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                retrieveGroupMessages();
+                switch (MessageActivity.this.getType()) {
+                    case MESSAGE_COMMENTS:
+                        retrieveCommentMessages();
+                        break;
+                    case GROUP_MESSAGES:
+                        retrieveGroupMessages();
+                        break;
+                }
             }
         });
     }
@@ -165,6 +172,7 @@ public class MessageActivity extends NotifiableActivity {
     protected void onDestroy() {
         super.onDestroy();
         YieldsApplication.nullGroup();
+        YieldsApplication.getBinder().unsetNotifiableActivity();
     }
 
     /**
@@ -198,15 +206,20 @@ public class MessageActivity extends NotifiableActivity {
         if (!inputMessage.isEmpty() || mSendImage){
             Content content;
             if (mSendImage && mImage != null) {
+                Log.d("MessageActivity", "Create image content");
                 content = new ImageContent(mImage, inputMessage);
                 mSendImage = false;
                 mImage = null;
                 mImageThumbnail.setImageBitmap(null);
                 mImageThumbnail.setPadding(0, 0, 0, 0);
+            } else if (UrlContent.containsUrl(inputMessage)) {
+                Log.d("MessageActivity", "Create URL content.");
+                content = new UrlContent(inputMessage);
+                Log.d("MessageActivity", "URL content created.");
             } else {
+                Log.d("MessageActivity", "Create text content");
                 content = new TextContent(inputMessage);
             }
-
             Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
                 Log.d("MessageActivity", "Send group message");
@@ -403,9 +416,10 @@ public class MessageActivity extends NotifiableActivity {
 
     /**
      * Cancel an image in a message when clicking on the thumbnail.
+     *
      * @param v The view clicked on.
      */
-    public void cancelImageSending(View v){
+    public void cancelImageSending(View v) {
         String message = "Image removed from message";
         YieldsApplication.showToast(YieldsApplication.getApplicationContext(), message);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -435,8 +449,24 @@ public class MessageActivity extends NotifiableActivity {
             public void onClick(View v) {
                 Log.d("CommentFragment", "CommentView clicked.");
                 if (mCommentMessage.getContent().isCommentable()) {
-                    YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).getImage());
-                    startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                    switch (mCommentMessage.getContent().getType()) {
+                        case IMAGE:
+                            YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).
+                                    getImage());
+                            startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                            break;
+
+                        case URL:
+                            String url = ((UrlContent) mCommentMessage.getContent()).getUrl();
+                            Log.d("MessageActivity", "Open URL in browser : " + url);
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(browserIntent);
+                            break;
+
+                        default:
+                            throw new MessageActivityException("Error, unsupported operation for this type" +
+                                    " of content");
+                    }
                 }
             }
         });
@@ -468,6 +498,7 @@ public class MessageActivity extends NotifiableActivity {
         mTextTitle.setText(mGroup.getName());
         mCurrentFragment = new GroupMessageFragment();
         ((GroupMessageFragment) mCurrentFragment).setAdapter(mGroupMessageAdapter);
+        retrieveGroupMessages();
         ((GroupMessageFragment) mCurrentFragment).setMessageListOnClickListener
                 (new AdapterView.OnItemClickListener() {
                     @Override
@@ -521,7 +552,7 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if(mGroupMessageAdapter.getCount() < messagesTree.size()) {
+        if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
 
@@ -532,9 +563,15 @@ public class MessageActivity extends NotifiableActivity {
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
 
+        ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
+
+        if (mGroupMessageAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
+            listView.setSelection(mGroupMessageAdapter.getCount() - 1);
+        } else {
+            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+        }
+
         mGroupMessageAdapter.notifyDataSetChanged();
-        ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
 
     /**
@@ -543,7 +580,7 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveCommentMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if(mCommentAdapter.getCount() < messagesTree.size()) {
+        if (mCommentAdapter.getCount() < messagesTree.size()) {
             Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
             mCommentAdapter.clear();
 
@@ -552,9 +589,15 @@ public class MessageActivity extends NotifiableActivity {
             }
         }
 
+        ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();
+
+        if (mCommentAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
+            listView.setSelection(mCommentAdapter.getCount() - 1);
+        } else {
+            listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+        }
+
         mCommentAdapter.notifyDataSetChanged();
-        ((CommentFragment) mCurrentFragment).getCommentListView()
-                .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
     }
 
     /**

@@ -28,7 +28,7 @@ object Dependencies {
   }
 
   val redis = Seq(
-    "net.debasishg" %% "redisclient" % "3.0"
+    "net.debasishg" %% "redisclient" % "3.1"
   )
 
   val tests = Seq(
