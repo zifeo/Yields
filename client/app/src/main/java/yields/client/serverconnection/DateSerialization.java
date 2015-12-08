@@ -39,6 +39,10 @@ public class DateSerialization {
      */
     public Date toDate(String date) throws ParseException{
         date = date.replace("Z","+00:00");
+        if (date.length() < 28) {
+            date = date.substring(0, 19) + ".000" + date.substring(19);
+        }
+
         return mDateFormatISO6101.parse(date);
     }
 

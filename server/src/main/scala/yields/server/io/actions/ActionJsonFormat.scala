@@ -4,8 +4,10 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
+import yields.server.actions.media.MediaMessage
 import yields.server.actions.nodes.{NodeMessage, NodeSearch, NodeHistory}
 import yields.server.actions.publisher.{PublisherMessage, PublisherInfo, PublisherUpdate, PublisherCreate}
+import yields.server.actions.rss.{RSSInfo, RSSCreate}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -46,6 +48,11 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
     case x: UserInfo => packWithKind(x)
     case x: UserSearch => packWithKind(x)
 
+    case x: RSSCreate => packWithKind(x)
+    case x: RSSInfo => packWithKind(x)
+
+    case x: MediaMessage => packWithKind(x)
+
     case _ =>
       val kind = obj.getClass.getSimpleName
       serializationError(s"unregistered action kind: $kind")
@@ -73,6 +80,11 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
           case "UserNodeList" => message.convertTo[UserNodeList]
           case "UserInfo" => message.convertTo[UserInfo]
           case "UserSearch" => message.convertTo[UserSearch]
+
+          case "RSSCreate" => message.convertTo[RSSCreate]
+          case "RSSInfo" => message.convertTo[RSSInfo]
+
+          case "MediaMessage" => message.convertTo[MediaMessage]
 
           case _ => deserializationError(s"unregistered action kind: $kind")
         }

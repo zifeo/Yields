@@ -39,9 +39,9 @@ import yields.client.messages.TextContent;
 import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -128,7 +128,14 @@ public class MessageActivity extends NotifiableActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                retrieveGroupMessages();
+                switch (MessageActivity.this.getType()) {
+                    case MESSAGE_COMMENTS:
+                        retrieveCommentMessages();
+                        break;
+                    case GROUP_MESSAGES:
+                        retrieveGroupMessages();
+                        break;
+                }
             }
         });
     }
@@ -150,6 +157,7 @@ public class MessageActivity extends NotifiableActivity {
     protected void onDestroy() {
         super.onDestroy();
         YieldsApplication.nullGroup();
+        YieldsApplication.getBinder().unsetNotifiableActivity();
     }
 
     /**
@@ -540,9 +548,15 @@ public class MessageActivity extends NotifiableActivity {
             Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
         }
 
+        ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
+
+        if (mGroupMessageAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
+            listView.setSelection(mGroupMessageAdapter.getCount() - 1);
+        } else {
+            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+        }
+
         mGroupMessageAdapter.notifyDataSetChanged();
-        ((GroupMessageFragment) mCurrentFragment).getMessageListView()
-                .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
     }
 
     /**
@@ -560,9 +574,15 @@ public class MessageActivity extends NotifiableActivity {
             }
         }
 
+        ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();
+
+        if (mCommentAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
+            listView.setSelection(mCommentAdapter.getCount() - 1);
+        } else {
+            listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+        }
+
         mCommentAdapter.notifyDataSetChanged();
-        ((CommentFragment) mCurrentFragment).getCommentListView()
-                .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
     }
 
     /**

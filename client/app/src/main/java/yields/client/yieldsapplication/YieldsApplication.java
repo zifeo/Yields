@@ -330,6 +330,14 @@ public class YieldsApplication {
     }
 
     /**
+     * nulls the binder to the service
+     *
+     */
+    public static void nullBinder() {
+        mBinder = null;
+    }
+
+    /**
      * Static method used for centralized toast display
      *
      * @param context The app context

@@ -592,6 +592,7 @@ public class ResponseHandler {
                 }
             } else {
                 if (YieldsApplication.getUser().getId().equals(infoId)) {
+
                     YieldsApplication.getUser().update(response);
 
                     Bitmap image;

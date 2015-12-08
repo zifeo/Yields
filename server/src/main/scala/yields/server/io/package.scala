@@ -2,8 +2,10 @@ package yields.server
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
+import yields.server.actions.media.{MediaMessageBrd, MediaMessageRes, MediaMessage}
 import yields.server.actions.nodes._
 import yields.server.actions.publisher._
+import yields.server.actions.rss.{RSSInfoRes, RSSInfo, RSSCreateRes, RSSCreate}
 import yields.server.actions.users._
 import yields.server.io.actions.{BroadcastJsonFormat, ActionJsonFormat, ResultJsonFormat}
 import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
@@ -88,6 +90,19 @@ package object io {
   implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
   implicit lazy val publisherMessageResJF = jsonFormat3(PublisherMessageRes)
   implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
+
+  // RSS
+  implicit lazy val rssCreateJF = jsonFormat3(RSSCreate)
+  implicit lazy val rssCreateResJF = jsonFormat1(RSSCreateRes)
+
+  implicit lazy val rssInfoJF = jsonFormat1(RSSInfo)
+  implicit lazy val rssInfoResJF = jsonFormat3(RSSInfoRes)
+
+  // Media
+  implicit lazy val mediaMessageJF = jsonFormat4(MediaMessage)
+  implicit lazy val mediaMessageResJF = jsonFormat2(MediaMessageRes)
+  implicit lazy val mediaMessageBrdJF = jsonFormat6(MediaMessageBrd)
+
 
   /** *** Message passing interface *****/
 
