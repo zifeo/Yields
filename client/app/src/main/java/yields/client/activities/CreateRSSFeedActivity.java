@@ -70,7 +70,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String url = mEditTextUrl.getText().toString();
 
-        if (!url.startsWith("http://")){
+        if (!url.startsWith("http://") && !url.startsWith("https://")){
             String message = getString(R.string.messageUrlHttp);
             YieldsApplication.showToast(getApplicationContext(), message);
         }
