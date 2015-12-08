@@ -2,8 +2,9 @@ package yields.server.actions.groups
 
 import java.time.OffsetDateTime
 
-import yields.server.actions.{Result, Broadcast}
-import yields.server.actions.nodes.NodeMessage
+import yields.server.Yields
+import yields.server.actions.Result
+import yields.server.actions.nodes.{NodeMessage, NodeMessageBrd}
 import yields.server.dbi.models._
 
 /**
@@ -24,9 +25,11 @@ case class GroupMessage(nid: NID, text: Option[String], contentType: Option[Stri
   override def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result =
     GroupMessageRes(nid, datetime, contentNid)
 
-  /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast =
-    GroupMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
+  /** Sent the broadcast. */
+  override def broadcast(users: List[UID], datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Unit = {
+    val bcast = NodeMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
+    Yields.broadcast(users)(bcast)
+  }
 
 }
 
@@ -36,20 +39,3 @@ case class GroupMessage(nid: NID, text: Option[String], contentType: Option[Stri
   * @param datetime message recorded datetime
   */
 case class GroupMessageRes(nid: NID, datetime: OffsetDateTime, contentNid: Option[NID]) extends Result
-
-/**
-  * [[GroupMessage]] broadcast.
-  * @param nid group id
-  * @param datetime message recorded datetime
-  * @param sender message sender
-  * @param text message text if any
-  * @param contentType message content type if any
-  * @param content message content if any
-  */
-case class GroupMessageBrd(nid: NID,
-                           datetime: OffsetDateTime,
-                           sender: UID,
-                           text: Option[String],
-                           contentType: Option[String],
-                           content: Option[Blob],
-                           contentNid: Option[NID]) extends Broadcast
