@@ -60,7 +60,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        SystemClock.sleep(200);
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
