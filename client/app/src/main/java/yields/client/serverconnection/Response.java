@@ -14,7 +14,7 @@ public class Response {
      * The Kind of possible Responses.
      */
     public enum ResKind {
-        NODE_HISTORY_RESPONSE("NodeHistoryRes"),
+        NODE_HISTORY_RESPONSE("NodeHistoryRes"), MEDIA_MESSAGE_RESPONSE("MediaMessageRes"),
         USER_CONNECT_RESPONSE("UserConnectRes"), USER_GROUP_LIST_RESPONSE("UserNodeListRes"),
         USER_INFO_RESPONSE("UserInfoRes"), GROUP_CREATE_RESPONSE("GroupCreateRes"),
         USER_UPDATE_RESPONSE("UserUpdateRes"), USER_SEARCH_RESPONSE("UserSearchRes"),
@@ -28,7 +28,6 @@ public class Response {
         GROUP_MESSAGE_BCAST("GroupMessageBrd"), PUBLISHER_CREATE_BCAST("PublisherCreateBrd"),
         PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"), PUBLISHER_MESSAGE_BCAST("PublisherMessageBrd"),
         RSS_CREATE_BCAST("RssCreateBrd"), RSS_MESSAGE_BCAST("RssMessageCast");
-
 
         private final String name;
 

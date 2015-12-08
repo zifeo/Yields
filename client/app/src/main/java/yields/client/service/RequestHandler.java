@@ -9,14 +9,16 @@ import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
 import yields.client.node.Group;
 import yields.client.node.User;
+import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
+import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
-import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -206,7 +208,7 @@ public class RequestHandler {
     /**
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
-    protected void handleNodeMessageRequest(NodeMessageRequest serviceRequest) {
+    protected void handleNodeMessageRequest(GroupMessageRequest serviceRequest) {
         mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNodeId());
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
 
@@ -251,6 +253,16 @@ public class RequestHandler {
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleNodeSearchRequest(NodeSearchRequest serviceRequest) {
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        mController.sendToServer(serverRequest);
+    }
+
+    /**
+     * Handles the appropriate ServiceRequest which is given to it by argument.
+     */
+    protected void handleMediaMessageRequest(MediaMessageRequest serviceRequest) {
+        mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNodeId());
+
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }

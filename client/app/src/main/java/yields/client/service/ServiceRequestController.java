@@ -19,8 +19,9 @@ import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
+import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
-import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -155,11 +156,14 @@ public class ServiceRequestController {
             case GROUP_UPDATE_USERS:
                 mRequestHandler.handleGroupUpdateUsersRequest((GroupUpdateUsersRequest) serviceRequest);
                 break;
-            case NODE_MESSAGE:
-                mRequestHandler.handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
+            case GROUP_MESSAGE:
+                mRequestHandler.handleNodeMessageRequest((GroupMessageRequest) serviceRequest);
                 break;
             case NODE_HISTORY:
                 mRequestHandler.handleNodeHistoryRequest((NodeHistoryRequest) serviceRequest);
+                break;
+            case MEDIA_MESSAGE:
+                mRequestHandler.handleMediaMessageRequest((MediaMessageRequest) serviceRequest);
                 break;
             case USER_SEARCH:
                 mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
@@ -251,6 +255,9 @@ public class ServiceRequestController {
                 break;
             case RSS_MESSAGE_BCAST:
                 mResponseHandler.handleRSSMessageBroadcast(serverResponse);
+                break;
+            case MEDIA_MESSAGE_RESPONSE:
+                mResponseHandler.handleMediaMessageResponse(serverResponse);
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "No such response kind : " +
