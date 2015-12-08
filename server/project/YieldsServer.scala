@@ -21,7 +21,7 @@ object YieldsServer extends Build {
 
     libraryDependencies ++= {
       import Dependencies._
-      meta ++ akka ++ akkaExp ++ redis ++ tests
+      meta ++ akka ++ akkaExp ++ rss ++ redis ++ tests
     },
 
     scalacOptions in (Compile, doc) ++= Seq(
