@@ -9,30 +9,29 @@ import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 
 /**
- * ServiceRequest asking the Service to add a Message to a Node.
+ * ServiceRequest asking the Service to add a Message to a Media.
  */
-public class NodeMessageRequest extends ServiceRequest {
+public class MediaMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
-    private final Id mReceivingGroupId;
+    private final Id mReceivingNodeId;
     private final Group.GroupVisibility mVisibility;
 
 
     /**
-     * Main constructor for this type of ServiceRequest (sending a Message to a Node).
+     * Main constructor for this type of ServiceRequest (sending a Message to a Media).
      *
-     * @param message          The Message that should be sent.
-     * @param receivingGroupId The Id of the group to which the Message should be added.
+     * @param message         The Message that should be sent.
+     * @param receivingNodeId The Id of the Media to which the Message should be added.
      */
-    public NodeMessageRequest(Message message, Id receivingGroupId,
-                              Group.GroupVisibility visibility) {
+    public MediaMessageRequest(Message message, Id receivingNodeId, Group.GroupVisibility visibility) {
         super();
         Objects.requireNonNull(message);
-        Objects.requireNonNull(receivingGroupId);
+        Objects.requireNonNull(receivingNodeId);
         Objects.requireNonNull(visibility);
 
         mMessage = message;
-        mReceivingGroupId = receivingGroupId;
+        mReceivingNodeId = receivingNodeId;
         mVisibility = visibility;
     }
 
@@ -43,7 +42,7 @@ public class NodeMessageRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.NODE_MESSAGE;
+        return RequestKind.MEDIA_MESSAGE;
     }
 
     /**
@@ -55,7 +54,7 @@ public class NodeMessageRequest extends ServiceRequest {
     public ServerRequest parseRequestForServer() {
         Message message = getMessage();
 
-        return RequestBuilder.nodeMessageRequest(message.getSender(), mReceivingGroupId,
+        return RequestBuilder.groupMessageRequest(message.getSender(), mReceivingNodeId,
                 mVisibility, message.getContent(), message.getDate());
     }
 
@@ -74,6 +73,7 @@ public class NodeMessageRequest extends ServiceRequest {
      * @return The receiving Node of this ServiceRequest.
      */
     public Id getReceivingNodeId() {
-        return mReceivingGroupId;
+        return mReceivingNodeId;
     }
 }
+

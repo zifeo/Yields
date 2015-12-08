@@ -735,4 +735,31 @@ public class ResponseHandler {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleMediaMessageResponse(Response serverResponse) {
+        try {
+            JSONObject response = serverResponse.getMessage();
+            Date prevDatetime = DateSerialization.dateSerializer
+                    .toDate(serverResponse.getMetadata().getString("ref"));
+            Date serverDatetime = DateSerialization.dateSerializer
+                    .toDate(response.getString("datetime"));
+
+            long nid = response.getLong("nid");
+            Id id = new Id(nid);
+
+            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
+                    message.getContent(), prevDatetime, message.getStatus());
+            mCacheHelper.deleteMessage(copyMessage, id);
+            mCacheHelper.addMessage(message, id);
+
+            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+        } catch (JSONException | ParseException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
+    }
 }

@@ -1,14 +1,12 @@
 package yields.client.Requests;
 
 import android.graphics.Bitmap;
-import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +19,6 @@ import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
-import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.RequestBuilder;
@@ -287,8 +284,8 @@ public class ServerRequestsTests {
     }
 
     /**
-     * Tests if a nodeMessageRequest is correctly built.
-     * (Test for nodeMessageRequest(Id sender, Id groupId, Content content))
+     * Tests if a groupMessageRequest is correctly built.
+     * (Test for groupMessageRequest(Id sender, Id groupId, Content content))
      */
     @Test
     public void testGroupMessageRequest() {
@@ -302,7 +299,7 @@ public class ServerRequestsTests {
             String imageEncoded = ImageSerialization.serializeImage(newImage,
                     ImageSerialization.SIZE_IMAGE_NODE);
 
-            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     Group.GroupVisibility.PRIVATE, textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -317,7 +314,7 @@ public class ServerRequestsTests {
             assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.TEXT.getValue()),
                     text);
 
-            serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
+            serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     Group.GroupVisibility.PRIVATE, imageContent, new Date());
             json = new JSONObject(serverRequest.message());
 
@@ -350,7 +347,7 @@ public class ServerRequestsTests {
             String text = "Apple pie is best pie !";
             TextContent textContent = new TextContent(text);
 
-            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     Group.GroupVisibility.PRIVATE, textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
@@ -385,7 +382,7 @@ public class ServerRequestsTests {
             String imageEncoded = ImageSerialization.serializeImage(newImage,
                     ImageSerialization.SIZE_IMAGE);
 
-            ServerRequest serverRequest = RequestBuilder.nodeMessageRequest(senderId, groupId,
+            ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     Group.GroupVisibility.PRIVATE, imageContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
