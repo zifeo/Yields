@@ -10,7 +10,6 @@ import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -50,7 +49,7 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         YieldsApplication.setUser(user);
 
         Group g = new Group("Group", new Id(124), new ArrayList<Id>());
-        g.setVisibility(Group.GroupVisibility.PUBLIC);
+        g.setVisibility(Group.GroupType.PUBLISHER);
         YieldsApplication.setGroup(g);
     }
 

@@ -59,7 +59,7 @@ public class GroupCreateRequest extends ServiceRequest {
 
 
         return RequestBuilder.groupCreateRequest(mCreator.getId(), mGroup.getName(), mGroup
-                .getVisibility(), userIds, nodeIds);
+                .getType(), userIds, nodeIds);
     }
 
     /**

@@ -26,12 +26,12 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
 
-    public enum GroupVisibility {
-        PRIVATE("PRIVATE"), PUBLIC("PUBLIC"), RSS("RSS");
+    public enum GroupType {
+        PRIVATE("PRIVATE"), PUBLISHER("PUBLISHER"), RSS("RSS");
 
         private final String mName;
 
-        GroupVisibility(String name) {
+        GroupType(String name) {
             mName = name;
         }
 
@@ -45,22 +45,22 @@ public class Group extends Node {
     private List<User> mUsers;
     private List<Group> mNodes;
     private Bitmap mImage;
-    private GroupVisibility mVisibility;
+    private GroupType mType;
     private Set<Tag> mTags;
     private Date mDate;
 
     /**
      * Constructor for groups
      *
-     * @param name       The name of the group
-     * @param id         The id of the group
-     * @param users      The current users of the group
-     * @param image      The current image of the group
-     * @param visibility The visibility of the group
-     * @param validated  If the group has been validated by the server
+     * @param name      The name of the group
+     * @param id        The id of the group
+     * @param users     The current users of the group
+     * @param image     The current image of the group
+     * @param type      The type of the group
+     * @param validated If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<Id> users, Bitmap image, GroupVisibility visibility,
+    public Group(String name, Id id, List<Id> users, Bitmap image, GroupType type,
                  boolean validated, Date lastUpdate) {
         super(name, id);
         Objects.requireNonNull(users);
@@ -69,7 +69,7 @@ public class Group extends Node {
         mUsers = new ArrayList<>();
         mImage = Objects.requireNonNull(image);
         mValidated = validated;
-        mVisibility = visibility;
+        mType = type;
         mTags = new HashSet<>();
         mDate = lastUpdate;
         mNodes = new ArrayList<>();
@@ -82,8 +82,8 @@ public class Group extends Node {
     /**
      * Constructor for groups
      *
-     * @param name       The name of the group
-     * @param id         The id of the group
+     * @param name The name of the group
+     * @param id   The id of the group
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, Group group) {
@@ -93,14 +93,14 @@ public class Group extends Node {
         mUsers = group.getUsers();
         mImage = group.getImage();
         mValidated = false;
-        mVisibility = GroupVisibility.PRIVATE;
+        mType = GroupType.PRIVATE;
         mTags = new HashSet<>();
         mDate = new Date();
         mNodes = new ArrayList<>();
     }
 
     /**
-     * Overloaded constructor for groups for default visibility.
+     * Overloaded constructor for groups for default type.
      * By default a group is set to private.
      *
      * @param name  The name of the group
@@ -110,7 +110,7 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<Id> users, Bitmap image) {
-        this(name, id, users, image, GroupVisibility.PRIVATE, false, new Date());
+        this(name, id, users, image, GroupType.PRIVATE, false, new Date());
     }
 
     /**
@@ -122,7 +122,7 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<Id> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
                 false, new Date());
     }
 
@@ -135,7 +135,7 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<Id> users, Boolean validated, Date lastUpdate) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
                 validated, lastUpdate);
     }
 
@@ -145,15 +145,16 @@ public class Group extends Node {
      * @param jsonGroup The JsonArray containing the group.
      * @throws JSONException
      */
-    public Group(JSONArray jsonGroup) throws JSONException, ParseException{
+    public Group(JSONArray jsonGroup) throws JSONException, ParseException {
         this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<Id>(), true,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
     /**
      * Construct a Group from the Id and the name recieved from the server.
-     * @param groupId The Id of the group in String format.
-     * @param name The name of the group.
+     *
+     * @param groupId     The Id of the group in String format.
+     * @param name        The name of the group.
      * @param refreshedAt Last date the group has been refreshed.
      */
     public Group(String groupId, String name, String refreshedAt) throws ParseException {
@@ -163,25 +164,28 @@ public class Group extends Node {
 
     /**
      * Get the last time the group was updated.
+     *
      * @return The sus-mentioned date.
      */
-    public Date getLastUpdate(){
+    public Date getLastUpdate() {
         return new Date(mDate.getTime());
     }
 
     /**
      * Set's the last time the group was updated.
+     *
      * @param date The date of the last update.
      */
-    public void setLastUpdate(Date date){
+    public void setLastUpdate(Date date) {
         mDate = new Date(date.getTime());
     }
 
     /**
      * Create a wrapper for the comment message in order to be able to send and retreive comment
      * for this message.
+     *
      * @param messageComment The message commented.
-     * @param group The parent group containing the message.
+     * @param group          The parent group containing the message.
      * @return The group wrapper for this message.
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
@@ -190,14 +194,15 @@ public class Group extends Node {
 
     /**
      * Validates a message received at a certain date and changes the date to the server side date.
-     * @param date The old Date of the Message.
+     *
+     * @param date    The old Date of the Message.
      * @param newDate The newDate of the Message.
      * @return The Message updated.
      */
-    public Message validateMessage(Date date, Date newDate){
-        Message message =  mMessages.remove(date);
+    public Message validateMessage(Date date, Date newDate) {
+        Message message = mMessages.remove(date);
 
-        if (message != null){
+        if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
             message.recomputeView();
             mMessages.put(newDate, message);
@@ -210,21 +215,21 @@ public class Group extends Node {
     }
 
     /**
-     * Set the visibility of a group.
+     * Set the type of a group.
      *
-     * @param visibility The new visibility.
+     * @param type The new type.
      */
-    public void setVisibility(GroupVisibility visibility) {
-        mVisibility = visibility;
+    public void setType(GroupType type) {
+        mType = type;
     }
 
     /**
-     * Getter for the group visibility.
+     * Getter for the group type.
      *
-     * @return The visibility attribute of the group.
+     * @return The type attribute of the group.
      */
-    public GroupVisibility getVisibility() {
-        return mVisibility;
+    public GroupType getType() {
+        return mType;
     }
 
     /**

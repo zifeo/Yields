@@ -53,7 +53,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectName(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         YieldsApplication.setGroup(g);
 
         getActivity();
@@ -65,7 +65,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectNoTags(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         YieldsApplication.setGroup(g);
         getActivity();
 
@@ -77,7 +77,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectTag(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         g.addTag(new Group.Tag("fun"));
 
         YieldsApplication.setGroup(g);
@@ -91,7 +91,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectTags(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         g.addTag(new Group.Tag("fun"));
         g.addTag(new Group.Tag("happy"));
 
@@ -110,7 +110,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectUsers(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         User u1 = new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage());
         User u2 = new User("Clank", new Id(121), "c@veldin.com", YieldsApplication.getDefaultUserImage());
         YieldsApplication.getUser().addUserToEntourage(u1);

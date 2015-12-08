@@ -109,7 +109,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * Test that runs through all activities related to group creation, and set the new group
      * to public
      */
-    public void testGroupCreationSetPrivateVisibility() {
+    public void testGroupCreationSetPrivateType() {
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"), closeSoftKeyboard());
@@ -129,7 +129,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
             if (textGroupName.equals("Private Group")) {
                 found = true;
                 Group group = (Group) listView.getAdapter().getItem(i);
-                assertEquals(Group.GroupVisibility.PRIVATE, group.getVisibility());
+                assertEquals(Group.GroupType.PRIVATE, group.getType());
             }
         }
         if (!found) {
@@ -141,7 +141,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * Test that runs through all activities related to group creation, flipping
      * through public and private, and set the new group to public
      */
-    public void testGroupCreationFlipBetweenVisibilityButtonPublic() {
+    public void testGroupCreationFlipBetweenTypeButtonPublic() {
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Public Group"), closeSoftKeyboard());
@@ -163,7 +163,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
             if (textGroupName.equals("Public Group")) {
                 found = true;
                 Group group = (Group) listView.getAdapter().getItem(i);
-                assertEquals(Group.GroupVisibility.PUBLIC, group.getVisibility());
+                assertEquals(Group.GroupType.PUBLISHER, group.getType());
             }
         }
         if (!found) {
@@ -175,11 +175,9 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * Test that runs through all activities related to group creation, flipping
      * through public and private, and set the new group to private
      */
-    public void testGroupCreationFlipBetweenVisibilityButtonPrivate() {
+    public void testGroupCreationFlipBetweenTypeButtonPrivate() {
         onView(withId(R.id.actionCreate)).perform(click());
-
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"), closeSoftKeyboard());
-
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
         onView(withId(R.id.radioButtonPublicGroup)).perform(click());
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
@@ -197,7 +195,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
             if (textGroupName.equals("Private Group")) {
                 found = true;
                 Group group = (Group) listView.getAdapter().getItem(i);
-                assertEquals(Group.GroupVisibility.PRIVATE, group.getVisibility());
+                assertEquals(Group.GroupType.PRIVATE, group.getType());
             }
         }
         if (!found) {

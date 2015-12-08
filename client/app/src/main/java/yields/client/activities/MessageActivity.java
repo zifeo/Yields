@@ -221,7 +221,7 @@ public class MessageActivity extends NotifiableActivity {
                 Log.d("MessageActivity", "Create text content");
                 content = new TextContent(inputMessage);
             }
-            Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
+            Message message = new Message("message", new Id(-1), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
                 Log.d("MessageActivity", "Send group message");
                 mGroupMessageAdapter.add(message);
@@ -229,7 +229,7 @@ public class MessageActivity extends NotifiableActivity {
                 ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                         .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
                 GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(),
-                        mGroup.getVisibility());
+                        mGroup.getType());
                 YieldsApplication.getBinder().sendRequest(request);
             } else {
                 mCommentAdapter.add(message);
@@ -237,7 +237,7 @@ public class MessageActivity extends NotifiableActivity {
                 ((CommentFragment) mCurrentFragment).getCommentListView()
                         .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
                 MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId(),
-                        Group.GroupVisibility.PRIVATE);
+                        Group.GroupType.PRIVATE);
                 YieldsApplication.getBinder().sendRequest(request);
             }
 

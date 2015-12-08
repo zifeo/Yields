@@ -418,8 +418,8 @@ public class CacheDatabaseTests {
         assertEquals(group.getId().getId(),
                 fromDatabase.getId().getId());
 
-        assertEquals(Group.GroupVisibility.PRIVATE,
-                fromDatabase.getVisibility());
+        assertEquals(Group.GroupType.PRIVATE,
+                fromDatabase.getType());
 
         assertTrue(compareImages(group.getImage(),
                 fromDatabase.getImage()));
@@ -445,7 +445,7 @@ public class CacheDatabaseTests {
         assertEquals(fromDatabase.getName(), group.getName());
         assertEquals(fromDatabase.getId().getId(), group.getId().getId());
         assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
-        assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PRIVATE);
+        assertEquals(fromDatabase.getType(), Group.GroupType.PRIVATE);
         assertTrue(compareImages(Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565),
                 fromDatabase.getImage()));
         assertEquals(group.isValidated(), fromDatabase.isValidated());
@@ -453,20 +453,20 @@ public class CacheDatabaseTests {
 
     /**
      * Tests if a Group can have it's visibility changed.
-     * (Test for updateGroupVisibility(Id groupId, Group.GroupVisibility visibility))
+     * (Test for updateGroupType(Id groupId, Group.GroupType type))
      */
     @Test
-    public void testDatabaseCanUpdateGroupVisibility() {
+    public void testDatabaseCanUpdateGroupType() {
         Group group = MockFactory.generateMockGroups(1).get(0);
         mDatabaseHelper.addGroup(group);
-        mDatabaseHelper.updateGroupVisibility(group.getId(), Group.GroupVisibility.PUBLIC);
+        mDatabaseHelper.updateGroupVisibility(group.getId(), Group.GroupType.PUBLISHER);
         Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
         assertEquals(fromDatabase.getName(), group.getName());
         assertEquals(fromDatabase.getId().getId(), group.getId().getId());
         assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
         assertTrue(compareImages(group.getImage(),
                 fromDatabase.getImage()));
-        assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PUBLIC);
+        assertEquals(fromDatabase.getType(), Group.GroupType.PUBLISHER);
         assertEquals(group.isValidated(), fromDatabase.isValidated());
     }
 
@@ -486,7 +486,7 @@ public class CacheDatabaseTests {
         assertTrue(compareImages(group.getImage(),
                 fromDatabase.getImage()));
         assertEquals(true, fromDatabase.isValidated());
-        assertEquals(fromDatabase.getVisibility(), group.getVisibility());
+        assertEquals(fromDatabase.getType(), group.getType());
     }
 
     /**

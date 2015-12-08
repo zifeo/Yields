@@ -55,7 +55,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GROUP_NAME = "groupName";
     private static final String KEY_GROUP_USERS = "groupUsers";
     private static final String KEY_GROUP_IMAGE = "groupImage";
-    private static final String KEY_GROUP_VISIBILITY = "groupVisibility";
+    private static final String KEY_GROUP_TYPE = "groupType";
     private static final String KEY_GROUP_VALIDATED = "groupValidated";
 
     private static final String KEY_MESSAGE_NODE_ID = "nodeID";
@@ -75,7 +75,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_GROUPS = "CREATE TABLE " + TABLE_GROUPS
             + "(" + KEY_GROUP_NODE_ID + " INTEGER PRIMARY KEY,"
             + KEY_GROUP_NAME + " TEXT," + KEY_GROUP_USERS + " TEXT," + KEY_GROUP_IMAGE
-            + " TEXT," + KEY_GROUP_VISIBILITY + " TEXT," + KEY_GROUP_VALIDATED + " BOOLEAN" + ")";
+            + " TEXT," + KEY_GROUP_TYPE + " TEXT," + KEY_GROUP_VALIDATED + " BOOLEAN" + ")";
 
     private static final String CREATE_TABLE_MESSAGES = "CREATE TABLE " + TABLE_MESSAGES
             + "(" + KEY_MESSAGE_DATE + " TEXT PRIMARY KEY," + KEY_MESSAGE_NODE_ID + " INTEGER,"
@@ -437,15 +437,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     /**
      * Updates the visibility of a Group in the database.
      *
-     * @param groupId    The Id field of the Group that will have it's visibility changed.
-     * @param visibility The new visibility of the Group.
+     * @param groupId The Id field of the Group that will have it's visibility changed.
+     * @param type    The new visibility of the Group.
      */
-    public void updateGroupVisibility(Id groupId, Group.GroupVisibility visibility) {
+    public void updateGroupType(Id groupId, Group.GroupType type) {
         Objects.requireNonNull(groupId);
-        Objects.requireNonNull(visibility);
+        Objects.requireNonNull(type);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_GROUP_VISIBILITY, visibility.getValue());
+        values.put(KEY_GROUP_TYPE, type.getValue());
         mDatabase.update(TABLE_GROUPS, values, KEY_GROUP_NODE_ID + " = ?",
                 new String[]{groupId.getId().toString()});
     }
@@ -580,8 +580,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             Bitmap groupImage =
                     ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
 
-            Group.GroupVisibility groupVisibility =
-                    Group.GroupVisibility.valueOf(cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+            Group.GroupType groupType =
+                    Group.GroupType.valueOf(cursor.getString(cursor.getColumnIndex(KEY_GROUP_TYPE)));
 
             int validated = cursor.getInt(cursor.getColumnIndex(KEY_GROUP_VALIDATED));
             boolean groupValidated = (1 == validated);
@@ -591,7 +591,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             List<Id> groupUsers = getIdListFromString(allUsers);
             cursor.close();
 
-            return new Group(groupName, groupId, groupUsers, groupImage, groupVisibility,
+            return new Group(groupName, groupId, groupUsers, groupImage, groupType,
                     groupValidated, new Date());
         }
     }
@@ -617,8 +617,8 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 Bitmap groupImage =
                         ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex(KEY_GROUP_IMAGE)));
 
-                Group.GroupVisibility groupVisibility =
-                        Group.GroupVisibility.valueOf(cursor.getString(cursor.getColumnIndex(KEY_GROUP_VISIBILITY)));
+                Group.GroupType groupType =
+                        Group.GroupType.valueOf(cursor.getString(cursor.getColumnIndex(KEY_GROUP_TYPE)));
 
                 int validated = cursor.getInt(cursor.getColumnIndex(KEY_GROUP_VALIDATED));
                 boolean groupValidated = (1 == validated);
@@ -627,7 +627,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                         cursor.getColumnIndex(KEY_GROUP_USERS));
                 List<Id> groupUsers = getIdListFromString(allUsers);
 
-                groups.add(new Group(groupName, groupId, groupUsers, groupImage, groupVisibility, groupValidated,
+                groups.add(new Group(groupName, groupId, groupUsers, groupImage, groupType, groupValidated,
                         new Date()));
             } while (cursor.moveToNext());
 
@@ -895,7 +895,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_GROUP_NODE_ID, group.getId().getId());
         values.put(KEY_GROUP_IMAGE, ImageSerialization.serializeImage(group.getImage(), ImageSerialization.SIZE_IMAGE));
-        values.put(KEY_GROUP_VISIBILITY, group.getVisibility().getValue());
+        values.put(KEY_GROUP_TYPE, group.getType().getValue());
         values.put(KEY_GROUP_NAME, group.getName());
 
         int validated = group.isValidated() ? 1 : 0;
