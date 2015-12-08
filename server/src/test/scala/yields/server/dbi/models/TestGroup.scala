@@ -64,4 +64,20 @@ class TestGroup extends YieldsSpec {
     g3.nodes should contain(g2.nid)
   }
 
+  it should "update updated_at" in {
+    val group = Group.create("name", 0)
+    val upStart = group.updated_at
+    group.updated()
+    val upEnd = group.updated_at
+    upStart should not be upEnd
+  }
+
+  it should "update refreshed_at" in {
+    val group = Group.create("name", 0)
+    val refStart = group.refreshed_at
+    group.refreshed()
+    val refEnd = group.refreshed_at
+    refStart should not be refEnd
+  }
+
 }
