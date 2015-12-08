@@ -101,6 +101,15 @@ class TestGroupMessage extends YieldsSpec {
 
   }
 
+  it should "update the refreshed_at field" in {
+    val meta = Metadata.now(0)
+    val group = Group.create("name", meta.client)
+    val refresh1 = group.refreshed_at
+    val action = GroupMessage(group.nid, Some("text"), None, None)
+    action.run(meta)
+    refresh1 should not be group.refreshed_at
+  }
+
   it should "not accept message from outside its users" in {
 
     val meta = Metadata.now(0)

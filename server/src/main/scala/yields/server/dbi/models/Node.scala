@@ -20,7 +20,7 @@ import yields.server.utils.Temporal
   * nodes:[nid]:nodes Map[NID, OffsetDateTime] with score datetime
   * nodes:[nid]:feed Zset[(uid, text, nid, datetime)] with score incremental (tid)
   */
-class Node protected (val nid: NID) {
+class Node protected(val nid: NID) {
 
   object NodeKey {
     val node = s"nodes:$nid"
@@ -175,6 +175,7 @@ class Node protected (val nid: NID) {
 
   /** Add message */
   def addMessage(content: FeedContent): Boolean = {
+    refreshed()
     valueOrException(redis(_.zadd(NodeKey.feed, content._1.toEpochSecond, content))) == 1
   }
 

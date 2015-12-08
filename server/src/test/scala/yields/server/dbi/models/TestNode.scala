@@ -12,10 +12,8 @@ class TestNode extends YieldsSpec {
     val nodes = names.map(Publisher.create(_, 1))
 
     names.zip(nodes).foreach { case (name, node) =>
-      Node.fromName(name).map(_.nid) should contain (node.nid)
+      Node.fromName(name).map(_.nid) should contain(node.nid)
     }
-
   }
-
 
 }
