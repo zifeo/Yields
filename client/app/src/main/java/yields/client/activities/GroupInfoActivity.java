@@ -195,6 +195,7 @@ public class GroupInfoActivity extends NotifiableActivity {
                     List<Id> userList = new ArrayList<>();
                     userList.add(YieldsApplication.getUser().getId());
                     Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
+                    newGroup.addNode(mGroup);
 
                     //TODO Add the publisher in the new group
 
