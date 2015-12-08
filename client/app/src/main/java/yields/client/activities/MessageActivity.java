@@ -3,10 +3,14 @@ package yields.client.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -39,6 +43,8 @@ import yields.client.messages.TextContent;
 import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.service.YieldService;
+import yields.client.service.YieldServiceBinder;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
@@ -59,6 +65,7 @@ public class MessageActivity extends NotifiableActivity {
     private static ActionBar mActionBar;
     private Menu mMenu;
     private ImageButton mSendButton;
+    private ServiceConnection mConnection;
 
     private static ContentType mType;
     private static Message mCommentMessage;
@@ -112,8 +119,34 @@ public class MessageActivity extends NotifiableActivity {
         mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
 
-        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
-        YieldsApplication.getBinder().sendRequest(historyRequest);
+        if (YieldsApplication.getBinder() != null) {
+            NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
+            YieldsApplication.getBinder().sendRequest(historyRequest);
+        } else {
+            mConnection = new ServiceConnection() {
+
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    YieldsApplication.setBinder((YieldServiceBinder) service);
+                    YieldsApplication.getBinder().attachActivity(MessageActivity.this);
+                    YieldsApplication.getBinder().connectionStatus();
+
+                    NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
+                    YieldsApplication.getBinder().sendRequest(historyRequest);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    mConnection = null;
+                }
+            };
+
+            Intent serviceBindingIntent = new Intent(this, YieldService.class)
+                    .putExtra("bindGroupActivity", true);
+
+            bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -157,7 +190,9 @@ public class MessageActivity extends NotifiableActivity {
     protected void onDestroy() {
         super.onDestroy();
         YieldsApplication.nullGroup();
-        YieldsApplication.getBinder().unsetNotifiableActivity();
+        if (mConnection != null) {
+            unbindService(mConnection);
+        }
     }
 
     /**
@@ -178,7 +213,9 @@ public class MessageActivity extends NotifiableActivity {
         inflater.inflate(R.menu.menu_message, menu);
         boolean res = super.onCreateOptionsMenu(menu);
         mMenu = menu;
-        YieldsApplication.getBinder().connectionStatus();
+        if (YieldsApplication.getBinder() != null) {
+            YieldsApplication.getBinder().connectionStatus();
+        }
         return res;
     }
 
@@ -225,7 +262,7 @@ public class MessageActivity extends NotifiableActivity {
                 YieldsApplication.getBinder().sendRequest(request);
             }
 
-            YieldsApplication.getGroup().addMessage(message);
+            mGroup.addMessage(message);
         }
     }
 
