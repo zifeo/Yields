@@ -4,7 +4,6 @@ import yields.server.actions.groups._
 import yields.server.actions.users.{UserConnect, UserConnectRes, UserUpdate, UserUpdateRes}
 import yields.server.tests._
 
-import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**

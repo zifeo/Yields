@@ -86,7 +86,7 @@ NodeHistory
 	rules	count > 0 & nid in nodes & senders in entourage
 NodeSearch
 	input	pattern: String
-	output	nodes: Seq[NID], names: Seq[String], pic: Seq[Array[Byte]]
+	output	nodes: Seq[NID], names: Seq[String], pics: Seq[Array[Byte]]
 	rules	nodes "public"
 ```
 

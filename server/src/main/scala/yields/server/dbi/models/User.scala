@@ -3,12 +3,12 @@ package yields.server.dbi.models
 import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
-import yields.server.actions.exceptions.{NewUserExistException, UnauthorizedActionException}
+import yields.server.actions.exceptions.NewUserExistException
 import yields.server.dbi._
-import yields.server.dbi.exceptions.IllegalValueException
 import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.dbi.models.User.StaticKey
 import yields.server.utils.Temporal
+import yields.server.actions._
 
 /**
   * User model with linked database interface.
@@ -21,7 +21,6 @@ import yields.server.utils.Temporal
   * users:[uid] Map[String, String] - name / email / pic / created_at / updated_at / connected_at
   * users:[uid]:nodes Map[NID, OffsetDateTime]
   * users:[uid]:entourage Map[UID, OffsetDateTime]
-  * users:indexes:email Map[Email, UID] - email
   *
   * TODO: improve setters by only settings if the value is different.
   *
@@ -181,8 +180,7 @@ final class User private(val uid: UID) {
     * on the concerned getter call and issue either the default value or a corresponding exception.
     */
   def hydrate(): Unit = {
-    val values = redis(_.hgetall[String, String](Key.user))
-      .getOrElse(throw new IllegalValueException("node should have some data"))
+    val values = valueOrException(redis(_.hgetall[String, String](Key.user)))
     _name = values.get(StaticKey.name)
     _email = values.get(StaticKey.email)
     _created_at = values.get(StaticKey.created_at).map(OffsetDateTime.parse)
@@ -213,33 +211,25 @@ object User {
     * @return user
     */
   def create(email: String): User = {
-    if (!redis(_.hexists(StaticKey.emailIndex, email))) {
-      val uid = newIdentity()
-      val user = User(uid)
-      redis { r =>
-        val now = Temporal.now
-        val infos = List(
-          (StaticKey.email, email),
-          (StaticKey.created_at, now),
-          (StaticKey.updated_at, now)
-        )
-        r.hmset(user.Key.user, infos)
-        r.hset(StaticKey.emailIndex, email, uid)
-      }
-      user._email = Some(email)
-      user
-    } else throw new NewUserExistException("email already registered")
+    if (redis(_.hexists(StaticKey.emailIndex, email)))
+      throw new NewUserExistException("email already registered")
+
+    val user = User(newIdentity())
+    val now = Temporal.now
+    val infos = List(
+      (StaticKey.email, email),
+      (StaticKey.created_at, now),
+      (StaticKey.updated_at, now)
+    )
+    assert(redis(_.hmset(user.Key.user, infos)))
+    assert(Indexes.userEmailRegister(email, user.uid))
+    user._email = Some(email)
+    user
   }
 
   /** Retrieves user model given an user email. */
-  def fromEmail(email: String): Option[User] = {
-
-    import yields.server.actions._
-
-    if (validEmail(email)) {
-      redis(_.hget[UID](StaticKey.emailIndex, email)).map(User(_))
-    } else throw new UnauthorizedActionException(s"invalid email in fromEmail method")
-  }
+  def fromEmail(email: String): Option[User] =
+    Indexes.userEmailLookup(email).map(User(_))
 
   /** Prepares user model for retrieving data given an user id. */
   def apply(uid: UID): User = {

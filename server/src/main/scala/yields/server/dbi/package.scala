@@ -40,11 +40,11 @@ package object dbi {
     * @param queries queries to be run on in block
     * @return list of values or status of redis queries
     */
-  private[dbi] def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[Any]] =
-    redis.withClient(_.pipeline(queries))
+  private[dbi] def redisPipeline[T](queries: RedisClient#PipelineClient => Any): Option[List[T]] =
+    redis.withClient(_.pipeline(queries)).asInstanceOf[Option[List[T]]]
 
   /** Terminates database connection. */
-  def close(): Unit =
+  private[server] def close(): Unit =
     redis.close
 
   /**
