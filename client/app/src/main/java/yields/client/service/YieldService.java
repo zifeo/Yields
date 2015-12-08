@@ -30,7 +30,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class YieldService extends Service {
     // This is necessary as mServiceRequestController can't be final.
     private final Object serviceControllerLock = new Object();
-    private Binder mBinder;
+    private YieldServiceBinder mBinder;
     private NotifiableActivity mCurrentNotifiableActivity;
     private Group mCurrentGroup;
     private int mIdLastNotification;
@@ -115,6 +115,11 @@ public class YieldService extends Service {
     }
 
     public void notifyChange(NotifiableActivity.Change change) {
+        if (change == NotifiableActivity.Change.CONNECTED
+                || change == NotifiableActivity.Change.NEW_USER) {
+            mBinder.changeStatus(change);
+        }
+
         if (mCurrentNotifiableActivity != null) {
             Log.d("Y:" + this.getClass().getName(), "notified activity");
             mCurrentNotifiableActivity.notifyChange(change);
