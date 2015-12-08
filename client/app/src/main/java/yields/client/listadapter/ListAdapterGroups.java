@@ -46,6 +46,7 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         TextView textViewGroupLastMessage = (TextView)
                 singleGroup.findViewById(R.id.textViewGroupLastMessage);
         ImageView imageGroup = (ImageView) singleGroup.findViewById(R.id.imageViewGroup);
+        ImageView imagePastille = (ImageView) singleGroup.findViewById(R.id.imageViewPastille);
 
         Group group = mGroups.get(position);
 
@@ -55,6 +56,8 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         Bitmap groupImage = group.getImage();
         imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(groupImage,
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
+
+        // TODO implement logic for imagePastille
 
         return singleGroup;
     }
