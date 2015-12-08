@@ -1,5 +1,7 @@
 package yields.client.messages;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
@@ -12,6 +14,7 @@ import org.junit.Test;
 import java.net.URL;
 import java.net.URLStreamHandler;
 
+import yields.client.R;
 import yields.client.activities.MessageActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.generalhelpers.MockModel;
