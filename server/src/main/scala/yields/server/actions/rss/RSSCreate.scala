@@ -1,7 +1,7 @@
 package yields.server.actions.rss
 
 import yields.server.actions.{Action, Result, _}
-import yields.server.dbi.models.{NID, Rss}
+import yields.server.dbi.models.{NID, RSS$}
 import yields.server.mpi.Metadata
 
 /**
@@ -20,7 +20,7 @@ case class RSSCreate(name: String, url: String, filter: String, tags: Seq[String
     val nid =
       if (!validRSS(url)) 0l
       else {
-        val rss = Rss.create(name, url, filter)
+        val rss = RSS.create(name, url, filter)
         if (tags.nonEmpty) {
           rss.addTags(tags)
         }

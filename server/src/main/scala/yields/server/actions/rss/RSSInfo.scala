@@ -1,7 +1,7 @@
 package yields.server.actions.rss
 
 import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{Rss, NID}
+import yields.server.dbi.models.{RSS$, NID}
 import yields.server.mpi.Metadata
 
 /**
@@ -15,7 +15,7 @@ case class RSSInfo(nid: NID) extends Action {
     * @return action result
     */
   override def run(metadata: Metadata): Result = {
-    val rss = Rss(nid)
+    val rss = RSS(nid)
     RSSInfoRes(rss.name, rss.url, rss.filter, rss.tags)
   }
 }
