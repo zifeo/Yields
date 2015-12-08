@@ -48,26 +48,36 @@ final class Rss private(nid: NID) extends Node(nid) with Tags {
 
 /** Companion object for [[Rss]] */
 object Rss {
+
+  object StaticRssKey {
+    val filter = "filter"
+  }
+
   /**
     * Create a new rss in db
     * @param name rss name to create
     * @param url rss url
-    * @return rss obeject
+    * @param filter terms filtering the RSS
+    * @return rss object
     */
-  def create(name: String, url: String): Rss = {
+  def create(name: String, url: String, filter: String): Rss = {
     val rss = Rss(newIdentity())
-    redis { r =>
-      val infos = List(
-        (StaticNodeKey.created_at, Temporal.now),
-        (StaticNodeKey.name, name),
-        (StaticNodeKey.kind, classOf[Group].getSimpleName)
-      )
-      r.hmset(rss.NodeKey.node, infos)
-    }
+    val now = Temporal.now
+    val infos = List(
+      (StaticNodeKey.name, name),
+      (StaticRssKey.filter, filter),
+      (StaticNodeKey.kind, classOf[Group].getSimpleName),
+      (StaticNodeKey.created_at, now),
+      (StaticNodeKey.refreshed_at, now),
+      (StaticNodeKey.updated_at, now)
+    )
+    assert(redis(_.hmset(rss.NodeKey.node, infos)))
     rss
   }
 
+  /** Builds a RSS node. */
   def apply(nid: NID) = {
     new Rss(nid)
   }
+
 }

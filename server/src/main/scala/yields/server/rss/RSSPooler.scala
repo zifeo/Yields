@@ -15,7 +15,7 @@ final class RSSPooler extends Actor with ActorLogging {
   import RSSPooler._
 
   def receive: Receive = {
-git
+
     // ----- RSSPooler -----
 
     case Pool =>
