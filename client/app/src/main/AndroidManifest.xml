@@ -124,9 +124,9 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".activities.NodeListActivity">
+            android:name=".activities.NodeListActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <service
