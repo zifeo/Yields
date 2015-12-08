@@ -50,7 +50,7 @@ final class Dispatcher() extends Actor with ActorLogging {
 
   }
 
-  override val supervisorStrategy = FaultTolerance.nonFatalResume(log)
+  override val supervisorStrategy = FaultTolerance.nonFatalResumeOrEscalate(log)
 
   /** Add uid - actor pair to pool. */
   private def add(uid: UID, client: ActorRef, pool: Pool): Pool = {
