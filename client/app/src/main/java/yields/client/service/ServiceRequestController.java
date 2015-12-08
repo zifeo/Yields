@@ -8,22 +8,20 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import yields.client.cache.CacheDatabaseHelper;
-import yields.client.exceptions.ServiceRequestException;
 import yields.client.serverconnection.CommunicationChannel;
 import yields.client.serverconnection.ConnectionManager;
 import yields.client.serverconnection.ConnectionSubscriber;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
-import yields.client.servicerequest.GroupAddRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupUpdateUsersRequest;
-import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
-import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.NodeMessageRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
+import yields.client.servicerequest.MediaMessageRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
@@ -36,10 +34,8 @@ import yields.client.servicerequest.UserUpdateRequest;
 
 import static java.lang.Thread.sleep;
 
-//TODO : Do database calls for response handling
-
 /**
- * Controller for ServiceRequests.
+ * Controller for ServiceRequests and ServerResponses.
  */
 public class ServiceRequestController {
 
@@ -54,10 +50,10 @@ public class ServiceRequestController {
     private Thread mConnector;
 
     /**
-     * Constructs the requestController which will serve as a link to the server and database
+     * Constructs the requestController which will serve as a link to the server and cache.
      *
-     * @param cacheDatabaseHelper
-     * @param service
+     * @param cacheDatabaseHelper The cache helper that will be used for cache handling.
+     * @param service             The service that is using this Controller.
      */
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
@@ -70,9 +66,9 @@ public class ServiceRequestController {
     }
 
     /**
-     * Handles any error while connecting to the server
+     * Handles any error while connecting to the server.
      *
-     * @param e the exception that was triggered the connection error
+     * @param e the exception that was triggered the connection error.
      */
     public void handleConnectionError(final IOException e) {
         if (!isConnecting.getAndSet(true)) {
@@ -97,7 +93,7 @@ public class ServiceRequestController {
     }
 
     /**
-     * Notify connector to reconnect faster
+     * Notify connector to reconnect faster.
      */
     public void notifyConnector() {
         if (mConnector != null && mConnector.isAlive()) {
@@ -106,9 +102,9 @@ public class ServiceRequestController {
     }
 
     /**
-     * Test if the server is connected
+     * Test if the server is connected.
      *
-     * @return
+     * @return True if is connected, false otherwise.
      */
     public boolean isConnected() {
         return !isConnecting.get();
@@ -117,7 +113,7 @@ public class ServiceRequestController {
     /**
      * Handles any given ServiceRequest.
      *
-     * @param serviceRequest
+     * @param serviceRequest The serviceRequest that should be handled.
      */
     public void handleServiceRequest(ServiceRequest serviceRequest) {
         switch (serviceRequest.getType()) {
@@ -160,17 +156,14 @@ public class ServiceRequestController {
             case GROUP_UPDATE_USERS:
                 mRequestHandler.handleGroupUpdateUsersRequest((GroupUpdateUsersRequest) serviceRequest);
                 break;
-            case GROUP_ADD:
-                mRequestHandler.handleGroupAddRequest((GroupAddRequest) serviceRequest);
-                break;
-            case GROUP_REMOVE:
-                mRequestHandler.handleGroupRemoveRequest((GroupRemoveRequest) serviceRequest);
-                break;
-            case NODE_MESSAGE:
-                mRequestHandler.handleNodeMessageRequest((NodeMessageRequest) serviceRequest);
+            case GROUP_MESSAGE:
+                mRequestHandler.handleNodeMessageRequest((GroupMessageRequest) serviceRequest);
                 break;
             case NODE_HISTORY:
                 mRequestHandler.handleNodeHistoryRequest((NodeHistoryRequest) serviceRequest);
+                break;
+            case MEDIA_MESSAGE:
+                mRequestHandler.handleMediaMessageRequest((MediaMessageRequest) serviceRequest);
                 break;
             case USER_SEARCH:
                 mRequestHandler.handleUserSearchRequest((UserSearchRequest) serviceRequest);
@@ -184,13 +177,15 @@ public class ServiceRequestController {
         }
     }
 
+    /**
+     * Handles any given Response.
+     *
+     * @param serverResponse The response to be handled.
+     */
     public void handleServerResponse(Response serverResponse) {
         switch (serverResponse.getKind()) {
             case NODE_HISTORY_RESPONSE:
                 mResponseHandler.handleNodeHistoryResponse(serverResponse); /* Done */
-                break;
-            case NODE_MESSAGE_RESPONSE:
-                mResponseHandler.handleNodeMessageResponse(serverResponse); /* DONE */
                 break;
             case USER_CONNECT_RESPONSE:
                 mResponseHandler.handleUserConnectResponse(serverResponse); /* DONE */
@@ -204,17 +199,11 @@ public class ServiceRequestController {
             case GROUP_CREATE_RESPONSE:
                 mResponseHandler.handleGroupCreateResponse(serverResponse); /* DONE */
                 break;
-            case USER_UPDATE_RESPONSE:
-                mResponseHandler.handleUserUpdateResponse(serverResponse);
-                break;
             case USER_SEARCH_RESPONSE:
                 mResponseHandler.handleUserSearchResponse(serverResponse);
                 break;
             case NODE_SEARCH_RESPONSE:
                 mResponseHandler.handleNodeSearchResponse(serverResponse);
-                break;
-            case GROUP_UPDATE_RESPONSE:
-                mResponseHandler.handleGroupUpdateResponse(serverResponse);
                 break;
             case GROUP_INFO_RESPONSE:
                 mResponseHandler.handleGroupInfoResponse(serverResponse);
@@ -267,14 +256,17 @@ public class ServiceRequestController {
             case RSS_MESSAGE_BCAST:
                 mResponseHandler.handleRSSMessageBroadcast(serverResponse);
                 break;
+            case MEDIA_MESSAGE_RESPONSE:
+                mResponseHandler.handleMediaMessageResponse(serverResponse);
+                break;
             default:
-                Log.d("Y:" + this.getClass().getName(),"No such response kind : " +
+                Log.d("Y:" + this.getClass().getName(), "No such response kind : " +
                         serverResponse.getKind());
         }
     }
 
     /**
-     * Connects to the server
+     * Connects the controller to the server.
      */
     private void connectToServer() {
         try {
@@ -298,7 +290,9 @@ public class ServiceRequestController {
     }
 
     /**
+     * Sends a ServerRequest to the server.
      *
+     * @param serverRequest The ServerRequest that should be sent.
      */
     protected void sendToServer(ServerRequest serverRequest) {
         try {

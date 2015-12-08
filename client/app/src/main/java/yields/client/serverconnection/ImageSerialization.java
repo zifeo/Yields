@@ -18,7 +18,6 @@ public class ImageSerialization {
             int height = image.getHeight();
             double ratio = width > height ? ((double) resizeTo) / width : ((double) resizeTo) / height;
 
-
             image = Bitmap.createScaledBitmap(image, (int) (width * ratio),
                     (int) (height * ratio), true);
         }

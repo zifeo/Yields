@@ -16,7 +16,6 @@ import java.util.Objects;
 import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
-import yields.client.messages.ImageContent;
 import yields.client.node.Group;
 import yields.client.servicerequest.ServiceRequest;
 
@@ -421,9 +420,9 @@ public class RequestBuilder {
      * @param date     The reference date for the message (Id)
      * @return The request for the server
      */
-    public static ServerRequest nodeMessageRequest(Id senderId, Id groupId,
-                                                   Group.GroupVisibility visibility,
-                                                   Content content, Date date) {
+    public static ServerRequest groupMessageRequest(Id senderId, Id groupId,
+                                                    Group.GroupVisibility visibility,
+                                                    Content content, Date date) {
 
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
@@ -446,6 +445,7 @@ public class RequestBuilder {
                 builder.addNullField(Fields.CONTENT_TYPE);
                 builder.addNullField(Fields.CONTENT);
                 break;
+
             case IMAGE:
                 builder.addField(Fields.CONTENT_TYPE, "image");
                 builder.addField(Fields.CONTENT, content.getContentForRequest());
@@ -504,6 +504,52 @@ public class RequestBuilder {
                 ServiceRequest.RequestKind.NODE_SEARCH, senderId);
 
         builder.addField(Fields.PATTERN, pattern);
+
+        return builder.request();
+    }
+
+    /**
+     * Builds a message request for the server.
+     *
+     * @param senderId The sender Id.
+     * @param nodeId   The Node to send to.
+     * @param content  The content of the message
+     * @param date     The reference date for the message (Id)
+     * @return The request for the server
+     */
+    public static ServerRequest mediaMessageRequest(Id senderId, Id nodeId,
+                                                    Group.GroupVisibility visibility,
+                                                    Content content, Date date) {
+
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(nodeId);
+        Objects.requireNonNull(date);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.MEDIA_MESSAGE, senderId);
+
+        builder.addField(Fields.NID, nodeId);
+        builder.addField(Fields.DATE, date);
+        builder.addField(Fields.TEXT, content.getTextForRequest());
+
+        switch (content.getType()) {
+            case TEXT:
+                builder.addNullField(Fields.CONTENT_TYPE);
+                builder.addNullField(Fields.CONTENT);
+                break;
+
+            case IMAGE:
+                builder.addField(Fields.CONTENT_TYPE, "image");
+                builder.addField(Fields.CONTENT, content.getContentForRequest());
+                break;
+
+            case URL:
+                builder.addField(Fields.CONTENT_TYPE, "url");
+                builder.addField(Fields.CONTENT, content.getContentForRequest());
+                break;
+
+            default:
+                throw new ContentException("No such ContentType exists ! " + content.getType().toString());
+        }
 
         return builder.request();
     }
