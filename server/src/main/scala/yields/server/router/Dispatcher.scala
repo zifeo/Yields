@@ -10,7 +10,7 @@ import scala.language.postfixOps
 /**
   * Actor in charge of recording connection statuses and distributing push notifications to them.
   */
-final class Dispatcher() extends Actor with ActorLogging {
+final class Dispatcher extends Actor with ActorLogging {
 
   import ClientHub._
   import Dispatcher._

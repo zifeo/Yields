@@ -8,6 +8,7 @@ import yields.server.actions.Broadcast
 import yields.server.dbi.models.UID
 import yields.server.pipeline.Pipeline
 import yields.server.router.{Dispatcher, Router}
+import yields.server.rss.RSSPooler
 import yields.server.utils.FaultTolerance._
 
 /**
@@ -23,6 +24,7 @@ object Yields {
 
   private lazy val dispatcher = system.actorOf(Dispatcher.props, "Yields-dispatcher")
   private lazy val router = system.actorOf(Router.props(Pipeline(), dispatcher), "Yields-router")
+  private lazy val rsspooler = system.actorOf(RSSPooler.props, "Yields-rsspooler")
 
   /**
     * Launches the Yields app.
@@ -55,6 +57,7 @@ object Yields {
   private[server] def start(): Unit = {
     dispatcher
     router
+    rsspooler
   }
 
   /**
