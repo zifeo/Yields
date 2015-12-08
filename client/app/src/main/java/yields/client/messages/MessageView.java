@@ -76,6 +76,13 @@ public class MessageView extends LinearLayout {
 
         ImageView imageViewProfilPicture;
         imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
+        imageViewProfilPicture.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
+
 
         Bitmap image = sender.getImg();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
