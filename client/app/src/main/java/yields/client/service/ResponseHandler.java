@@ -1,8 +1,6 @@
 package yields.client.service;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -12,11 +10,9 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
-import yields.client.exceptions.CacheDatabaseException;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.ClientUser;
@@ -25,33 +21,38 @@ import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.Response;
-import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.GroupInfoRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserGroupListRequest;
 import yields.client.servicerequest.UserInfoRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
+/**
+ * Handles Responses from the server.
+ * It notifies the app and updates the cache according to the Response from the server.
+ */
 public class ResponseHandler {
 
     private final YieldService mService;
     private final CacheDatabaseHelper mCacheHelper;
 
+    /**
+     * Main constructor for a ResponseHandler.
+     *
+     * @param cacheDatabaseHelper The helper for the associated cache.
+     * @param yieldService        The service which uses this handler.
+     */
     public ResponseHandler(CacheDatabaseHelper cacheDatabaseHelper, YieldService yieldService) {
         mCacheHelper = cacheDatabaseHelper;
         mService = yieldService;
     }
 
-
-    protected void handleUserUpdateResponse(Response serverResponse){
-        Log.d("Y:" + this.getClass().getName(), "Response for UserUpdate");
-        ServiceRequest userInfo = new UserInfoRequest(YieldsApplication.getUser(),
-                YieldsApplication.getUser().getId());
-        mService.sendRequest(userInfo);
-    }
-
-    protected void handleUserSearchResponse(Response serverResponse){
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleUserSearchResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
             long uid = response.getLong("uid");
@@ -71,7 +72,10 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleNodeSearchResponse(Response serverResponse){
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleNodeSearchResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
             JSONArray nodes = response.getJSONArray("nodes");
@@ -83,7 +87,7 @@ public class ResponseHandler {
             int nodeCount = nodes.length();
             ArrayList<Group> groupList = new ArrayList<>();
 
-            for (int i = 0 ; i < nodeCount ; i ++){
+            for (int i = 0; i < nodeCount; i++) {
                 Id id = new Id(nodes.getLong(i));
                 String nodeName = names.getString(i);
                 Bitmap image = ImageSerialization.unSerializeImage(pics.getString(i));
@@ -107,23 +111,18 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleGroupUpdateResponse(Response serverResponse){
-        Log.d("ServiceRequestCtrll", "Response for Group Update.");
-        ServiceRequest groupInfo = new UserGroupListRequest(YieldsApplication.getUser());
-        mService.sendRequest(groupInfo);
-        // No output.
-        // TODO : decide what to do.
-    }
-
-    protected void handleGroupInfoResponse(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleGroupInfoResponse(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             JSONArray users = response.getJSONArray("users");
             // TODO: discuss use of nodes in groups !important
             //JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++) {
+            for (int i = 0; i < users.length(); i++) {
                 Id userId = new Id(users.getLong(i));
                 userList.add(userId);
                 if (YieldsApplication.getUserFromId(userId) == null) {
@@ -139,13 +138,14 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             String name = response.getString("name");
             String image = response.getString("pic");
-            Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
+            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
             }
             group.updateUsers(userList);
 
+            mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -153,22 +153,31 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleGroupMessageResponse(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleGroupMessageResponse(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
-            long nid = response.getLong("nid");
             Date prevDatetime = DateSerialization.dateSerializer
                     .toDate(serverResponse.getMetadata().getString("ref"));
             Date serverDatetime = DateSerialization.dateSerializer
                     .toDate(response.getString("datetime"));
+
+            long nid = response.getLong("nid");
             Id id = new Id(nid);
 
-            if (YieldsApplication.getUser().modifyGroup(id).getLastUpdate().before(serverDatetime)) {
-                YieldsApplication.getUser().modifyGroup(id)
+            if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
+                YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            YieldsApplication.getUser().modifyGroup(id).validateMessage(prevDatetime, serverDatetime);
+            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
+                    message.getContent(), prevDatetime, message.getStatus());
+            mCacheHelper.deleteMessage(copyMessage, id);
+            mCacheHelper.addMessage(message, id);
+
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -176,7 +185,10 @@ public class ResponseHandler {
         }
     }
 
-    protected void handlePublisherCreateResponse(Response serverResponse){
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherCreateResponse(Response serverResponse) {
         try {
             // TODO : Change behaviour so that you don't go quit activity as long as group is not accepted.
             YieldsApplication.getUser().activateGroup(
@@ -188,13 +200,19 @@ public class ResponseHandler {
         }
     }
 
-    protected void handlePublisherUpdateResponse(Response serverResponse){
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherUpdateResponse(Response serverResponse) {
         Log.d("ServiceRequestCtrllr", "Response for Publisher Update.");
         // Nothing to parse.
         // TODO : decide what to do.
     }
 
-    protected void handlePublisherInfoResponse(Response serverResponse){
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherInfoResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
             JSONArray users = response.getJSONArray("users");
@@ -202,7 +220,7 @@ public class ResponseHandler {
             //JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++) {
+            for (int i = 0; i < users.length(); i++) {
                 Id userId = new Id(users.getLong(i));
                 userList.add(userId);
                 if (YieldsApplication.getUser() == null) {
@@ -218,7 +236,7 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             String name = response.getString("name");
             String image = response.getString("pic");
-            Group group = YieldsApplication.getUser().modifyGroup(new Id(nid));
+            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
@@ -232,8 +250,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handlePublisherMessageResponse(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherMessageResponse(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             Date prevDatetime = DateSerialization.dateSerializer
@@ -242,12 +263,12 @@ public class ResponseHandler {
                     .toDate(response.getString("datetime"));
             Id id = new Id(nid);
 
-            if (YieldsApplication.getUser().modifyGroup(id).getLastUpdate().before(serverDatetime)) {
-                YieldsApplication.getUser().modifyGroup(id)
+            if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
+                YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            YieldsApplication.getUser().modifyGroup(id).validateMessage(prevDatetime, serverDatetime);
+            YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -255,8 +276,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleRSSCreateResponse(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleRSSCreateResponse(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             Id id = new Id(nid);
@@ -268,8 +292,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleNodeMessageBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleNodeMessageBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
 
             Message message = new Message(response.getString("datetime"),
@@ -278,16 +305,19 @@ public class ResponseHandler {
 
             Id groupId = new Id(response.getLong("nid"));
 
+            mCacheHelper.addMessage(message, groupId);
             mService.receiveMessage(groupId, message);
-
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
     }
 
-    protected void handleUserUpdateBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleUserUpdateBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             User user;
             Boolean newUser = false;
@@ -309,18 +339,22 @@ public class ResponseHandler {
                 user.setImg(YieldsApplication.getDefaultUserImage());
             }
 
+            mCacheHelper.addUser(user);
+
             if (newUser) {
                 //TODO : notify() to add user to entourage -> notification
             }
-
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
     }
 
-    protected void handleGroupCreateBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleGroupCreateBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             String name = response.getString("name");
@@ -329,13 +363,15 @@ public class ResponseHandler {
             //JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
+            for (int i = 0; i < users.length(); i++) {
                 userList.add(new Id(users.getLong(i)));
             }
 
             Group newGroup = new Group(name, new Id(nid), userList);
             newGroup.setValidated();
             YieldsApplication.getUser().addGroup(newGroup);
+
+            mCacheHelper.addGroup(newGroup);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -343,8 +379,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleGroupUpdateBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleGroupUpdateBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             Id nid = new Id(response.getLong("nid"));
             String name = response.getString("name");
@@ -353,15 +392,16 @@ public class ResponseHandler {
             //JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
+            for (int i = 0; i < users.length(); i++) {
                 userList.add(new Id(users.getLong(i)));
             }
 
-            Group group = YieldsApplication.getUser().modifyGroup(nid);
+            Group group = YieldsApplication.getUser().getGroup(nid);
             group.updateUsers(userList);
             group.setImage(ImageSerialization.unSerializeImage(response.getString("pic")));
             group.setName(name);
 
+            mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -369,8 +409,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handleGroupMessageBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleGroupMessageBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
 
             Message message = new Message(response.getString("datetime"),
@@ -379,6 +422,7 @@ public class ResponseHandler {
 
             Id groupId = new Id(response.getLong("nid"));
 
+            mCacheHelper.addMessage(message, groupId);
             mService.receiveMessage(groupId, message);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -386,8 +430,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handlePublisherCreateBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherCreateBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             String name = response.getString("name");
@@ -396,7 +443,7 @@ public class ResponseHandler {
             //JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
+            for (int i = 0; i < users.length(); i++) {
                 userList.add(new Id(users.getLong(i)));
             }
 
@@ -409,8 +456,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handlePublisherUpdateBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherUpdateBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             Id nid = new Id(response.getLong("nid"));
             String name = response.getString("name");
@@ -419,11 +469,11 @@ public class ResponseHandler {
             //JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0 ; i < users.length() ; i ++){
+            for (int i = 0; i < users.length(); i++) {
                 userList.add(new Id(users.getLong(i)));
             }
 
-            Group group = YieldsApplication.getUser().modifyGroup(nid);
+            Group group = YieldsApplication.getUser().getGroup(nid);
             group.updateUsers(userList);
             group.setImage(ImageSerialization.unSerializeImage(response.getString("pic")));
             group.setName(name);
@@ -435,8 +485,11 @@ public class ResponseHandler {
         }
     }
 
-    protected void handlePublisherMessageBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handlePublisherMessageBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
 
             Message message = new Message(response.getString("datetime"),
@@ -452,9 +505,11 @@ public class ResponseHandler {
         }
     }
 
-    //TODO : Actually don't know what to do yet
-    protected void handleRSSCreateBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleRSSCreateBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
             long nid = response.getLong("nid");
             String name = response.getString("name");
@@ -468,9 +523,11 @@ public class ResponseHandler {
         }
     }
 
-    //TODO : Actually don't know what to do yet
-    protected void handleRSSMessageBroadcast(Response serverResponse){
-        try{
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleRSSMessageBroadcast(Response serverResponse) {
+        try {
             JSONObject response = serverResponse.getMessage();
 
             long nid = response.getLong("nid");
@@ -490,11 +547,15 @@ public class ResponseHandler {
         }
     }
 
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
     protected void handleGroupCreateResponse(Response serverResponse) {
         try {
             // TODO : Change behaviour so that you don't go quit activity as long as group is not accepted.
-            YieldsApplication.getUser().activateGroup(
-                    new Id(serverResponse.getMessage().getLong("nid")));
+            Id groupId = new Id(serverResponse.getMessage().getLong("nid"));
+            YieldsApplication.getUser().activateGroup(groupId);
+            mCacheHelper.updateGroupValidity(groupId, true);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -502,6 +563,9 @@ public class ResponseHandler {
         }
     }
 
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
     protected void handleUserInfoResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
@@ -510,14 +574,37 @@ public class ResponseHandler {
             if (response.getString("email").equals("")) {
                 if (user != null) {
                     user.update(response);
+
+                    Bitmap image;
+                    if (!response.getString("pic").equals("")) {
+                        image = ImageSerialization.unSerializeImage(response.getString("pic"));
+                    } else {
+                        image = YieldsApplication.getDefaultUserImage();
+                    }
+                    String name = response.getString("name");
+                    String email = response.getString("email");
+                    User receivedUser = new User(name, infoId, email, image);
+                    mCacheHelper.addUser(receivedUser);
                 } else {
                     user = new User(response);
+                    mCacheHelper.addUser(user);
                     YieldsApplication.addNotKnown(user);
                 }
             } else {
                 if (YieldsApplication.getUser().getId().equals(infoId)) {
 
                     YieldsApplication.getUser().update(response);
+
+                    Bitmap image;
+                    if (!response.getString("pic").equals("")) {
+                        image = ImageSerialization.unSerializeImage(response.getString("pic"));
+                    } else {
+                        image = YieldsApplication.getDefaultUserImage();
+                    }
+                    String name = response.getString("name");
+                    String email = response.getString("email");
+                    User receivedUser = new User(name, infoId, email, image);
+                    mCacheHelper.addUser(receivedUser);
 
                     JSONArray entourage = response.getJSONArray("entourage");
                     JSONArray entourageRefreshedAt = response.getJSONArray("entourageUpdatedAt");
@@ -534,9 +621,19 @@ public class ResponseHandler {
                 } else {
                     if (user == null) {
                         user = new User(response);
-
                         YieldsApplication.getUser().addUserToEntourage(user);
+                        mCacheHelper.addUser(user);
                     } else {
+                        Bitmap image;
+                        if (!response.getString("pic").equals("")) {
+                            image = ImageSerialization.unSerializeImage(response.getString("pic"));
+                        } else {
+                            image = YieldsApplication.getDefaultUserImage();
+                        }
+                        String name = response.getString("name");
+                        String email = response.getString("email");
+                        User receivedUser = new User(name, infoId, email, image);
+                        mCacheHelper.addUser(receivedUser);
                         user.update(response);
                     }
 
@@ -548,6 +645,9 @@ public class ResponseHandler {
         }
     }
 
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
     protected void handleUserGroupListResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
@@ -559,14 +659,19 @@ public class ResponseHandler {
             assert (groupCount == updatedAt.length() &&
                     groupCount == refreshedAt.length());
 
-            for (int i = 0 ; i < groupCount ; i ++){
-                Group group = new Group(groupsId.getString(i), "placeholder", refreshedAt
-                        .getString(i));
+            for (int i = 0; i < groupCount; i++) {
+
+                Group group = mCacheHelper.getGroup(new Id(Long.valueOf(groupsId.getString(i))));
+
+                if (group == null) {
+                    group = new Group(groupsId.getString(i), "placeholder", refreshedAt.getString(i));
+                }
+
                 YieldsApplication.getUser().addGroup(group);
                 ServiceRequest groupInfo =
-                        new GroupInfoRequest(YieldsApplication.getUser().getId(),group.getId());
+                        new GroupInfoRequest(YieldsApplication.getUser().getId(), group.getId());
                 mService.sendRequest(groupInfo);
-                ServiceRequest historyRequest = new NodeHistoryRequest(group, new Date());
+                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
                 mService.sendRequest(historyRequest);
             }
 
@@ -577,6 +682,9 @@ public class ResponseHandler {
 
     }
 
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
     protected void handleUserConnectResponse(Response serverResponse) {
         // TODO : Parse the new field.
         ClientUser user = YieldsApplication.getUser();
@@ -597,36 +705,8 @@ public class ResponseHandler {
         }
     }
 
-
     /**
-     * Handles NodeMessage responses.
-     *
-     * @param serverResponse The Response received from the server.
-     */
-    protected void handleNodeMessageResponse(Response serverResponse) {
-        // TODO : Handle errors JSONs
-        try {
-            JSONObject responseMessage = serverResponse.getMessage();
-            JSONObject metadata = serverResponse.getMetadata();
-            String time = metadata.getString("ref");
-            Date date = DateSerialization.dateSerializer.toDate(time);
-            Group group = mCacheHelper.getGroup(new Id(Long.valueOf(metadata.getString("client"))));
-            Message message = mCacheHelper.getMessagesForGroup(group, date, 1).get(0);
-            mCacheHelper.deleteMessage(message, group.getId());
-            Message updatedMessage = new Message("", new Id(-1), message.getSender(), message.getContent(),
-                    DateSerialization.dateSerializer.toDate(metadata.getString("datetime")),
-                    Message.MessageStatus.SENT);
-            mCacheHelper.addMessage(updatedMessage, group.getId());
-            mService.receiveMessage(group.getId(), updatedMessage);
-        } catch (JSONException | ParseException | CacheDatabaseException e) {
-            Log.d("Y:" + this.getClass().getName(), "Couldn't handle NodeMessageResponse correctly !");
-        }
-    }
-
-    /**
-     * Handles NodeHistory responses.
-     *
-     * @param serverResponse The response received from the server.
+     * Handles the appropriate Response which is given to it by argument.
      */
     protected void handleNodeHistoryResponse(Response serverResponse) {
         try {
@@ -643,12 +723,12 @@ public class ResponseHandler {
 
             Id groupId = new Id(nid);
             ArrayList<Message> messageList = new ArrayList<>();
-            for (int i = 0 ; i < count ; i ++) {
+            for (int i = 0; i < count; i++) {
 
                 Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
                         .getString(i), contentTypes.getString(i), contents.getString(i));
                 messageList.add(message);
-                //mCacheHelper.addMessage(message, groupId);
+                mCacheHelper.addMessage(message, groupId);
             }
 
             mService.receiveMessages(groupId, messageList);
@@ -657,4 +737,30 @@ public class ResponseHandler {
         }
     }
 
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleMediaMessageResponse(Response serverResponse) {
+        try {
+            JSONObject response = serverResponse.getMessage();
+            Date prevDatetime = DateSerialization.dateSerializer
+                    .toDate(serverResponse.getMetadata().getString("ref"));
+            Date serverDatetime = DateSerialization.dateSerializer
+                    .toDate(response.getString("datetime"));
+
+            long nid = response.getLong("nid");
+            Id id = new Id(nid);
+
+            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
+                    message.getContent(), prevDatetime, message.getStatus());
+            mCacheHelper.deleteMessage(copyMessage, id);
+            mCacheHelper.addMessage(message, id);
+
+            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+        } catch (JSONException | ParseException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString());
+        }
+    }
 }

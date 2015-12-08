@@ -1,38 +1,42 @@
 package yields.client.id;
 
-import java.util.Objects;
-
 /**
  * Id used in the App.
  */
-public class Id implements IdInterface<Long> {
+public class Id {
 
     private Long mId;
 
     /**
      * Constructor for the Id taking a long in parameter.
+     *
      * @param value The id in Long.
      */
-    public Id(long value){
+    public Id(long value) {
         mId = value;
     }
 
     /**
      * Return the value of the id.
-     * @return
+     *
+     * @return The Long value of the id.
      */
-    @Override
     public Long getId() {
         return mId;
     }
 
     /**
-     * Perform equality test between ids.
-     * @param other The id we wnat to compare.
+     * Performs equality test between ids.
+     *
+     * @param other The id we want to compare.
      * @return True if they are the same, false otherwise.
      */
     @Override
-    public boolean equals(IdInterface<Long> other) {
-        return Objects.equals(mId, other.getId());
+    public boolean equals(Object other) {
+        if (!(other instanceof Id)) {
+            return false;
+        } else {
+            return ((Id) other).getId().equals(this.getId());
+        }
     }
 }

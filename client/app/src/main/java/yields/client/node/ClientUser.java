@@ -30,10 +30,10 @@ public class ClientUser extends User {
     /**
      * Creates a client user which represents the client connected to the application.
      *
-     * @param name The name of the User.
-     * @param id The id of the User.
+     * @param name  The name of the User.
+     * @param id    The id of the User.
      * @param email The Email of the User.
-     * @param img The image of the User.
+     * @param img   The image of the User.
      */
     public ClientUser(String name, Id id, String email, Bitmap img) {
         super(name, id, email, img);
@@ -43,6 +43,7 @@ public class ClientUser extends User {
 
     /**
      * constructs a shell for a clientUser waiting for update from server.
+     *
      * @param email The email of the user.
      */
     public ClientUser(String email) {
@@ -75,6 +76,7 @@ public class ClientUser extends User {
 
     /**
      * Get an unmodifiable sorted list of the user groups.
+     *
      * @return The sus-mentioned list.
      */
     public List<Group> getUserGroups() {
@@ -117,6 +119,7 @@ public class ClientUser extends User {
      * @param id The id of the group to activate.
      */
     //TODO: to be changed when response from server changed
+    //TODO: use ref to know which Group to activate
     public void activateGroup(Id id) {
         for (Group group : mGroups) {
             if (!group.isValidated()) {
@@ -127,14 +130,14 @@ public class ClientUser extends User {
     }
 
     /**
-     * Get group to be modified.
+     * Getter for a Group by it's ID, returns null if there is no group for
+     * the given Id.
      *
-     * @param groupId The group Id.
-     * @return The group to be modified
+     * @param groupId The Id of the wanted Group.
+     * @return The Group or null if there is no such Group.
      */
-    public Group modifyGroup(Id groupId) {
-        for (Group group :
-                mGroups) {
+    public Group getGroup(Id groupId) {
+        for (Group group : mGroups) {
             if (group.getId().equals(groupId)) {
                 return group;
             }
@@ -143,12 +146,14 @@ public class ClientUser extends User {
     }
 
     /**
-     * Get the User to be modified.
+     * Getter for a User from the entourage.
+     * Returns null if the Id of the User is not in the entourage.
      *
-     * @param userId The user Id.
-     * @return The user to be modified
+     * @param userId The id of the User.
+     * @return The User from the entourage with the same id or null
+     * if there is no User with that Id in the entourage.
      */
-    public User modifyEntourage(Id userId) {
+    public User getUserFromEntourage(Id userId) {
         for (User user : mEntourage) {
             if (userId.equals(user.getId())) {
                 return user;

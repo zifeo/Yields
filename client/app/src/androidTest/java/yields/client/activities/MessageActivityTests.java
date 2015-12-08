@@ -29,7 +29,6 @@ import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -284,7 +283,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     }
 
     @Test
-    public void testCannotSendEmptyTextMessage(){
+    public void testCannotSendEmptyTextMessage() {
         final MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         onView(withId(R.id.sendButton)).perform(click());
@@ -293,7 +292,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     }
 
     @Test
-    public void testCaptionForImageIsNotMandatory(){
+    public void testCaptionForImageIsNotMandatory() {
         final MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         messageActivity.simulateImageMessage();
