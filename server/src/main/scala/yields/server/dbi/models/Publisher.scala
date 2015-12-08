@@ -22,6 +22,13 @@ final class Publisher private(nid: NID) extends Node(nid) with Tags {
   val nodeKey = NodeKey.node
   override val nodeID = nid
 
+  /** Name setter. */
+  override def name_=(n: String): Unit = {
+    Indexes.searchableUnregister(name, nid)
+    super.name_=(n)
+    Indexes.searchableRegister(name, nid)
+  }
+
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {
     val parent = super.addMessage(content)
