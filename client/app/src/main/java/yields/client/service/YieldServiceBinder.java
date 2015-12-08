@@ -9,6 +9,7 @@ import yields.client.servicerequest.ServiceRequest;
 
 public class YieldServiceBinder extends Binder {
     private final YieldService mService;
+    public NotifiableActivity.Change connected = null;
 
     /**
      * Creates the binder and links it to the service
@@ -53,5 +54,12 @@ public class YieldServiceBinder extends Binder {
     public void sendRequest(ServiceRequest request) {
         Objects.requireNonNull(request);
         mService.sendRequest(request);
+    }
+
+    /**
+     * Apply change
+     */
+    public void changeStatus(NotifiableActivity.Change newStatus) {
+        connected = newStatus;
     }
 }
