@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -82,8 +83,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         System.out.println(messageActivity.isDestroyed());
 
         //Group info
-        ActionBar actionBar = (ActionBar) messageActivity.getSupportActionBar();
-        assertEquals(MOCK_GROUP.getName(), actionBar.getTitle());
+        TextView title = (TextView) messageActivity.findViewById(R.id.toolbarTitle);
+        assertEquals(MOCK_GROUP.getName(), title.getText().toString());
 
         //Input field
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);

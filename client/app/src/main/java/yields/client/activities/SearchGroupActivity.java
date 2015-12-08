@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -114,11 +115,24 @@ public class SearchGroupActivity extends NotifiableActivity{
     }
 
     /**
-     * Method automatically called when the tool bar is created
-     * @param menu The menu of the activity
+     * Method automatically called for the tool bar items.
+     * @param menu The tool bar menu.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search_group, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Method automatically called when the tool bar is created.
+     * @param menu The menu of the activity.
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.actionSearch).setEnabled(false);
+
         openSearch();
 
         return super.onPrepareOptionsMenu(menu);
