@@ -13,7 +13,7 @@ import yields.server.utils.Config
 trait YieldsSpec extends FlatSpec with Matchers with DbiSpec with AllGenerators with BeforeAndAfterAll {
 
   override protected def afterAll(): Unit = {
-    val folder = new File(Config.getString("ressource.media.folder"))
+    val folder = new File(Config.getString("resources.media.folder"))
     if (folder.exists) {
       val files = folder.listFiles
       for (f <- files if f.isFile) {
