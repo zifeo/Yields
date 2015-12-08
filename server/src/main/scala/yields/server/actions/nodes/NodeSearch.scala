@@ -20,8 +20,8 @@ case class NodeSearch(pattern: String) extends Action {
 
     val query = Node.fromName(pattern).map(node => (node.nid, node.name, node.pic))
     val (nids, names, pics) = query.toList.unzip3
-
     NodeSearchRes(nids, names, pics)
+    
   }
 
 }
