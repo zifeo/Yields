@@ -87,7 +87,7 @@ public class GroupInfoActivity extends NotifiableActivity {
         if (mGroup.getVisibility() == Group.GroupVisibility.PRIVATE){
             textViewTags.setVisibility(View.GONE);
         }
-        else if (tags.size() == 0){
+        else if (tags.isEmpty()){
             textViewTags.setText(getString(R.string.noTags));
         }
         else if (tags.size() == 1){
