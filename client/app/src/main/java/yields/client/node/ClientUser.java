@@ -25,6 +25,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class ClientUser extends User {
 
     private List<Group> mGroups;
+    private List<Group> mCommentGroups;
     private final List<User> mEntourage;
 
     /**
@@ -39,6 +40,7 @@ public class ClientUser extends User {
         super(name, id, email, img);
         mGroups = new ArrayList<>();
         mEntourage = new ArrayList<>();
+        mCommentGroups = new ArrayList<>();
     }
 
     /**
@@ -72,6 +74,20 @@ public class ClientUser extends User {
             }
         }
         mGroups.add(group);
+    }
+
+    /**
+     * Add a comment group to the user
+     *
+     * @param group The comment group to add.
+     */
+    public void addCommentGroup(Group group) {
+        for (Group prevGroup : mCommentGroups) {
+            if (prevGroup.getId().getId().equals(group.getId().getId())) {
+                return;
+            }
+        }
+        mCommentGroups.add(group);
     }
 
     /**
@@ -138,6 +154,22 @@ public class ClientUser extends User {
      */
     public Group getGroup(Id groupId) {
         for (Group group : mGroups) {
+            if (group.getId().equals(groupId)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Getter for a Comment Group by it's ID, returns null if there is no group for
+     * the given Id.
+     *
+     * @param groupId The Id of the wanted comment Group.
+     * @return The Group or null if there is no such comment Group.
+     */
+    public Group getCommentGroup(Id groupId) {
+        for (Group group : mCommentGroups) {
             if (group.getId().equals(groupId)) {
                 return group;
             }

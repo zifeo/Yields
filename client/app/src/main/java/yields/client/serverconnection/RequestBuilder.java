@@ -415,12 +415,14 @@ public class RequestBuilder {
      *
      * @param senderId The sender Id.
      * @param groupId  The group to send to.
+     * @param type     The type of the group being send to, if the type is null then this a MediaMessageRequest
+     *                 will be built.
      * @param content  The content of the message
-     * @param date     The reference date for the message (Id)
+     * @param date     The reference date for the message.
      * @return The request for the server
      */
     public static ServerRequest groupMessageRequest(Id senderId, Id groupId,
-                                                    Group.GroupType visibility,
+                                                    Group.GroupType type,
                                                     Content content, Date date) {
 
         Objects.requireNonNull(senderId);
@@ -429,10 +431,12 @@ public class RequestBuilder {
 
         RequestBuilder builder;
 
-        if (visibility.equals(Group.GroupType.PRIVATE)) {
-            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_MESSAGE, senderId);
-        } else {
+        if (type == null) {
+            builder = new RequestBuilder(ServiceRequest.RequestKind.MEDIA_MESSAGE, senderId);
+        } else if (type.equals(Group.GroupType.PUBLISHER)) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_MESSAGE, senderId);
+        } else {
+            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_MESSAGE, senderId);
         }
 
         builder.addField(Fields.NID, groupId);

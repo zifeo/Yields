@@ -160,7 +160,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
-                group.setVisibility(mGroupType);
+                group.setType(mGroupType);
                 YieldsApplication.getUser().addGroup(group);
                 YieldsApplication.getBinder().sendRequest(
                         new GroupCreateRequest(YieldsApplication.getUser(), group));
