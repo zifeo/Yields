@@ -1,8 +1,7 @@
-package yields.server.mpi
+package yields.server.io
 
-import yields.server.tests._
-import yields.server.io._
-import yields.server.tests.YieldsPropsSpec
+import yields.server.mpi.{Metadata, Notification, Request, Response}
+import yields.server.tests.{YieldsPropsSpec, _}
 
 class MessagesJsonFormatSpecifications extends YieldsPropsSpec {
 
