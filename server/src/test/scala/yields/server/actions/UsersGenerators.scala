@@ -7,7 +7,7 @@ import yields.server.actions.users._
 import yields.server.dbi.models._
 import yields.server.tests.DefaultsGenerators
 
-trait UsersGenerators extends DefaultsGenerators with ModelsGenerators {
+trait UsersGenerators extends DefaultsGenerators {
 
   import Arbitrary.arbitrary
 

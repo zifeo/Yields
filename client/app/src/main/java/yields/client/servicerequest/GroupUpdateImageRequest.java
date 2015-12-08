@@ -1,6 +1,7 @@
 package yields.client.servicerequest;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.Objects;
 

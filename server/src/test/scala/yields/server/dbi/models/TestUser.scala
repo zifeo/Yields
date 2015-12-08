@@ -1,9 +1,8 @@
 package yields.server.dbi.models
 
-import org.scalatest.Matchers
-import yields.server.dbi._
+import yields.server.tests.YieldsSpec
 
-class TestUser extends DBFlatSpec with Matchers {
+class TestUser extends YieldsSpec {
 
   val email = "test@test.com"
 

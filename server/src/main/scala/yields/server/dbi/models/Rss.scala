@@ -29,7 +29,7 @@ final class Rss private(nid: NID) extends Node(nid) with Tags {
 
   /** url getter. */
   def url: String = _url.getOrElse {
-    _url = redis.withClient(_.hget[String](NodeKey.node, RSSKey.url))
+    _url = redis(_.hget[String](NodeKey.node, RSSKey.url))
     valueOrException(_url)
   }
 
@@ -40,7 +40,7 @@ final class Rss private(nid: NID) extends Node(nid) with Tags {
   // Updates the field with given value and actualize timestamp.
   private def update[T](field: String, value: T): Option[T] = {
     val updates = List((field, value), (StaticNodeKey.updated_at, Temporal.now))
-    redis.withClient(_.hmset(NodeKey.node, updates))
+    redis(_.hmset(NodeKey.node, updates))
     Some(value)
   }
 
@@ -56,7 +56,7 @@ object Rss {
     */
   def create(name: String, url: String): Rss = {
     val rss = Rss(newIdentity())
-    redis.withClient { r =>
+    redis { r =>
       val infos = List(
         (StaticNodeKey.created_at, Temporal.now),
         (StaticNodeKey.name, name),
