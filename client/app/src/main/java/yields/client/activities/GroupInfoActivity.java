@@ -120,6 +120,18 @@ public class GroupInfoActivity extends NotifiableActivity {
 
         YieldsApplication.setUserList(mGroup.getUsers());
 
+        Button nodesButton = (Button) findViewById(R.id.buttonNodes);
+
+        nodesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupInfoActivity.this, NodeListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        YieldsApplication.setGroupsSearched(mGroup.getNodes());
+
         checkButtons();
     }
 
