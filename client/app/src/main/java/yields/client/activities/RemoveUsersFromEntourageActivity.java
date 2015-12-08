@@ -24,10 +24,11 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapter;
-    private List<Map.Entry<User, Boolean> > mEntourageChecked;
+    private List<Map.Entry<User, Boolean>> mEntourageChecked;
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -42,7 +43,7 @@ public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
         mEntourageChecked = new ArrayList<>();
         List<User> entourage = YieldsApplication.getUser().getEntourage();
 
-        for (int i = 0; i < entourage.size(); i++){
+        for (int i = 0; i < entourage.size(); i++) {
             mEntourageChecked.add(new AbstractMap.SimpleEntry<>(entourage.get(i), false));
         }
 
@@ -57,6 +58,7 @@ public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -67,27 +69,29 @@ public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method called when the user clicks on 'Done'
+    /**
+     * Method called when the user clicks on 'Done'
+     *
      * @param item The tool bar item clicked
      * @return true
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final List<User> usersToBeRemoved = new ArrayList<>();
-        for (int i = 0; i < mEntourageChecked.size(); i++){
-            if (mEntourageChecked.get(i).getValue()){
+        for (int i = 0; i < mEntourageChecked.size(); i++) {
+            if (mEntourageChecked.get(i).getValue()) {
                 usersToBeRemoved.add(mEntourageChecked.get(i).getKey());
             }
         }
 
-        if (usersToBeRemoved.size() > 0){
+        if (usersToBeRemoved.size() > 0) {
             String title = "Remove users from entourage";
-            if (usersToBeRemoved.size() == 1){
+            if (usersToBeRemoved.size() == 1) {
                 title = "Remove " + usersToBeRemoved.get(0).getName() + " from your entourage";
             }
 
             String message = "Are you sure you want to remove these users from your entourage ?";
-            if (usersToBeRemoved.size() == 1){
+            if (usersToBeRemoved.size() == 1) {
                 message = "Are you sure you want to remove " + usersToBeRemoved.get(0).getName() +
                         " from your entourage ?";
             }
@@ -99,8 +103,9 @@ public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
-                            for (User u : usersToBeRemoved){
-                                ServiceRequest request = new UserEntourageRemoveRequest(YieldsApplication.getUser(), u);
+                            for (User u : usersToBeRemoved) {
+                                ServiceRequest request =
+                                        new UserEntourageRemoveRequest(YieldsApplication.getUser().getId(), u.getId());
 
                                 YieldsApplication.getBinder().sendRequest(request);
                             }
@@ -118,8 +123,7 @@ public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
                     })
                     .create();
             dialog.show();
-        }
-        else {
+        } else {
             finish();
         }
 

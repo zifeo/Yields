@@ -21,8 +21,9 @@ import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupRemoveRequest;
+import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -40,6 +41,7 @@ public class GroupInfoActivity extends NotifiableActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -62,10 +64,10 @@ public class GroupInfoActivity extends NotifiableActivity {
 
         int indexMode = intent.getIntExtra(SearchGroupActivity.MODE_KEY, 0);
 
-        if (indexMode < 0 || indexMode >= SearchGroupActivity.Mode.values().length){
+        if (indexMode < 0 || indexMode >= SearchGroupActivity.Mode.values().length) {
             throw new IllegalIntentExtraException(
                     "Mode extra must be between 0 and "
-                            + (SearchGroupActivity.Mode.values().length - 1) +  " in GroupInfoActivity");
+                            + (SearchGroupActivity.Mode.values().length - 1) + " in GroupInfoActivity");
         }
 
         mMode = SearchGroupActivity.Mode.values()[indexMode];
@@ -89,15 +91,13 @@ public class GroupInfoActivity extends NotifiableActivity {
         }
         else if (tags.isEmpty()){
             textViewTags.setText(getString(R.string.noTags));
-        }
-        else if (tags.size() == 1){
+        } else if (tags.size() == 1) {
             String text = "Tag : " + tags.get(0).getText();
             textViewTags.setText(text);
-        }
-        else {
+        } else {
             StringBuilder builder = new StringBuilder("Tags : ");
-            for (int i = 0; i < MAX_TAGS && i < tags.size(); i++){
-                if (i != 0){
+            for (int i = 0; i < MAX_TAGS && i < tags.size(); i++) {
+                if (i != 0) {
                     builder.append(", ");
                 }
                 builder.append(tags.get(i).getText());
@@ -123,7 +123,8 @@ public class GroupInfoActivity extends NotifiableActivity {
         checkButtons();
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -187,10 +188,16 @@ public class GroupInfoActivity extends NotifiableActivity {
     /**
      * Check if the user is in the group and set the appropriate states to the buttons
      */
+<<<<<<< HEAD
     private void checkButtons(){
         if (!mGroup.containsUser(YieldsApplication.getUser())){
             if (mMode == SearchGroupActivity.Mode.SEARCH){
                 final Button subscribeButton = (Button) findViewById(R.id.buttonSubscribeGroup);
+=======
+    private void checkButtons() {
+        if (mMode == SearchGroupActivity.Mode.SEARCH) {
+            YieldsApplication.setUserList(mGroup.getUsers());
+>>>>>>> master
 
                 subscribeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -204,6 +211,7 @@ public class GroupInfoActivity extends NotifiableActivity {
                         ServiceRequest request =new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
                         YieldsApplication.getBinder().sendRequest(request);
 
+<<<<<<< HEAD
                         subscribeButton.setEnabled(false);
                     }
                 });
@@ -216,11 +224,28 @@ public class GroupInfoActivity extends NotifiableActivity {
                         alreadySubscribed = true;
                         foundGroup = group;
                     }
+=======
+                    ServiceRequest request = new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
+                    YieldsApplication.getBinder().sendRequest(request);
+
+                    subscribeButton.setEnabled(false);
+                }
+            });
+
+            boolean alreadySubscribed = false;
+            Group foundGroup = null;
+            ClientUser user = YieldsApplication.getUser();
+            for (Group group : user.getUserGroups()) {
+                if (group.containsNode(mGroup)) {
+                    alreadySubscribed = true;
+                    foundGroup = group;
+>>>>>>> master
                 }
                 final Group subscriptionGroup = foundGroup;
 
                 final Button unsubscribeButton = (Button) findViewById(R.id.buttonUnsubscribeGroup);
 
+<<<<<<< HEAD
                 unsubscribeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -230,12 +255,25 @@ public class GroupInfoActivity extends NotifiableActivity {
                         ServiceRequest request = new GroupRemoveRequest(YieldsApplication.getUser(),
                                 subscriptionGroup.getId(), YieldsApplication.getUser().getId());
                         YieldsApplication.getBinder().sendRequest(request);
+=======
+            unsubscribeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    assert subscriptionGroup != null : "subscriptionGroup should " +
+                            "never be null when unsubscribeButton is clickable";
+                    List<User> usersToRemove = new ArrayList<>();
+                    usersToRemove.add(YieldsApplication.getUser());
+                    ServiceRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(),
+                            subscriptionGroup.getId(), usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE);
+                    YieldsApplication.getBinder().sendRequest(request);
+>>>>>>> master
 
                         unsubscribeButton.setEnabled(false);
                     }
                 });
 
 
+<<<<<<< HEAD
 
                 if (alreadySubscribed){
                     subscribeButton.setVisibility(View.GONE);
@@ -270,6 +308,37 @@ public class GroupInfoActivity extends NotifiableActivity {
 
                             startActivity(intent);
                         }
+=======
+            if (alreadySubscribed) {
+                subscribeButton.setVisibility(View.GONE);
+                unsubscribeButton.setVisibility(View.VISIBLE);
+            } else {
+                subscribeButton.setVisibility(View.VISIBLE);
+                unsubscribeButton.setVisibility(View.GONE);
+            }
+        } else {
+            final Button addButton = (Button) findViewById(R.id.buttonAddGroup);
+            addButton.setVisibility(View.VISIBLE);
+
+            addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    YieldsApplication.setGroupAdded(mGroup);
+                    YieldsApplication.setGroupAddedValid(true);
+
+                    if (mMode == SearchGroupActivity.Mode.ADD_NODE_NEW_GROUP) {
+                        Intent intent = new Intent(GroupInfoActivity.this, CreateGroupActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(GroupInfoActivity.this, GroupSettingsActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                        startActivity(intent);
+>>>>>>> master
                     }
                 });
             }

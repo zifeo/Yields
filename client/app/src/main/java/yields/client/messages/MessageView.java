@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -61,9 +62,7 @@ public class MessageView extends LinearLayout {
      */
     private View createMessageView() throws MessageViewException {
         User sender = YieldsApplication.getUserFromId(mMessage.getSender());
-        String senderEmail = sender.getEmail();
-        String currentUserEmail = YieldsApplication.getUser().getEmail();
-        boolean userIsSender = senderEmail.equals(currentUserEmail);
+        boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
         Context applicationContext = YieldsApplication.getApplicationContext();
 
         LayoutInflater vi;

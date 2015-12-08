@@ -1,12 +1,9 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
-import yields.client.node.User;
+import yields.client.id.Id;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -14,22 +11,22 @@ import yields.client.serverconnection.ServerRequest;
  */
 public class UserEntourageRemoveRequest extends ServiceRequest {
 
-    private final User mUser;
-    private final User mUserToRemove;
+    private final Id mUser;
+    private final Id mUserToRemove;
 
     /**
      * Main constructor for this type of ServiceRequest (removing a User from another User's
      * entourage).
      *
-     * @param user            The User sending the request, and who wants his entourage modified..
-     * @param userToBeRemoved The User that will be removed from user's entourage.
+     * @param senderId        The Id of the User sending the request, and who wants his entourage modified..
+     * @param userToBeRemoved The Id of the User that will be removed from user's entourage.
      */
-    public UserEntourageRemoveRequest(User user, User userToBeRemoved) {
+    public UserEntourageRemoveRequest(Id senderId, Id userToBeRemoved) {
         super();
-        Objects.requireNonNull(user);
+        Objects.requireNonNull(senderId);
         Objects.requireNonNull(userToBeRemoved);
 
-        mUser = user;
+        mUser = senderId;
         mUserToRemove = userToBeRemoved;
     }
 
@@ -50,15 +47,15 @@ public class UserEntourageRemoveRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userEntourageRemoveRequest(mUser.getId(), mUserToRemove.getId());
+        return RequestBuilder.userEntourageRemoveRequest(mUser, mUserToRemove);
     }
 
     /**
-     * Returns the User that should be removed from the entourage.
+     * Returns the Id of the User that should be removed from the entourage.
      *
-     * @return The User that should be removed from the entourage.
+     * @return The Id of the User that should be removed from the entourage.
      */
-    public User getUserToRemove() {
+    public Id getUserToRemove() {
         return mUserToRemove;
     }
 }

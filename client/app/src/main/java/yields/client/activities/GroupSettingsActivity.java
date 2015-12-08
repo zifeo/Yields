@@ -28,7 +28,6 @@ import yields.client.listadapter.ListAdapterGroupSettings;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
-import yields.client.servicerequest.GroupRemoveRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
@@ -51,9 +50,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
     private static final String TAG = "GroupSettingsActivity";
 
     /**
-     * Method automatically called on the creation of the activity
+     * Method automatically called on the creation of the activity.
      *
-     * @param savedInstanceState the previous instance of the activity
+     * @param savedInstanceState the previous instance of the activity.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +95,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Method called when this activity is resumed
+     * Method called when this activity is resumed.
      */
     @Override
     public void onResume() {
@@ -115,11 +114,11 @@ public class GroupSettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Method automatically called when the user has selected the new group image
+     * Method automatically called when the user has selected the new group image.
      *
-     * @param requestCode The code of the request
-     * @param resultCode  The code of the result
-     * @param data        The data where the uri, or the list of email is
+     * @param requestCode The code of the request.
+     * @param resultCode  The code of the result.
+     * @param data        The data where the uri, or the list of email is.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -167,16 +166,16 @@ public class GroupSettingsActivity extends AppCompatActivity {
             String message = newUsers.size() + " user(s) added to group";
             YieldsApplication.showToast(getApplicationContext(), message);
 
-            ServiceRequest updateGroup = new GroupUpdateUsersRequest(YieldsApplication.getUser(), mGroup.getId(),
-                    newUsers, GroupUpdateUsersRequest.AddOrRemove.ADD);
+            ServiceRequest updateGroup = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), mGroup.getId(),
+                    newUsers, GroupUpdateUsersRequest.UpdateType.ADD);
             YieldsApplication.getBinder().sendRequest(updateGroup);
         }
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /** Method used to take care of clicks on the tool bar.
      *
-     * @param item The tool bar item clicked
-     * @return true iff the click is not propagated
+     * @param item The tool bar item clicked.
+     * @return true iff the click is not propagated.
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -192,17 +191,17 @@ public class GroupSettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Class used to take care of clicks in the listview
+     * Class used to take care of clicks in the listview.
      */
     private class CustomListener implements AdapterView.OnItemClickListener {
 
         /**
-         * Method called when an item in the listview is clicked
+         * Method called when an item in the listview is clicked.
          *
-         * @param parent   The AdapterView
-         * @param view     The view clicked
-         * @param position The position in the list
-         * @param id       The id of the view
+         * @param parent   The AdapterView.
+         * @param view     The view clicked.
+         * @param position The position in the list.
+         * @param id       The id of the view.
          */
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -332,9 +331,11 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        List<User> usersToRemove = new ArrayList<User>();
+                        usersToRemove.add(YieldsApplication.getUser());
                         YieldsApplication.getBinder().sendRequest(
-                                new GroupRemoveRequest(YieldsApplication.getUser(), mGroup.getId(),
-                                        YieldsApplication.getUser().getId()));
+                                new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), mGroup.getId(),
+                                        usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE));
 
                         YieldsApplication.showToast(getApplicationContext(), "Group left !");
 
