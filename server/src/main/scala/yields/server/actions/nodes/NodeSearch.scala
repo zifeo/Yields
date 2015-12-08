@@ -1,7 +1,7 @@
 package yields.server.actions.nodes
 
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Blob, NID}
+import yields.server.dbi.models.{Node, Blob, NID}
 import yields.server.mpi.Metadata
 
 
@@ -18,9 +18,10 @@ case class NodeSearch(pattern: String) extends Action {
     */
   override def run(metadata: Metadata): Result = {
 
-    // TODO: look for publishers through tags and names with tests
+    val query = Node.fromName(pattern).map(node => (node.nid, node.name, node.pic))
+    val (nids, names, pics) = query.toList.unzip3
 
-    NodeSearchRes(List.empty, List.empty, List.empty)
+    NodeSearchRes(nids, names, pics)
   }
 
 }
@@ -29,6 +30,6 @@ case class NodeSearch(pattern: String) extends Action {
   * [[NodeSearch]] result. List always share the same number of elements.
   * @param nodes sequence of nid matching the pattern
   * @param names sequence of names matching the pattern
-  * @param pic sequence of pic matching the pattern
+  * @param pics sequence of pic matching the pattern
   */
-case class NodeSearchRes(nodes: List[NID], names: List[String], pic: Seq[Blob]) extends Result
+case class NodeSearchRes(nodes: List[NID], names: List[String], pics: Seq[Blob]) extends Result
