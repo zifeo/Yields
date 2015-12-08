@@ -55,7 +55,6 @@ public class UrlContent extends Content {
         if (mUrl.length() == 0) {
             throw new ContentException("Error in URL content constructor, caption does not contain any URL.");
         }
-        Log.d("UrlContent", "Caption : " + caption + "  contains url : " + mUrl);
         mValidUrl = makeUrlValid(mUrl);
         try {
             getTitleDescriptionAndThumbnail();
@@ -63,8 +62,6 @@ public class UrlContent extends Content {
             mTitle = ERROR_INVALID_URL;
             mDescription = ERROR_INVALID_URL;
         }
-        Log.d("UrlContent", "Title = " + mTitle);
-        Log.d("UrlContent", "Description = " + mDescription);
     }
 
     /**
@@ -156,7 +153,6 @@ public class UrlContent extends Content {
         } else if (addWww) {
             url = "https://www." + url.substring(8, url.length());
         }
-        Log.d("UrlContent", "valid URL = " + url);
         return url;
     }
 
@@ -207,10 +203,8 @@ public class UrlContent extends Content {
      * @return An array list containing the URLs in order.
      */
     public static String extractUrlFromCaption(String caption) {
-        Log.d("UrlContent", "extractUrlFromCaption : " + caption);
         String words[] = caption.split(" ");
         for (String word : words) {
-            Log.d("UrlContent", "Word : " + word);
             if (word.contains(".")) {
                 Matcher matcher = URL_PATTERN.matcher(word);
                 if (matcher.matches()) {
@@ -246,9 +240,7 @@ public class UrlContent extends Content {
         int imgBlockPos = pageBody.indexOf("<img");
         boolean found = false;
         String path = null;
-        String fuckandroid = null;
         if (propertyPos != -1) {
-            fuckandroid = pageBody.substring(propertyPos);
             // There is the property in the body.
             int contentPos = pageBody.indexOf("content=\"", propertyPos);
             if (contentPos != -1) {
@@ -271,10 +263,6 @@ public class UrlContent extends Content {
                 return YieldsApplication.getDefaultThumbnail();
             }
         }
-
-        Log.d("UrlContent", "imgBlock = " + imgBlockPos);
-        Log.d("UrlContent", "propertyPos = " + propertyPos);
-        Log.d("UrlContent", "Image path : " + path);
         if (found){
             URL url = null;
             try {
