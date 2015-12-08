@@ -29,7 +29,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     val node = instance(nid)
     val sender = metadata.client
 
-    if (! node.users.contains(sender))
+    if (!node.users.contains(sender))
       throw new UnauthorizedActionException(s"$sender does not belong to $nid")
 
     if (contentType.isDefined != content.isDefined)
@@ -44,6 +44,9 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
       cntType <- contentType
       cnt <- content
     } yield Media.create(cntType, cnt, sender)
+
+    media.map(_.addUser(node.users))
+
     val datetime = Temporal.now
     val mediaNid = media.map(_.nid)
 
