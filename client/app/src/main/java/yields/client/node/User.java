@@ -71,6 +71,17 @@ public class User extends Node {
     }
 
     /**
+     * Updates the User from an other instance of User.
+     *
+     * @param userUpdated the JSONObject from the response
+     */
+    public void update(User userUpdated) {
+        this.setName(userUpdated.getName());
+        this.setEmail(userUpdated.getEmail());
+        this.setImg(userUpdated.getImg());
+    }
+
+    /**
      * constructs a shell for a User waiting for update from server.
      * @param id The id of the user.
      */
@@ -111,5 +122,22 @@ public class User extends Node {
      */
     public void setEmail(String email) {
         mEmail = email;
+    }
+
+    /**
+     * Override of the equals method.
+     * Performs an equality test on this User.
+     * Two users are equal if they have the same Id.
+     *
+     * @param other The Object to be compared with.
+     * @return True if the equality holds, false otherwise.
+     */
+    @Override
+    public boolean equals(Object other){
+        if (!(other instanceof User)) {
+            return false;
+        } else {
+            return ((User) other).getId().equals(this.getId());
+        }
     }
 }

@@ -21,7 +21,8 @@ public class ListAdapterMessages extends ArrayAdapter<Message> {
     /**
      * Mains constructor, creates a ListAdapter from the Application's context,
      * a resource, and a List of Messages.
-     * @param context The context of the Application.
+     *
+     * @param context  The context of the Application.
      * @param resource The resource id for the ListView.
      * @param messages The List of Messages that will be displayed on the ListView.
      */
@@ -31,9 +32,10 @@ public class ListAdapterMessages extends ArrayAdapter<Message> {
 
     /**
      * Returns a view for every Message in the ListView
-     * @param position The position of the Message in the ListView.
+     *
+     * @param position    The position of the Message in the ListView.
      * @param convertView The view to be converted.
-     * @param parent The parent of the returned View.
+     * @param parent      The parent of the returned View.
      * @return A view for the Message at the given position.
      */
     @Override
@@ -42,7 +44,7 @@ public class ListAdapterMessages extends ArrayAdapter<Message> {
         MessageView messageView = null;
         int tag = this.getCount();
         try {
-            messageView = new MessageView(YieldsApplication.getApplicationContext(), message);
+            messageView = message.getView();
             messageView.setTag((Object) tag);
         } catch (MessageViewException e) {
             Log.d("ListAdapterMessages", "Couldn't add view to message list");

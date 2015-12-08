@@ -6,15 +6,12 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.util.Date;
 import java.util.List;
 
 import yields.client.R;
@@ -22,13 +19,10 @@ import yields.client.activities.GroupActivity;
 import yields.client.activities.MessageActivity;
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
-import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserConnectRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -234,11 +228,10 @@ public class YieldService extends Service {
      * @param message The message in question.
      */
     synchronized public void receiveMessage(Id groupId, Message message) {
-        if (mCurrentGroup != null)
-
         if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
-                !mCurrentGroup.getId().equals(groupId)) {
-            Group group = YieldsApplication.getUser().modifyGroup(groupId);
+                !mCurrentGroup.getId().getId().equals(groupId.getId())) {
+            Group group = YieldsApplication.getUser().getGroup(groupId);
+
             group.addMessage(message);
             group.setLastUpdate(message.getDate());
             sendMessageNotification(group, message);
@@ -266,7 +259,7 @@ public class YieldService extends Service {
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
-            YieldsApplication.getUser().modifyGroup(groupId).addMessages(messages);
+            YieldsApplication.getUser().getGroup(groupId).addMessages(messages);
         }
     }
 

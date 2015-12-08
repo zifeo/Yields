@@ -40,8 +40,9 @@ import yields.client.messages.TextContent;
 import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.servicerequest.GroupMessageRequest;
+import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
-import yields.client.servicerequest.NodeMessageRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -127,7 +128,7 @@ public class MessageActivity extends NotifiableActivity {
         mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
 
-        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(historyRequest);
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
@@ -203,7 +204,7 @@ public class MessageActivity extends NotifiableActivity {
     public void onSendMessage(View v) {
         String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
-        if (!inputMessage.isEmpty() || mSendImage){
+        if (!inputMessage.isEmpty() || mSendImage) {
             Content content;
             if (mSendImage && mImage != null) {
                 Log.d("MessageActivity", "Create image content");
@@ -227,7 +228,7 @@ public class MessageActivity extends NotifiableActivity {
                 mGroupMessageAdapter.notifyDataSetChanged();
                 ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                         .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
-                NodeMessageRequest request = new NodeMessageRequest(message, mGroup.getId(),
+                GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(),
                         mGroup.getVisibility());
                 YieldsApplication.getBinder().sendRequest(request);
             } else {
@@ -235,7 +236,7 @@ public class MessageActivity extends NotifiableActivity {
                 mCommentAdapter.notifyDataSetChanged();
                 ((CommentFragment) mCurrentFragment).getCommentListView()
                         .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-                NodeMessageRequest request = new NodeMessageRequest(message, mCommentMessage.getId(),
+                MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId(),
                         Group.GroupVisibility.PRIVATE);
                 YieldsApplication.getBinder().sendRequest(request);
             }
@@ -481,7 +482,7 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        NodeHistoryRequest request = new NodeHistoryRequest(mGroup, new Date());
+        NodeHistoryRequest request = new NodeHistoryRequest(mGroup.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
 
