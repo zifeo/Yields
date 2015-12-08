@@ -125,6 +125,9 @@ public class LoggingInActivity extends NotifiableActivity {
             YieldsApplication.setBinder((YieldServiceBinder) service);
             YieldsApplication.getBinder().attachActivity(LoggingInActivity.this);
             YieldsApplication.getBinder().connectionStatus();
+            if (YieldsApplication.getBinder().connected != null) {
+                notifyChange(YieldsApplication.getBinder().connected);
+            }
         }
 
         @Override
