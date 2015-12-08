@@ -92,11 +92,11 @@ package object io {
   implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
 
   // RSS
-  implicit lazy val rssCreateJF = jsonFormat3(RSSCreate)
+  implicit lazy val rssCreateJF = jsonFormat4(RSSCreate)
   implicit lazy val rssCreateResJF = jsonFormat1(RSSCreateRes)
 
   implicit lazy val rssInfoJF = jsonFormat1(RSSInfo)
-  implicit lazy val rssInfoResJF = jsonFormat3(RSSInfoRes)
+  implicit lazy val rssInfoResJF = jsonFormat4(RSSInfoRes)
 
   // Media
   implicit lazy val mediaMessageJF = jsonFormat4(MediaMessage)
