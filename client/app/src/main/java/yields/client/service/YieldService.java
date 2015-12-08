@@ -291,7 +291,7 @@ public class YieldService extends Service {
                         .setLargeIcon(group.getImage())
                         .setContentTitle("Message from " + YieldsApplication
                                 .getUserFromId(message.getSender()).getName())
-                        .setContentText(message.getContent().toString().substring(0,
+                        .setContentText(message.getContent().getTextForRequest().substring(0,
                                 message.getContent().getTextForRequest().length() > 50 ?
                                         50 : message.getContent().getTextForRequest().length()));
 
