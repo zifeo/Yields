@@ -234,9 +234,7 @@ public class YieldService extends Service {
      * @param message The message in question.
      */
     synchronized public void receiveMessage(Id groupId, Message message) {
-        Log.d("sfdugfaguzfguag", "Group id : " + groupId.getId().toString());
         if (mCurrentGroup != null)
-            Log.d("sfdugfaguzfguag", "current group id : " + mCurrentGroup.getId().getId().toString());
 
         if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
                 !mCurrentGroup.getId().equals(groupId)) {
@@ -299,7 +297,6 @@ public class YieldService extends Service {
                                 message.getContent().getTextForRequest().length() > 50 ?
                                         50 : message.getContent().getTextForRequest().length()));
 
-        Log.d("notify", "jfshgiohsadofhojfojasioahdsoi");
         // Creates an explicit intent for an Activity in your app
         YieldsApplication.setGroup(group);
         Intent resultIntent = new Intent(this, MessageActivity.class);
