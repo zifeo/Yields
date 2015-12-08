@@ -6,6 +6,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import yields.client.R;
 import yields.client.generalhelpers.ServiceTestConnection;
@@ -51,7 +52,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct name is displayed
      */
     public void testCorrectName(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
         YieldsApplication.setGroup(g);
 
         getActivity();
@@ -62,7 +64,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that no tag is displayed
      */
     public void testCorrectNoTags(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
         YieldsApplication.setGroup(g);
         getActivity();
 
@@ -73,7 +76,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct, unique tag, is displayed
      */
     public void testCorrectTag(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
         g.addTag(new Group.Tag("fun"));
 
         YieldsApplication.setGroup(g);
@@ -86,7 +90,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct tags are displayed
      */
     public void testCorrectTags(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
         g.addTag(new Group.Tag("fun"));
         g.addTag(new Group.Tag("happy"));
 
@@ -104,7 +109,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      * Test that the correct users are displayed
      */
     public void testCorrectUsers(){
-        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>());
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
         User u1 = new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage());
         User u2 = new User("Clank", new Id(121), "c@veldin.com", YieldsApplication.getDefaultUserImage());
         YieldsApplication.getUser().addUserToEntourage(u1);
