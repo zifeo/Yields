@@ -98,4 +98,15 @@ public class UserSettingsActivityTests extends ActivityInstrumentationTestCase2<
 
         onView(withText(R.string.removeFromEntourage)).check(matches(isDisplayed()));
     }
+
+    /**
+     * Test that see the user's info
+     */
+    public void testInfo() {
+        getActivity();
+        onView(withText(R.string.userInfo)).perform(click());
+
+        onView(withId(R.id.textViewEmail)).check(matches(withText("a@b.c")));
+        onView(withId(R.id.textViewUserName)).check(matches(withText("User")));
+    }
 }
