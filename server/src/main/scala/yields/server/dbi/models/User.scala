@@ -81,9 +81,6 @@ final class User private(val uid: UID) {
     * Delete old picture if there is one and create new media on disk
     */
   def pic_=(content: Blob): Unit = {
-    if (_pic.isDefined) {
-      Media.deleteContentOnDisk(_pic.get)
-    }
     val newPic = Media.create("image", content, uid)
     _pic = update(Key.user, StaticKey.pic, newPic.nid)
   }
