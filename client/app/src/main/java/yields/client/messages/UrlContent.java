@@ -55,7 +55,6 @@ public class UrlContent extends Content {
         if (mUrl.length() == 0) {
             throw new ContentException("Error in URL content constructor, caption does not contain any URL.");
         }
-        Log.d("UrlContent", "Caption : " + caption + "  contains url : " + mUrl);
         mValidUrl = makeUrlValid(mUrl);
         try {
             getTitleDescriptionAndThumbnail();
@@ -63,8 +62,6 @@ public class UrlContent extends Content {
             mTitle = ERROR_INVALID_URL;
             mDescription = ERROR_INVALID_URL;
         }
-        Log.d("UrlContent", "Title = " + mTitle);
-        Log.d("UrlContent", "Description = " + mDescription);
     }
 
     /**
@@ -156,7 +153,6 @@ public class UrlContent extends Content {
         } else if (addWww) {
             url = "https://www." + url.substring(8, url.length());
         }
-        Log.d("UrlContent", "valid URL = " + url);
         return url;
     }
 
@@ -207,10 +203,8 @@ public class UrlContent extends Content {
      * @return An array list containing the URLs in order.
      */
     public static String extractUrlFromCaption(String caption) {
-        Log.d("UrlContent", "extractUrlFromCaption : " + caption);
         String words[] = caption.split(" ");
         for (String word : words) {
-            Log.d("UrlContent", "Word : " + word);
             if (word.contains(".")) {
                 Matcher matcher = URL_PATTERN.matcher(word);
                 if (matcher.matches()) {
@@ -237,7 +231,7 @@ public class UrlContent extends Content {
      * @return A thumbnail for the page. If no thumbnail can be found, returns the defaultThumbnail defined in the
      * YieldsApplication class.
      */
-    public Bitmap getThumbnailFromMetadata(String pageBody) {
+    public static Bitmap getThumbnailFromMetadata(String pageBody) {
         // 2 tests :
         // _ If there is a property="og:image" available we take it.
         // _ Else we take the first image that appears in the page body.
@@ -245,10 +239,10 @@ public class UrlContent extends Content {
         int propertyPos = pageBody.indexOf("property=\"og:image\"");
         int imgBlockPos = pageBody.indexOf("<img");
         boolean found = false;
-        String path;
+        String path = null;
         if (propertyPos != -1) {
             // There is the property in the body.
-            int contentPos = pageBody.indexOf("content=\"");
+            int contentPos = pageBody.indexOf("content=\"", propertyPos);
             if (contentPos != -1) {
                 int pathBegin = contentPos + 9;
                 int pathEnd = pageBody.indexOf("\"", pathBegin);
@@ -260,17 +254,34 @@ public class UrlContent extends Content {
             }
         }
 
-        if (!found && imgBlockPos != -1) {
-            int srcBegin = pageBody.indexOf("src=\"");
-            int srcEnd = pageBody.indexOf("\"", srcBegin + 5);
-            path = pageBody.substring(srcBegin + 5, srcEnd);
-        } else {
+        if (!found){
+            if (imgBlockPos != -1) {
+                int srcBegin = pageBody.indexOf("src=\"");
+                int srcEnd = pageBody.indexOf("\"", srcBegin + 5);
+                path = pageBody.substring(srcBegin + 5, srcEnd);
+            } else {
+                return YieldsApplication.getDefaultThumbnail();
+            }
+        }
+        if (found){
+            URL url = null;
+            try {
+                url = new URL(path);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                return myBitmap;
+            } catch (MalformedURLException e) {
+                return YieldsApplication.getDefaultThumbnail();
+            } catch (IOException e) {
+                return YieldsApplication.getDefaultThumbnail();
+            }
+        }
+        else{
             return YieldsApplication.getDefaultThumbnail();
         }
-        Log.d("UrlContent", "imgBlock = " + imgBlockPos);
-        Log.d("UrlContent", "propertyPos = " + propertyPos);
-        Log.d("UrlContent", "Image path : " + path);
-        return YieldsApplication.getDefaultThumbnail();
     }
 
     /**
@@ -314,7 +325,6 @@ public class UrlContent extends Content {
                     url = new URL(mValidUrl);
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setInstanceFollowRedirects(true);
-                    connection.setConnectTimeout(1000);
                     if (connection.getResponseCode() / 100 == 3) {
                         // Code 3XX mean redirect, we need to follow them.
                         String redirect = connection.getHeaderField("Location");
@@ -322,7 +332,6 @@ public class UrlContent extends Content {
                         mValidUrl = redirect;
                         URL redirectURL = new URL(redirect);
                         connection = (HttpURLConnection) redirectURL.openConnection();
-                        connection.setConnectTimeout(1000);
                     }
                     pageBody = inputStreamToString(connection.getInputStream());
                     mTitle = getTitleFromMetadata(pageBody);
