@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'jacoco'
 
 android {
     compileSdkVersion 23
@@ -34,10 +35,31 @@ dependencies {
     compile 'com.google.android.gms:play-services-plus:8.3.0'
     compile 'com.android.support:design:23.1.1'
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
-    androidTestCompile 'com.android.support.test:runner:0.4'
-    androidTestCompile 'com.android.support.test:rules:0.3'
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+    androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     testCompile 'junit:junit:4.12'
     androidTestCompile 'org.mockito:mockito-core:1.10.19'
-    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.1'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+}
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+task jacocoReport(type: JacocoReport, dependsOn: "connectedAndroidTest") {
+    sourceDirectories = files(['src/main/java'])
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes',
+            excludes: [
+                    '**/R.class',
+                    '**/R$*.class',
+                    '**/BuildConfig.*',
+                    '**/Manifest*.*',
+                    '**/*Test*.*',
+                    '**/android/**/*.*'
+            ]
+    )
+
+    executionData = files('build/outputs/code-coverage/connected/coverage.ec')
 }
