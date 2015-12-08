@@ -59,6 +59,7 @@ object RSS {
     val now = Temporal.now
     val infos = List(
       (StaticNodeKey.name, name),
+      (StaticRssKey.url, url),
       (StaticRssKey.filter, filter),
       (StaticNodeKey.kind, classOf[Group].getSimpleName),
       (StaticNodeKey.created_at, now),

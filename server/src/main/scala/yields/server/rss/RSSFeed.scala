@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
   *
   * @param url RSS url
   */
-final class RSSFeed(url: String) extends App {
+final class RSSFeed(url: String) {
 
   private val feed = new SyndFeedInput().build(new XmlReader(new URL(url)))
 
@@ -23,6 +23,7 @@ final class RSSFeed(url: String) extends App {
   lazy val authors = feed.getAuthors.asScala.map(_.getName).toList
   lazy val link = feed.getLink
   lazy val updatedAt = Temporal.date2OffsetDateTime(feed.getPublishedDate)
+
   lazy val entries = feed.getEntries.asScala.map { entry =>
     val title = entry.getTitle
     val author = entry.getAuthor
@@ -35,7 +36,7 @@ final class RSSFeed(url: String) extends App {
   /** Retrieves last entries given a date. */
   def since(datetime: OffsetDateTime): List[(OffsetDateTime, String, String, String)] =
     entries
-      .filter(_._1.compareTo(datetime) < 0)
+      .filter(_._1.compareTo(datetime) > 0)
       .map(t => (t._1, t._2, t._3, t._4))
 
   /** Retrieves last entries given a date and filter only entries containg filter, terms */
@@ -45,7 +46,7 @@ final class RSSFeed(url: String) extends App {
       val terms = filter.split(',').map(_.trim)
       entries
         .filter { case (date, _, _, _, content) =>
-          date.compareTo(datetime) < 0 && terms.exists(content.contains)
+          date.compareTo(datetime) > 0 && terms.exists(content.contains)
         }
         .map(t => (t._1, t._2, t._3, t._4))
     }
