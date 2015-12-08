@@ -7,7 +7,7 @@ class TestGroup extends YieldsSpec {
 
   val testName = "Group Test"
 
-  it should "insert the group in the database" in {
+  "A group" should "insert the group in the database by creation" in {
     val g1 = Group.create(testName, 1)
     val g2 = Group(g1.nid)
 

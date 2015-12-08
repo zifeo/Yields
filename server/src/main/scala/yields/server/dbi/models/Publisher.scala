@@ -44,18 +44,17 @@ object Publisher {
     */
   def create(name: String, creator: UID): Publisher = {
     val publisher = Publisher(newIdentity())
-    redis { r =>
-      val now = Temporal.now
-      val infos = List(
-        (StaticNodeKey.name, name),
-        (StaticNodeKey.kind, classOf[Group].getSimpleName),
-        (StaticNodeKey.creator, creator),
-        (StaticNodeKey.created_at, now),
-        (StaticNodeKey.refreshed_at, now),
-        (StaticNodeKey.updated_at, now)
-      )
-      r.hmset(publisher.NodeKey.node, infos)
-    }
+    val now = Temporal.now
+    val infos = List(
+      (StaticNodeKey.name, name),
+      (StaticNodeKey.kind, classOf[Group].getSimpleName),
+      (StaticNodeKey.creator, creator),
+      (StaticNodeKey.created_at, now),
+      (StaticNodeKey.refreshed_at, now),
+      (StaticNodeKey.updated_at, now)
+    )
+    assert(redis(_.hmset(publisher.NodeKey.node, infos)))
+    assert(Indexes.searchableRegister(name, publisher.nid))
     publisher.addUser(creator)
     publisher
   }

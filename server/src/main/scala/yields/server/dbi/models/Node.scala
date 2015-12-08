@@ -195,6 +195,10 @@ object Node {
     val node_pic = "pic_nid"
   }
 
+  /** Return some searchable nodes. */
+  def fromName(name: String): Set[Node] =
+    Indexes.searchableFuzyLookup(name).map(Node(_))
+
   /** Node constructor. */
   def apply(nid: NID): Node = {
     new Node(nid)

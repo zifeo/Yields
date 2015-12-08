@@ -1,7 +1,10 @@
 package yields.server.dbi
 
-import yields.server.dbi.models.{NID, UID, User}
+import yields.server.dbi.models.{NID, UID}
 import yields.server.utils.Config
+import com.redis.serialization.Parse.Implicits._
+
+import scala.collection.mutable
 
 /**
   * Regroup all indexes.
@@ -53,15 +56,23 @@ private[dbi] object Indexes {
     */
   def searchableFuzyLookup(name: String): Set[NID] = {
     val base = Key.searchable
-    val keys = redis(_.scan(0, s"$base:*$name*", fuzycount)) match {
+    val lookup = redis[Option[(Option[Int], Option[List[Option[String]]])]](_.scan[String](0, s"$base:*$name*", fuzycount))
+
+    val keys = lookup match {
       case Some((_, Some(matches))) => matches.flatten
       case _ => List.empty
     }
-    val fetched = redisPipeline(r => keys.foreach(r.smembers(_)))
-    fetched match {
-      case Some(nids: List[List[NID]]) => nids.flatten.toSet
-      case None => Set.empty
-    }
+
+    val fetched = redisPipeline[Option[Set[Some[NID]]]](r => keys.map(r.smembers[NID](_)))
+    val res = mutable.Set.empty[NID]
+    for {
+      result <- fetched
+      setOpt <- result
+      set <- setOpt
+      nidOpt <- set
+      nid <- nidOpt
+    } res += nid
+    res.toSet
   }
 
 }
