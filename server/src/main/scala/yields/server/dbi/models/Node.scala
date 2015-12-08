@@ -73,11 +73,19 @@ class Node protected (val nid: NID) {
     valueOrException(_updated_at)
   }
 
+  /** Updates datetime setter. */
+  def updated(): Unit =
+    _updated_at = update(NodeKey.node, StaticNodeKey.updated_at, Temporal.now)
+
   /** Refresh datetime getter. */
   def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
     _refreshed_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.refreshed_at))
     valueOrDefault(_refreshed_at, Temporal.minimum)
   }
+
+  /** Refreshes datetime setter. */
+  def refreshed(): Unit =
+    _refreshed_at = update(NodeKey.node, StaticNodeKey.refreshed_at, Temporal.now)
 
   /** creator getter */
   def creator: UID = {
