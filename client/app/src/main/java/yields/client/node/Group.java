@@ -194,16 +194,20 @@ public class Group extends Node {
 
     /**
      * Validates a message received at a certain date and changes the date to the server side date.
+     * The message also sees it's Id updated if acts as a Node on the server side.
+     * The message status is always set to SENT.
      *
-     * @param date    The old Date of the Message.
-     * @param newDate The newDate of the Message.
+     * @param contentId The Id of the Message if there is one.
+     * @param date      The old Date of the Message.
+     * @param newDate   The newDate of the Message.
      * @return The Message updated.
      */
-    public Message validateMessage(Date date, Date newDate) {
+    public Message updateMessageIdDateAndStatus(Id contentId, Date date, Date newDate) {
         Message message = mMessages.remove(date);
 
         if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
+            message.setId(contentId);
             message.recomputeView();
             mMessages.put(newDate, message);
             return message;
@@ -245,7 +249,7 @@ public class Group extends Node {
     /**
      * Changes/updates the users of the group
      *
-     * @param userList
+     * @param userList The new list of Users for the group.
      */
     public void updateUsers(ArrayList<Id> userList) {
         mUsers.clear();
@@ -384,7 +388,6 @@ public class Group extends Node {
      * Returns the lasts messages of the group (up to a certain date util the user scrolls up).
      *
      * @return A sorted map containing the messages sorted by date.
-     * @throws IOException In case the user cannot retreive the messages.
      */
     synchronized public SortedMap<Date, Message> getLastMessages() {
         return Collections.unmodifiableSortedMap(mMessages);

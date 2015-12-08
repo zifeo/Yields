@@ -226,9 +226,6 @@ public class ServiceRequestController {
             case RSS_CREATE_RESPONSE:
                 mResponseHandler.handleRSSCreateResponse(serverResponse);
                 break;
-            case NODE_MESSAGE_BCAST:
-                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
-                break;
             case USER_UPDATE_BCAST:
                 mResponseHandler.handleUserUpdateBroadcast(serverResponse);
                 break;

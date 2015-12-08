@@ -167,12 +167,15 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             Id id = new Id(nid);
 
+            long contentNid = response.optLong("contentNid", -1);
+
             if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
                 YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            Message message = YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(Long.valueOf(contentNid)),
+                    prevDatetime, serverDatetime);
             Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
                     message.getContent(), prevDatetime, message.getStatus());
             mCacheHelper.deleteMessage(copyMessage, id);
@@ -263,12 +266,18 @@ public class ResponseHandler {
                     .toDate(response.getString("datetime"));
             Id id = new Id(nid);
 
+            String contentNid = response.optString("contentNid");
+            if (contentNid.equals("null")) {
+                contentNid = "-1";
+            }
+
             if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
                 YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(Long.valueOf(contentNid)),
+                    prevDatetime, serverDatetime);
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -287,27 +296,6 @@ public class ResponseHandler {
 
             // TODO (Nico) : Notify activity.
         } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    /**
-     * Handles the appropriate Response which is given to it by argument.
-     */
-    protected void handleNodeMessageBroadcast(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-
-            Message message = new Message(response.getString("datetime"),
-                    response.getLong("sender"), response.getString("text"),
-                    response.getString("contentType"), response.getString("content"));
-
-            Id groupId = new Id(response.getLong("nid"));
-
-            mCacheHelper.addMessage(message, groupId);
-            mService.receiveMessage(groupId, message);
-        } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
@@ -416,7 +404,12 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            Message message = new Message(response.getString("datetime"),
+            String contentNid = response.optString("contentNid");
+            if (contentNid.equals("null")) {
+                contentNid = "-1";
+            }
+
+            Message message = new Message(response.getString("datetime"), Long.valueOf(contentNid),
                     response.getLong("sender"), response.getString("text"),
                     response.optString("contentType"), response.optString("content"));
 
@@ -492,7 +485,12 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            Message message = new Message(response.getString("datetime"),
+            String contentNid = response.optString("contentNid");
+            if (contentNid.equals("null")) {
+                contentNid = "-1";
+            }
+
+            Message message = new Message(response.getString("datetime"), Long.valueOf(contentNid),
                     response.getLong("sender"), response.getString("text"),
                     response.getString("contentType"), response.getString("content"));
 
@@ -538,9 +536,6 @@ public class ResponseHandler {
             String content = response.getString("content");
 
             // TODO : Create Message and add it to where the f*ck it need to be added.
-            Message message = new Message(datetime.toString(), senderId, text,
-                    contentType, content);
-            // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -716,6 +711,7 @@ public class ResponseHandler {
             JSONArray texts = serverResponse.getMessage().getJSONArray("texts");
             JSONArray contentTypes = serverResponse.getMessage().getJSONArray("contentTypes");
             JSONArray contents = serverResponse.getMessage().getJSONArray("contents");
+            JSONArray contentNids = serverResponse.getMessage().getJSONArray("contentNids");
 
             int count = datetimes.length();
             assert (count == senders.length() && count == texts.length() && count == contentTypes
@@ -724,13 +720,16 @@ public class ResponseHandler {
             Id groupId = new Id(nid);
             ArrayList<Message> messageList = new ArrayList<>();
             for (int i = 0; i < count; i++) {
+                String contentNid = contentNids.optString(i);
+                if (contentNid.equals("null")) {
+                    contentNid = "-1";
+                }
 
-                Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
+                Message message = new Message(datetimes.getString(i), Long.valueOf(contentNid), senders.getLong(i), texts
                         .getString(i), contentTypes.getString(i), contents.getString(i));
                 messageList.add(message);
                 mCacheHelper.addMessage(message, groupId);
             }
-
             mService.receiveMessages(groupId, messageList);
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
@@ -751,13 +750,15 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             Id id = new Id(nid);
 
-            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
-            Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
-                    message.getContent(), prevDatetime, message.getStatus());
-            mCacheHelper.deleteMessage(copyMessage, id);
-            mCacheHelper.addMessage(message, id);
-
-            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+            Message message = YieldsApplication.getUser().getCommentGroup(id).updateMessageIdDateAndStatus(new Id(-1),
+                    prevDatetime, serverDatetime);
+            if(message != null) {
+                Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
+                        message.getContent(), prevDatetime, message.getStatus());
+                mCacheHelper.deleteMessage(copyMessage, id);
+                mCacheHelper.addMessage(message, id);
+                mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+            }
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
