@@ -15,8 +15,7 @@ public class MediaMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
     private final Id mReceivingNodeId;
-    private final Group.GroupVisibility mVisibility;
-
+    private final Group.GroupType mType;
 
     /**
      * Main constructor for this type of ServiceRequest (sending a Message to a Media).
@@ -24,7 +23,7 @@ public class MediaMessageRequest extends ServiceRequest {
      * @param message         The Message that should be sent.
      * @param receivingNodeId The Id of the Media to which the Message should be added.
      */
-    public MediaMessageRequest(Message message, Id receivingNodeId, Group.GroupVisibility visibility) {
+    public MediaMessageRequest(Message message, Id receivingNodeId, Group.GroupType visibility) {
         super();
         Objects.requireNonNull(message);
         Objects.requireNonNull(receivingNodeId);
@@ -32,7 +31,7 @@ public class MediaMessageRequest extends ServiceRequest {
 
         mMessage = message;
         mReceivingNodeId = receivingNodeId;
-        mVisibility = visibility;
+        mType = visibility;
     }
 
     /**
@@ -55,7 +54,7 @@ public class MediaMessageRequest extends ServiceRequest {
         Message message = getMessage();
 
         return RequestBuilder.groupMessageRequest(message.getSender(), mReceivingNodeId,
-                mVisibility, message.getContent(), message.getDate());
+                mType, message.getContent(), message.getDate());
     }
 
     /**
