@@ -71,10 +71,4 @@ class PublishersJsonFormatSpecifications extends YieldsPropsSpec {
     }
   }
 
-  property("PublisherMessageBrd") {
-    forAll() { (x: PublisherMessageBrd) =>
-      checkToAndFromJson(x)
-    }
-  }
-
 }
