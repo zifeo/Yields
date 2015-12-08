@@ -3,14 +3,9 @@ package yields.server.actions.publisher
 import java.time.OffsetDateTime
 
 import yields.server.Yields
-import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.actions.groups.GroupMessageRes
-import yields.server.actions.nodes.NodeMessage
-import yields.server.actions.{Broadcast, Result, Action}
-import yields.server.dbi.models.Media.create
+import yields.server.actions.Result
+import yields.server.actions.nodes.{NodeMessage, NodeMessageBrd}
 import yields.server.dbi.models._
-import yields.server.mpi.Metadata
-import yields.server.utils.Temporal
 
 /**
   * Send a message to a publisher.
@@ -30,12 +25,14 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
   override def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result =
     PublisherMessageRes(nid, datetime, contentNid)
 
-  /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast = {
-    val bcast = PublisherMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
-    val reach = Publisher(nid).receivers.flatMap(Node(_).users)
-    Yields.broadcast(reach)(bcast)
-    bcast
+  /** Sent the broadcast. */
+  override def broadcast(users: List[UID], datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Unit = {
+    val bcast = NodeMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
+    Yields.broadcast(users)(bcast)
+
+    Publisher(nid).receivers.map(Node(_)).foreach { node =>
+      Yields.broadcast(node.receivers)(bcast.copy(nid = node.nid, sender = nid))
+    }
   }
 
 }
@@ -46,20 +43,3 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
   * @param datetime time when action was executed
   */
 case class PublisherMessageRes(nid: NID, datetime: OffsetDateTime, contentNid: Option[NID]) extends Result
-
-/**
-  * [[PublisherMessage]] broadcast.
-  * @param nid nid of publisher
-  * @param datetime time when action was executed
-  * @param sender message sender
-  * @param text text sent
-  * @param contentType content type if content is specified
-  * @param content content if a media was specified
-  */
-case class PublisherMessageBrd(nid: NID,
-                               datetime: OffsetDateTime,
-                               sender: UID,
-                               text: Option[String],
-                               contentType: Option[String],
-                               content: Option[Blob],
-                               contentNid: Option[NID]) extends Broadcast
