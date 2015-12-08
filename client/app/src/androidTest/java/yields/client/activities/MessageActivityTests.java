@@ -3,6 +3,7 @@ package yields.client.activities;
 import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Bitmap;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.app.ActionBar;
@@ -28,7 +29,6 @@ import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -64,11 +64,12 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
 
-        YieldsApplication.setGroup(MOCK_GROUP);
-
         ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
                 new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
+
+        SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
+        YieldsApplication.setGroup(MOCK_GROUP);
         assertTrue(YieldsApplication.getUser().getImg() != null);
     }
 
@@ -78,7 +79,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testStartingDisplay() {
         MessageActivity messageActivity = getActivity();
-        YieldsApplication.setGroup(MOCK_GROUP);
+        System.out.println(messageActivity.isDestroyed());
 
         //Group info
         ActionBar actionBar = (ActionBar) messageActivity.getSupportActionBar();
@@ -123,7 +124,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
-        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         ListView listView = messageActivity.getCurrentFragmentListView();
         int i = listView.getChildCount();
@@ -132,7 +132,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
                 ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         assertTrue(inputMessageField.getText().length() == 0);
-
         messageActivity.finish();
     }
 
@@ -142,7 +141,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testIfInputFieldAutoscrolls() {
         Activity messageActivity = getActivity();
-        YieldsApplication.setGroup(MOCK_GROUP);
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod" +
                 " tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, " +
@@ -153,16 +151,15 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         assertTrue(0 < inputMessageField.getScrollY());
         inputMessageField.clearComposingText();
-
         messageActivity.finish();
     }
 
     @Test
     public void testInitialTypeIsGroupMessage() {
         MessageActivity messageActivity = getActivity();
-        YieldsApplication.setGroup(MOCK_GROUP);
         assertEquals(MessageActivity.ContentType.GROUP_MESSAGES,
                 messageActivity.getType());
+        messageActivity.finish();
     }
 
     @Test
@@ -181,6 +178,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         View message = messageList.findViewWithTag((Object) tag);
         onView(withTagValue(is((Object) tag))).perform(click());
         assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS, messageActivity.getType());
+        messageActivity.finish();
     }
 
     @Test
@@ -211,14 +209,12 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertEquals("Mock comment message 1", ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         assertTrue(inputMessageField.getText().length() == 0);
-
         messageActivity.finish();
     }
 
     @Test
     public void testParentMessageIsCorrect() throws InterruptedException {
         MessageActivity messageActivity = getActivity();
-        YieldsApplication.setGroup(MOCK_GROUP);
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock comment";
         messageActivity.simulateImageMessage();
@@ -236,6 +232,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         CommentView commentView = (CommentView) messageContainer.getChildAt(0);
         assertEquals("Mock comment", ((ImageContent) commentView.getMessage().getContent()).getCaption());
+        messageActivity.finish();
     }
 
     @Test
@@ -245,7 +242,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         input = "Should be flushed";
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
@@ -256,6 +252,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         View message = messageList.findViewWithTag((Object) tag);
         onView(withTagValue(is((Object) tag))).perform(click());
         assertEquals("", inputMessageField.getText().toString());
+        messageActivity.finish();
     }
 
     @Test
@@ -265,7 +262,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
@@ -283,14 +279,25 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         });
         Thread.sleep(1000);
         assertEquals(MessageActivity.ContentType.GROUP_MESSAGES, messageActivity.getType());
+        messageActivity.finish();
     }
 
     @Test
-    public void testCannotSendEmptyTextMessage(){
+    public void testCannotSendEmptyTextMessage() {
         final MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
-        YieldsApplication.setGroup(MOCK_GROUP);
         onView(withId(R.id.sendButton)).perform(click());
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
+        messageActivity.finish();
+    }
+
+    @Test
+    public void testCaptionForImageIsNotMandatory() {
+        final MessageActivity messageActivity = getActivity();
+        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
+        messageActivity.simulateImageMessage();
+        onView(withId(R.id.sendButton)).perform(click());
+        assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
+        messageActivity.finish();
     }
 }

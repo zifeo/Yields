@@ -4,8 +4,10 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
+import yields.server.actions.media.{MediaMessageRes, MediaMessage}
 import yields.server.actions.nodes.{NodeHistoryRes, NodeSearchRes}
 import yields.server.actions.publisher.{PublisherCreateRes, PublisherUpdateRes, PublisherInfoRes, PublisherMessageRes}
+import yields.server.actions.rss.{RSSCreateRes, RSSInfoRes}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -41,6 +43,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
       case x: UserNodeListRes => packWithKind(x)
       case x: UserInfoRes => packWithKind(x)
       case x: UserSearchRes => packWithKind(x)
+
+      case x: RSSCreateRes => packWithKind(x)
+      case x: RSSInfoRes => packWithKind(x)
+
+      case x: MediaMessageRes => packWithKind(x)
 
       case _ => serializationError(s"unregistered result kind: $kind")
     }
@@ -79,6 +86,11 @@ object ResultJsonFormat extends RootJsonFormat[Result] {
           case "UserNodeListRes" => message.convertTo[UserNodeListRes]
           case "UserInfoRes" => message.convertTo[UserInfoRes]
           case "UserSearchRes" => message.convertTo[UserSearchRes]
+
+          case "RSSCreateRes" => message.convertTo[RSSCreateRes]
+          case "RSSInfoRes" => message.convertTo[RSSInfoRes]
+
+          case "MediaMessageRes" => message.convertTo[MediaMessageRes]
 
           case _ => deserializationError(s"unregistered result kind: $kind")
         }

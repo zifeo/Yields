@@ -24,8 +24,6 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class LoggingInActivity extends NotifiableActivity {
 
-    private boolean wasConnected = false;
-
     /**
      * onCreate method for the LoggingInActivity.
      * @param savedInstanceState The bundle.
@@ -66,6 +64,15 @@ public class LoggingInActivity extends NotifiableActivity {
         startActivity(intent);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (YieldsApplication.getBinder() != null) {
+            unbindService(mConnection);
+            YieldsApplication.nullBinder();
+        }
+    }
+
     /**
      * Method call when the connection response has been received
      *
@@ -100,11 +107,6 @@ public class LoggingInActivity extends NotifiableActivity {
      */
     @Override
     synchronized public void notifyOnServerConnected() {
-        if (!wasConnected) {
-            ServiceRequest connectReq = new UserConnectRequest(YieldsApplication.getUser());
-            YieldsApplication.getBinder().sendRequest(connectReq);
-            wasConnected = true;
-        }
     }
 
     /**
@@ -112,7 +114,6 @@ public class LoggingInActivity extends NotifiableActivity {
      */
     @Override
     synchronized public void notifyOnServerDisconnected() {
-        wasConnected = false;
     }
 
     /**
