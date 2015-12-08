@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
-import android.util.Log;
 
 import org.junit.After;
 import org.junit.Before;
@@ -105,6 +104,11 @@ public class CacheDatabaseTests {
             Message message = new Message("Node " + i, new Id(i), new Id(-i),
                     MockFactory.generateFakeTextContent(i), new Date(), Message.MessageStatus.NOT_SENT);
             mDatabaseHelper.addMessage(message, new Id(666));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                fail("Thread couldn't sleep !");
+            }
         }
 
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM messages;", null);
