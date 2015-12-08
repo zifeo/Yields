@@ -1,7 +1,7 @@
 package yields.server.actions.rss
 
-import yields.server.actions.{Result, Action}
-import yields.server.dbi.models.{RSS$, NID}
+import yields.server.actions.{Action, Result}
+import yields.server.dbi.models.{NID, RSS}
 import yields.server.mpi.Metadata
 
 /**

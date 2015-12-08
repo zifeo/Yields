@@ -2,7 +2,7 @@ package yields.server.rss
 
 import akka.actor._
 import yields.server.dbi.models.RSS
-import yields.server.utils.{Temporal, FaultTolerance}
+import yields.server.utils.{Config, Temporal, FaultTolerance}
 
 import scala.language.postfixOps
 import scala.concurrent.duration._
@@ -14,6 +14,8 @@ import scala.concurrent.ExecutionContext.Implicits._
 final class RSSPooler extends Actor with ActorLogging {
 
   import RSSPooler._
+
+  val rsscooling = Config.getInt("rsscooling")
 
   def receive: Receive = {
 
@@ -30,15 +32,14 @@ final class RSSPooler extends Actor with ActorLogging {
         }
 
         if (news.nonEmpty) {
-          rss.updated()
           val name = rss.name
           val newsCount = news.size
-          log.debug(s"RSS poolin: $name refreshed with $newsCount")
+          log.info(s"RSS pooling: $name refreshed with $newsCount")
+          rss.refreshed()
         }
-        rss.refreshed()
 
       }
-      context.system.scheduler.scheduleOnce(5 seconds, self, Pool)
+      context.system.scheduler.scheduleOnce(rsscooling.seconds, self, Pool)
       log.info("RSS pooling: round ends")
 
     // ----- Default -----
