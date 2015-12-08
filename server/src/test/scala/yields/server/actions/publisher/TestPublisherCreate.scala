@@ -1,14 +1,11 @@
 package yields.server.actions.publisher
 
-import org.scalatest.Matchers
 import yields.server.actions.exceptions.UnauthorizedActionException
-import yields.server.actions.groups.GroupCreate
-import yields.server.dbi.DBFlatSpec
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
-import yields.server.tests.AllGenerators
+import yields.server.tests.YieldsSpec
 
-class TestPublisherCreate extends DBFlatSpec with Matchers with AllGenerators {
+class TestPublisherCreate extends YieldsSpec {
 
   "PublisherCreate" should "create a publisher" in {
 

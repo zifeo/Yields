@@ -22,6 +22,7 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
+import yields.client.messages.UrlContent;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
@@ -696,38 +697,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Moves the Cursor passed as an argument to the first occurrence of a row where the DATE field
-     * contains a Date that is older than the Date passed as an argument.
-     * It returns true if the row exists and false otherwise.
-     *
-     * @param cursor       The cursor than is moved until it reaches an accepting row.
-     * @param furthestDate The Date that serves as a limit to this search.
-     * @return True if there exists such a row, false otherwise.
-     * @throws CacheDatabaseException If one row that the cursor passed couldn't be read.
-     */
-    private boolean goToFirstOccurrenceOfEarlierDate(Cursor cursor, Date furthestDate) throws CacheDatabaseException {
-        boolean done = false;
-        boolean retValue = false;
-
-        while (!done) {
-            try {
-                String dateAsString = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_DATE));
-                Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
-                if (date.compareTo(furthestDate) <= 0) {
-                    done = true;
-                    retValue = true;
-                } else if (!cursor.moveToNext()) {
-                    done = true;
-                    retValue = false;
-                }
-            } catch (ParseException e) {
-                throw new CacheDatabaseException("Unable to retrieve Message !");
-            }
-        }
-        return retValue;
-    }
-
-    /**
      * Clears the database entirely.
      */
     public void clearDatabase() {
@@ -743,7 +712,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         YieldsApplication.getApplicationContext().deleteDatabase(DATABASE_NAME);
     }
 
-
     /**
      * Serializes a Content into a String in base 64.
      *
@@ -758,15 +726,17 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 return serializeTextContent((TextContent) content);
             case IMAGE:
                 return serializeImageContent((ImageContent) content);
+            case URL:
+                return serializeURLContent((UrlContent) content);
             default:
                 throw new ContentException("No such content exists !");
         }
     }
 
     /**
-     * Deserializes a byte array into a Content.
+     * Deserializes a a String in base 64 into a Content.
      *
-     * @param cursor      The byte array to be deserialized.
+     * @param cursor      The cursor pointing to the Message which has the desired Content.
      * @param contentType The type of the Content.
      * @return The Content corresponding to the byte array.
      */
@@ -779,13 +749,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 return deserializeTextContent(cursor);
             case IMAGE:
                 return deserializeImageContent(cursor);
+            case URL:
+                return deserializeURLContent(cursor);
             default:
                 throw new ContentException("No such content exists !");
         }
     }
 
     /**
-     * Serializes the TextContent into a String in base 64.
+     * Serializes the ImageContent into a String in base 64.
      *
      * @param content The ImageContent to be serialized.
      * @return The serialized version of the ImageContent.
@@ -803,13 +775,15 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
      * @return The deserialized version of the ImageContent.
      */
     private static Content deserializeImageContent(Cursor cursor) {
+        Objects.requireNonNull(cursor);
+
         Bitmap image = ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT)));
         String caption = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_TEXT));
         return new ImageContent(image, caption);
     }
 
     /**
-     * Serializes the TextContent into a Byte array.
+     * Serializes the TextContent into a base 64 String.
      *
      * @param content The TextContent to be serialized.
      * @return The serialized version of the TextContent.
@@ -821,17 +795,41 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Deserializes a Byte array into a TextContent.
+     * Deserializes a String in base 64 into a TextContent.
      *
-     * @param cursor The bytes to be deserialized.
-     * @return The deserialized version of the bytes.
+     * @param cursor The cursor pointing to the Message which has the desired Content.
+     * @return The deserialized version of the String.
      */
     private static Content deserializeTextContent(Cursor cursor) {
         Objects.requireNonNull(cursor);
 
         String contentText = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_TEXT));
-        TextContent content = new TextContent(contentText);
-        return content;
+        return new TextContent(contentText);
+    }
+
+    /**
+     * Serializes the URLContent into a base 64 String.
+     *
+     * @param content The URLContent to be serialized.
+     * @return The serialized version of the TextContent.
+     */
+    private static String serializeURLContent(UrlContent content) {
+        Objects.requireNonNull(content);
+
+        return content.getUrl();
+    }
+
+    /**
+     * Deserializes a String in base 64 into a URLContent.
+     *
+     * @param cursor The cursor pointing to the Message which has the desired Content.
+     * @return The deserialized version of the String.
+     */
+    private static Content deserializeURLContent(Cursor cursor) {
+        Objects.requireNonNull(cursor);
+
+        String urlText = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_TEXT));
+        return new UrlContent(urlText);
     }
 
     /**

@@ -1,16 +1,11 @@
 package yields.server.actions.groups
 
-import org.scalatest.Matchers
-import yields.server._
-import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.dbi._
+import yields.server.actions.exceptions.UnauthorizedActionException
 import yields.server.dbi.models._
-import yields.server.dbi.tags.Tag
 import yields.server.mpi.Metadata
-import yields.server.tests.AllGenerators
-import yields.server.utils.Temporal
+import yields.server.tests.YieldsSpec
 
-class TestGroupCreate extends DBFlatSpec with Matchers with AllGenerators {
+class TestGroupCreate extends YieldsSpec {
 
   "GroupCreate" should "create a group" in {
 

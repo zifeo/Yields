@@ -17,8 +17,8 @@ import scala.io._
   *
   * @param nid media id
   *
-  *            Special field :
-  *            nodes:[nid]   -> hash  hash / path / contentType
+  * Special field :
+  * nodes:[nid]   -> hash  hash / path / contentType
   *
   */
 class Media private(nid: NID) extends Node(nid) {
@@ -55,7 +55,6 @@ class Media private(nid: NID) extends Node(nid) {
       throw new MediaException("Cannot write in non-existent path")
 
     writeContentOnDisk(_path.get, content)
-
   }
 
   def hash: String = _hash.getOrElse {
@@ -65,19 +64,16 @@ class Media private(nid: NID) extends Node(nid) {
 
   /** Store the hash in the database to easily retrieve the content from the disk */
   private def hash_=(hash: String): Unit = {
-    redis(_.hset(NodeKey.node, MediaKey.hash, hash))
-    _hash = Some(hash)
-    path = _hash.get
+    _hash = update(NodeKey.node, MediaKey.hash, hash)
   }
 
   private def contentType_=(contentType: String): Unit = {
-    redis(_.hset(NodeKey.node, MediaKey.contentType, contentType))
-    _contentType = Some(contentType)
+    _contentType = update(NodeKey.node, MediaKey.contentType, contentType)
   }
 
   def contentType: String = _contentType.getOrElse {
     _contentType = redis(_.hget[String](NodeKey.node, MediaKey.contentType))
-    valueOrException(_contentType)
+    valueOrDefault(_contentType, "")
   }
 
   def path: String = _path.getOrElse {
@@ -87,8 +83,7 @@ class Media private(nid: NID) extends Node(nid) {
 
   private def path_=(hash: String): Unit = {
     val path = buildPathFromName(hash)
-    redis(_.hset(NodeKey.node, MediaKey.path, path))
-    _path = Some(path)
+    _path = update(NodeKey.node, MediaKey.path, path)
   }
 
 }
