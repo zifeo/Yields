@@ -2,14 +2,11 @@ package yields.client.service;
 
 import android.util.Log;
 
-import org.json.JSONArray;
-
 import java.util.List;
 
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.exceptions.CacheDatabaseException;
-import yields.client.id.Id;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
@@ -226,7 +223,7 @@ public class RequestHandler {
         try {
             mCacheHelper.getMessagesForGroup(serviceRequest.getGroup(), serviceRequest.getDate(), NodeHistoryRequest.MESSAGE_COUNT);
         } catch (CacheDatabaseException e) {
-            e.printStackTrace();
+            Log.d("Y:" + this.getClass().toString(), "Failed to retrieve messages from Cache !");
         }
 
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
