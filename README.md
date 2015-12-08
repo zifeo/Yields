@@ -70,7 +70,7 @@ UserInfo
 	rules	uid == client (1) | uid in entourage (2)
 UserNodeList
 	input	()
-	output	nodes: Seq[NID], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
+	output	nodes: Seq[NID], kind: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	email: String
 	output	uid: UID

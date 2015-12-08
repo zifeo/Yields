@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 
 import yields.server.actions.exceptions.ActionArgumentException
 import yields.server.actions.{Action, Result}
-import yields.server.dbi.models.{Group, NID, UID, User}
+import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
@@ -19,9 +19,10 @@ case class UserNodeList() extends Action {
     */
   override def run(metadata: Metadata): Result = {
 
-      val user = User(metadata.client)
-      val (nodes, updates, refreshes) = user.nodesWithUpdates.unzip3
-      UserNodeListRes(nodes, updates, refreshes)
+    val user = User(metadata.client)
+    val (nodes, updates, refreshes) = user.nodesWithUpdates.unzip3
+    // TODO find a better way to differentiate kind
+    UserNodeListRes(nodes, nodes.map(Node(_).kind), updates, refreshes)
 
   }
 
@@ -32,5 +33,7 @@ case class UserNodeList() extends Action {
   * @param groups sequence of nid, name and last activity
   */
 case class UserNodeListRes(groups: Seq[NID],
+                           kind: Seq[String],
                            updatedAt: Seq[OffsetDateTime],
-                           refreshedAt: Seq[OffsetDateTime]) extends Result
+                           refreshedAt: Seq[OffsetDateTime]
+                          ) extends Result
