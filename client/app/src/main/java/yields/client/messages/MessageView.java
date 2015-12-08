@@ -99,7 +99,7 @@ public class MessageView extends LinearLayout {
         ImageView sentIndicator = (ImageView) v.findViewById(R.id.sentindicator);
         Bitmap sentImage;
 
-        if(userIsSender) {
+        if (userIsSender) {
             switch (mMessage.getStatus()) {
                 case SEEN:
                     sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
