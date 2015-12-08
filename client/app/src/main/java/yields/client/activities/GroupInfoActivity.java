@@ -86,7 +86,10 @@ public class GroupInfoActivity extends NotifiableActivity {
 
         TextView textViewTags = (TextView) findViewById(R.id.textViewTags);
 
-        if (tags.size() == 0) {
+        if (mGroup.getVisibility() == Group.GroupVisibility.PRIVATE){
+            textViewTags.setVisibility(View.GONE);
+        }
+        else if (tags.isEmpty()){
             textViewTags.setText(getString(R.string.noTags));
         } else if (tags.size() == 1) {
             String text = "Tag : " + tags.get(0).getText();
@@ -114,6 +117,8 @@ public class GroupInfoActivity extends NotifiableActivity {
                 startActivity(intent);
             }
         });
+
+        YieldsApplication.setUserList(mGroup.getUsers());
 
         checkButtons();
     }
@@ -183,13 +188,12 @@ public class GroupInfoActivity extends NotifiableActivity {
     /**
      * Check if the user is in the group and set the appropriate states to the buttons
      */
-    private void checkButtons() {
-        if (mMode == SearchGroupActivity.Mode.SEARCH) {
-            YieldsApplication.setUserList(mGroup.getUsers());
+    private void checkButtons(){
+        if (!mGroup.containsUser(YieldsApplication.getUser())){
+            if (mMode == SearchGroupActivity.Mode.SEARCH){
+                final Button subscribeButton = (Button) findViewById(R.id.buttonSubscribeGroup);
 
-            final Button subscribeButton = (Button) findViewById(R.id.buttonSubscribeGroup);
-
-            subscribeButton.setOnClickListener(new View.OnClickListener() {
+                subscribeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     List<Id> userList = new ArrayList<>();
@@ -197,76 +201,82 @@ public class GroupInfoActivity extends NotifiableActivity {
                     Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
                     newGroup.addNode(mGroup);
 
-                    //TODO Add the publisher in the new group
+                        ServiceRequest request =new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
+                        YieldsApplication.getBinder().sendRequest(request);
 
-                    ServiceRequest request = new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
-                    YieldsApplication.getBinder().sendRequest(request);
+                        subscribeButton.setEnabled(false);
+                    }
+                });
 
-                    subscribeButton.setEnabled(false);
-                }
-            });
-
-            boolean alreadySubscribed = false;
-            Group foundGroup = null;
-            ClientUser user = YieldsApplication.getUser();
-            for (Group group : user.getUserGroups()) {
-                if (group.containsNode(mGroup)) {
-                    alreadySubscribed = true;
-                    foundGroup = group;
-                }
-            }
-            final Group subscriptionGroup = foundGroup;
-
-            final Button unsubscribeButton = (Button) findViewById(R.id.buttonUnsubscribeGroup);
-
-            unsubscribeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    assert subscriptionGroup != null : "subscriptionGroup should " +
-                            "never be null when unsubscribeButton is clickable";
-                    List<User> usersToRemove = new ArrayList<>();
-                    usersToRemove.add(YieldsApplication.getUser());
-                    ServiceRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(),
-                            subscriptionGroup.getId(), usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE);
-                    YieldsApplication.getBinder().sendRequest(request);
-
-                    unsubscribeButton.setEnabled(false);
-                }
-            });
-
-
-            if (alreadySubscribed) {
-                subscribeButton.setVisibility(View.GONE);
-                unsubscribeButton.setVisibility(View.VISIBLE);
-            } else {
-                subscribeButton.setVisibility(View.VISIBLE);
-                unsubscribeButton.setVisibility(View.GONE);
-            }
-        } else {
-            final Button addButton = (Button) findViewById(R.id.buttonAddGroup);
-            addButton.setVisibility(View.VISIBLE);
-
-            addButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    YieldsApplication.setGroupAdded(mGroup);
-                    YieldsApplication.setGroupAddedValid(true);
-
-                    if (mMode == SearchGroupActivity.Mode.ADD_NODE_NEW_GROUP) {
-                        Intent intent = new Intent(GroupInfoActivity.this, CreateGroupActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-                        startActivity(intent);
-                    } else {
-                        Intent intent = new Intent(GroupInfoActivity.this, GroupSettingsActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-                        startActivity(intent);
+                boolean alreadySubscribed = false;
+                Group foundGroup = null;
+                ClientUser user = YieldsApplication.getUser();
+                for (Group group : user.getUserGroups()){
+                    if (group.containsNode(mGroup)){
+                        alreadySubscribed = true;
+                        foundGroup = group;
                     }
                 }
-            });
+                final Group subscriptionGroup = foundGroup;
+
+                final Button unsubscribeButton = (Button) findViewById(R.id.buttonUnsubscribeGroup);
+
+                unsubscribeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        assert subscriptionGroup != null : "subscriptionGroup should " +
+                                "never be null when unsubscribeButton is clickable";
+
+                                ArrayList<User> list = new ArrayList<>();
+                        list.add(YieldsApplication.getUser());
+                                ServiceRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId
+                                        (),
+                                subscriptionGroup
+                                        .getId(), list,
+                                        GroupUpdateUsersRequest.UpdateType.REMOVE);
+                        YieldsApplication.getBinder().sendRequest(request);
+
+
+                        unsubscribeButton.setEnabled(false);
+                    }
+                });
+
+                if (alreadySubscribed){
+                    subscribeButton.setVisibility(View.GONE);
+                    unsubscribeButton.setVisibility(View.VISIBLE);
+                }
+                else {
+                    subscribeButton.setVisibility(View.VISIBLE);
+                    unsubscribeButton.setVisibility(View.GONE);
+                }
+            }
+            else {
+                final Button addButton = (Button) findViewById(R.id.buttonAddGroup);
+                addButton.setVisibility(View.VISIBLE);
+
+                addButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        YieldsApplication.setGroupAdded(mGroup);
+                        YieldsApplication.setGroupAddedValid(true);
+
+                        if (mMode == SearchGroupActivity.Mode.ADD_NODE_NEW_GROUP){
+                            Intent intent = new Intent(GroupInfoActivity.this, CreateGroupActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                            startActivity(intent);
+                        }
+                        else {
+                            Intent intent = new Intent(GroupInfoActivity.this, GroupSettingsActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                            startActivity(intent);
+                        }
+                    }
+                });
+            }
         }
     }
 }
