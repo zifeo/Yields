@@ -2,7 +2,8 @@ package yields.server.actions
 
 import org.scalacheck.{Arbitrary, Gen}
 
-trait ActionsGenerators extends GroupsGenerators with UsersGenerators with NodesGenerators {
+trait ActionsGenerators extends GroupsGenerators with UsersGenerators with NodesGenerators with MediaGenerators
+with PublishersGenerators with RSSGenerators {
 
   import Gen.oneOf
 
@@ -10,7 +11,10 @@ trait ActionsGenerators extends GroupsGenerators with UsersGenerators with Nodes
     val arbs = Seq(
       groupCreateArb, groupUpdateArb, groupInfoArb, groupMessageArb,
       nodeHistoryArb, nodeSearchArb,
-      userConnectArb, userUpdateArb, userInfoArb, userGroupListArb
+      userConnectArb, userUpdateArb, userInfoArb, userGroupListArb,
+      mediaMessageArb,
+      publisherCreateArb, publisherInfoArb, publisherMessageArb, publisherUpdateArb,
+      rssCreateArb, rssInfoArb
     )
     assert(arbs.size >= 2)
     val gens = arbs.map(_.arbitrary)
@@ -21,7 +25,10 @@ trait ActionsGenerators extends GroupsGenerators with UsersGenerators with Nodes
     val arbs = Seq(
       groupCreateResArb, groupUpdateResArb, groupInfoResArb, groupMessageResArb,
       nodeHistoryResArb, nodeSearchResArb,
-      userConnectResArb, userUpdateResArb, userInfoResArb, userGroupListResArb
+      userConnectResArb, userUpdateResArb, userInfoResArb, userGroupListResArb,
+      mediaMessageResArb,
+      publisherCreateResArb, publisherInfoResArb, publisherMessageResArb, publisherUpdateResArb,
+      rssCreateResArb, rssInfoResArb
     )
     assert(arbs.size >= 2)
     val gens = arbs.map(_.arbitrary)
@@ -31,7 +38,9 @@ trait ActionsGenerators extends GroupsGenerators with UsersGenerators with Nodes
   implicit lazy val broadcastArb: Arbitrary[Broadcast] = Arbitrary {
     val arbs = Seq(
       groupCreateBrdArb, groupUpdateBrdArb, groupMessageBrdArb,
-      userUpdateBrdArb
+      userUpdateBrdArb,
+      mediaMessageBrdArb,
+      publisherCreateBrdArb, publisherMessageBrdArb, publisherUpdateBrdArb
     )
     assert(arbs.size >= 2)
     val gens = arbs.map(_.arbitrary)
