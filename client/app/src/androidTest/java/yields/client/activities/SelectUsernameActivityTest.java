@@ -1,7 +1,6 @@
 package yields.client.activities;
 
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
 import android.test.ActivityInstrumentationTestCase2;
 
 import yields.client.R;

@@ -22,6 +22,7 @@ trait Tags {
       redis(_.sadd(TagKey.tags, x))
       Tag(x).addNode(nodeID)
     }
+    tags.foreach(Indexes.searchableRegister(_, nodeID))
   }
 
   /** remove tags from publisher */
@@ -30,6 +31,7 @@ trait Tags {
       redis(_.srem(TagKey.tags, x))
       Tag(x).addNode(nodeID)
     }
+    tags.foreach(Indexes.searchableUnregister(_, nodeID))
   }
 
   /**
@@ -48,17 +50,14 @@ trait Tags {
 
   /** get the tags of a node */
   def tags: Set[String] = {
-    val t: Set[TID] = _tags.getOrElse {
-      val mem: Option[Set[Option[TID]]] = redis(_.smembers[TID](TagKey.tags))
-      val t: Set[TID] = mem match {
-        case Some(x: Set[Option[TID]]) =>
-          val defined: Set[Option[TID]] = x.filter(_.isDefined)
-          val noOpt: Set[TID] = defined.map(_.get)
-          noOpt
-        case _ => Set()
+    val t = _tags.getOrElse {
+      val mem = redis(_.smembers[TID](TagKey.tags))
+      val tags: Set[NID] = mem match {
+        case Some(matches) => matches.flatten
+        case _ => Set.empty
       }
-      _tags = Some(t)
-      t.toSet
+      _tags = Some(tags)
+      tags
     }
 
     for {

@@ -14,16 +14,23 @@ final class RSS private(nid: NID) extends Node(nid) with Tags {
   val nodeKey = NodeKey.node
   override val nodeID = nid
 
+  private var _url: Option[String] = None
+  private var _filter: Option[String] = None
+
+  /** Name setter. */
+  override def name_=(n: String): Unit = {
+    Indexes.searchableUnregister(name, nid)
+    super.name_=(n)
+    Indexes.searchableRegister(name, nid)
+  }
+
   /** Add message */
   override def addMessage(content: FeedContent): Boolean = {
-    val children = for (nid <- nodes) yield {
+    val children = for (nid <- receivers) yield {
       Node(nid).addMessage(content)
     }
     children.forall(x => x)
   }
-
-  private var _url: Option[String] = None
-  private var _filter: Option[String] = None
 
   /** Filter getter. */
   def filter: String = _filter.getOrElse {
@@ -61,7 +68,7 @@ object RSS {
       (StaticNodeKey.name, name),
       (StaticRssKey.url, url),
       (StaticRssKey.filter, filter),
-      (StaticNodeKey.kind, classOf[Group].getSimpleName),
+      (StaticNodeKey.kind, classOf[RSS].getSimpleName),
       (StaticNodeKey.created_at, now),
       (StaticNodeKey.refreshed_at, now),
       (StaticNodeKey.updated_at, now)
