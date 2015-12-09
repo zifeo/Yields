@@ -20,7 +20,6 @@ import yields.client.listadapter.ListAdapterUsersGroupsCheckBox;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -34,7 +33,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private ListView mListView;
 
     private String mGroupName;
-    private Group.GroupVisibility mGroupType;
+    private Group.GroupType mGroupType;
 
     private static final String TAG = "CreateGroupActivity";
     private static final int REQUEST_ADD_CONTACT = 1;
@@ -65,7 +64,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
 
         mGroupName = intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY);
-        mGroupType = Group.GroupVisibility.valueOf(
+        mGroupType = Group.GroupType.valueOf(
                 intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
         Log.d("CreateGroupActivity", "Group type = " +
                 intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
@@ -168,7 +167,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
-                group.setVisibility(mGroupType);
+                group.setType(mGroupType);
                 YieldsApplication.getUser().addGroup(group);
                 YieldsApplication.getBinder().sendRequest(
                         new GroupCreateRequest(YieldsApplication.getUser(), group));
