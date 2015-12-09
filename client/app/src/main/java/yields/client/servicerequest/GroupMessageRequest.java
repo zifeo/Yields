@@ -15,8 +15,7 @@ public class GroupMessageRequest extends ServiceRequest {
 
     private final Message mMessage;
     private final Id mReceivingGroupId;
-    private final Group.GroupVisibility mVisibility;
-
+    private final Group.GroupType mType;
 
     /**
      * Main constructor for this type of ServiceRequest (sending a Message to a Group).
@@ -24,16 +23,15 @@ public class GroupMessageRequest extends ServiceRequest {
      * @param message          The Message that should be sent.
      * @param receivingGroupId The Id of the Group to which the Message should be added.
      */
-    public GroupMessageRequest(Message message, Id receivingGroupId,
-                               Group.GroupVisibility visibility) {
+    public GroupMessageRequest(Message message, Id receivingGroupId, Group.GroupType type) {
         super();
         Objects.requireNonNull(message);
         Objects.requireNonNull(receivingGroupId);
-        Objects.requireNonNull(visibility);
+        Objects.requireNonNull(type);
 
         mMessage = message;
         mReceivingGroupId = receivingGroupId;
-        mVisibility = visibility;
+        mType = type;
     }
 
     /**
@@ -56,7 +54,7 @@ public class GroupMessageRequest extends ServiceRequest {
         Message message = getMessage();
 
         return RequestBuilder.groupMessageRequest(message.getSender(), mReceivingGroupId,
-                mVisibility, message.getContent(), message.getDate());
+                mType, message.getContent(), message.getDate());
     }
 
     /**
