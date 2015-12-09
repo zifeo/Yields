@@ -24,7 +24,7 @@ case class NodeInfo(nid: NID) extends Action {
     Node(nid).kind match {
       case "Publisher" => PublisherInfo(nid).run(metadata)
       case "RSS" => RSSInfo(nid).run(metadata)
-      case _ => throw new UnauthorizedActionException(s"$sender cannot get info on $nid")
+      case otherKind => throw new UnauthorizedActionException(s"$sender cannot get info on $nid ($otherKind)")
     }
     
   }
