@@ -27,13 +27,14 @@ class Node protected (val nid: NID) {
     val users = s"$node:users"
     val nodes = s"$node:nodes"
     val feed = s"$node:feed"
+    val receivers =  s"$node:receivers"
   }
 
   private var _name: Option[String] = None
   private var _kind: Option[String] = None
-  private var _created_at: Option[OffsetDateTime] = None
-  private var _updated_at: Option[OffsetDateTime] = None
-  private var _refreshed_at: Option[OffsetDateTime] = None
+  private var _createdAt: Option[OffsetDateTime] = None
+  private var _updatedAt: Option[OffsetDateTime] = None
+  private var _refreshedAt: Option[OffsetDateTime] = None
   private var _creator: Option[UID] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
@@ -62,30 +63,34 @@ class Node protected (val nid: NID) {
   }
 
   /** Creation datetime getter. */
-  def created_at: OffsetDateTime = _created_at.getOrElse {
-    _created_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.created_at))
-    valueOrException(_created_at)
+  def createdAt: OffsetDateTime = _createdAt.getOrElse {
+    _createdAt = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.created_at))
+    valueOrException(_createdAt)
   }
 
   /** Update datetime getter. */
-  def updated_at: OffsetDateTime = _updated_at.getOrElse {
-    _updated_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.updated_at))
-    valueOrException(_updated_at)
+  def updatedAt: OffsetDateTime = _updatedAt.getOrElse {
+    _updatedAt = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.updated_at))
+    valueOrException(_updatedAt)
   }
 
   /** Updates datetime setter. */
   def updated(): Unit =
-    _updated_at = update(NodeKey.node, StaticNodeKey.updated_at, Temporal.now)
+    _updatedAt = update(NodeKey.node, StaticNodeKey.updated_at, Temporal.now)
 
   /** Refresh datetime getter. */
-  def refreshed_at: OffsetDateTime = _refreshed_at.getOrElse {
-    _refreshed_at = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.refreshed_at))
-    valueOrDefault(_refreshed_at, Temporal.minimum)
+  def refreshedAt: OffsetDateTime = _refreshedAt.getOrElse {
+    _refreshedAt = redis(_.hget[OffsetDateTime](NodeKey.node, StaticNodeKey.refreshed_at))
+    valueOrDefault(_refreshedAt, Temporal.minimum)
   }
+
+  /** Refresh datetime getter. */
+  def refreshedAt_=(dateTime: OffsetDateTime): Unit =
+    _refreshedAt = update(NodeKey.node, StaticNodeKey.refreshed_at, dateTime)
 
   /** Refreshes datetime setter. */
   def refreshed(): Unit =
-    _refreshed_at = update(NodeKey.node, StaticNodeKey.refreshed_at, Temporal.now)
+    refreshedAt = Temporal.now
 
   /** creator getter */
   def creator: UID = {
@@ -120,6 +125,20 @@ class Node protected (val nid: NID) {
   def removeUser(oldUsers: List[UID]): Boolean =
     remWithTime(NodeKey.users, oldUsers)
 
+  /** Receivers getter. */
+  def receivers: List[NID] = _nodes.getOrElse {
+    _nodes = redis(_.hkeys[NID](NodeKey.receivers))
+    valueOrDefault(_nodes, List.empty)
+  }
+
+  /** Add receiver. */
+  def addReceiver(newReceiver: NID): Boolean =
+    addWithTime(NodeKey.receivers, newReceiver)
+
+  /** Remove receiver. */
+  def removeReceiver(oldReceiver: NID): Boolean =
+    remWithTime(NodeKey.receivers, oldReceiver)
+
   /** Nodes getter. */
   def nodes: List[NID] = _nodes.getOrElse {
     _nodes = redis(_.hkeys[NID](NodeKey.nodes))
@@ -127,22 +146,30 @@ class Node protected (val nid: NID) {
   }
 
   /** Add node. */
-  def addNode(newNode: NID): Boolean =
+  def addNode(newNode: NID): Boolean = {
+    Node(newNode).addReceiver(nid)
     if (newNode == nid) false
     else addWithTime(NodeKey.nodes, newNode)
+  }
 
   /** Add multiple nodes. */
-  def addNode(newNodes: List[NID]): Boolean =
+  def addNode(newNodes: List[NID]): Boolean = {
+    newNodes.foreach(Node(_).addReceiver(nid))
     if (newNodes == List(nid)) false
     else addWithTime(NodeKey.nodes, newNodes.filterNot(_ == nid))
+  }
 
   /** Remove node. */
-  def removeNode(oldNode: NID): Boolean =
+  def removeNode(oldNode: NID): Boolean = {
+    Node(oldNode).addReceiver(nid)
     remWithTime(NodeKey.nodes, oldNode)
+  }
 
   /** Remove multiple nodes. */
-  def removeNode(oldNode: List[NID]): Boolean =
+  def removeNode(oldNode: List[NID]): Boolean = {
+    oldNode.foreach(Node(_).addReceiver(nid))
     remWithTime(NodeKey.nodes, oldNode)
+  }
 
   /** Picture getter. */
   def pic: Blob = _pic.map(_.content).getOrElse {
@@ -183,9 +210,9 @@ class Node protected (val nid: NID) {
     val values = valueOrException(redis(_.hgetall[String, String](NodeKey.node)))
     _name = values.get(StaticNodeKey.name)
     _kind = values.get(StaticNodeKey.kind)
-    _created_at = values.get(StaticNodeKey.created_at).map(OffsetDateTime.parse)
-    _updated_at = values.get(StaticNodeKey.updated_at).map(OffsetDateTime.parse)
-    _refreshed_at = values.get(StaticNodeKey.refreshed_at).map(OffsetDateTime.parse)
+    _createdAt = values.get(StaticNodeKey.created_at).map(OffsetDateTime.parse)
+    _updatedAt = values.get(StaticNodeKey.updated_at).map(OffsetDateTime.parse)
+    _refreshedAt = values.get(StaticNodeKey.refreshed_at).map(OffsetDateTime.parse)
   }
 
 }

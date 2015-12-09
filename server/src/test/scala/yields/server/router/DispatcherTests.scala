@@ -1,7 +1,7 @@
 package yields.server.router
 
 import akka.testkit.{TestActorRef, TestProbe}
-import yields.server.actions.groups.GroupMessageBrd
+import yields.server.actions.nodes.NodeMessageBrd
 import yields.server.router.ClientHub.OnPush
 import yields.server.tests._
 
@@ -13,7 +13,7 @@ class DispatcherTests extends YieldsAkkaSpec {
 
     val dispatcher = TestActorRef[Dispatcher]
     val client = 0
-    val broadcast = sample[GroupMessageBrd]
+    val broadcast = sample[NodeMessageBrd]
 
     dispatcher ! InitConnection(client)
 
@@ -33,7 +33,7 @@ class DispatcherTests extends YieldsAkkaSpec {
     val probe = TestProbe()
     val clientA = 0
     val clientB = 1
-    val broadcast = sample[GroupMessageBrd]
+    val broadcast = sample[NodeMessageBrd]
 
     dispatcher ! InitConnection(clientA)
     probe.send(dispatcher, InitConnection(clientB))
@@ -49,7 +49,7 @@ class DispatcherTests extends YieldsAkkaSpec {
     val dispatcher = TestActorRef[Dispatcher]
     val probe = TestProbe()
     val client = 0
-    val broadcast = sample[GroupMessageBrd]
+    val broadcast = sample[NodeMessageBrd]
 
     dispatcher ! InitConnection(client)
     probe.send(dispatcher, InitConnection(client))
@@ -66,7 +66,7 @@ class DispatcherTests extends YieldsAkkaSpec {
     val probe = TestProbe()
     val clientA = 0
     val clientB = 1
-    val broadcast = sample[GroupMessageBrd]
+    val broadcast = sample[NodeMessageBrd]
 
     dispatcher ! InitConnection(clientA)
     probe.send(dispatcher, InitConnection(clientB))
@@ -85,7 +85,7 @@ class DispatcherTests extends YieldsAkkaSpec {
 
     val dispatcher = TestActorRef[Dispatcher]
     val client = 0
-    val broadcast = sample[GroupMessageBrd]
+    val broadcast = sample[NodeMessageBrd]
 
     dispatcher ! InitConnection(client)
 

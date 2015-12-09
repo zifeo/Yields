@@ -4,9 +4,8 @@ import spray.json.DefaultJsonProtocol._
 import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
-import yields.server.actions.media.MediaMessageBrd
-import yields.server.actions.nodes.NodeHistoryRes
-import yields.server.actions.publisher.{PublisherMessageBrd, PublisherUpdateBrd, PublisherMessage, PublisherCreateBrd}
+import yields.server.actions.nodes.NodeMessageBrd
+import yields.server.actions.publisher.{PublisherUpdateBrd, PublisherCreateBrd}
 import yields.server.actions.users._
 import yields.server.io._
 
@@ -24,17 +23,15 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
   override def write(obj: Broadcast): JsValue = {
     val kind = obj.getClass.getSimpleName
     obj match {
+      case x: NodeMessageBrd => packWithKind(x)
+
       case x: GroupCreateBrd => packWithKind(x)
       case x: GroupUpdateBrd => packWithKind(x)
-      case x: GroupMessageBrd => packWithKind(x)
 
       case x: PublisherCreateBrd => packWithKind(x)
       case x: PublisherUpdateBrd => packWithKind(x)
-      case x: PublisherMessageBrd => packWithKind(x)
 
       case x: UserUpdateBrd => packWithKind(x)
-
-      case x: MediaMessageBrd => packWithKind(x)
 
       case _ => serializationError(s"unregistered broadcast kind: $kind")
     }
@@ -55,17 +52,15 @@ object BroadcastJsonFormat extends RootJsonFormat[Broadcast] {
     json.asJsObject.getFields(kindFld, messageFld) match {
       case Seq(JsString(kind), message) =>
         kind match {
+          case "NodeMessageBrd" => message.convertTo[NodeMessageBrd]
+
           case "GroupCreateBrd" => message.convertTo[GroupCreateBrd]
           case "GroupUpdateBrd" => message.convertTo[GroupUpdateBrd]
-          case "GroupMessageBrd" => message.convertTo[GroupMessageBrd]
 
           case "PublisherCreateBrd" => message.convertTo[PublisherCreateBrd]
           case "PublisherUpdateBrd" => message.convertTo[PublisherUpdateBrd]
-          case "PublisherMessageBrd" => message.convertTo[PublisherMessageBrd]
 
           case "UserUpdateBrd" => message.convertTo[UserUpdateBrd]
-
-          case "MediaMessageBrd" => message.convertTo[MediaMessageBrd]
 
           case _ => deserializationError(s"unregistered broadcast kind: $kind")
         }

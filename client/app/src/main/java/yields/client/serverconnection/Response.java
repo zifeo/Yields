@@ -30,6 +30,7 @@ public class Response {
         RSS_CREATE_BCAST("RssCreateBrd"), RSS_MESSAGE_BCAST("RssMessageCast"),
         MEDIA_MESSAGE_BCAST("MediaMessageBrd");
 
+
         private final String name;
 
         ResKind(String name) {
