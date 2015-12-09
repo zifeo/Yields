@@ -48,9 +48,9 @@ public class NodeListActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                YieldsApplication.setGroup(mGroup.getNodes().get(position));
+                YieldsApplication.setUserSearched(mGroup.getNodes().get(position));
 
-                Intent intent = new Intent(NodeListActivity.this, GroupInfoActivity.class);
+                Intent intent = new Intent(NodeListActivity.this, UserInfoActivity.class);
                 startActivity(intent);
             }
         });

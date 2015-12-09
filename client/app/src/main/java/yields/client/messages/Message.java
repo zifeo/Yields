@@ -88,7 +88,7 @@ public class Message{
      */
     public Message(String dateTime, Long senderID, String text, String contentType, String content) throws ParseException {
         //super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)).getTime()));
-
+        this.mCommentGroupId = new Id(Objects.requireNonNull(senderID));
         this.mSender = new Id(senderID);
 
         if (contentType.equals("image")) {
@@ -146,7 +146,7 @@ public class Message{
      * @return A string describing the message.
      */
     public String getPreview() {
-        return YieldsApplication.getUserFromId(mSender).getName() + " : " + mContent.getPreview();
+        return YieldsApplication.getNodeFromId(mSender).getName() + " : " + mContent.getPreview();
     }
 
     /**

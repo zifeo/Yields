@@ -16,12 +16,13 @@ import java.util.Objects;
 import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.service.YieldServiceBinder;
 
 public class YieldsApplication {
     private static ClientUser mUser;
-    private static User mUserSearched;
+    private static Node mUserSearched;
     private static List<User> mUserList;
     private static List<User> mNotKnown = new ArrayList<>();
     private static Group mGroup;
@@ -132,7 +133,7 @@ public class YieldsApplication {
      *
      * @return The user displayed
      */
-    public static User getUserSearched() {
+    public static Node getUserSearched() {
         return mUserSearched;
     }
 
@@ -262,10 +263,10 @@ public class YieldsApplication {
     /**
      * Setter for the user to be displayed in UserInfoActivity
      *
-     * @param user The user that will be displayed.
+     * @param node The user that will be displayed.
      */
-    public static void setUserSearched(User user) {
-        mUserSearched = Objects.requireNonNull(user);
+    public static void setUserSearched(Node node) {
+        mUserSearched = Objects.requireNonNull(node);
     }
 
     /**
@@ -391,6 +392,7 @@ public class YieldsApplication {
 
         User user = mUser.getUserFromEntourage(userId);
 
+
         if (user == null) {
             for (User userN : mNotKnown) {
                 if (userId.equals(userN.getId())) {
@@ -400,6 +402,34 @@ public class YieldsApplication {
         }
 
         return user;
+    }
+
+    /**
+     * Get a certain User.
+     *
+     * @param nodeId The id of the user needed.
+     * @return The user to be modified.
+     */
+    public static Node getNodeFromId(Id nodeId) {
+        if (nodeId.equals(mUser.getId())) {
+            return mUser;
+        }
+
+        Node node = mUser.getUserFromEntourage(nodeId);
+
+        if (node == null) {
+            node = mUser.getNodeFromId(nodeId);
+        }
+
+        if (node == null) {
+            for (User userN : mNotKnown) {
+                if (nodeId.equals(userN.getId())) {
+                    return userN;
+                }
+            }
+        }
+
+        return node;
     }
 
     /**

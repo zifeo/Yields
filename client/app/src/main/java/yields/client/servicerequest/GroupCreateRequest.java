@@ -63,8 +63,8 @@ public class GroupCreateRequest extends ServiceRequest {
         }
 
 
-        return RequestBuilder.groupCreateRequest(mCreator.getId(), mGroup.getName(), mGroup
-                .getVisibility(), userIds, nodeIds);
+        return RequestBuilder.groupCreateRequest(mCreator.getId(),
+                mGroup, userIds, nodeIds);
     }
 
     /**

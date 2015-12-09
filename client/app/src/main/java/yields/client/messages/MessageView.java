@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import yields.client.activities.UserInfoActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.gui.GraphicTransforms;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -62,7 +64,8 @@ public class MessageView extends LinearLayout {
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
-        final User sender = YieldsApplication.getUserFromId(mMessage.getSender());
+        Log.d("DEBUG", mMessage.getContent().getTextForRequest());
+        final Node sender = YieldsApplication.getNodeFromId(mMessage.getSender());
         boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
         final Context applicationContext = YieldsApplication.getApplicationContext();
 

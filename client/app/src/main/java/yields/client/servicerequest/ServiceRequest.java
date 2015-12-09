@@ -19,7 +19,8 @@ public abstract class ServiceRequest {
         GROUP_INFO("GroupInfo"), NODE_HISTORY("NodeHistory"), NODE_SEARCH("NodeSearch"),
         PUBLISHER_CREATE("PublisherCreate"), GROUP_MESSAGE("GroupMessage"), MEDIA_MESSAGE("MediaMessage"),
         GROUP_UPDATE_USERS("GroupUpdate"), PUBLISHER_MESSAGE("PublisherMessage"),
-        USER_UPDATE_NAME("UserUpdate"), PUBLISHER_INFO("PublisherInfo");
+        USER_UPDATE_NAME("UserUpdate"), PUBLISHER_INFO("PublisherInfo"), NODE_INFO("NodeInfo"),
+        RSS_CREATE("RSSCreate");
 
         private final String mName;
 

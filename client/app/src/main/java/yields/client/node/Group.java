@@ -131,6 +131,20 @@ public class Group extends Node {
      * @param users The current users of the group
      * @throws NodeException if one of the node is null.
      */
+    public Group(String name, Id id, List<Id> users, Id node) {
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+                false, new Date());
+        this.addNode(YieldsApplication.getUser().getNodeFromId(node));
+    }
+
+    /**
+     * Overloaded constructor.
+     *
+     * @param name  The name of the group
+     * @param id    The id of the group
+     * @param users The current users of the group
+     * @throws NodeException if one of the node is null.
+     */
     public Group(String name, Id id, List<Id> users, Boolean validated, Date lastUpdate) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
                 validated, lastUpdate);
@@ -243,6 +257,18 @@ public class Group extends Node {
         mUsers.clear();
         for (Id uId : userList) {
             mUsers.add(YieldsApplication.getUserFromId(uId));
+        }
+    }
+
+    /**
+     * Changes/updates the users of the group
+     *
+     * @param nodeList
+     */
+    public void updateNodes(ArrayList<Id> nodeList) {
+        mNodes.clear();
+        for (Id uId : nodeList) {
+            mNodes.add(YieldsApplication.getUser().getNodeFromId(uId));
         }
     }
 

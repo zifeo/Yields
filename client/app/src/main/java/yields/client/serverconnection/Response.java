@@ -27,7 +27,7 @@ public class Response {
         GROUP_CREATE_BCAST("GroupCreateBrd"), GROUP_UPDATE_BCAST("GroupUpdateBrd"),
         GROUP_MESSAGE_BCAST("GroupMessageBrd"), PUBLISHER_CREATE_BCAST("PublisherCreateBrd"),
         PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"), PUBLISHER_MESSAGE_BCAST("PublisherMessageBrd"),
-        RSS_CREATE_BCAST("RssCreateBrd"), RSS_MESSAGE_BCAST("RssMessageCast");
+        RSS_MESSAGE_BCAST("RssMessageCast");
 
         private final String name;
 

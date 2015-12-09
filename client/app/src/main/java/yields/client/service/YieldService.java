@@ -160,7 +160,8 @@ public class YieldService extends Service {
      * @param serviceRequest The serviceRequest to send
      */
     public void sendRequest(ServiceRequest serviceRequest) {
-        new SendRequestTask().execute(serviceRequest);
+        Log.d("REQIGSAUHVDUASVDAZSGFGUZA", "SENDING REQUEST 3");
+        new SendRequestTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, serviceRequest);
     }
 
     /**

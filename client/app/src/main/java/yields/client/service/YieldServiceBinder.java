@@ -1,6 +1,7 @@
 package yields.client.service;
 
 import android.os.Binder;
+import android.util.Log;
 
 import java.util.Objects;
 
@@ -53,6 +54,7 @@ public class YieldServiceBinder extends Binder {
      */
     public void sendRequest(ServiceRequest request) {
         Objects.requireNonNull(request);
+        Log.d("REQIGSAUHVDUASVDAZSGFGUZA", "SENDING REQUEST 2");
         mService.sendRequest(request);
     }
 
