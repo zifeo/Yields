@@ -57,7 +57,6 @@ public class ServiceRequestController {
      */
     public ServiceRequestController(CacheDatabaseHelper cacheDatabaseHelper, YieldService service) {
         mCacheHelper = cacheDatabaseHelper;
-        mCacheHelper.clearDatabase();
         mService = service;
         isConnecting = new AtomicBoolean(true);
         connectToServer();
