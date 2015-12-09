@@ -33,11 +33,19 @@ class NodesJsonFormatSpecifications extends YieldsPropsSpec {
 
   //
 
+<<<<<<< 30ac8fc0ea9aff8f04363bd2b66a6449bfd0d139
   property("NodeMessageBrd") {
     forAll() { (x: NodeMessageBrd) =>
+=======
+  property("NodeInfo") {
+    forAll() { (x: NodeInfo) =>
+>>>>>>> add test for node info
       checkToAndFromJson(x)
     }
   }
 
+<<<<<<< 30ac8fc0ea9aff8f04363bd2b66a6449bfd0d139
 
+=======
+>>>>>>> add test for node info
 }

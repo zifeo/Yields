@@ -68,7 +68,7 @@ object RSS {
       (StaticNodeKey.name, name),
       (StaticRssKey.url, url),
       (StaticRssKey.filter, filter),
-      (StaticNodeKey.kind, classOf[Group].getSimpleName),
+      (StaticNodeKey.kind, classOf[RSS].getSimpleName),
       (StaticNodeKey.created_at, now),
       (StaticNodeKey.refreshed_at, now),
       (StaticNodeKey.updated_at, now)
