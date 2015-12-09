@@ -111,33 +111,6 @@ public class GroupInfoActivity extends NotifiableActivity {
             textViewTags.setText(builder.toString());
         }
 
-        /*Button usersButton = (Button) findViewById(R.id.buttonUsers);
-
-        usersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
-                String title = "Users of " + mGroup.getName();
-                intent.putExtra(UserListActivity.TITLE_KEY, title);
-                intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, false);
-                startActivity(intent);
-            }
-        });
-
-        YieldsApplication.setUserList(mGroup.getUsers());
-
-        Button nodesButton = (Button) findViewById(R.id.buttonNodes);
-
-        nodesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(GroupInfoActivity.this, NodeListActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        YieldsApplication.setGroupsSearched(mGroup.getNodes());*/
-
         checkButtons();
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayoutUsersAndNodes);
