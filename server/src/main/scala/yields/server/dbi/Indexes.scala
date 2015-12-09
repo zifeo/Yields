@@ -4,8 +4,6 @@ import yields.server.dbi.models.{NID, UID}
 import yields.server.utils.Config
 import com.redis.serialization.Parse.Implicits._
 
-import scala.collection.mutable
-
 /**
   * Regroup all indexes.
   *
@@ -81,15 +79,7 @@ private[dbi] object Indexes {
     }
 
     val fetched = redisPipeline[Option[Set[Option[NID]]]](r => keys.map(r.smembers[NID](_)))
-    val res = mutable.Set.empty[NID]
-    for {
-      result <- fetched
-      setOpt <- result
-      set <- setOpt
-      nidOpt <- set
-      nid <- nidOpt
-    } res += nid
-    res.toSet
+    fetched.toList.flatten.flatten.flatten.flatten.toSet
   }
 
   /**
