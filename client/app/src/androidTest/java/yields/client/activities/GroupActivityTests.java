@@ -42,6 +42,9 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
     public void setUp() throws Exception {
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
+        ServiceTestConnection.connectActivityToService();
+
         new MockModel();
         getActivity();
     }

@@ -43,6 +43,8 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
+        ServiceTestConnection.connectActivityToService();
+
         ClientUser user = MockFactory.generateFakeClientUser("User", new Id(123), "a@b.c", YieldsApplication.getDefaultUserImage());
         user.addUserToEntourage(MockFactory.generateFakeClientUser("Friend", new Id(125), "a@b.d", YieldsApplication.getDefaultUserImage()));
 

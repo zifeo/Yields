@@ -284,6 +284,9 @@ public class GroupInfoActivity extends NotifiableActivity {
                         assert subscriptionGroup != null : "subscriptionGroup should " +
                                 "never be null when unsubscribeButton is clickable";
 
+                        YieldsApplication.getUser().removeGroup(subscriptionGroup);
+                        subscriptionGroup.removeUser(YieldsApplication.getUser().getId());
+
                         ArrayList<User> list = new ArrayList<>();
                         list.add(YieldsApplication.getUser());
                         ServiceRequest request = new GroupUpdateUsersRequest(
@@ -293,6 +296,9 @@ public class GroupInfoActivity extends NotifiableActivity {
                         YieldsApplication.getBinder().sendRequest(request);
 
                         unsubscribeButton.setEnabled(false);
+
+                        //TODO Remove this when the response is handled
+                        GroupInfoActivity.this.notifyChange(Change.GROUP_LEAVE);
                     }
                 });
 
