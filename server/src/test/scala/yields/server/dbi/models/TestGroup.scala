@@ -66,17 +66,17 @@ class TestGroup extends YieldsSpec {
 
   it should "update updated_at" in {
     val group = Group.create("name", 0)
-    val upStart = group.updated_at
+    val upStart = group.updatedAt
     group.updated()
-    val upEnd = group.updated_at
+    val upEnd = group.updatedAt
     upStart should not be upEnd
   }
 
   it should "update refreshed_at" in {
     val group = Group.create("name", 0)
-    val refStart = group.refreshed_at
+    val refStart = group.refreshedAt
     group.refreshed()
-    val refEnd = group.refreshed_at
+    val refEnd = group.refreshedAt
     refStart should not be refEnd
   }
 
