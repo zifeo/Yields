@@ -68,6 +68,15 @@
         android:visibility="visible" />
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/nodes"
+        android:id="@+id/buttonNodes"
+        android:layout_gravity="center_horizontal"
+        android:visibility="visible" />
+
+    <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

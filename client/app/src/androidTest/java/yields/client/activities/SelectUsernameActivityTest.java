@@ -5,6 +5,9 @@ import android.support.test.espresso.Espresso;
 import android.test.ActivityInstrumentationTestCase2;
 
 import yields.client.R;
+import yields.client.generalhelpers.ServiceTestConnection;
+import yields.client.id.Id;
+import yields.client.node.ClientUser;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -22,6 +25,8 @@ import static org.hamcrest.Matchers.not;
 public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2<SelectUsernameActivity> {
     public SelectUsernameActivityTest() {
         super(SelectUsernameActivity.class);
+
+        ServiceTestConnection.connectActivityToService();
     }
 
     @Override
@@ -29,6 +34,9 @@ public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
         YieldsApplication.cancelToast();
+
+        YieldsApplication.setUser(new ClientUser("", new Id(1), "a@a.a",
+                YieldsApplication.getDefaultUserImage()));
     }
 
     @Override
@@ -53,5 +61,16 @@ public class SelectUsernameActivityTest extends ActivityInstrumentationTestCase2
 
         onView(withText(R.string.messageUsernameContainsSpaces)).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that writes a correct name.
+     */
+    public void testGoodName() {
+        getActivity();
+        onView(withId(R.id.editTextCreateAccount)).perform(typeText("John"), closeSoftKeyboard());
+        onView(withId(R.id.actionDoneEnterUsername)).perform(click());
+
+        onView(withId(R.id.actionDiscover)).check(matches(isDisplayed()));
     }
 }

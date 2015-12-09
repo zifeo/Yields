@@ -69,7 +69,7 @@
     <string name="addNode">Add node</string>
     <string name="rss">RSS feed</string>
     <string name="enterUrl">Enter the feed\'s url</string>
-    <string name="messageUrlHttp">The url must start with http://</string>
+    <string name="messageUrlHttp">The url must start with http:// or https://</string>
     <string name="messageRssCreated">RSS feed created !</string>
     <string name="typeUrl">Type the URL of the RSS feed !</string>
     <string name="typeEmailEntourage">Type the email of the person to add him !</string>
@@ -83,4 +83,6 @@
     <string name="removeUsers">Select the contacts you want to remove from your entourage</string>
     <string name="removeFromEntourage">Remove contacts</string>
     <string name="messageNoGroup">Search for publishers, RSS feed, or create a new group to start using Yields !</string>
+    <string name="nodes">Nodes</string>
+    <string name="userInfo">See your info</string>
 </resources>
