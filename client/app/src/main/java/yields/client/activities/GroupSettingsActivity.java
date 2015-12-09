@@ -135,8 +135,18 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     String message = "Group image changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
 
+                    Bitmap croppedImage;
+                    int h = image.getHeight();
+                    int w = image.getWidth();
+                    if (w > h){
+                        croppedImage = Bitmap.createBitmap(image, (w-h)/2, 0, h, h);
+                    }
+                    else {
+                        croppedImage = Bitmap.createBitmap(image, 0, (h-w)/2, w, w);
+                    }
+
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
-                    mGroup.setImage(Bitmap.createScaledBitmap(image, diameter, diameter, false));
+                    mGroup.setImage(Bitmap.createScaledBitmap(croppedImage, diameter, diameter, false));
 
                     ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(),
                             mGroup.getImage());

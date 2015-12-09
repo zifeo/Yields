@@ -121,7 +121,6 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         YieldsApplication.setGroup(g);
         getActivity();
 
-        //onView(withId(R.id.buttonUsers)).perform(click());
         onView(withText("Ratchet")).perform(click());
 
         onView(withId(R.id.textViewUserName)).check(matches(isDisplayed()));
