@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.R;
 import yields.client.exceptions.NodeException;
@@ -72,6 +73,15 @@ public class ClientUser extends User {
             }
         }
         mGroups.add(group);
+    }
+
+    /**
+     * Remove a group from the user's list.
+     *
+     * @param group the group to remove.
+     */
+    public void removeGroup(Group group) {
+        mGroups.remove(Objects.requireNonNull(group));
     }
 
     /**
