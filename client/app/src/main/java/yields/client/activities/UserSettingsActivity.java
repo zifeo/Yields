@@ -128,7 +128,7 @@ public class UserSettingsActivity extends AppCompatActivity {
                     else {
                         croppedImage = Bitmap.createBitmap(image, 0, (h-w)/2, w, w);
                     }
-                    
+
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
                     mUser.setImg(Bitmap.createScaledBitmap(croppedImage, diameter, diameter, false));
 

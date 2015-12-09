@@ -97,7 +97,14 @@ public class CreateGroupActivity extends AppCompatActivity {
         if (YieldsApplication.isGroupAddedValid()){
             Group group = YieldsApplication.getGroupAdded();
 
-            if (!mGroups.contains(group)) {
+            boolean isAlreadyAdded = false;
+            for (Group g : mGroups){
+                if (g.getId().equals(group.getId())){
+                    isAlreadyAdded = true;
+                }
+            }
+
+            if (!isAlreadyAdded) {
                 mGroups.add(group);
             }
 
@@ -222,7 +229,9 @@ public class CreateGroupActivity extends AppCompatActivity {
                 User user = YieldsApplication.getUserFromId(currentId);
                 // There shouldn't be multiple identical users in entourage
                 if (user != null) {
-                    mUsers.add(user);
+                    if (!mUsers.contains(user)){
+                        mUsers.add(user);
+                    }
                 } else {
                     throw new IllegalStateException("Not possible to add a non existant user");
                 }
