@@ -776,4 +776,28 @@ public class ResponseHandler {
                     serverResponse.object().toString() + " because of : " + e.getMessage());
         }
     }
+
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleNodeMessageBroadcast(Response serverResponse) {
+        try {
+            JSONObject response = serverResponse.getMessage();
+
+            long contentNid = response.optLong("contentNid", -1);
+
+
+            Message message = new Message(response.getString("datetime"), contentNid,
+                    response.getLong("sender"), response.getString("text"),
+                    response.optString("contentType"), response.optString("content"));
+
+            Id groupId = new Id(response.getLong("nid"));
+
+            mCacheHelper.addMessage(message, groupId);
+            mService.receiveMessage(groupId, message);
+        } catch (JSONException | ParseException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString() + " because of : " + e.getMessage());
+        }
+    }
 }
