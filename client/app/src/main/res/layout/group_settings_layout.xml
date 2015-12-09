@@ -11,7 +11,7 @@
         android:layout_height="fill_parent"
         android:layout_marginRight="6dip"
         android:paddingLeft="15sp"
-        android:src="@drawable/default_user_image"/>
+        android:src="@drawable/ic_add_black_24dp"/>
 
     <TextView
         android:id="@+id/textViewSetting"
@@ -24,6 +24,6 @@
         android:maxLines="1"
         android:paddingLeft="10sp"
         android:gravity="center_vertical"
-        android:text="Username" />
+        android:text="Setting" />
 
 </RelativeLayout>

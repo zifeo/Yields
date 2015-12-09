@@ -30,6 +30,8 @@ import yields.client.servicerequest.UserUpdateNameRequest;
 import yields.client.servicerequest.UserUpdateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
+import static yields.client.gui.GraphicTransforms.getCroppedSquaredBitmap;
+
 /**
  * Activity where the user can change some settings, like its username, its image, ...
  */
@@ -118,9 +120,9 @@ public class UserSettingsActivity extends AppCompatActivity {
 
                     String message = "User picture changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
-
+                    
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
-                    mUser.setImg(Bitmap.createScaledBitmap(image, diameter, diameter, false));
+                    mUser.setImg(Bitmap.createScaledBitmap(getCroppedSquaredBitmap(image), diameter, diameter, false));
 
                     ServiceRequest request = new UserUpdateRequest(mUser);
                     YieldsApplication.getBinder().sendRequest(request);
