@@ -82,7 +82,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
         itemList.add(Settings.LEAVE_GROUP.ordinal(), getResources().getString(R.string.leaveGroup));
 
-        if (mGroup.getVisibility() != Group.GroupVisibility.PRIVATE){
+        if (mGroup.getType() != Group.GroupType.PRIVATE){
             itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
         }
 
