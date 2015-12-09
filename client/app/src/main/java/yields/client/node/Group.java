@@ -235,6 +235,16 @@ public class Group extends Node {
         Objects.requireNonNull(user);
         mUsers.add(YieldsApplication.getUserFromId(user));
     }
+    /**
+     * Remove a user from the group.
+     *
+     * @param user The user we want to remove.
+     */
+    public void removeUser(Id user) {
+        Objects.requireNonNull(user);
+        mUsers.remove(YieldsApplication.getUserFromId(user));
+    }
+
 
     /**
      * Changes/updates the users of the group
