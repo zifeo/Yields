@@ -109,7 +109,6 @@ public class CommentViewTests extends ActivityInstrumentationTestCase2<MessageAc
         BitmapDrawable bitmapDrawable = ((BitmapDrawable) imageView.getDrawable());
         Bitmap bitmap = bitmapDrawable .getBitmap();
 
-        boolean same = false;
         assertEquals(resizedImage.getWidth(), bitmap.getWidth());
         assertEquals(resizedImage.getHeight(), bitmap.getHeight());
 
