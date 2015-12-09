@@ -203,8 +203,7 @@ public class Group extends Node {
             mMessages.put(newDate, message);
             return message;
         } else {
-            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant in " +
-                    mMessages.firstKey().getTime() + "or " + mMessages.lastKey().getTime());
+            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant.");
             return null;
         }
     }
