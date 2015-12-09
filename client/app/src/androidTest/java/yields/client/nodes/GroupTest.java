@@ -20,6 +20,7 @@ import java.util.TreeMap;
 
 import yields.client.activities.MessageActivity;
 import yields.client.activities.MockFactory;
+import yields.client.generalhelpers.MockModel;
 import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
@@ -54,7 +55,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         YieldsApplication.setUser(MockFactory.generateFakeClientUser("Bob " +
                 "Ross", new Id(1337), "HappyLittleTree@joyOfPainting.ru", Bitmap
                 .createBitmap(80, 80, Bitmap.Config.RGB_565)));
-
+        new MockModel();
         mG = new FakeGroup("Group", new Id(32), new ArrayList<Id>());
         YieldsApplication.setGroup(mG);
     }
@@ -62,12 +63,12 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
     @Test
     public void testGroupIdParsingFromResponse() throws JSONException, ParseException{
         Group g = new Group(jsonGroup);
-        assertEquals(g.getId().getId(), new Long(0));
+        assertEquals(g.getId().getId(), Long.valueOf(0));
     }
 
     @Test
     public void testGroupDateParsingFromResponse() throws JSONException, ParseException{
-        Group g = new Group(jsonGroup);
+        Group g = new Group(jsonGroup.getString(0), jsonGroup.getString(1), jsonGroup.getString(2));
         assertEquals(g.getLastUpdate(),
                 DateSerialization.dateSerializer.toDate("2015-11-23T13:25:51.157+01:00"));
     }
@@ -90,6 +91,59 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
         for (int i = 0 ; i < MOCK_MESSAGE_COUNT ; i ++){
             Assert.assertEquals("Mock message #" + i, ((TextContent) messages.get(i).getContent()).getText());
         }
+    }
+
+    @Test
+    public void testMessagesAreAddedToGroup() throws JSONException, ParseException {
+        Group g = new Group(jsonGroup);
+        ArrayList<Message> messages = new ArrayList<Message>();
+        Message expected = MockFactory.generateMockMessage("", new Id(2), YieldsApplication.getUser(), new TextContent
+                ("topkek"));
+        messages.add(expected);
+        g.addMessages(messages);
+        SortedMap<Date, Message> lastMessages = g.getLastMessages();
+        assertEquals(1, lastMessages.size());
+        for (Message m : lastMessages.values()){
+            assertEquals(expected, m);
+        }
+    }
+
+    @Test
+    public void testContainsNode() throws JSONException, ParseException {
+        Group g = new Group(jsonGroup);
+        Group g2 = new Group(jsonGroup);
+        g.addNode(g2);
+        assertTrue(g.containsNode(g2));
+        assertFalse(g2.containsNode(g));
+    }
+
+    @Test
+    public void testValidateMessageInGroup() throws JSONException, ParseException {
+        Group g = new Group(jsonGroup);
+        Message message = MockFactory.generateMockMessage("", new Id(2), YieldsApplication.getUser(), new TextContent
+                ("topkek"));
+        g.addMessage(message);
+        Date validatedDate = new Date(message.getDate().getTime() + 1000);
+        Message validated = g.validateMessage(message.getDate(), validatedDate);
+        assertEquals(message.getDate(), validatedDate);
+        assertEquals(message.getStatus(), Message.MessageStatus.SENT);
+        assertEquals(message, validated);
+    }
+
+    @Test
+    public void testValidateMessageNotPresentInGroup() throws JSONException, ParseException {
+        Group g = new Group(jsonGroup);
+        Message validated = g.validateMessage(new Date(), new Date());
+        assertEquals(null, validated);
+    }
+
+    @Test
+    public void testUpdateUsers() throws JSONException, ParseException {
+        Group g = new Group(jsonGroup);
+        ArrayList<Id> ids = new ArrayList<>();
+        ids.add(new Id(2));
+        g.updateUsers(ids);
+        assertEquals(1, g.getUsers().size());
     }
 
     private class FakeGroup extends Group{
