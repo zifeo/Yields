@@ -273,7 +273,7 @@ public class MessageActivity extends NotifiableActivity {
                 mCommentAdapter.notifyDataSetChanged();
                 ((CommentFragment) mCurrentFragment).getCommentListView()
                         .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-                MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId(),
+                MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getCommentGroupId(),
                         Group.GroupVisibility.PRIVATE);
                 YieldsApplication.getBinder().sendRequest(request);
             }

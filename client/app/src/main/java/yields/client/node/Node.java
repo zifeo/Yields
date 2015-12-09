@@ -1,5 +1,8 @@
 package yields.client.node;
 
+import android.graphics.Bitmap;
+import android.media.Image;
+
 import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
@@ -11,6 +14,7 @@ import yields.client.id.Id;
 public abstract class Node {
     private String mName;
     private Id mId;
+    private Bitmap mImage;
 
     /**
      * Creates a node.
@@ -19,9 +23,10 @@ public abstract class Node {
      * @param id The Id of the node.
      * @throws NodeException In case of trouble making the node.
      */
-    public Node(String name, Id id) throws NodeException {
+    public Node(String name, Id id, Bitmap image) throws NodeException {
         this.mName = Objects.requireNonNull(name);
         this.mId = Objects.requireNonNull(id);
+        this.mImage = Objects.requireNonNull(image);
     }
 
     /**
@@ -40,6 +45,24 @@ public abstract class Node {
      */
     public void setName(String name){
         mName = Objects.requireNonNull(name);
+    }
+
+    /**
+     * Set the image to the group
+     *
+     * @param image A squared image which this method will make circular
+     */
+    public void setImage(Bitmap image) {
+        mImage = Objects.requireNonNull(image);
+    }
+
+    /**
+     * Returns the group's image
+     *
+     * @return the group's image, uncropped
+     */
+    public Bitmap getImage() {
+        return mImage;
     }
 
     /**

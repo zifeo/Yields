@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,8 +17,6 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 import yields.client.R;
-import yields.client.activities.GroupInfoActivity;
-import yields.client.activities.NodeListActivity;
 import yields.client.activities.UserInfoActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
@@ -92,7 +89,7 @@ public class MessageView extends LinearLayout {
         });
 
 
-        Bitmap image = sender.getImg();
+        Bitmap image = sender.getImage();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
 

@@ -175,7 +175,7 @@ public class ResponseHandler {
             }
 
             Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
-            Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
+            Message copyMessage = new Message( message.getCommentGroupId(), message.getSender(),
                     message.getContent(), prevDatetime, message.getStatus());
             mCacheHelper.deleteMessage(copyMessage, id);
             mCacheHelper.addMessage(message, id);
@@ -336,9 +336,9 @@ public class ResponseHandler {
             String optString = response.optString("pic");
 
             if (!optString.equals("")) {
-                user.setImg(ImageSerialization.unSerializeImage(optString));
+                user.setImage(ImageSerialization.unSerializeImage(optString));
             } else {
-                user.setImg(YieldsApplication.getDefaultUserImage());
+                user.setImage(YieldsApplication.getDefaultUserImage());
             }
 
             mCacheHelper.addUser(user);
@@ -754,7 +754,7 @@ public class ResponseHandler {
             Id id = new Id(nid);
 
             Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
-            Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
+            Message copyMessage = new Message(message.getCommentGroupId(), message.getSender(),
                     message.getContent(), prevDatetime, message.getStatus());
             mCacheHelper.deleteMessage(copyMessage, id);
             mCacheHelper.addMessage(message, id);
