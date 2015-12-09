@@ -1,22 +1,14 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
-import yields.client.R;
-import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
-import yields.client.serverconnection.ImageSerialization;
-import yields.client.serverconnection.Response;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -26,6 +18,7 @@ public class ClientUser extends User {
 
     private List<Group> mGroups;
     private final List<User> mEntourage;
+    private final List<Group> mNodes;
 
     /**
      * Creates a client user which represents the client connected to the application.
@@ -39,6 +32,7 @@ public class ClientUser extends User {
         super(name, id, email, img);
         mGroups = new ArrayList<>();
         mEntourage = new ArrayList<>();
+        mNodes = new ArrayList<>();
     }
 
     /**
@@ -72,6 +66,25 @@ public class ClientUser extends User {
             }
         }
         mGroups.add(group);
+    }
+
+    /**
+     * Add a group to the user
+     *
+     * @param node the node to add.
+     */
+    public void addNode(Group node) {
+        for (Group prevGroup : mGroups) {
+            if (prevGroup.getId().getId().equals(node.getId().getId())) {
+                return;
+            }
+        }
+        for (Node prevGroup : mNodes) {
+            if (prevGroup.getId().getId().equals(node.getId().getId())) {
+                return;
+            }
+        }
+        mNodes.add(node);
     }
 
     /**
@@ -118,15 +131,10 @@ public class ClientUser extends User {
      *
      * @param id The id of the group to activate.
      */
-    //TODO: to be changed when response from server changed
-    //TODO: use ref to know which Group to activate
-    public void activateGroup(Id id) {
-        for (Group group : mGroups) {
-            if (!group.isValidated()) {
-                group.setValidated();
-                group.setId(id);
-            }
-        }
+    public void activateGroup(Date ref, Id id) {
+        Group group = getGroupFromRef(ref);
+        group.setId(id);
+        group.setValidated();
     }
 
     /**
@@ -162,4 +170,47 @@ public class ClientUser extends User {
 
         return null;
     }
+
+    /**
+     * Getter for a Node from the connected nodes.
+     * Returns null if the Id of the Node is not in the entourage.
+     *
+     * @param nodeId The id of the Node.
+     * @return The User from the entourage with the same id or null
+     * if there is no User with that Id in the entourage.
+     */
+    public Group getNodeFromId(Id nodeId) {
+        for (Group node : mNodes) {
+            if (nodeId.equals(node.getId())) {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Getter for a Node from the connected nodes.
+     * Returns null if the Id of the Node is not in the entourage.
+     *
+     * @return The User from the entourage with the same id or null
+     * if there is no User with that Id in the entourage.
+     */
+    public Group getGroupFromRef(Date ref) {
+        for (Group node : mNodes) {
+            if (node.getRef() != null && node.getRef().compareTo(ref) == 0) {
+                return node;
+            }
+        }
+        for (Group group : mGroups) {
+            if (group.getRef() != null && group.getRef().compareTo(ref) == 0) {
+                return group;
+            }
+        }
+
+        return null;
+    }
+
+
+
 }

@@ -107,8 +107,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
             assertEquals(id, messageView.getMessage().getSender());
 
             //Node Info
-            assertEquals(nodeName, messageView.getMessage().getName());
-            assertEquals(id.getId(), messageView.getMessage().getId().getId());
+            assertEquals(id.getId(), messageView.getMessage().getCommentGroupId().getId());
 
             //Content Info
             assertEquals("text", messageView.getMessage().getContent().getType());

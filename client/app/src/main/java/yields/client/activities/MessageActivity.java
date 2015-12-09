@@ -267,6 +267,7 @@ public class MessageActivity extends NotifiableActivity {
                         .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
                 GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(),
                         mGroup.getVisibility());
+                Log.d("REQIGSAUHVDUASVDAZSGFGUZA", "SENDING REQUEST 1");
                 YieldsApplication.getBinder().sendRequest(request);
             } else {
                 mCommentAdapter.add(message);

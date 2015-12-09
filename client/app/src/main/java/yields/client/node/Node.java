@@ -3,18 +3,21 @@ package yields.client.node;
 import android.graphics.Bitmap;
 import android.media.Image;
 
+import java.util.Date;
 import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Represent a node in the model of our application.
  */
-public abstract class Node {
+public class Node {
     private String mName;
     private Id mId;
     private Bitmap mImage;
+    private Date mRef;
 
     /**
      * Creates a node.
@@ -27,6 +30,18 @@ public abstract class Node {
         this.mName = Objects.requireNonNull(name);
         this.mId = Objects.requireNonNull(id);
         this.mImage = Objects.requireNonNull(image);
+    }
+
+    /**
+     * Creates an invalidated node.
+     *
+     * @param id The Id of the node.
+     * @throws NodeException In case of trouble making the node.
+     */
+    public Node(Id id) throws NodeException {
+        this.mName = "";
+        this.mId = Objects.requireNonNull(id);
+        this.mImage = YieldsApplication.getDefaultGroupImage();
     }
 
     /**
@@ -45,6 +60,14 @@ public abstract class Node {
      */
     public void setName(String name){
         mName = Objects.requireNonNull(name);
+    }
+
+    public Date getRef() {
+        return mRef;
+    }
+
+    public void setRef(Date mRef) {
+        this.mRef = mRef;
     }
 
     /**

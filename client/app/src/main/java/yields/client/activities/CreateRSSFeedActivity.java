@@ -9,8 +9,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import java.util.Date;
+
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
+import yields.client.id.Id;
+import yields.client.node.Group;
+import yields.client.node.Node;
+import yields.client.servicerequest.RSSCreateRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -75,8 +82,11 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
         }
         else {
+            Node rss = new Node(mGroupName, new Id(0), YieldsApplication.getDefaultGroupImage());
 
-            // TODO send request
+            ServiceRequest rssCreaterequest = new RSSCreateRequest(
+                    YieldsApplication.getUser().getId(), url, rss,
+                    mEditTextKeywords.getText().toString());
         }
 
         return true;

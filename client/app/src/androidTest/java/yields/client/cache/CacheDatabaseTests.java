@@ -101,7 +101,7 @@ public class CacheDatabaseTests {
         for (int i = 0; i < 5; i++) {
             User user = new User("John" + i, new Id(-i), "lol@jpg", YieldsApplication.getDefaultUserImage());
             YieldsApplication.addNotKnown(user);
-            Message message = new Message("Node " + i, new Id(i), new Id(-i),
+            Message message = new Message( new Id(i), new Id(-i),
                     MockFactory.generateFakeTextContent(i), new Date(), Message.MessageStatus.NOT_SENT);
             mDatabaseHelper.addMessage(message, new Id(666));
             try {
@@ -765,7 +765,8 @@ public class CacheDatabaseTests {
     private boolean compareMessages(Message originalMessage, Message messageFromCache) {
         boolean equal = originalMessage.getSender().equals(messageFromCache.getSender());
 
-        equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
+        equal = equal && originalMessage.getCommentGroupId().getId()
+                .equals(messageFromCache.getCommentGroupId().getId());
         equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);
         equal = equal && originalMessage.getPreview().equals(messageFromCache.getPreview());
         equal = equal && originalMessage.getStatus().equals(messageFromCache.getStatus());

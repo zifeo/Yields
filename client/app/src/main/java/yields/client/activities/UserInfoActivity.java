@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -35,18 +36,20 @@ public class UserInfoActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("User Information");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        User user = Objects.requireNonNull(YieldsApplication.getUserSearched(),
+        Node node = Objects.requireNonNull(YieldsApplication.getUserSearched(),
                 "getUserSearched() in YieldsApplication cannot be null when UserInfoActivity is created");
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewUser);
         int size = getResources().getInteger(R.integer.largeGroupImageDiameter);
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(user.getImage(), size, size, false));
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(node.getImage(), size, size, false));
 
         TextView textViewName = (TextView) findViewById(R.id.textViewUserName);
-        textViewName.setText(user.getName());
+        textViewName.setText(node.getName());
 
-        TextView textViewEmail = (TextView) findViewById(R.id.textViewEmail);
-        textViewEmail.setText(user.getEmail());
+        if (node instanceof User) {
+            TextView textViewEmail = (TextView) findViewById(R.id.textViewEmail);
+            textViewEmail.setText(((User) node).getEmail());
+        }
     }
 
     /** Method used to take care of clicks on the tool bar

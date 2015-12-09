@@ -92,15 +92,15 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessageHasCorrectStatus() {
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Content content = MockFactory.generateFakeTextContent(1);
-        Message message = new Message("message", new Id(-4), user.getId(), content, new Date(),
+        Message message = new Message(new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.NOT_SENT);
         assertEquals(Message.MessageStatus.NOT_SENT, message.getStatus());
 
-        message = new Message("message", new Id(-4), user.getId(), content, new Date(),
+        message = new Message( new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.SENT);
         assertEquals(Message.MessageStatus.SENT, message.getStatus());
 
-        message = new Message("message", new Id(-4), user.getId(), content, new Date(),
+        message = new Message(new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.SEEN);
         assertEquals(Message.MessageStatus.SEEN, message.getStatus());
     }
