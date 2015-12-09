@@ -162,7 +162,6 @@ public class MessageActivity extends NotifiableActivity {
             bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
-
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
     }
@@ -475,8 +474,7 @@ public class MessageActivity extends NotifiableActivity {
     private void createCommentFragment() {
         Log.d("MessageActivity", "createCommentFragment");
         mInputField.setText("");
-        FragmentTransaction fragmentTransaction = mFragmentManager.
-                beginTransaction();
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
         mTextTitle.setText("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
                 .getName());
@@ -521,7 +519,6 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        YieldsApplication.setGroup(mGroup);
         YieldsApplication.getBinder().attachActivity(this);
         NodeHistoryRequest request = new NodeHistoryRequest(mCommentMessage.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(request);
@@ -621,13 +618,10 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveCommentMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if (mCommentAdapter.getCount() < messagesTree.size()) {
-            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
-            mCommentAdapter.clear();
+        mCommentAdapter.clear();
 
-            for (Message message : messagesTree.values()) {
-                mCommentAdapter.add(message);
-            }
+        for (Message message : messagesTree.values()) {
+            mCommentAdapter.add(message);
         }
 
         ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();

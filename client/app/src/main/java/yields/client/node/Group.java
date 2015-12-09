@@ -302,7 +302,16 @@ public class Group extends Node {
      * @param newMessage Message to be added
      */
     synchronized public void addMessage(Message newMessage) {
-        mMessages.put(newMessage.getDate(), newMessage);
+        Message previous = mMessages.put(newMessage.getDate(), newMessage);
+        String previousMessage;
+        if(previous == null){
+            previousMessage = "null";
+        }
+        else{
+            previousMessage = previous.getContent().getTextForRequest();
+        }
+        Log.d("Y:"+ this.getClass().toString(), "Added message to group, this message was replaced: " +
+                previousMessage);
     }
 
     /**
@@ -312,7 +321,7 @@ public class Group extends Node {
      */
     synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
-            mMessages.put(newMessage.getDate(), newMessage);
+            addMessage(newMessage);
         }
 
         if (!mMessages.isEmpty()) {
