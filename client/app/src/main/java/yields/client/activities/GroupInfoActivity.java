@@ -5,10 +5,13 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,7 +21,10 @@ import java.util.Objects;
 import yields.client.R;
 import yields.client.exceptions.IllegalIntentExtraException;
 import yields.client.exceptions.MissingIntentExtraException;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
+import yields.client.listadapter.ListAdapterUsers;
+import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -105,7 +111,7 @@ public class GroupInfoActivity extends NotifiableActivity {
             textViewTags.setText(builder.toString());
         }
 
-        Button usersButton = (Button) findViewById(R.id.buttonUsers);
+        /*Button usersButton = (Button) findViewById(R.id.buttonUsers);
 
         usersButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,9 +136,33 @@ public class GroupInfoActivity extends NotifiableActivity {
             }
         });
 
-        YieldsApplication.setGroupsSearched(mGroup.getNodes());
+        YieldsApplication.setGroupsSearched(mGroup.getNodes());*/
 
         checkButtons();
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayoutUsersAndNodes);
+
+        for (int i = 0; i < 15; i++){
+            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+            View userView = inflater.inflate(R.layout.user_layout, layout, false);
+
+            TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
+            ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
+
+            User user = YieldsApplication.getUser();
+
+            textViewUserName.setText(user.getName());
+
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+                    getApplicationContext().getResources().getInteger(R.integer.groupImageDiameter)));
+
+            userView.setClickable(true);
+
+            layout.addView(userView);
+        }
+
+
+
     }
 
     /**
