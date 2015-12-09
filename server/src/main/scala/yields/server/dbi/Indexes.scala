@@ -2,6 +2,7 @@ package yields.server.dbi
 
 import yields.server.dbi.models.{NID, UID}
 import yields.server.utils.Config
+import com.redis.serialization.Parse.Implicits._
 
 /**
   * Regroup all indexes.

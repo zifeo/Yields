@@ -3,6 +3,7 @@ package yields.server.rss
 import java.net.URL
 import java.time.OffsetDateTime
 
+import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.{SyndFeedInput, XmlReader}
 import yields.server.utils.Temporal
 
@@ -12,44 +13,51 @@ import scala.collection.JavaConverters._
   * Takes care of parsing a valid RSS feed and offer information retrieval manner.
   * RSS example: http://stackoverflow.com/feeds
   *
-  * @param url RSS url
+  * @param feed RSS feed
   */
-final class RSSFeed(url: String) {
+final class RSSFeed(private val feed: SyndFeed) {
 
-  private val feed = new SyndFeedInput().build(new XmlReader(new URL(url)))
+  /** Create a RSS from a string representing an url. */
+  def this(url: String) {
+    this(new SyndFeedInput().build(new XmlReader(new URL(url))))
+  }
 
-  lazy val title = feed.getTitle
-  lazy val description = feed.getDescription
-  lazy val authors = feed.getAuthors.asScala.map(_.getName).toList
-  lazy val link = feed.getLink
+  require(feed != null)
+
+  lazy val title = notNull(feed.getTitle)
+  lazy val description = notNull(feed.getDescription)
+  lazy val author = notNull(feed.getAuthor)
+  lazy val link = notNull(feed.getLink)
   lazy val updatedAt = Temporal.date2OffsetDateTime(feed.getPublishedDate)
 
   lazy val entries = feed.getEntries.asScala.map { entry =>
-    val title = entry.getTitle
-    val author = entry.getAuthor
-    val link = entry.getLink
-    val content = entry.getDescription.getValue
+    val title = notNull(entry.getTitle)
+    val author = notNull(entry.getAuthor)
+    val link = notNull(entry.getLink)
     val date = Temporal.date2OffsetDateTime(entry.getPublishedDate)
-    (date, title, author, link, content)
+    val content = notNull(entry.getDescription.getValue)
+    RSSEntry(title, author, link, date, content)
   }.toList
 
   /** Retrieves last entries given a date. */
-  def since(datetime: OffsetDateTime): List[(OffsetDateTime, String, String, String)] =
-    entries
-      .filter(_._1.compareTo(datetime) > 0)
-      .map(t => (t._1, t._2, t._3, t._4))
+  def since(datetime: OffsetDateTime): List[RSSEntry] =
+    entries.filter(_.datetime.compareTo(datetime) > 0)
 
   /** Retrieves last entries given a date and filter only entries containg filter, terms */
-  def sinceFiltered(datetime: OffsetDateTime, filter: String): List[(OffsetDateTime, String, String, String)] = {
-    if (filter.isEmpty) since(datetime)
-    else {
-      val terms = filter.split(',').map(_.trim)
-      entries
-        .filter { case (date, _, _, _, content) =>
-          date.compareTo(datetime) > 0 && terms.exists(content.contains)
-        }
-        .map(t => (t._1, t._2, t._3, t._4))
-    }
+  def sinceFiltered(datetime: OffsetDateTime, filter: String): List[RSSEntry] = {
+    val selected = since(datetime)
+    val terms = filter.split(',').map(_.trim)
+    println(terms.toList)
+    if (terms.isEmpty) selected
+    else
+      selected.filter { entry =>
+        entry.datetime.compareTo(datetime) > 0 && terms.exists(entry.content.contains)
+      }
   }
+
+  /** Returns given string or empty one if null. */
+  private def notNull(str: String): String =
+    if (str == null) ""
+    else str
 
 }
