@@ -1,38 +1,11 @@
 package yields.server.rss
 
-import java.time.OffsetDateTime
-
-import com.rometools.rome.feed.synd._
 import yields.server.tests._
 import yields.server.utils.Temporal
 
 import scala.collection.JavaConverters._
 
 class RSSFeedTests extends YieldsSpec {
-
-  def createFeed(title: String, desc: String, author: String, link: String, datetime: OffsetDateTime): SyndFeedImpl = {
-    val feed = new SyndFeedImpl()
-    feed.setFeedType("rss_2.0")
-    feed.setTitle(title)
-    feed.setDescription(desc)
-    feed.setAuthor(author)
-    feed.setLink(link)
-    feed.setPublishedDate(Temporal.offsetDateTime2Date(datetime))
-    feed
-  }
-
-  def createEntry(title: String, desc: String, author: String, link: String, datetime: OffsetDateTime): SyndEntry = {
-    val entry = new SyndEntryImpl
-    entry.setTitle(title)
-    val description = new SyndContentImpl()
-    description.setType("text/plain")
-    description.setValue(desc)
-    entry.setDescription(description)
-    entry.setAuthor(author)
-    entry.setLink(link)
-    entry.setPublishedDate(Temporal.offsetDateTime2Date(datetime))
-    entry
-  }
 
   "A RSSFeed" should "correctly wrap a feed" in {
 
