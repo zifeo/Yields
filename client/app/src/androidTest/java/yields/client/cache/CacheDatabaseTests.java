@@ -459,7 +459,7 @@ public class CacheDatabaseTests {
     public void testDatabaseCanUpdateGroupType() {
         Group group = MockFactory.generateMockGroups(1).get(0);
         mDatabaseHelper.addGroup(group);
-        mDatabaseHelper.updateGroupVisibility(group.getId(), Group.GroupType.PUBLISHER);
+        mDatabaseHelper.updateGroupType(group.getId(), Group.GroupType.PUBLISHER);
         Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
         assertEquals(fromDatabase.getName(), group.getName());
         assertEquals(fromDatabase.getId().getId(), group.getId().getId());

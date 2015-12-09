@@ -55,9 +55,6 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class MessageActivity extends NotifiableActivity {
 
-    public MessageActivity(ListAdapterMessages mCommentAdapter) {
-        this.mCommentAdapter = mCommentAdapter;
-    }
 
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
