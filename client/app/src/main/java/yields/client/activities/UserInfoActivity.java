@@ -40,7 +40,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewUser);
         int size = getResources().getInteger(R.integer.largeGroupImageDiameter);
-        imageView.setImageBitmap(Bitmap.createScaledBitmap(user.getImg(), size, size, false));
+        imageView.setImageBitmap(Bitmap.createScaledBitmap(user.getImage(), size, size, false));
 
         TextView textViewName = (TextView) findViewById(R.id.textViewUserName);
         textViewName.setText(user.getName());

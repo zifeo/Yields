@@ -232,8 +232,8 @@ public class CacheDatabaseTests {
         assertEquals(userToRename.getId(),
                 userFromDatabase.getId().getId());
 
-        assertTrue(compareImages(YieldsApplication.getUserFromId(userToRename).getImg(),
-                userFromDatabase.getImg()));
+        assertTrue(compareImages(YieldsApplication.getUserFromId(userToRename).getImage(),
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -263,7 +263,7 @@ public class CacheDatabaseTests {
                 userFromDatabase.getId().getId());
 
         assertTrue(compareImages(newImage,
-                userFromDatabase.getImg()));
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -289,8 +289,8 @@ public class CacheDatabaseTests {
             assertEquals(users.get(i).getId(),
                     userFromDatabase.getId().getId());
 
-            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImg(),
-                    userFromDatabase.getImg()));
+            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImage(),
+                    userFromDatabase.getImage()));
         }
     }
 
@@ -318,8 +318,8 @@ public class CacheDatabaseTests {
             assertEquals(users.get(i).getId(),
                     usersFromDatabase.get(users.size() - i - 1).getId().getId());
 
-            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImg(),
-                    usersFromDatabase.get(users.size() - i - 1).getImg()));
+            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImage(),
+                    usersFromDatabase.get(users.size() - i - 1).getImage()));
         }
     }
 
@@ -353,8 +353,8 @@ public class CacheDatabaseTests {
             assertEquals(users.get(i).getId(),
                     usersFromDatabase.get(users.size() - i - 1).getId().getId());
 
-            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImg(),
-                    usersFromDatabase.get(users.size() - i - 1).getImg()));
+            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImage(),
+                    usersFromDatabase.get(users.size() - i - 1).getImage()));
         }
     }
 
@@ -651,7 +651,7 @@ public class CacheDatabaseTests {
         Bitmap imageFromCache =
                 ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex("userImage")));
         boolean userImageIsCorrect =
-                compareImages(user.getImg(), imageFromCache);
+                compareImages(user.getImage(), imageFromCache);
 
         return idIsCorrect && userNameIsCorrect && userEmailIsCorrect && userImageIsCorrect;
     }

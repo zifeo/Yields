@@ -44,7 +44,6 @@ public class Group extends Node {
     private boolean mValidated;
     private List<User> mUsers;
     private List<Group> mNodes;
-    private Bitmap mImage;
     private GroupVisibility mVisibility;
     private Set<Tag> mTags;
     private Date mDate;
@@ -62,12 +61,11 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<Id> users, Bitmap image, GroupVisibility visibility,
                  boolean validated, Date lastUpdate) {
-        super(name, id);
+        super(name, id, image);
         Objects.requireNonNull(users);
         Objects.requireNonNull(lastUpdate);
         this.mMessages = new TreeMap<>();
         mUsers = new ArrayList<>();
-        mImage = Objects.requireNonNull(image);
         mValidated = validated;
         mVisibility = visibility;
         mTags = new HashSet<>();
@@ -87,11 +85,10 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, Group group) {
-        super(name, id);
+        super(name, id, group.getImage());
         Objects.requireNonNull(group);
         this.mMessages = new TreeMap<>();
         mUsers = group.getUsers();
-        mImage = group.getImage();
         mValidated = false;
         mVisibility = GroupVisibility.PRIVATE;
         mTags = new HashSet<>();
@@ -185,7 +182,7 @@ public class Group extends Node {
      * @return The group wrapper for this message.
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
-        return new Group("message comment", messageComment.getId(), group);
+        return new Group("message comment", messageComment.getCommentGroupId(), group);
     }
 
     /**
@@ -309,25 +306,6 @@ public class Group extends Node {
         if (!mMessages.isEmpty()) {
             setLastUpdate(mMessages.lastKey());
         }
-    }
-
-
-    /**
-     * Set the image to the group
-     *
-     * @param image A squared image which this method will make circular
-     */
-    public void setImage(Bitmap image) {
-        mImage = Objects.requireNonNull(image);
-    }
-
-    /**
-     * Returns the group's image
-     *
-     * @return the group's image, uncropped
-     */
-    public Bitmap getImage() {
-        return mImage;
     }
 
     /**

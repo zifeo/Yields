@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v7.app.ActionBar;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.View;
@@ -73,7 +72,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
         YieldsApplication.setGroup(MOCK_GROUP);
-        assertTrue(YieldsApplication.getUser().getImg() != null);
+        assertTrue(YieldsApplication.getUser().getImage() != null);
     }
 
     /**
