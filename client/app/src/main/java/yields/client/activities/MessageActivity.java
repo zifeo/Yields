@@ -551,8 +551,12 @@ public class MessageActivity extends NotifiableActivity {
                             mLastApplicationGroup = mGroup;
                             // Then we update the group currently displayed as it is the commented
                             // message
-                            mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
-                            YieldsApplication.getUser().addCommentGroup(mGroup);
+                            Group commentGroup = YieldsApplication.getUser().getCommentGroup(mCommentMessage.getId());
+                            if(commentGroup == null){
+                                commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
+                                YieldsApplication.getUser().addCommentGroup(commentGroup);
+                            }
+                            mGroup = commentGroup;
                             YieldsApplication.setGroup(mGroup);
                             mType = ContentType.MESSAGE_COMMENTS;
                             createCommentFragment();

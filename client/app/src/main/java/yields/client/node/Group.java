@@ -203,7 +203,13 @@ public class Group extends Node {
      * @return The Message updated.
      */
     public Message updateMessageIdDateAndStatus(Id contentId, Date date, Date newDate) {
+        Integer size = this.mMessages.size();
+        Log.d("Y:" + this.getClass().getName(), size.toString());
+
         Message message = mMessages.remove(date);
+
+        size = this.mMessages.size();
+        Log.d("Y:" + this.getClass().getName(), size.toString());
 
         if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
@@ -310,6 +316,8 @@ public class Group extends Node {
         } else {
             previousMessage = previous.getContent().getTextForRequest();
         }
+        Integer size = mMessages.size();
+        Log.d("Y:" + this.getClass().toString(), "New message count in Group is : " + size.toString());
         Log.d("Y:" + this.getClass().toString(), DateSerialization.dateSerializer.toString(newMessage.getDate()));
 
         Log.d("Y:" + this.getClass().toString(), "Added message to group: " + this.getId().getId().toString()
