@@ -103,7 +103,7 @@
                 android:id="@+id/textViewTags"
                 android:layout_gravity="center_horizontal"
                 android:maxWidth="300dp"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
 
             <LinearLayout
                 android:orientation="vertical"
@@ -113,23 +113,5 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <!--<Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:text="@string/users"
-        android:id="@+id/buttonUsers"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/nodes"
-        android:id="@+id/buttonNodes"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible" /> -->
 
 </LinearLayout>
