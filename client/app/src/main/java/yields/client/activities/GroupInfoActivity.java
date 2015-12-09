@@ -142,14 +142,12 @@ public class GroupInfoActivity extends NotifiableActivity {
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayoutUsersAndNodes);
 
-        for (int i = 0; i < 15; i++){
+        for (final User user : mGroup.getUsers()){
             LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
-            View userView = inflater.inflate(R.layout.user_layout, layout, false);
+            View userView = inflater.inflate(R.layout.user_layout_separator, layout, false);
 
             TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
             ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
-
-            User user = YieldsApplication.getUser();
 
             textViewUserName.setText(user.getName());
 
@@ -157,12 +155,54 @@ public class GroupInfoActivity extends NotifiableActivity {
                     getApplicationContext().getResources().getInteger(R.integer.groupImageDiameter)));
 
             userView.setClickable(true);
+            userView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    YieldsApplication.setUserSearched(user);
+
+                    Intent intent = new Intent(GroupInfoActivity.this, UserInfoActivity.class);
+                    startActivity(intent);
+                }
+            });
 
             layout.addView(userView);
         }
 
+        for (final Group group : mGroup.getNodes()){
+            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+            View groupView = inflater.inflate(R.layout.user_layout_separator, layout, false);
 
+            TextView textViewUserName = (TextView) groupView.findViewById(R.id.textViewUserName);
+            ImageView imageUser = (ImageView) groupView.findViewById(R.id.imageUser);
 
+            textViewUserName.setText(group.getName());
+
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(group.getImage(),
+                    getApplicationContext().getResources().getInteger(R.integer.groupImageDiameter)));
+
+            groupView.setClickable(true);
+            groupView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    YieldsApplication.setGroup(group);
+
+                    Intent intent = new Intent(GroupInfoActivity.this, GroupInfoActivity.class);
+                    intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+                    startActivity(intent);
+                }
+            });
+
+            layout.addView(groupView);
+        }
+    }
+
+    /**
+     * Automatically called when the activity is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        YieldsApplication.setGroup(mGroup);
     }
 
     /**
