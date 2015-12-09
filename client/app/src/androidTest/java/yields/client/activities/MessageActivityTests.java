@@ -336,7 +336,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertTrue(list.getCount() == 0);
         messageActivity.finish();
     }
-
+/*
     @Test
     public void testNotifyChange() throws InterruptedException {
         final MessageActivity messageActivity = getActivity();
@@ -348,5 +348,5 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         Message m = (Message) messageList.getAdapter().getItem(0);
         TextContent content = (TextContent) m.getContent();
         assertEquals("topkek", content.getText());
-    }
+    }*/
 }
