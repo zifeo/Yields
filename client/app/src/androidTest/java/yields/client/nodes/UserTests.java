@@ -13,11 +13,13 @@ import yields.client.serverconnection.ImageSerialization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UserTests {
     private static JSONObject jsonUserNoPic;
     private static JSONObject jsonUserPic;
+    private static JSONObject jsonUserUpdate;
     private static final String base64Image = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsK" +
             "CwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQU" +
             "FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wgARCABvAKsDAREA" +
@@ -121,6 +123,12 @@ public class UserTests {
         jsonUserPic.put("uid", 420);
         jsonUserPic.put("email", "asd.asd@qwe.kr");
         jsonUserPic.put("pic", base64Image);
+
+        jsonUserUpdate = new JSONObject();
+        jsonUserUpdate.put("name", "Jaedong");
+        jsonUserUpdate.put("uid", 200);
+        jsonUserUpdate.put("email", "ez.skin@ez.life");
+        jsonUserUpdate.put("pic", base64Image);
     }
 
     @Test
@@ -139,6 +147,16 @@ public class UserTests {
         assertEquals("asd.asd@qwe.kr", user.getEmail());
 
         // TODO : Compare images from the base64 in this class, and from the user.
+    }
+
+    @Test
+    public void testUpdateUser() throws JSONException {
+        User user = new User(jsonUserNoPic);
+        user.update(jsonUserUpdate);
+        assertEquals("Jaedong", user.getName());
+        assertNotEquals(Long.valueOf(200), user.getId().getId());
+        assertEquals("ez.skin@ez.life", user.getEmail());
+        // TODO : compare image update.
     }
 
     @Test
