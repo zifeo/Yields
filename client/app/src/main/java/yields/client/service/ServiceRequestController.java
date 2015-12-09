@@ -226,9 +226,6 @@ public class ServiceRequestController {
             case RSS_CREATE_RESPONSE:
                 mResponseHandler.handleRSSCreateResponse(serverResponse);
                 break;
-            case NODE_MESSAGE_BCAST:
-                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
-                break;
             case USER_UPDATE_BCAST:
                 mResponseHandler.handleUserUpdateBroadcast(serverResponse);
                 break;
@@ -238,17 +235,14 @@ public class ServiceRequestController {
             case GROUP_UPDATE_BCAST:
                 mResponseHandler.handleGroupUpdateBroadcast(serverResponse);
                 break;
-            case GROUP_MESSAGE_BCAST:
-                mResponseHandler.handleGroupMessageBroadcast(serverResponse);
+            case NODE_MESSAGE_BCAST:
+                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
                 break;
             case PUBLISHER_CREATE_BCAST:
                 mResponseHandler.handlePublisherCreateBroadcast(serverResponse);
                 break;
             case PUBLISHER_UPDATE_BCAST:
                 mResponseHandler.handlePublisherUpdateBroadcast(serverResponse);
-                break;
-            case PUBLISHER_MESSAGE_BCAST:
-                mResponseHandler.handlePublisherMessageBroadcast(serverResponse);
                 break;
             case RSS_CREATE_BCAST:
                 mResponseHandler.handleRSSCreateBroadcast(serverResponse);

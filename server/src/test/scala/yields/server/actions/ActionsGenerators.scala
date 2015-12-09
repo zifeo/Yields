@@ -37,10 +37,10 @@ with PublishersGenerators with RSSGenerators {
 
   implicit lazy val broadcastArb: Arbitrary[Broadcast] = Arbitrary {
     val arbs = Seq(
-      groupCreateBrdArb, groupUpdateBrdArb, groupMessageBrdArb,
+      groupCreateBrdArb, groupUpdateBrdArb,
       userUpdateBrdArb,
-      mediaMessageBrdArb,
-      publisherCreateBrdArb, publisherMessageBrdArb, publisherUpdateBrdArb
+      publisherCreateBrdArb, publisherUpdateBrdArb,
+      nodeMessageBrdArb
     )
     assert(arbs.size >= 2)
     val gens = arbs.map(_.arbitrary)

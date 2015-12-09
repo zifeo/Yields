@@ -103,16 +103,4 @@ trait PublishersGenerators extends DefaultsGenerators {
     } yield PublisherMessageRes(nid, datetime, contentNid)
   }
 
-  implicit lazy val publisherMessageBrdArb: Arbitrary[PublisherMessageBrd] = Arbitrary {
-    for {
-      nid <- arbitrary[NID]
-      datetime <- arbitrary[OffsetDateTime]
-      sender <- arbitrary[UID]
-      text <- arbitrary[Option[String]]
-      contentType <- arbitrary[Option[String]]
-      content <- arbitrary[Option[Blob]]
-      contentNid <- arbitrary[Option[NID]]
-    } yield PublisherMessageBrd(nid, datetime, sender, text, contentType, content, contentNid)
-  }
-
 }
