@@ -1,4 +1,4 @@
-package yields.client.Requests;
+package yields.client.requests;
 
 import android.graphics.Bitmap;
 
