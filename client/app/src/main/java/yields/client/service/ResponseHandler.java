@@ -745,6 +745,9 @@ public class ResponseHandler {
                     prevDatetime, serverDatetime);
             Log.d("HELLO", id.getId().toString());
             Log.d("HELLO", YieldsApplication.getUser().getCommentGroup(id).getId().getId().toString());
+            Integer size = YieldsApplication.getUser().getCommentGroup(id).getLastMessages().size();
+            Log.d("HELLO", size.toString());
+
             if(message != null) {
                 Log.d("HELLO2", id.getId().toString());
                 Log.d("HELLO2", YieldsApplication.getUser().getCommentGroup(id).getId().getId().toString());
