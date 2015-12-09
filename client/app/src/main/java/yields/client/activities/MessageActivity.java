@@ -141,6 +141,7 @@ public class MessageActivity extends NotifiableActivity {
 
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
+                    YieldsApplication.setGroup(mGroup);
                     YieldsApplication.setBinder((YieldServiceBinder) service);
                     YieldsApplication.getBinder().attachActivity(MessageActivity.this);
                     YieldsApplication.getBinder().connectionStatus();
@@ -520,6 +521,7 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
+        YieldsApplication.setGroup(mGroup);
         YieldsApplication.getBinder().attachActivity(this);
         NodeHistoryRequest request = new NodeHistoryRequest(mCommentMessage.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(request);

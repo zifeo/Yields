@@ -754,7 +754,11 @@ public class ResponseHandler {
 
             Message message = YieldsApplication.getUser().getCommentGroup(id).updateMessageIdDateAndStatus(new Id(-1),
                     prevDatetime, serverDatetime);
+            Log.d("HELLO", id.getId().toString());
+            Log.d("HELLO", YieldsApplication.getUser().getCommentGroup(id).getId().getId().toString());
             if(message != null) {
+                Log.d("HELLO2", id.getId().toString());
+                Log.d("HELLO2", YieldsApplication.getUser().getCommentGroup(id).getId().getId().toString());
                 Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
                         message.getContent(), prevDatetime, message.getStatus());
                 mCacheHelper.deleteMessage(copyMessage, id);
