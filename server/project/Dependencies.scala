@@ -27,6 +27,10 @@ object Dependencies {
     )
   }
 
+  val rss = Seq(
+    "com.rometools" % "rome" % "1.5.1"
+  )
+
   val redis = Seq(
     "net.debasishg" %% "redisclient" % "3.1"
   )

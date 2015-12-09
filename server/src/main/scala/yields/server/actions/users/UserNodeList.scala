@@ -33,7 +33,7 @@ case class UserNodeList() extends Action {
   * @param groups sequence of nid, name and last activity
   */
 case class UserNodeListRes(groups: Seq[NID],
-                           kind: Seq[String],
+                           kinds: Seq[String],
                            updatedAt: Seq[OffsetDateTime],
                            refreshedAt: Seq[OffsetDateTime]
                           ) extends Result
