@@ -6,9 +6,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import yields.client.R;
 import yields.client.generalhelpers.MockModel;
 import yields.client.generalhelpers.ServiceTestConnection;
+import yields.client.id.Id;
 import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -222,5 +225,42 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
 
         onView(withText(R.string.messageUrlHttp)).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that runs through all activities related to group creation,
+     * and add a node to the group
+     */
+    public void testGroupCreationNodeAdded() {
+        onView(withId(R.id.actionCreate)).perform(click());
+
+        onView(withId(R.id.editTextSelectGroupName)).perform(typeText("Private Group"), closeSoftKeyboard());
+
+        onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
+
+        // Simulate the node added
+        YieldsApplication.setGroupAdded(new Group("group", new Id(1), new ArrayList<Id>()));
+        YieldsApplication.setGroupAddedValid(true);
+
+        onView(withId(R.id.actionDoneSelectName)).perform(click());
+
+        onView(withId(R.id.actionDoneCreateGroup)).perform(click());
+
+        ListView listView = (ListView) getActivity().findViewById(R.id.listViewGroups);
+        boolean found = false;
+        for (int i = 0; i < listView.getChildCount(); ++i) {
+            View v = listView.getChildAt(i);
+            TextView groupName = (TextView) v.findViewById(R.id.textViewGroupName);
+            String textGroupName = groupName.getText().toString();
+
+            if (textGroupName.equals("Private Group")) {
+                found = true;
+                Group group = (Group) listView.getAdapter().getItem(i);
+                assertEquals(Group.GroupVisibility.PRIVATE, group.getVisibility());
+            }
+        }
+        if (!found) {
+            fail("Error group not found");
+        }
     }
 }

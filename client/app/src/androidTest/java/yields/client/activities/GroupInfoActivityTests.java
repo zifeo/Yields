@@ -126,4 +126,34 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
 
         onView(withId(R.id.textViewUserName)).check(matches(isDisplayed()));
     }
+
+    /**
+     * Test that subscribe to the group.
+     */
+    public void testSubscribe(){
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+
+        YieldsApplication.setGroup(g);
+        getActivity();
+
+        onView(withId(R.id.buttonSubscribeGroup)).perform(click());
+    }
+
+    /**
+     * Test that unsubscribe from the group.
+     */
+    public void testUnsubscribe(){
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+        Group sub = new Group("sub", new Id(1), new ArrayList<Id>());
+        YieldsApplication.getUser().addGroup(sub);
+        sub.addUser(YieldsApplication.getUser().getId());
+        sub.addNode(g);
+
+        YieldsApplication.setGroup(g);
+        getActivity();
+
+        onView(withId(R.id.buttonUnsubscribeGroup)).perform(click());
+    }
 }
