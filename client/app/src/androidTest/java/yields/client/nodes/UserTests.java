@@ -150,9 +150,20 @@ public class UserTests {
     }
 
     @Test
-    public void testUpdateUser() throws JSONException {
+    public void testUpdateUserJSON() throws JSONException {
         User user = new User(jsonUserNoPic);
         user.update(jsonUserUpdate);
+        assertEquals("Jaedong", user.getName());
+        assertNotEquals(Long.valueOf(200), user.getId().getId());
+        assertEquals("ez.skin@ez.life", user.getEmail());
+        // TODO : compare image update.
+    }
+
+    @Test
+    public void testUpdateUserWithUser() throws JSONException {
+        User user = new User(jsonUserNoPic);
+        User user2 = new User(jsonUserUpdate);
+        user.update(user2);
         assertEquals("Jaedong", user.getName());
         assertNotEquals(Long.valueOf(200), user.getId().getId());
         assertEquals("ez.skin@ez.life", user.getEmail());
