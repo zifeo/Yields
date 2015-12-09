@@ -2,6 +2,7 @@ package yields.client.activities;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
@@ -26,6 +27,7 @@ import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.messages.CommentView;
 import yields.client.messages.ImageContent;
+import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -34,6 +36,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -49,6 +52,8 @@ import static org.hamcrest.Matchers.is;
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
     private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
+    private static final ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
+            new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
 
     public MessageActivityTests() {
         super(MessageActivity.class);
@@ -66,9 +71,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         YieldsApplication.setApplicationContext(InstrumentationRegistry.getContext());
         YieldsApplication.setResources(InstrumentationRegistry.getTargetContext().getResources());
-
-        ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
-                new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
 
         SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
@@ -302,7 +304,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testCannotSendEmptyTextMessage() {
         final MessageActivity messageActivity = getActivity();
-        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         onView(withId(R.id.sendButton)).perform(click());
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
@@ -311,10 +312,41 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testCaptionForImageIsNotMandatory() {
         final MessageActivity messageActivity = getActivity();
-        EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         messageActivity.simulateImageMessage();
         onView(withId(R.id.sendButton)).perform(click());
         assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
+    }
+
+    @Test
+    public void testGetCurrentFragment() throws InterruptedException {
+        final MessageActivity messageActivity = getActivity();
+        String input = "Mock message #1";
+        messageActivity.simulateImageMessage();
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
+        int tag = 0;
+        messageList.getChildAt(0).setTag((Object) tag);
+        onView(withTagValue(is((Object) tag))).perform(click());
+        assertEquals(MessageActivity.ContentType.MESSAGE_COMMENTS, messageActivity.getType());
+        closeSoftKeyboard();
+        ListView list = messageActivity.getCurrentFragmentListView();
+        assertTrue(list.getCount() == 0);
+        messageActivity.finish();
+    }
+
+    @Test
+    public void testNotifyChange() throws InterruptedException {
+        final MessageActivity messageActivity = getActivity();
+        MOCK_GROUP.addMessage(MockFactory.generateMockMessage("", new Id(2), MOCK_CLIENT_USER, new TextContent("topkek")));
+        Log.d("MessageActivityTest", "Notify changes");
+        messageActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
+        Message m = (Message) messageList.getAdapter().getItem(0);
+        TextContent content = (TextContent) m.getContent();
+        assertEquals("topkek", content.getText());
     }
 }
