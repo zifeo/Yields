@@ -61,4 +61,12 @@ trait NodesGenerators extends DefaultsGenerators {
     } yield NodeMessageBrd(nid, datetime, sender, text, contentType, content, contentNid)
   }
 
+  //
+
+  implicit lazy val nodeInfoArb: Arbitrary[NodeInfo] = Arbitrary {
+    for {
+      nid <- arbitrary[NID]
+    } yield NodeInfo(nid)
+  }
+
 }
