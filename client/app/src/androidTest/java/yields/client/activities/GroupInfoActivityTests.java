@@ -40,6 +40,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
+        ServiceTestConnection.connectActivityToService();
+
         YieldsApplication.setUser(MockFactory.generateFakeClientUser("Arnaud", new Id(1), "aa",
                 YieldsApplication.getDefaultUserImage()));
 

@@ -341,6 +341,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        YieldsApplication.getUser().removeGroup(mGroup);
+                        mGroup.removeUser(YieldsApplication.getUser().getId());
+
                         List<User> usersToRemove = new ArrayList<User>();
                         usersToRemove.add(YieldsApplication.getUser());
                         YieldsApplication.getBinder().sendRequest(
