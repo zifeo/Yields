@@ -50,8 +50,8 @@ final class RSSPooler extends Actor with ActorLogging {
     * Goes through all RSS, gets updates, spreads news and broadcasts it.
     * @return list of RSS name with new title entry.
     */
-  def updateRSS(rsss: List[RSS]): List[(String, String)] =
-    rsss.flatMap { rss =>
+  def updateRSS(rss: List[RSS]): List[(String, String)] =
+    rss.flatMap { rss =>
       val feed = new RSSFeed(rss.url)
       val news = feed.sinceFiltered(rss.refreshedAt, rss.filter)
       if (news.nonEmpty) {
