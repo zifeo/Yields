@@ -9,6 +9,7 @@ import yields.server.mpi.Metadata
   * @param nid nid
   */
 case class RSSInfo(nid: NID) extends Action {
+
   /**
     * Run the action given the sender.
     * @param metadata action requester
@@ -18,6 +19,7 @@ case class RSSInfo(nid: NID) extends Action {
     val rss = RSS(nid)
     RSSInfoRes(rss.name, rss.url, rss.filter, rss.tags)
   }
+
 }
 
 /**

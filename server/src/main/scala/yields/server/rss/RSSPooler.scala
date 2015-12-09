@@ -25,28 +25,9 @@ final class RSSPooler extends Actor with ActorLogging {
 
     case Pool =>
       log.info("RSS pooling: round starts")
-      RSS.all.foreach { rss =>
-
-        val feed = new RSSFeed(rss.url)
-        val news = feed.sinceFiltered(rss.refreshed_at, rss.filter)
-        val name = rss.name
-        val reach = rss.receivers.flatMap(Node(_).receivers)
-
-        for ((date, title, author, link) <- news) {
-          val now = Temporal.now
-          rss.addMessage((now, rss.nid, None, s"$title $link"))
-          rss.receivers.map(Node(_)).foreach { node =>
-            Yields.broadcast(node.receivers) {
-              NodeMessageBrd(node.nid, now, rss.nid, Some(title), None, None, None)
-            }
-          }
-          log.info(s"RSS pooling: $name refreshed with $title")
-        }
-
-        if (news.nonEmpty) {
-          rss.refreshed()
-        }
-
+      val updates = updateRSS(RSS.all)
+      updates.foreach { case (rssName, entryTitle) =>
+        log.debug(s"RSS pooling: $rssName refreshed with $entryTitle")
       }
       context.system.scheduler.scheduleOnce(rsscooling.seconds, self, Pool)
       log.info("RSS pooling: round ends")
@@ -64,6 +45,30 @@ final class RSSPooler extends Actor with ActorLogging {
   override def preStart(): Unit = {
     self ! Pool
   }
+
+  /**
+    * Goes through all RSS, gets updates, spreads news and broadcasts it.
+    * @return list of RSS name with new title entry.
+    */
+  def updateRSS(rss: List[RSS]): List[(String, String)] =
+    rss.flatMap { rss =>
+      val feed = new RSSFeed(rss.url)
+      val news = feed.sinceFiltered(rss.refreshedAt, rss.filter)
+      if (news.nonEmpty) {
+        rss.refreshed()
+      }
+
+      news.map { case RSSEntry(title, author, link, entry, _) =>
+        val now = Temporal.now
+        rss.addMessage((now, rss.nid, None, s"$title $link"))
+        rss.receivers.map(Node(_)).foreach { node =>
+          Yields.broadcast(node.receivers) {
+            NodeMessageBrd(node.nid, now, rss.nid, Some(title), None, None, None)
+          }
+        }
+        (rss.name, title)
+      }
+    }
 
 }
 

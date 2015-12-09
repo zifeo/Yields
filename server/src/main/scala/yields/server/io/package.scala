@@ -8,7 +8,6 @@ import yields.server.actions.publisher._
 import yields.server.actions.rss.{RSSCreate, RSSCreateRes, RSSInfo, RSSInfoRes}
 import yields.server.actions.users._
 import yields.server.io.actions.{ActionJsonFormat, BroadcastJsonFormat, ResultJsonFormat}
-import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
 import yields.server.io.mpi.{NotificationJsonFormat, RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -18,12 +17,6 @@ import yields.server.mpi.Metadata
 package object io {
 
   implicit lazy val offsetDateTimeJF = OffsetDateTimeJsonFormat
-
-  /** *** Models *****/
-
-  implicit lazy val nodeJF = NodeJsonFormat
-  implicit lazy val groupJF = GroupJsonFormat
-  implicit lazy val userJF = UserJsonFormat
 
   /** *** Actions  *****/
 
