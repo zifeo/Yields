@@ -310,6 +310,8 @@ public class Group extends Node {
         } else {
             previousMessage = previous.getContent().getTextForRequest();
         }
+        Log.d("Y:" + this.getClass().toString(), DateSerialization.dateSerializer.toString(newMessage.getDate()));
+
         Log.d("Y:" + this.getClass().toString(), "Added message to group: " + this.getId().getId().toString()
                 + ", this message was replaced: " + previousMessage);
         Log.d("Y:" + this.getClass().toString(), "Message added had text " + newMessage.getContent().getTextForRequest());
