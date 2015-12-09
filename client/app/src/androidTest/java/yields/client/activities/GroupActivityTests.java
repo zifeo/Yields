@@ -257,7 +257,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
             if (textGroupName.equals("Private Group")) {
                 found = true;
                 Group group = (Group) listView.getAdapter().getItem(i);
-                assertEquals(Group.GroupVisibility.PRIVATE, group.getVisibility());
+                assertEquals(Group.GroupType.PRIVATE, group.getType());
             }
         }
         if (!found) {

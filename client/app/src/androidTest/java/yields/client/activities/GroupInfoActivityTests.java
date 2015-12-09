@@ -133,7 +133,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testSubscribe(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
 
         YieldsApplication.setGroup(g);
         getActivity();
@@ -146,7 +146,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testUnsubscribe(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         Group sub = new Group("sub", new Id(1), new ArrayList<Id>());
         YieldsApplication.getUser().addGroup(sub);
         sub.addUser(YieldsApplication.getUser().getId());
