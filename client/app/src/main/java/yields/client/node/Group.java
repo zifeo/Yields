@@ -212,8 +212,9 @@ public class Group extends Node {
             mMessages.put(newDate, message);
             return message;
         } else {
-            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant in " +
-                    mMessages.firstKey().getTime() + "or " + mMessages.lastKey().getTime());
+            Log.d("Y:" + this.getClass().getName(), DateSerialization.dateSerializer.toString(date));
+            Log.d("Y:" + this.getClass().getName(), "Couldn't update message " + contentId.getId().toString()
+                    + " as it was not in the group with id " + this.getId().getId().toString());
             return null;
         }
     }
@@ -304,14 +305,14 @@ public class Group extends Node {
     synchronized public void addMessage(Message newMessage) {
         Message previous = mMessages.put(newMessage.getDate(), newMessage);
         String previousMessage;
-        if(previous == null){
+        if (previous == null) {
             previousMessage = "null";
-        }
-        else{
+        } else {
             previousMessage = previous.getContent().getTextForRequest();
         }
-        Log.d("Y:"+ this.getClass().toString(), "Added message to group, this message was replaced: " +
-                previousMessage);
+        Log.d("Y:" + this.getClass().toString(), "Added message to group: " + this.getId().getId().toString()
+                + ", this message was replaced: " + previousMessage);
+        Log.d("Y:" + this.getClass().toString(), "Message added had text " + newMessage.getContent().getTextForRequest());
     }
 
     /**

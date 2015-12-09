@@ -109,7 +109,6 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void onClick(View v) {
                 YieldsApplication.setGroup(mGroup);
-
                 Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                 intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
                 startActivity(intent);
@@ -260,7 +259,7 @@ public class MessageActivity extends NotifiableActivity {
 
             Message message = new Message("message", new Id(-1), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
-                Log.d("Y:" + this.getClass().toString(), "Send group message");
+                Log.d("Y:" + this.getClass().toString(), "Send group message to " + mGroup.getId().getId().toString());
                 mGroup.addMessage(message);
                 mGroupMessageAdapter.add(message);
                 mGroupMessageAdapter.notifyDataSetChanged();
@@ -270,12 +269,12 @@ public class MessageActivity extends NotifiableActivity {
                 GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(), mGroup.getType());
                 YieldsApplication.getBinder().sendRequest(request);
             } else {
-                Log.d("Y:" + this.getClass().toString(), "Send media message");
+                Log.d("Y:" + this.getClass().toString(), "Send media message to " + mGroup.getId().getId().toString());
                 mGroup.addMessage(message);
                 mCommentAdapter.add(message);
                 mCommentAdapter.notifyDataSetChanged();
-                ((CommentFragment) mCurrentFragment).getCommentListView()
-                        .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+                ((CommentFragment) mCurrentFragment)
+                        .getCommentListView().smoothScrollToPosition(mCommentAdapter.getCount() - 1);
 
                 MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId());
                 YieldsApplication.getBinder().sendRequest(request);
@@ -474,6 +473,7 @@ public class MessageActivity extends NotifiableActivity {
     private void createCommentFragment() {
         Log.d("MessageActivity", "createCommentFragment");
         mInputField.setText("");
+        YieldsApplication.getBinder().attachActivity(this);
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
         mTextTitle.setText("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
