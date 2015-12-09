@@ -59,4 +59,24 @@ public class GraphicTransforms {
 
         return outputImage;
     }
+
+    /**
+     *  Computes a squared shaped, cropped {@code Bitmap} image of the one passed as an argument.
+     * @param inputImage The image that will be cropped.
+     * @return  A {@code Bitmap} image which has a circle shape.
+     */
+    public static Bitmap getCroppedSquaredBitmap(Bitmap inputImage){
+        Objects.requireNonNull(inputImage);
+        Bitmap croppedImage;
+        int h = inputImage.getHeight();
+        int w = inputImage.getWidth();
+        if (w > h){
+            croppedImage = Bitmap.createBitmap(inputImage, (w-h)/2, 0, h, h);
+        }
+        else {
+            croppedImage = Bitmap.createBitmap(inputImage, 0, (h-w)/2, w, w);
+        }
+
+        return croppedImage;
+    }
 }

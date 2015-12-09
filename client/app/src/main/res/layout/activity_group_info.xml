@@ -19,91 +19,99 @@
         >
     </android.support.v7.widget.Toolbar>
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" >
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/imageViewGroup"
-            android:contentDescription="@string/groupImage"
-            android:src="@drawable/default_group_image"
-            android:layout_marginTop="30dp"
-            android:layout_marginStart="30dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:weightSum="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Large Text"
-            android:id="@+id/textViewGroupName"
-            android:textSize="30sp"
-            android:layout_marginStart="15dp"
-            android:layout_alignTop="@+id/imageViewGroup"
-            android:layout_toEndOf="@+id/imageViewGroup" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
 
-    </RelativeLayout>
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/imageViewGroup"
+                    android:contentDescription="@string/groupImage"
+                    android:src="@drawable/default_group_image"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentStart="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_marginTop="30dp"
-        android:text="Tags : "
-        android:id="@+id/textViewTags"
-        android:layout_gravity="center_horizontal"
-        android:maxWidth="300dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Large Text"
+                    android:id="@+id/textViewGroupName"
+                    android:textSize="30sp"
+                    android:layout_marginStart="15dp"
+                    android:layout_alignTop="@+id/imageViewGroup"
+                    android:layout_toEndOf="@+id/imageViewGroup" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:text="@string/users"
-        android:id="@+id/buttonUsers"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible" />
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subscribeGroup"
+                    android:id="@+id/buttonSubscribeGroup"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"
+                    android:layout_alignBottom="@+id/imageViewGroup"
+                    android:layout_alignStart="@+id/textViewGroupName" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/nodes"
-        android:id="@+id/buttonNodes"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible" />
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unsubscribeGroup"
+                    android:id="@+id/buttonUnsubscribeGroup"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"
+                    android:layout_alignBottom="@+id/imageViewGroup"
+                    android:layout_alignStart="@+id/textViewGroupName" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/subscribeGroup"
-        android:id="@+id/buttonSubscribeGroup"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone" />
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/addGroup"
+                    android:id="@+id/buttonAddGroup"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"
+                    android:layout_alignBottom="@+id/imageViewGroup"
+                    android:layout_alignStart="@+id/textViewGroupName" />
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/unsubscribeGroup"
-        android:id="@+id/buttonUnsubscribeGroup"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone" />
+            </RelativeLayout>
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/addGroup"
-        android:id="@+id/buttonAddGroup"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_marginTop="30dp"
+                android:text="Tags : "
+                android:id="@+id/textViewTags"
+                android:layout_gravity="center_horizontal"
+                android:maxWidth="300dp"
+                android:visibility="visible"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/linearLayoutUsersAndNodes"></LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

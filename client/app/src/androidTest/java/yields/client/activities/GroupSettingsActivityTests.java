@@ -43,6 +43,8 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
+        ServiceTestConnection.connectActivityToService();
+
         ClientUser user = MockFactory.generateFakeClientUser("User", new Id(123), "a@b.c", YieldsApplication.getDefaultUserImage());
         user.addUserToEntourage(MockFactory.generateFakeClientUser("Friend", new Id(125), "a@b.d", YieldsApplication.getDefaultUserImage()));
 
@@ -169,5 +171,18 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withText("Ok")).perform(click());
 
         onView(withId(R.id.actionDiscover)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that add a new user.
+     */
+    public void testAddUser() {
+        getActivity();
+        onView(withText(R.string.addUsers)).perform(click());
+
+        onView(withId(R.id.checkboxUser)).perform(click());
+        onView(withId(R.id.actionDoneSelectUser)).perform(click());
+
+        onView(withText(R.string.addUsers)).check(matches(isDisplayed()));
     }
 }
