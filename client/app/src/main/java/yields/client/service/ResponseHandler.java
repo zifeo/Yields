@@ -176,7 +176,7 @@ public class ResponseHandler {
                         .setLastUpdate(serverDatetime);
             }
 
-            Message message = YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(Long.valueOf(contentNid)),
+            Message message = YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(contentNid),
                     prevDatetime, serverDatetime);
             Message copyMessage = new Message(message.getName(), message.getId(), message.getSender(),
                     message.getContent(), prevDatetime, message.getStatus());
@@ -268,17 +268,14 @@ public class ResponseHandler {
                     .toDate(response.getString("datetime"));
             Id id = new Id(nid);
 
-            String contentNid = response.optString("contentNid");
-            if (contentNid.equals("null")) {
-                contentNid = "-1";
-            }
+            long contentNid = response.optLong("contentNid", -1);
 
             if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
                 YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(Long.valueOf(contentNid)),
+            YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(contentNid),
                     prevDatetime, serverDatetime);
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
@@ -406,12 +403,10 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            String contentNid = response.optString("contentNid");
-            if (contentNid.equals("null")) {
-                contentNid = "-1";
-            }
+            long contentNid = response.optLong("contentNid", -1);
 
-            Message message = new Message(response.getString("datetime"), Long.valueOf(contentNid),
+
+            Message message = new Message(response.getString("datetime"), contentNid,
                     response.getLong("sender"), response.getString("text"),
                     response.optString("contentType"), response.optString("content"));
 
@@ -487,12 +482,9 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            String contentNid = response.optString("contentNid");
-            if (contentNid.equals("null")) {
-                contentNid = "-1";
-            }
+            long contentNid = response.optLong("contentNid", -1);
 
-            Message message = new Message(response.getString("datetime"), Long.valueOf(contentNid),
+            Message message = new Message(response.getString("datetime"), contentNid,
                     response.getLong("sender"), response.getString("text"),
                     response.getString("contentType"), response.getString("content"));
 
@@ -722,12 +714,9 @@ public class ResponseHandler {
             Id groupId = new Id(nid);
             ArrayList<Message> messageList = new ArrayList<>();
             for (int i = 0; i < count; i++) {
-                String contentNid = contentNids.optString(i);
-                if (contentNid.equals("null")) {
-                    contentNid = "-1";
-                }
+                Long contentNid = contentNids.optLong(i, -1);
 
-                Message message = new Message(datetimes.getString(i), Long.valueOf(contentNid), senders.getLong(i), texts
+                Message message = new Message(datetimes.getString(i), contentNid, senders.getLong(i), texts
                         .getString(i), contentTypes.getString(i), contents.getString(i));
                 messageList.add(message);
                 mCacheHelper.addMessage(message, groupId);
