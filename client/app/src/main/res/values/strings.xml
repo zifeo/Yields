@@ -33,7 +33,7 @@
     <string name="enterGroupName">Enter your group\'s name</string>
     <string name="next">Next</string>
     <string name="groupType">Group type : </string>
-    <string name="publicGroup">Public group</string>
+    <string name="publicGroup">Publisher</string>
     <string name="privateGroup">Private group</string>
     <string name="messageGroupNameTooShort">Group name too short</string>
     <string name="backToGroupActivity">Back to group list</string>

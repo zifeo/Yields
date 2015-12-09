@@ -1,20 +1,14 @@
 package yields.client.activities;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import yields.client.R;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
-import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;

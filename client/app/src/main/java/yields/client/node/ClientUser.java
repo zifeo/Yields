@@ -1,22 +1,14 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
-import yields.client.R;
-import yields.client.exceptions.NodeException;
-import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
-import yields.client.serverconnection.ImageSerialization;
-import yields.client.serverconnection.Response;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -58,7 +50,7 @@ public class ClientUser extends User {
      * @param groups the groups to add
      */
     public void addGroups(List<Group> groups) {
-        for(Group group: groups){
+        for (Group group : groups) {
             addGroup(group);
         }
     }
@@ -91,7 +83,14 @@ public class ClientUser extends User {
         mCommentGroups.add(group);
     }
 
-
+    /**
+     * Remove a group from the user's list.
+     *
+     * @param group the group to remove.
+     */
+    public void removeGroup(Group group) {
+        mGroups.remove(Objects.requireNonNull(group));
+    }
 
     /**
      * Get an unmodifiable sorted list of the user groups.
