@@ -36,8 +36,10 @@ import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -113,6 +115,20 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
             assertEquals("text", messageView.getMessage().getContent().getType());
             assertEquals(textContent, ((TextContent) messageView.getMessage().getContent()).getText());
         }
+        messageActivity.finish();
+    }
+
+    /**
+     * Test that clicks on the group name.
+     */
+    @Test
+    public void testGroupInfo() {
+        MessageActivity messageActivity = getActivity();
+
+        onView(withId(R.id.toolbarTitle)).perform(click());
+
+        onView(withId(R.id.textViewGroupName)).check(matches(withText("Mock group")));
+
         messageActivity.finish();
     }
 

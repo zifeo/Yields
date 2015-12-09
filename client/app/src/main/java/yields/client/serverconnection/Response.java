@@ -25,8 +25,7 @@ public class Response {
         PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"), RSS_CREATE_RESPONSE("RssCreateRes"),
         NODE_MESSAGE_BCAST("NodeMessageBrd"), USER_UPDATE_BCAST("UserUpdateBrd"),
         GROUP_CREATE_BCAST("GroupCreateBrd"), GROUP_UPDATE_BCAST("GroupUpdateBrd"),
-        GROUP_MESSAGE_BCAST("GroupMessageBrd"), PUBLISHER_CREATE_BCAST("PublisherCreateBrd"),
-        PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"), PUBLISHER_MESSAGE_BCAST("PublisherMessageBrd"),
+        PUBLISHER_CREATE_BCAST("PublisherCreateBrd"), PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"),
         RSS_CREATE_BCAST("RssCreateBrd"), RSS_MESSAGE_BCAST("RssMessageCast");
 
         private final String name;

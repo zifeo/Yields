@@ -1,15 +1,11 @@
 package yields.server.dbi.models
 
-import java.io.{File, PrintWriter}
-import java.nio.file.{Files, Paths}
 import java.time.OffsetDateTime
 
 import com.redis.serialization.Parse.Implicits._
 import yields.server.dbi._
 import yields.server.dbi.exceptions.MediaException
-import yields.server.dbi.models.Media._
-import yields.server.utils.{Temporal, Config}
-import scala.io._
+import yields.server.utils.Temporal
 
 /**
   * Represent a media ressource
