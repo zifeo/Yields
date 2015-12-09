@@ -88,6 +88,8 @@ NodeSearch
 	input	pattern: String
 	output	nodes: Seq[NID], names: Seq[String], pics: Seq[Array[Byte]]
 	rules	nodes "public"
+NodeMessage
+	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 ```
 
 ### Groups actions
@@ -111,7 +113,6 @@ GroupMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 	output	nid: NID, datetime: OffsetDateTime
 	rules	nid in nodes
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 ```
 
 ### Publisher actions
@@ -134,7 +135,6 @@ PublisherMessage
 	input	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 	output	nid: NID, datetime: OffsetDateTime
 	rules	nid in nodes
-	bcast	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]], contentNid: Option[NID]
 ```
 
 Publishers is very similar to groups and even share some of its structures but most the request are separated for allowing further differences to appears.
@@ -157,5 +157,4 @@ RSSInfo
 MediaMessage
 	input 	nid: NID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 	output 	nid: NID, datetime: OffsetDateTime
-	bcast 	nid: NID, datetime: OffsetDateTime, sender: UID, text: Option[String], contentType: Option[String], content: Option[Array[Byte]]
 ```
