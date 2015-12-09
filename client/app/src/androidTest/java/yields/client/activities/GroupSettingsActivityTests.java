@@ -49,7 +49,7 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         YieldsApplication.setUser(user);
 
         Group g = new Group("Group", new Id(124), new ArrayList<Id>());
-        g.setVisibility(Group.GroupType.PUBLISHER);
+        g.setType(Group.GroupType.PUBLISHER);
         YieldsApplication.setGroup(g);
     }
 
