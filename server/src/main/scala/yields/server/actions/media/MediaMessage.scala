@@ -2,8 +2,9 @@ package yields.server.actions.media
 
 import java.time.OffsetDateTime
 
+import yields.server.Yields
 import yields.server.actions.{Result, Broadcast}
-import yields.server.actions.nodes.NodeMessage
+import yields.server.actions.nodes.{NodeMessageBrd, NodeMessage}
 import yields.server.dbi.models._
 
 /**
@@ -15,16 +16,20 @@ import yields.server.dbi.models._
   */
 case class MediaMessage(nid: NID, text: Option[String], contentType: Option[String], content: Option[Blob])
   extends NodeMessage(nid, text, contentType, content) {
+
+  /** Get node instance. */
+  override def instance(nid: NID): Node = Media(nid)
+
   /** Format the result. */
   override def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result =
     MediaMessageRes(nid, datetime)
 
-  /** Format the broadcast. */
-  override def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast =
-    MediaMessageBrd(nid, datetime, uid, text, contentType, content)
+  /** Sent the broadcast. */
+  override def broadcast(users: List[UID], datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Unit = {
+    val bcast = NodeMessageBrd(nid, datetime, uid, text, contentType, content, contentNid)
+    Yields.broadcast(users)(bcast)
+  }
 
-  /** Get node instance. */
-  override def instance(nid: NID): Node = Media(nid)
 }
 
 /**
@@ -33,19 +38,3 @@ case class MediaMessage(nid: NID, text: Option[String], contentType: Option[Stri
   * @param datetime message recorded datetime
   */
 case class MediaMessageRes(nid: NID, datetime: OffsetDateTime) extends Result
-
-/**
-  * [[MediaMessage]] broadcast.
-  * @param nid media id
-  * @param datetime message recorded datetime
-  * @param sender message sender
-  * @param text message text if any
-  * @param contentType message content type if any
-  * @param content message content if any
-  */
-case class MediaMessageBrd(nid: NID,
-                           datetime: OffsetDateTime,
-                           sender: UID,
-                           text: Option[String],
-                           contentType: Option[String],
-                           content: Option[Blob]) extends Broadcast

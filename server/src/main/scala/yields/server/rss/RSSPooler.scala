@@ -1,12 +1,14 @@
 package yields.server.rss
 
 import akka.actor._
-import yields.server.dbi.models.RSS
-import yields.server.utils.{Config, Temporal, FaultTolerance}
+import yields.server.Yields
+import yields.server.actions.nodes.NodeMessageBrd
+import yields.server.dbi.models.{Node, RSS}
+import yields.server.utils.{Config, FaultTolerance, Temporal}
 
-import scala.language.postfixOps
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits._
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 /**
   * RSS pooler starts pooling RSS at start and periodically continue after.
@@ -27,14 +29,21 @@ final class RSSPooler extends Actor with ActorLogging {
 
         val feed = new RSSFeed(rss.url)
         val news = feed.sinceFiltered(rss.refreshed_at, rss.filter)
+        val name = rss.name
+        val reach = rss.receivers.flatMap(Node(_).receivers)
+
         for ((date, title, author, link) <- news) {
-          rss.addMessage((Temporal.now, rss.nid, None, s"$title $link"))
+          val now = Temporal.now
+          rss.addMessage((now, rss.nid, None, s"$title $link"))
+          rss.receivers.map(Node(_)).foreach { node =>
+            Yields.broadcast(node.receivers) {
+              NodeMessageBrd(node.nid, now, rss.nid, Some(title), None, None, None)
+            }
+          }
+          log.info(s"RSS pooling: $name refreshed with $title")
         }
 
         if (news.nonEmpty) {
-          val name = rss.name
-          val newsCount = news.size
-          log.info(s"RSS pooling: $name refreshed with $newsCount")
           rss.refreshed()
         }
 
