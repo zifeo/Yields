@@ -234,7 +234,7 @@ public class CacheDatabaseTests {
         assertEquals(updatedUser.getEmail(),
                 userFromDatabase.getEmail());
 
-        assertEquals(updatedUser.getId(),
+        assertEquals(updatedUser.getId().getId(),
                 userFromDatabase.getId().getId());
 
         assertTrue(compareImages(updatedUser.getImg(),

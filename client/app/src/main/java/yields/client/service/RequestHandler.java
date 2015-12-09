@@ -266,6 +266,7 @@ public class RequestHandler {
     protected void handleMediaMessageRequest(MediaMessageRequest serviceRequest) {
         mCacheHelper.addMessage(serviceRequest.getMessage(), serviceRequest.getReceivingNodeId());
 
+
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }

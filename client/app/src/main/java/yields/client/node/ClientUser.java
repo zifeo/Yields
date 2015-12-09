@@ -91,6 +91,8 @@ public class ClientUser extends User {
         mCommentGroups.add(group);
     }
 
+
+
     /**
      * Get an unmodifiable sorted list of the user groups.
      *
