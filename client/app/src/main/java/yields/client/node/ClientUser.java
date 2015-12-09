@@ -58,8 +58,9 @@ public class ClientUser extends User {
      * @param groups the groups to add
      */
     public void addGroups(List<Group> groups) {
-        mGroups.clear();
-        mGroups.addAll(groups);
+        for(Group group: groups){
+            addGroup(group);
+        }
     }
 
     /**
