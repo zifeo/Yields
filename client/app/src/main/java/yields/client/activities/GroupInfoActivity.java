@@ -283,10 +283,12 @@ public class GroupInfoActivity extends NotifiableActivity {
                     Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
                     newGroup.addNode(mGroup);
 
-                        ServiceRequest request =new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
-                        YieldsApplication.getBinder().sendRequest(request);
+                    YieldsApplication.getUser().addGroup(newGroup);
 
-                        subscribeButton.setEnabled(false);
+                    ServiceRequest request = new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
+                    YieldsApplication.getBinder().sendRequest(request);
+
+                    subscribeButton.setEnabled(false);
                     }
                 });
 
@@ -309,15 +311,13 @@ public class GroupInfoActivity extends NotifiableActivity {
                         assert subscriptionGroup != null : "subscriptionGroup should " +
                                 "never be null when unsubscribeButton is clickable";
 
-                                ArrayList<User> list = new ArrayList<>();
+                        ArrayList<User> list = new ArrayList<>();
                         list.add(YieldsApplication.getUser());
-                                ServiceRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId
-                                        (),
-                                subscriptionGroup
-                                        .getId(), list,
-                                        GroupUpdateUsersRequest.UpdateType.REMOVE);
+                        ServiceRequest request = new GroupUpdateUsersRequest(
+                                YieldsApplication.getUser().getId(),
+                                subscriptionGroup.getId(), list,
+                                GroupUpdateUsersRequest.UpdateType.REMOVE);
                         YieldsApplication.getBinder().sendRequest(request);
-
 
                         unsubscribeButton.setEnabled(false);
                     }
@@ -326,9 +326,11 @@ public class GroupInfoActivity extends NotifiableActivity {
                 if (alreadySubscribed){
                     subscribeButton.setVisibility(View.GONE);
                     unsubscribeButton.setVisibility(View.VISIBLE);
+                    unsubscribeButton.setEnabled(true);
                 }
                 else {
                     subscribeButton.setVisibility(View.VISIBLE);
+                    subscribeButton.setEnabled(true);
                     unsubscribeButton.setVisibility(View.GONE);
                 }
             }
