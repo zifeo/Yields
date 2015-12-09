@@ -47,7 +47,6 @@ final class RSSFeed(private val feed: SyndFeed) {
   def sinceFiltered(datetime: OffsetDateTime, filter: String): List[RSSEntry] = {
     val selected = since(datetime)
     val terms = filter.split(',').map(_.trim)
-    println(terms.toList)
     if (terms.isEmpty) selected
     else
       selected.filter { entry =>

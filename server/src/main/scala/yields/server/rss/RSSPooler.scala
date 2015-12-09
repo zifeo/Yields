@@ -25,7 +25,10 @@ final class RSSPooler extends Actor with ActorLogging {
 
     case Pool =>
       log.info("RSS pooling: round starts")
-      updateAllRSS()
+      val updates = updateRSS(RSS.all)
+      updates.foreach { case (rssName, entryTitle) =>
+        log.debug(s"RSS pooling: $rssName refreshed with $entryTitle")
+      }
       context.system.scheduler.scheduleOnce(rsscooling.seconds, self, Pool)
       log.info("RSS pooling: round ends")
 
@@ -43,28 +46,27 @@ final class RSSPooler extends Actor with ActorLogging {
     self ! Pool
   }
 
-  /** Goes through all RSS, gets updates, spreads the news and broadcasts it. */
-  def updateAllRSS(): Unit =
-    RSS.all.foreach { rss =>
+  /**
+    * Goes through all RSS, gets updates, spreads news and broadcasts it.
+    * @return list of RSS name with new title entry.
+    */
+  def updateRSS(rsss: List[RSS]): List[(String, String)] =
+    rsss.flatMap { rss =>
       val feed = new RSSFeed(rss.url)
-      val news = feed.sinceFiltered(rss.refreshed_at, rss.filter)
-      val name = rss.name
+      val news = feed.sinceFiltered(rss.refreshedAt, rss.filter)
+      if (news.nonEmpty) {
+        rss.refreshed()
+      }
 
-      for (RSSEntry(title, author, link, entry, _) <- news) {
+      news.map { case RSSEntry(title, author, link, entry, _) =>
         val now = Temporal.now
         rss.addMessage((now, rss.nid, None, s"$title $link"))
-
         rss.receivers.map(Node(_)).foreach { node =>
           Yields.broadcast(node.receivers) {
             NodeMessageBrd(node.nid, now, rss.nid, Some(title), None, None, None)
           }
         }
-
-        log.debug(s"RSS pooling: $name refreshed with $title")
-      }
-
-      if (news.nonEmpty) {
-        rss.refreshed()
+        (rss.name, title)
       }
     }
 
