@@ -54,7 +54,7 @@ object Publisher {
     val now = Temporal.now
     val infos = List(
       (StaticNodeKey.name, name),
-      (StaticNodeKey.kind, classOf[Group].getSimpleName),
+      (StaticNodeKey.kind, classOf[Publisher].getSimpleName),
       (StaticNodeKey.creator, creator),
       (StaticNodeKey.created_at, now),
       (StaticNodeKey.refreshed_at, now),

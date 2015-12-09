@@ -39,5 +39,10 @@ class NodesJsonFormatSpecifications extends YieldsPropsSpec {
     }
   }
 
+  property("NodeInfo") {
+    forAll() { (x: NodeInfo) =>
+      checkToAndFromJson(x)
+    }
+  }
 
 }
