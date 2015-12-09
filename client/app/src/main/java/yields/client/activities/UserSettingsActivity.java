@@ -24,6 +24,7 @@ import java.util.Objects;
 import yields.client.R;
 import yields.client.listadapter.ListAdapterUserSettings;
 import yields.client.node.ClientUser;
+import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
 import yields.client.servicerequest.UserUpdateRequest;
@@ -33,7 +34,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the user can change some settings, like its username, its image, ...
  */
 public class UserSettingsActivity extends AppCompatActivity {
-    public enum Settings {NAME, IMAGE, REMOVE_ENTOURAGE, LOGOUT}
+    public enum Settings {INFO, NAME, IMAGE, REMOVE_ENTOURAGE, LOGOUT}
 
     private ClientUser mUser;
 
@@ -59,6 +60,7 @@ public class UserSettingsActivity extends AppCompatActivity {
 
         List<String> itemList = new ArrayList<>(Settings.values().length);
 
+        itemList.add(Settings.INFO.ordinal(), getResources().getString(R.string.userInfo));
         itemList.add(Settings.NAME.ordinal(), getResources().getString(R.string.changeUserName));
         itemList.add(Settings.IMAGE.ordinal(), getResources().getString(R.string.changeUserImage));
         itemList.add(Settings.REMOVE_ENTOURAGE.ordinal(), getResources().getString(R.string.removeFromEntourage));
@@ -151,6 +153,10 @@ public class UserSettingsActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Settings[] settings = Settings.values();
             switch (settings[position]) {
+                case INFO:
+                    seeInfoListener();
+                    break;
+
                 case NAME:
                     changeNameListener();
                     break;
@@ -167,6 +173,16 @@ public class UserSettingsActivity extends AppCompatActivity {
                     logoutListener();
                     break;
             }
+        }
+
+        /**
+         * Listener for the "See your info" item.
+         */
+        private void seeInfoListener() {
+            YieldsApplication.setUserSearched(mUser);
+
+            Intent intent = new Intent(UserSettingsActivity.this, UserInfoActivity.class);
+            startActivity(intent);
         }
 
         /**

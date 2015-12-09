@@ -1,6 +1,7 @@
 package yields.client.messages;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,6 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 import yields.client.R;
+import yields.client.activities.GroupInfoActivity;
+import yields.client.activities.NodeListActivity;
+import yields.client.activities.UserInfoActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.gui.GraphicTransforms;
@@ -61,9 +65,9 @@ public class MessageView extends LinearLayout {
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
-        User sender = YieldsApplication.getUserFromId(mMessage.getSender());
+        final User sender = YieldsApplication.getUserFromId(mMessage.getSender());
         boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
-        Context applicationContext = YieldsApplication.getApplicationContext();
+        final Context applicationContext = YieldsApplication.getApplicationContext();
 
         LayoutInflater vi;
         vi = LayoutInflater.from(applicationContext);
@@ -76,6 +80,17 @@ public class MessageView extends LinearLayout {
 
         ImageView imageViewProfilPicture;
         imageViewProfilPicture = (ImageView) v.findViewById(R.id.profilpic);
+        imageViewProfilPicture.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YieldsApplication.setUserSearched(sender);
+
+                Intent intent = new Intent(applicationContext, UserInfoActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                applicationContext.startActivity(intent);
+            }
+        });
+
 
         Bitmap image = sender.getImg();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
