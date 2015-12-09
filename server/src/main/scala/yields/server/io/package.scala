@@ -42,8 +42,10 @@ package object io {
 
   // Nodes
 
-  implicit lazy val groupSearchJF = jsonFormat1(NodeSearch)
-  implicit lazy val groupSearchResJF = jsonFormat3(NodeSearchRes)
+  implicit lazy val nodeSearchJF = jsonFormat1(NodeSearch)
+  implicit lazy val nodeSearchResJF = jsonFormat3(NodeSearchRes)
+
+  implicit lazy val nodeInfoJF = jsonFormat1(NodeInfo)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
   implicit lazy val nodeHistoryResJF = jsonFormat7(NodeHistoryRes)

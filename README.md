@@ -84,6 +84,8 @@ NodeHistory
 	input	nid: NID, datetime: OffsetDateTime, count: Int
 	output	nid: NID, datetimes: Seq[OffsetDateTime], senders: Seq[UID], texts: Seq[String], contentTypes: Seq[Option[String]], contents: Seq[Option[Array[Byte]], contentNids: List[Option[NID]]
 	rules	count > 0 & nid in nodes & senders in entourage
+NodeInfo
+	input	nid: NID
 NodeSearch
 	input	pattern: String
 	output	nodes: Seq[NID], names: Seq[String], pics: Seq[Array[Byte]]
@@ -145,7 +147,6 @@ Publishers is very similar to groups and even share some of its structures but m
 RSSCreate
 	input	name: String, url: String, filter: String, tags: Seq[String]
 	output	nid: NID
-	bcast	nid: NID, name: String, url: String
 RSSInfo
 	input 	nid: NID
 	output	name: String, url: String, filter: String, tags: Seq[String]
