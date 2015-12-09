@@ -70,7 +70,7 @@ UserInfo
 	rules	uid == client (1) | uid in entourage (2)
 UserNodeList
 	input	()
-	output	nodes: Seq[NID], kind: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
+	output	nodes: Seq[NID], kinds: Seq[String], updatedAt: Seq[OffsetDateTime], refreshedAt: Seq[OffsetDateTime]
 UserSearch
 	input	email: String
 	output	uid: UID
@@ -143,12 +143,12 @@ Publishers is very similar to groups and even share some of its structures but m
 
 ```
 RSSCreate
-	input	name: String, url: String, tags: Seq[String]
+	input	name: String, url: String, filter: String, tags: Seq[String]
 	output	nid: NID
 	bcast	nid: NID, name: String, url: String
 RSSInfo
 	input 	nid: NID
-	output	name: String, url: String, tags: Seq[String]
+	output	name: String, url: String, filter: String, tags: Seq[String]
 ```
 
 ### Media actions

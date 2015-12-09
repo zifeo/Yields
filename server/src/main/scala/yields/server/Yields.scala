@@ -3,14 +3,13 @@ package yields.server
 import java.util.logging.LogManager
 
 import akka.actor._
-import akka.stream.Supervision.{Resume, Stop}
 import akka.stream._
-import yields.server.actions.{Broadcast, Result}
+import yields.server.actions.Broadcast
 import yields.server.dbi.models.UID
 import yields.server.pipeline.Pipeline
 import yields.server.router.{Dispatcher, Router}
-
-import scala.util.control.NonFatal
+import yields.server.rss.RSSPooler
+import yields.server.utils.FaultTolerance._
 
 /**
   * Yields server daemon.
@@ -20,22 +19,12 @@ object Yields {
   LogManager.getLogManager.readConfiguration()
 
   private implicit lazy val system = ActorSystem("Yields-server")
-  private implicit lazy val materializer = {
-    val decider: Supervision.Decider = {
-      case NonFatal(nonfatal) =>
-        val message = nonfatal.getMessage
-        system.log.error(nonfatal, s"pipeline non fatal: $message")
-        Resume
-      case fatal =>
-        val message = fatal.getMessage
-        system.log.error(fatal, s"pipeline fatal: $message")
-        Stop
-    }
-    ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
-  }
+  private implicit lazy val materializer =
+    ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(nonFatalResumeOrStopStream(system.log)))
 
   private lazy val dispatcher = system.actorOf(Dispatcher.props, "Yields-dispatcher")
   private lazy val router = system.actorOf(Router.props(Pipeline(), dispatcher), "Yields-router")
+  private lazy val rsspooler = system.actorOf(RSSPooler.props, "Yields-rsspooler")
 
   /**
     * Launches the Yields app.
@@ -68,6 +57,7 @@ object Yields {
   private[server] def start(): Unit = {
     dispatcher
     router
+    rsspooler
   }
 
   /**

@@ -163,6 +163,23 @@ public class RequestBuilder {
     }
 
     /**
+     * ServerRequest for retrieving information on a Group.
+     *
+     * @param sender  The Id of the sender of the request, which wants the information.
+     * @param groupId The Id of the Group.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest publisherInfoRequest(Id sender, Id groupId) {
+        Objects.requireNonNull(sender);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_INFO, sender);
+
+        builder.addField(Fields.NID, groupId);
+
+        return builder.request();
+    }
+
+    /**
      * ServerRequest to receive the group list.
      *
      * @param senderId The senderId of the request.
@@ -263,6 +280,7 @@ public class RequestBuilder {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
         } else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
+            builder.addField(Fields.TAG, new ArrayList<>());
         }
 
         builder.addField(Fields.NAME, name);

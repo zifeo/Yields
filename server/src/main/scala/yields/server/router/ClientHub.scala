@@ -113,7 +113,7 @@ final class ClientHub(private val socket: ActorRef,
   }
 
   override val supervisorStrategy =
-    FaultTolerance.nonFatalResume(log)
+    FaultTolerance.nonFatalResumeOrEscalate(log)
 
   override def preStart(): Unit = {
     log.info("connected")

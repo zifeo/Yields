@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import yields.client.id.Id;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
@@ -55,6 +56,10 @@ public class GroupCreateRequest extends ServiceRequest {
 
         for (User user : mGroup.getUsers()) {
             userIds.add(user.getId());
+        }
+
+        for (Node node : mGroup.getNodes()) {
+            nodeIds.add(node.getId());
         }
 
 

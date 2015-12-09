@@ -80,7 +80,7 @@ public class ResponseHandler {
             JSONObject response = serverResponse.getMessage();
             JSONArray nodes = response.getJSONArray("nodes");
             JSONArray names = response.getJSONArray("names");
-            JSONArray pics = response.getJSONArray("pic");
+            JSONArray pics = response.getJSONArray("pics");
 
             assert (nodes.length() == names.length() && nodes.length() == pics.length());
 
@@ -92,16 +92,18 @@ public class ResponseHandler {
                 String nodeName = names.getString(i);
                 Bitmap image = ImageSerialization.unSerializeImage(pics.getString(i));
 
+                if (image == null) {
+                    image = YieldsApplication.getDefaultGroupImage();
+                }
+
                 groupList.add(new Group(nodeName, id, new ArrayList<Id>(), image));
             }
 
             Date ref = DateSerialization
                     .dateSerializer.toDate(serverResponse.getMetadata().getString("ref"));
 
-            if (ref.getTime() == YieldsApplication.getLastDateSearch().getTime()) {
-                YieldsApplication.getGroupsSearched().clear();
-                YieldsApplication.getGroupsSearched().addAll(groupList);
-            }
+            YieldsApplication.getGroupsSearched().clear();
+            YieldsApplication.getGroupsSearched().addAll(groupList);
 
             mService.notifyChange(NotifiableActivity.Change.GROUP_SEARCH);
 
