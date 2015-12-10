@@ -105,13 +105,17 @@ public class MessageActivity extends NotifiableActivity {
 
         mTextTitle = (TextView) findViewById(R.id.toolbarTitle);
 
+        mType = ContentType.GROUP_MESSAGES;
+
         mTextTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                YieldsApplication.setGroup(mGroup);
-                Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
-                intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
-                startActivity(intent);
+                if (mType == ContentType.GROUP_MESSAGES) {
+                    YieldsApplication.setGroup(mGroup);
+                    Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
+                    intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -127,10 +131,6 @@ public class MessageActivity extends NotifiableActivity {
                 .getApplicationContext()), R.layout.messagelayoutsender, new ArrayList<Message>());
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
-
-        mType = ContentType.GROUP_MESSAGES;
-        mFragmentManager = getFragmentManager();
-        createGroupMessageFragment();
 
         if (YieldsApplication.getBinder() != null) {
             NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
@@ -160,6 +160,9 @@ public class MessageActivity extends NotifiableActivity {
 
             bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
+
+        mFragmentManager = getFragmentManager();
+        createGroupMessageFragment();
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -552,7 +555,7 @@ public class MessageActivity extends NotifiableActivity {
                             // Then we update the group currently displayed as it is the commented
                             // message
                             Group commentGroup = YieldsApplication.getUser().getCommentGroup(mCommentMessage.getId());
-                            if(commentGroup == null){
+                            if (commentGroup == null) {
                                 commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
                                 YieldsApplication.getUser().addCommentGroup(commentGroup);
                             }
