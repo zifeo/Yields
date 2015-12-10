@@ -62,16 +62,16 @@ public class Group extends Node {
     public Group(String name, Id id, List<Id> users, Bitmap image, GroupVisibility visibility,
                  boolean validated, Date lastUpdate) {
         super(name, id, image);
-        Objects.requireNonNull(users);
-        Objects.requireNonNull(lastUpdate);
-        this.mMessages = new TreeMap<>();
-        mUsers = new ArrayList<>();
+        mDate = Objects.requireNonNull(lastUpdate);
+        mMessages = new TreeMap<>();
         mValidated = validated;
         mVisibility = visibility;
         mTags = new HashSet<>();
         mDate = lastUpdate;
         mNodes = new ArrayList<>();
 
+        Objects.requireNonNull(users);
+        mUsers = new ArrayList<>();
         for (Id uId : users) {
             mUsers.add(YieldsApplication.getUserFromId(uId));
         }
@@ -185,7 +185,9 @@ public class Group extends Node {
      * @param date The date of the last update.
      */
     public void setLastUpdate(Date date){
-        mDate = new Date(date.getTime());
+        if (date.compareTo(mDate) > 0) {
+            mDate = new Date(date.getTime());
+        }
     }
 
     /**
@@ -287,7 +289,7 @@ public class Group extends Node {
      * @param node The group node to add.
      */
     public void addNode(Group node) {
-        mNodes.add(node);
+        mNodes.add(Objects.requireNonNull(node));
     }
 
     /**
@@ -317,6 +319,7 @@ public class Group extends Node {
      */
     synchronized public void addMessage(Message newMessage) {
         mMessages.put(newMessage.getDate(), newMessage);
+        this.setLastUpdate(newMessage.getDate());
     }
 
     /**

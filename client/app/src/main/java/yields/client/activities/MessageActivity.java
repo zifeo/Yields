@@ -172,7 +172,7 @@ public class MessageActivity extends NotifiableActivity {
     public void onResume() {
         super.onResume();
         mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+        YieldsApplication.setGroup(mGroup);
         setHeaderBar();
         runOnUiThread(new Runnable() {
             @Override
@@ -197,6 +197,7 @@ public class MessageActivity extends NotifiableActivity {
         super.onPause();
         mCommentAdapter.clear();
         mGroupMessageAdapter.clear();
+        YieldsApplication.nullGroup();
     }
 
     /**
@@ -205,7 +206,6 @@ public class MessageActivity extends NotifiableActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        YieldsApplication.nullGroup();
         if (mConnection != null) {
             unbindService(mConnection);
         }
@@ -267,7 +267,6 @@ public class MessageActivity extends NotifiableActivity {
                         .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
                 GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(),
                         mGroup.getVisibility());
-                Log.d("REQIGSAUHVDUASVDAZSGFGUZA", "SENDING REQUEST 1");
                 YieldsApplication.getBinder().sendRequest(request);
             } else {
                 mCommentAdapter.add(message);

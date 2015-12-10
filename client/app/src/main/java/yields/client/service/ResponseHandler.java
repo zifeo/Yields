@@ -116,6 +116,20 @@ public class ResponseHandler {
         }
     }
 
+    protected void handleRSSInfoResponse(Response serverResponse) {
+        try {
+            JSONObject response = serverResponse.getMessage();
+            Id nid = new Id(response.getLong("nid"));
+            String name = response.getString("name");
+
+            Group rss = YieldsApplication.getUser().getNodeFromId(nid);
+            rss.setName(name);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
@@ -143,7 +157,6 @@ public class ResponseHandler {
                 Id nodeId = new Id(nodes.getLong(i));
                 nodeList.add(nodeId);
                 if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Log.d("DEBUG", nodeId.getId().toString());
                     Group newNode = new Group("", nodeId,new ArrayList<Id>());
                     YieldsApplication.getUser().addNode(newNode);
                     ServiceRequest nodeInfo =
@@ -227,7 +240,6 @@ public class ResponseHandler {
      * Handles the appropriate Response which is given to it by argument.
      */
     protected void handlePublisherUpdateResponse(Response serverResponse) {
-        Log.d("ServiceRequestCtrllr", "Response for Publisher Update.");
         // Nothing to parse.
         // TODO : decide what to do.
     }
@@ -259,7 +271,6 @@ public class ResponseHandler {
                 Id nodeId = new Id(nodes.getLong(i));
                 nodeList.add(nodeId);
                 if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Log.d("DEBUG", nodeId.getId().toString());
                     Group newNode = new Group("", nodeId,new ArrayList<Id>());
                     YieldsApplication.getUser().addNode(newNode);
                     ServiceRequest nodeInfo =
@@ -331,6 +342,7 @@ public class ResponseHandler {
             rss.setId(id);
 
             Group group = new Group(rss.getName(), new Id(0), new ArrayList<Id>(), id);
+            YieldsApplication.getUser().addGroup(group);
 
             ServiceRequest groupCreate = new GroupCreateRequest(YieldsApplication.getUser(), group);
             mService.sendRequest(groupCreate);
@@ -350,7 +362,7 @@ public class ResponseHandler {
 
             Message message = new Message(response.getString("datetime"),
                     response.getLong("sender"), response.getString("text"),
-                    response.getString("contentType"), response.getString("content"));
+                    response.optString("contentType"), response.optString("content"));
 
             Id groupId = new Id(response.getLong("nid"));
 
@@ -418,6 +430,7 @@ public class ResponseHandler {
 
             Group newGroup = new Group(name, new Id(nid), userList);
             newGroup.setValidated();
+            newGroup.setLastUpdate(new Date());
             YieldsApplication.getUser().addGroup(newGroup);
 
             mCacheHelper.addGroup(newGroup);
@@ -497,6 +510,7 @@ public class ResponseHandler {
             }
 
             Group newGroup = new Group(name, new Id(nid), userList);
+            newGroup.setLastUpdate(new Date());
             YieldsApplication.getUser().addGroup(newGroup);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
@@ -568,10 +582,8 @@ public class ResponseHandler {
             String contentType = response.getString("contentType");
             String content = response.getString("content");
 
-            // TODO : Create Message and add it to where the f*ck it need to be added.
             Message message = new Message(datetime.toString(), senderId, text,
                     contentType, content);
-            // TODO : (Nico) Notify activity.
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());

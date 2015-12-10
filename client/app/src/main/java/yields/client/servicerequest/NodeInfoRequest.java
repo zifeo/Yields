@@ -16,7 +16,7 @@ public class NodeInfoRequest extends ServiceRequest{
 
     @Override
     public RequestKind getType() {
-        return RequestKind.NODE_INFO;
+        return RequestKind.GROUP_INFO;
     }
 
     @Override

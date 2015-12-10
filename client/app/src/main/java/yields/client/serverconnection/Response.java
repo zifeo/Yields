@@ -22,12 +22,12 @@ public class Response {
         GROUP_INFO_RESPONSE("GroupInfoRes"), GROUP_MESSAGE_RESPONSE("GroupMessageRes"),
         PUBLISHER_CREATE_RESPONSE("PublisherCreateRes"), PUBLISHER_UPDATE_RESPONSE
                 ("PublisherUpdateRes"), PUBLISHER_INFO_RESPONSE("PublisherInfoRes"),
-        PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"), RSS_CREATE_RESPONSE("RssCreateRes"),
+        PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"), RSS_CREATE_RESPONSE("RSSCreateRes"),
         NODE_MESSAGE_BCAST("NodeMessageBrd"), USER_UPDATE_BCAST("UserUpdateBrd"),
         GROUP_CREATE_BCAST("GroupCreateBrd"), GROUP_UPDATE_BCAST("GroupUpdateBrd"),
         GROUP_MESSAGE_BCAST("GroupMessageBrd"), PUBLISHER_CREATE_BCAST("PublisherCreateBrd"),
         PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"), PUBLISHER_MESSAGE_BCAST("PublisherMessageBrd"),
-        RSS_MESSAGE_BCAST("RssMessageCast");
+        RSS_MESSAGE_BCAST("RssMessageCast"), RSS_INFO_RES("RSSInfoRes");
 
         private final String name;
 
