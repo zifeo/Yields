@@ -321,8 +321,14 @@ public class ResponseHandler {
                         .setLastUpdate(serverDatetime);
             }
 
-            YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(contentNid),
+            Message message = YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(contentNid),
                     prevDatetime, serverDatetime);
+            Message copyMessage = new Message(message.getCommentGroupId(), message.getSender(),
+                    message.getContent(), prevDatetime, message.getStatus());
+
+            mCacheHelper.deleteMessage(copyMessage, id);
+            mCacheHelper.addMessage(message, id);
+
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
