@@ -2,6 +2,7 @@ package yields.server
 
 import com.redis.{RedisClient, RedisClientPool}
 import yields.server.dbi.exceptions.IllegalValueException
+import yields.server.dbi.models.Node.StaticNodeKey
 import yields.server.utils.{Temporal, Config}
 
 import scala.language.implicitConversions

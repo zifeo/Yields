@@ -13,6 +13,7 @@ import yields.client.generalhelpers.MockModel;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.node.Group;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -46,6 +47,7 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         ServiceTestConnection.connectActivityToService();
 
         new MockModel();
+        ServiceTestConnection.connectActivityToService();
         getActivity();
     }
 

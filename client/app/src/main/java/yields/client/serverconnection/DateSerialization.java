@@ -26,7 +26,7 @@ public class DateSerialization {
      * @param date The date to serialize.
      * @return the serialized version of the date.
      */
-    public String toString(Date date) {
+    synchronized public String toString(Date date) {
         return mDateFormatISO6101.format(date);
     }
 

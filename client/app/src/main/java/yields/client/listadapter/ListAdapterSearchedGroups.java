@@ -13,6 +13,7 @@ import java.util.List;
 import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
+import yields.client.node.Node;
 
 /**
  * Class used to represent a list of groups, in a compact way, for the
@@ -41,7 +42,7 @@ public class ListAdapterSearchedGroups extends ArrayAdapter<Group> {
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
 
-        Group group = mGroups.get(position);
+        Node group = mGroups.get(position);
 
         View groupSearched = inflater.inflate(mGroupLayout, parent, false);
 

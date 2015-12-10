@@ -208,7 +208,7 @@ public class RequestsTest {
     public void userGroupListRequestRequestTest() {
 
         UserGroupListRequest req = new UserGroupListRequest(mUser);
-        assertEquals(ServiceRequest.RequestKind.USER_GROUP_LIST, req.getType());
+        assertEquals(ServiceRequest.RequestKind.USER_NODE_LIST, req.getType());
         String mes = req.parseRequestForServer().message();
         assertContains(mes, mUser.getId());
 
