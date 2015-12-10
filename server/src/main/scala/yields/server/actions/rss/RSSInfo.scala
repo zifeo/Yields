@@ -18,7 +18,7 @@ case class RSSInfo(nid: NID) extends Action {
   override def run(metadata: Metadata): Result = {
 
     val rss = RSS(nid)
-    RSSInfoRes(rss.name, rss.url, rss.filter, rss.tags)
+    RSSInfoRes(rss.nid, rss.name, rss.url, rss.filter, rss.tags)
 
   }
 
@@ -26,8 +26,9 @@ case class RSSInfo(nid: NID) extends Action {
 
 /**
   * [[RSSInfo]] result.
+  * @param nid rss id
   * @param name rss name
   * @param url rss url
   * @param tags rss tags
   */
-case class RSSInfoRes(name: String, url: String, filter: String, tags: Set[String]) extends Result
+case class RSSInfoRes(nid: NID, name: String, url: String, filter: String, tags: Set[String]) extends Result

@@ -11,16 +11,33 @@ public abstract class ServiceRequest {
      * The Kind of request possible
      */
     public enum RequestKind {
-        PING("PING"), USER_CONNECT("UserConnect"), USER_UPDATE("UserUpdate"), USER_SEARCH("UserSearch"),
-        USER_GROUP_LIST("UserNodeList"), USER_ENTOURAGE_ADD("UserEntourageAdd"),
-        USER_ENTOURAGE_REMOVE("UserEntourageRemove"), USER_INFO("UserInfo"),
-        GROUP_CREATE("GroupCreate"), GROUP_UPDATE("GroupUpdate"), GROUP_UPDATE_NAME("GroupUpdateName"),
-        GROUP_UPDATE_IMAGE("GroupUpdateImage"),
-        GROUP_INFO("NodeInfo"), NODE_HISTORY("NodeHistory"), NODE_SEARCH("NodeSearch"),
-        PUBLISHER_CREATE("PublisherCreate"), GROUP_MESSAGE("GroupMessage"), MEDIA_MESSAGE("MediaMessage"),
-        GROUP_UPDATE_USERS("GroupUpdate"), PUBLISHER_MESSAGE("PublisherMessage"),
-        USER_UPDATE_NAME("UserUpdate"), PUBLISHER_INFO("PublisherInfo"), NODE_INFO("NodeInfo"),
-        RSS_CREATE("RSSCreate"), GROUP_UPDATE_NODES("GroupUpdate");
+
+        PING("PING"),
+
+        USER_CONNECT("UserConnect"),
+        USER_UPDATE("UserUpdate"), USER_UPDATE_NAME("UserUpdate"),
+        USER_ENTOURAGE_ADD("UserEntourageAdd"), USER_ENTOURAGE_REMOVE("UserEntourageRemove"),
+        USER_INFO("UserInfo"),
+        USER_NODE_LIST("UserNodeList"),
+        USER_SEARCH("UserSearch"),
+
+        NODE_HISTORY("NodeHistory"),
+        NODE_INFO("NodeInfo"),
+        NODE_SEARCH("NodeSearch"),
+
+        GROUP_CREATE("GroupCreate"), GROUP_UPDATE_NODES("GroupUpdate"),
+        GROUP_UPDATE("GroupUpdate"), GROUP_UPDATE_NAME("GroupUpdate"),
+        GROUP_UPDATE_IMAGE("GroupUpdate"), GROUP_UPDATE_USERS("GroupUpdate"),
+        GROUP_INFO("GroupInfo"),
+        GROUP_MESSAGE("GroupMessage"),
+
+        PUBLISHER_CREATE("PublisherCreate"),
+        PUBLISHER_INFO("PublisherInfo"),
+        PUBLISHER_MESSAGE("PublisherMessage"),
+
+        RSS_CREATE("RSSCreate"),
+
+        MEDIA_MESSAGE("MediaMessage");
 
         private final String mName;
 

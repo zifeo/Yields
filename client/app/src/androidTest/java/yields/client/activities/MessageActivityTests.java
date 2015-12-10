@@ -39,6 +39,7 @@ import static android.support.test.espresso.action.ViewActions.actionWithAsserti
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -124,11 +125,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testGroupInfo() {
         MessageActivity messageActivity = getActivity();
-
         onView(withId(R.id.toolbarTitle)).perform(click());
-
-        onView(withId(R.id.textViewGroupName)).check(matches(withText("Mock group")));
-
+        onView(withId(R.id.textViewGroupName)).check(matches(isDisplayed()));
         messageActivity.finish();
     }
 

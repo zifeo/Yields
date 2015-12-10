@@ -1,5 +1,6 @@
 package yields.server.dbi.models
 
+import yields.server.actions.exceptions.NewUserExistException
 import yields.server.tests.YieldsSpec
 
 class TestUser extends YieldsSpec {
@@ -72,7 +73,7 @@ class TestUser extends YieldsSpec {
     u1.pic = pictureAsString
     val u2 = User(u1.uid)
 
-    u2.pic should be (u1.pic)
+    u2.pic should be(u1.pic)
   }
 
   it should "add the user in the model" in {
@@ -98,6 +99,13 @@ class TestUser extends YieldsSpec {
 
   "Trying to get a non-existent user" should "throw an exception" in {
     val user = User(1234567)
+  }
+
+  it should "throw an exception when trying to create a existant user" in {
+    val email = "email@email.com"
+    User.create(email)
+    val e = the[NewUserExistException] thrownBy User.create(email)
+    e.getMessage should be("email already registered")
   }
 
 }

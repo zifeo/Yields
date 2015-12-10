@@ -47,7 +47,7 @@
     <string name="close">Close</string>
     <string name="searchHint">Search for a name or a tag !</string>
     <string name="startSearchInfo">Start typing to search for nodes !</string>
-    <string name="noGroupFound">No group found ...</string>
+    <string name="noGroupFound">No node found ...</string>
     <string name="groupImage">Group image</string>
     <string name="users">Users</string>
     <string name="subscribeGroup">Subscribe to group</string>
@@ -58,7 +58,7 @@
     <string name="title_activity_image_show_pop_up">ImageShowPopUp</string>
     <string name="hello_world">Hello world!</string>
     <string name="connectIcon">Connect Icon</string>
-    <string name="noConnectionText">You aren\'t connected</string>
+    <string name="noConnectionText">No connection</string>
     <string name="saveImageToGalleryDialog">Save image to Gallery ?</string>
     <string name="saveImageAcceptButton">Save</string>
     <string name="saveImageDeclineButton">Cancel</string>

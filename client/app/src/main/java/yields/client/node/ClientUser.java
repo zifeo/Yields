@@ -136,6 +136,15 @@ public class ClientUser extends User {
     }
 
     /**
+     * Remove a User from the entourage.
+     *
+     * @param user the user to remove.
+     */
+    public void removeUserFromEntourage(User user) {
+        mEntourage.remove(Objects.requireNonNull(user));
+    }
+
+    /**
      * Gets an unmodifiable list of users.
      *
      * @return The list of user connected to this user.
@@ -169,7 +178,7 @@ public class ClientUser extends User {
                 return group;
             }
         }
-        return null;
+        return getCommentGroup(groupId);
     }
 
     /**

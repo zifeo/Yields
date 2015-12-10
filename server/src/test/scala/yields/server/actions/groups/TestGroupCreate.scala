@@ -27,7 +27,7 @@ class TestGroupCreate extends YieldsSpec {
         group.creator should be(user.uid)
         user.nodes should contain only nid
         users.foreach { uid =>
-          User(uid).nodes should contain (nid)
+          User(uid).nodes should contain(nid)
         }
     }
   }
@@ -38,7 +38,7 @@ class TestGroupCreate extends YieldsSpec {
     val meta = Metadata.now(user.uid)
 
     val users = List[UID](4, 5, 6)
-    val action = new GroupCreate("GroupName", users, List.empty)
+    val action = GroupCreate("GroupName", users, List.empty)
 
     val thrown = the[UnauthorizedActionException] thrownBy action.run(meta)
     thrown.getMessage should include(user.uid.toString)
