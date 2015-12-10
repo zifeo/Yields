@@ -157,7 +157,7 @@ public class ResponseHandler {
                 Id nodeId = new Id(nodes.getLong(i));
                 nodeList.add(nodeId);
                 if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Group newNode = new Group("", nodeId,new ArrayList<Id>());
+                    Group newNode = new Group("", nodeId, new ArrayList<Id>());
                     YieldsApplication.getUser().addNode(newNode);
                     ServiceRequest nodeInfo =
                             new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
@@ -275,7 +275,7 @@ public class ResponseHandler {
                 Id nodeId = new Id(nodes.getLong(i));
                 nodeList.add(nodeId);
                 if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Group newNode = new Group("", nodeId,new ArrayList<Id>());
+                    Group newNode = new Group("", nodeId, new ArrayList<Id>());
                     YieldsApplication.getUser().addNode(newNode);
                     ServiceRequest nodeInfo =
                             new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
@@ -364,7 +364,6 @@ public class ResponseHandler {
     }
 
 
-
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
@@ -415,6 +414,16 @@ public class ResponseHandler {
             }
 
             mCacheHelper.addUser(user);
+
+            for (Group g : YieldsApplication.getUser().getUserGroups()) {
+                for (Message m : g.getLastMessages().values()) {
+                    if (m.getSender().equals(user.getId())) {
+                        m.recomputeView();
+                    }
+                }
+            }
+
+            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
 
             if (newUser) {
                 //TODO : notify() to add user to entourage -> notification
