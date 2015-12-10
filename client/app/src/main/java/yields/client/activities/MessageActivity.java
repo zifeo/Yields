@@ -111,7 +111,7 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void onClick(View v) {
                 if (mType == ContentType.GROUP_MESSAGES) {
-                    YieldsApplication.setGroup(mGroup);
+                    YieldsApplication.setInfoGroup(mGroup);
                     Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                     intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
                     startActivity(intent);
@@ -149,6 +149,7 @@ public class MessageActivity extends NotifiableActivity {
                     }
                 } else {
                     YieldsApplication.setGroup(mGroup);
+                    YieldsApplication.setInfoGroup(mGroup);
                     mType = ContentType.GROUP_MESSAGES;
                     createGroupMessageFragment();
                 }
