@@ -292,7 +292,8 @@ public class GroupInfoActivity extends NotifiableActivity {
                         ServiceRequest request = new GroupUpdateUsersRequest(
                                 YieldsApplication.getUser().getId(),
                                 subscriptionGroup.getId(), list,
-                                GroupUpdateUsersRequest.UpdateType.REMOVE);
+                                GroupUpdateUsersRequest.UpdateType.REMOVE,
+                                subscriptionGroup.getType());
                         YieldsApplication.getBinder().sendRequest(request);
 
                         unsubscribeButton.setEnabled(false);
