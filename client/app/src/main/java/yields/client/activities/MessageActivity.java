@@ -107,7 +107,7 @@ public class MessageActivity extends NotifiableActivity {
         mTextTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                YieldsApplication.setGroup(mGroup);
+                YieldsApplication.setInfoGroup(mGroup);
 
                 Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                 intent.putExtra(SearchGroupActivity.MODE_KEY, 0);

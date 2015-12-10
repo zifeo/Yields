@@ -72,7 +72,7 @@ public class GroupInfoActivity extends NotifiableActivity {
 
         mMode = SearchGroupActivity.Mode.values()[indexMode];
 
-        mGroup = Objects.requireNonNull(YieldsApplication.getGroup(),
+        mGroup = Objects.requireNonNull(YieldsApplication.getInfoGroup(),
                 "The group in YieldsApplication cannot be null when GroupInfoActivity is created");
 
         ImageView imageView = (ImageView) findViewById(R.id.imageViewGroup);
