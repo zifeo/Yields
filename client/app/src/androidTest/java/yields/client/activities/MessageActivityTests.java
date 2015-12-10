@@ -337,19 +337,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertTrue(list.getCount() == 0);
         messageActivity.finish();
     }
-/*
-    @Test
-    public void testNotifyChange() throws InterruptedException {
-        final MessageActivity messageActivity = getActivity();
-        MOCK_GROUP.addMessage(MockFactory.generateMockMessage("", new Id(2), MOCK_CLIENT_USER, new TextContent("topkek")));
-        Log.d("MessageActivityTest", "Notify changes");
-        messageActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
-        Fragment fragment = messageActivity.getCurrentFragment();
-        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
-        Message m = (Message) messageList.getAdapter().getItem(0);
-        TextContent content = (TextContent) m.getContent();
-        assertEquals("topkek", content.getText());
-    }*/
 
     @Test
     public void testGroupIdGetter(){
@@ -411,6 +398,22 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         Message message = (Message) messageList.getAdapter().getItem(0);
         assertEquals(Content.ContentType.TEXT, message.getContent().getType());
     }
+
+    @Test
+    public void testNotifyNewMessages(){
+        YieldsApplication.setGroup(MOCK_GROUP);
+        final MessageActivity messageActivity = getActivity();
+        for (int i = 0 ; i < 30 ; i ++){
+            MOCK_GROUP.addMessage(MockFactory.generateMockMessage("", new Id(2), MOCK_CLIENT_USER, new TextContent("topkek")));
+            SystemClock.sleep(50);
+        }
+        assertEquals(0, messageActivity.getCurrentFragmentListView().getCount());
+        messageActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+        SystemClock.sleep(1000);
+        assertEquals(30, messageActivity.getCurrentFragmentListView().getCount());
+    }
+
+
 
     private void sendInput(String input){
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
