@@ -681,7 +681,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
                 Message.MessageStatus messageStatus = Message.MessageStatus.valueOf(messageStatusAsString);
                 try {
                     Date date = DateSerialization.dateSerializer.toDateForCache(dateAsString);
-                    messages.add(new Message(nodeName, messageId, senderId, content, date, messageStatus));
+                    messages.add(new Message(messageId, senderId, content, date, messageStatus));
                 } catch (ParseException exception) {
                     exception.printStackTrace();
                     Log.d(TAG, "Unable to retrieve Messages from Group with id: "
@@ -844,7 +844,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         Objects.requireNonNull(groupId);
 
         ContentValues values = new ContentValues();
-        values.put(KEY_MESSAGE_NODE_ID, message.getId().getId());
+        values.put(KEY_MESSAGE_NODE_ID, message.getCommentGroupId().getId());
         values.put(KEY_MESSAGE_SENDER_ID, message.getSender().getId());
         values.put(KEY_MESSAGE_GROUP_ID, groupId.getId());
         values.put(KEY_MESSAGE_TEXT, message.getContent().getTextForRequest());
@@ -869,7 +869,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_USER_NODE_ID, user.getId().getId());
         values.put(KEY_USER_NAME, user.getName());
         values.put(KEY_USER_EMAIL, user.getEmail());
-        values.put(KEY_USER_IMAGE, ImageSerialization.serializeImage(user.getImg(), ImageSerialization.SIZE_IMAGE));
+        values.put(KEY_USER_IMAGE, ImageSerialization.serializeImage(user.getImage(), ImageSerialization.SIZE_IMAGE));
 
         List<User> entourage = YieldsApplication.getUser().getEntourage();
         List<Id> entourageIds = new ArrayList<>();

@@ -205,6 +205,6 @@ public class CommentViewTests extends ActivityInstrumentationTestCase2<MessageAc
         }
         mDate = new Date();
         User user = YieldsApplication.getUser();
-        return new Message("C > Java", new Id(117), user.getId(), content, mDate, Message.MessageStatus.NOT_SENT);
+        return new Message(new Id(117), user.getId(), content, mDate, Message.MessageStatus.NOT_SENT);
     }
 }

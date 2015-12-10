@@ -11,7 +11,6 @@ import java.util.Objects;
 import yields.client.exceptions.MessageException;
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-import yields.client.node.Node;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -20,7 +19,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Message is a {@code Node} which is shared as a message in a conversation.
  */
-public class Message extends Node {
+public class Message{
 
     public enum MessageStatus {
         SENT("SENT"), SEEN("SEEN"), NOT_SENT("NOT_SENT");
@@ -41,21 +40,21 @@ public class Message extends Node {
     private Date mDate;
     private MessageStatus mStatus;
     private MessageView mView;
+    private Id mCommentGroupId;
 
     /**
      * Main constructor for a Message.
      *
-     * @param nodeName Name of the Node.
-     * @param nodeID   ID of the Node.
+     * @param nodeID   ID of the Node for a commentGroup.
      * @param sender   The sender of the message.
      * @param content  The content of the message.
      * @param status   The status of the message.
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, Id sender, Content content,
+    public Message(Id nodeID, Id sender, Content content,
                    Date date, MessageStatus status) {
-        super(nodeName, nodeID);
+        this.mCommentGroupId = nodeID;
         this.mSender = Objects.requireNonNull(sender);
         this.mContent = Objects.requireNonNull(content);
         this.mDate = new Date(date.getTime());
@@ -66,15 +65,14 @@ public class Message extends Node {
     /**
      * Constructor for a Message, sets it's MessageStatus to NOT_SENT.
      *
-     * @param nodeName Name of the Node.
      * @param nodeID   ID of the Node.
      * @param sender   The sender of the message.
      * @param content  The content of the message.
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, Id sender, Content content, Date date) {
-        this(nodeName, nodeID, sender, content, date, MessageStatus.NOT_SENT);
+    public Message(Id nodeID, Id sender, Content content, Date date) {
+        this(nodeID, sender, content, date, MessageStatus.NOT_SENT);
     }
 
     /**
@@ -88,8 +86,7 @@ public class Message extends Node {
      * @throws ParseException In case of parse exception with the date serialization.
      */
     public Message(String dateTime, Long contentId, Long senderID, String text, String contentType, String content) throws ParseException {
-        super("message", new Id(contentId));
-
+        this.mCommentGroupId = new Id(Objects.requireNonNull(contentId));
         this.mSender = new Id(senderID);
 
         if (contentType.equals("image")) {
@@ -147,7 +144,7 @@ public class Message extends Node {
      * @return A string describing the message.
      */
     public String getPreview() {
-        return YieldsApplication.getUserFromId(mSender).getName() + " : " + mContent.getPreview();
+        return YieldsApplication.getNodeFromId(mSender).getName() + " : " + mContent.getPreview();
     }
 
     /**
@@ -157,6 +154,20 @@ public class Message extends Node {
      */
     public MessageStatus getStatus() {
         return mStatus;
+    }
+
+    /**
+     * returns the comment group id
+     */
+    public Id getCommentGroupId() {
+        return mCommentGroupId;
+    }
+
+    /**
+     * sets the comment group id
+     */
+    public void setCommentGroupId(Id mCommentGroupId) {
+        this.mCommentGroupId = mCommentGroupId;
     }
 
     /**

@@ -49,7 +49,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USER_GROUP_LIST.getValue());
+                    ServiceRequest.RequestKind.USER_NODE_LIST.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
         } catch (JSONException e) {
@@ -147,8 +147,10 @@ public class ServerRequestsTests {
                 userIds.add(user);
             }
 
-            ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId, groupName,
-                    Group.GroupType.PRIVATE, userIds, nodeIds);
+            Group group = new Group(groupName, new Id(0), userIds, YieldsApplication.getDefaultGroupImage(),
+                    Group.GroupType.PRIVATE, true, new Date());
+            ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId,
+                    group, userIds, nodeIds);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),

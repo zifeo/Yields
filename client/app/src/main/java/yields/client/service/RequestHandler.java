@@ -12,6 +12,7 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.NodeInfoRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
@@ -20,6 +21,7 @@ import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeSearchRequest;
+import yields.client.servicerequest.RSSCreateRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -120,6 +122,16 @@ public class RequestHandler {
      */
     protected void handleGroupCreateRequest(GroupCreateRequest serviceRequest) {
         mCacheHelper.addGroup(serviceRequest.getGroup());
+
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        mController.sendToServer(serverRequest);
+    }
+
+    /**
+     * Handles the appropriate ServiceRequest which is given to it by argument.
+     */
+    protected void handleRssCreateRequest(RSSCreateRequest serviceRequest) {
+
 
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
@@ -238,7 +250,7 @@ public class RequestHandler {
     /**
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
-    protected void handleGroupInfoRequest(GroupInfoRequest serviceRequest) {
+    protected void handleGroupInfoRequest(ServiceRequest serviceRequest) {
         //TODO : see with Trofleb
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
