@@ -6,7 +6,6 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -216,13 +215,7 @@ public class Group extends Node {
      * @return The Message updated.
      */
     public Message updateMessageIdDateAndStatus(Id contentId, Date date, Date newDate) {
-        Integer size = this.mMessages.size();
-        Log.d("Y:" + this.getClass().getName(), size.toString());
-
         Message message = mMessages.remove(date);
-
-        size = this.mMessages.size();
-        Log.d("Y:" + this.getClass().getName(), size.toString());
 
         if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
