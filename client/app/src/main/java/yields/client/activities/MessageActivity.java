@@ -544,6 +544,18 @@ public class MessageActivity extends NotifiableActivity {
                 }
             }
         });
+        ((CommentFragment) mCurrentFragment).setListOnClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Message clickedMessage = mCommentAdapter.getItem(position);
+                if (clickedMessage.getContent().getType() == Content.ContentType.URL){
+                    String url = ((UrlContent) clickedMessage.getContent()).getUrl();
+                    Log.d("MessageActivity", "Open URL in browser : " + url);
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
+                }
+            }
+        });
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
         loadComments();
