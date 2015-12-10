@@ -44,7 +44,6 @@ public class Group extends Node {
     private boolean mValidated;
     private List<User> mUsers;
     private List<Group> mNodes;
-    private Bitmap mImage;
     private GroupType mType;
     private Set<Tag> mTags;
     private Date mDate;

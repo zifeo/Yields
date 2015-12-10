@@ -29,6 +29,8 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
     // This is necessary as mServiceRequestController can't be final.
+    public final static String GROUP_RECEIVING = "groupReceiving";
+    public final static String NOTIFICATION = "notification";
     private final Object serviceControllerLock = new Object();
     private YieldServiceBinder mBinder;
     private NotifiableActivity mCurrentNotifiableActivity;
@@ -298,6 +300,8 @@ public class YieldService extends Service {
         // Creates an explicit intent for an Activity in your app
         YieldsApplication.setGroup(group);
         Intent resultIntent = new Intent(this, MessageActivity.class);
+        resultIntent.putExtra(NOTIFICATION, true);
+        resultIntent.putExtra(GROUP_RECEIVING, group.getId().getId().longValue());
 
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
