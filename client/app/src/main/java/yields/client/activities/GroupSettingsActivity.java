@@ -31,6 +31,7 @@ import yields.client.node.User;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateNodesRequest;
+import yields.client.servicerequest.GroupUpdateTagsRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -110,7 +111,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
             groups.add(group);
 
             ServiceRequest updateNode = new GroupUpdateNodesRequest(YieldsApplication.getUser().getId(),
-                    mGroup.getId(), groups, GroupUpdateNodesRequest.UpdateType.ADD);
+                    mGroup.getId(), groups, GroupUpdateNodesRequest.UpdateType.ADD, mGroup.getType());
             YieldsApplication.getBinder().sendRequest(updateNode);
 
             String text = "Group \"" + group.getName() + "\" added";
@@ -146,7 +147,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     mGroup.setImage(Bitmap.createScaledBitmap(getCroppedSquaredBitmap(image), diameter, diameter, false));
 
                     ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(),
-                            mGroup.getImage());
+                            mGroup.getImage(), mGroup.getType());
                     YieldsApplication.getBinder().sendRequest(request);
                 } else {
                     String message = "Could not retrieve image";
@@ -174,7 +175,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
 
             ServiceRequest updateGroup = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), mGroup.getId(),
-                    newUsers, GroupUpdateUsersRequest.UpdateType.ADD);
+                    newUsers, GroupUpdateUsersRequest.UpdateType.ADD, mGroup.getType());
             YieldsApplication.getBinder().sendRequest(updateGroup);
         }
     }
@@ -280,7 +281,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
 
                         mUser.setName(newName);
 
-                        ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
+                        ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(),
+                                newName, mGroup.getType());
                         YieldsApplication.getBinder().sendRequest(request);
 
                         dialog.dismiss();
@@ -345,7 +347,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
                         usersToRemove.add(YieldsApplication.getUser());
                         YieldsApplication.getBinder().sendRequest(
                                 new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), mGroup.getId(),
-                                        usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE));
+                                        usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE,
+                                        mGroup.getType()));
 
                         YieldsApplication.showToast(getApplicationContext(), "Group left !");
 
@@ -406,8 +409,11 @@ public class GroupSettingsActivity extends AppCompatActivity {
                         Group.Tag tag = new Group.Tag(text);
 
                         mGroup.addTag(tag);
+                        List<Group.Tag> tags = new ArrayList<>();
 
-                        // TODO Send request to server to add tag in database
+                        ServiceRequest tagReq = new GroupUpdateTagsRequest(mUser.getId(), mGroup.getId(),
+                                tags, GroupUpdateTagsRequest.UpdateType.ADD, mGroup.getType());
+                        YieldsApplication.getBinder().sendRequest(tagReq);
 
                         dialog.dismiss();
                     }

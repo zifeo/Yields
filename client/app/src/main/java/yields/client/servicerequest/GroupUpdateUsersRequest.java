@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import yields.client.id.Id;
+import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
@@ -22,6 +23,7 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
     private final Id mGroupId;
     private final List<User> mUsers;
     private final UpdateType mUpdateType;
+    private final Group.GroupType mType;
 
     /**
      * Main constructor for this type of ServiceRequest (renaming a Group).
@@ -30,7 +32,8 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
      * @param groupId  The Id of the Group that should be renamed.
      * @param users    The users to add or delete from the group
      */
-    public GroupUpdateUsersRequest(Id senderId, Id groupId, List<User> users, UpdateType updateType) {
+    public GroupUpdateUsersRequest(Id senderId, Id groupId, List<User> users,
+                                   UpdateType updateType, Group.GroupType groupType) {
         super();
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
@@ -40,6 +43,7 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
         mGroupId = groupId;
         mUsers = users;
         mUpdateType = updateType;
+        mType = groupType;
     }
 
     /**
@@ -66,9 +70,9 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
 
         switch (mUpdateType) {
             case ADD:
-                return RequestBuilder.groupAddRequest(mSender, mGroupId, toRequest);
+                return RequestBuilder.groupAddRequest(mSender, mGroupId, toRequest, mType);
             case REMOVE:
-                return RequestBuilder.groupRemoveRequest(mSender, mGroupId, toRequest);
+                return RequestBuilder.groupRemoveRequest(mSender, mGroupId, toRequest, mType);
             default:
                 throw new IllegalStateException("no known state : " + mUpdateType);
         }
