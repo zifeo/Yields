@@ -187,7 +187,7 @@ public class Group extends Node {
      *
      * @param date The date of the last update.
      */
-    public void setLastUpdate(Date date){
+    public void setLastUpdate(Date date) {
         if (date.compareTo(mDate) > 0) {
             mDate = new Date(date.getTime());
         }
@@ -265,6 +265,7 @@ public class Group extends Node {
         Objects.requireNonNull(user);
         mUsers.add(YieldsApplication.getUserFromId(user));
     }
+
     /**
      * Remove a user from the group.
      *
@@ -335,8 +336,8 @@ public class Group extends Node {
      */
     public boolean containsNode(Group group) {
         Objects.requireNonNull(group);
-        for (Group g : mNodes){
-            if (g.getId().equals(group.getId())){
+        for (Group g : mNodes) {
+            if (g.getId().equals(group.getId())) {
                 return true;
             }
         }
@@ -460,6 +461,16 @@ public class Group extends Node {
      */
     private Message getLastMessage() {
         return mMessages.lastEntry().getValue();
+    }
+
+    /**
+     * Override hashcode method.
+     *
+     * @return hash of Id
+     */
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
     /**
