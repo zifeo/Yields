@@ -24,14 +24,6 @@ final class RSS private(nid: NID) extends Node(nid) with Tags {
     Indexes.searchableRegister(name, nid)
   }
 
-  /** Add message */
-  override def addMessage(content: FeedContent): Boolean = {
-    val children = for (nid <- receivers) yield {
-      Node(nid).addMessage(content)
-    }
-    children.forall(x => x)
-  }
-
   /** Filter getter. */
   def filter: String = _filter.getOrElse {
     _filter = redis(_.hget[String](NodeKey.node, StaticRssKey.filter))

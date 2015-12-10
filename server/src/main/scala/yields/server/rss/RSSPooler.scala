@@ -60,12 +60,13 @@ final class RSSPooler extends Actor with ActorLogging {
 
       news.map { case RSSEntry(title, author, link, entry, _) =>
         val now = Temporal.now
-        val media = Media.create("url", link, rss.nid)
-        val text = s"$title $link"
-        rss.addMessage((now, rss.nid, Some(media.nid), text))
         rss.receivers.map(Node(_)).foreach { node =>
+          val media = Media.create(Media.ContentType.url, link, rss.nid)
+          media.addUser(node.users)
+          val text = s"$title $link"
           Yields.broadcast(node.users) {
-            NodeMessageBrd(node.nid, now, rss.nid, Some(text), Some("url"), Some(media.content), Some(media.nid))
+            NodeMessageBrd(node.nid, now, rss.nid, Some(text),
+              Some(media.contentType), Some(media.content), Some(media.nid))
           }
         }
         (rss.name, title)
