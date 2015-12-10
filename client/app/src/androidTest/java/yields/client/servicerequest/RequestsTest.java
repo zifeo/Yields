@@ -12,6 +12,8 @@ import android.util.TypedValue;
 import org.junit.Test;
 
 import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import yields.client.generalhelpers.MockModel;
@@ -72,7 +74,7 @@ public class RequestsTest {
     public void groupMessageRequestTest() {
 
         GroupMessageRequest req =
-                new GroupMessageRequest(mMessage, mGroup.getId(), Group.GroupVisibility.PUBLIC);
+                new GroupMessageRequest(mMessage, mGroup.getId(), Group.GroupType.PRIVATE);
         assertEquals(mMessage, req.getMessage());
         assertEquals(mGroup.getId(), req.getReceivingNodeId());
         assertEquals(ServiceRequest.RequestKind.GROUP_MESSAGE, req.getType());
@@ -89,10 +91,56 @@ public class RequestsTest {
         GroupUpdateImageRequest req = new GroupUpdateImageRequest(mUser, mGroup.getId(), mImage);
         assertEquals(mGroup.getId(), req.getGroupId());
         assertEquals(mImage.getByteCount(), req.getNewGroupImage().getByteCount());
-        assertEquals(req.getType(), ServiceRequest.RequestKind.GROUP_UPDATE_IMAGE);
+        assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_IMAGE, req.getType());
         String mes = req.parseRequestForServer().message();
         assertContains(mes, mUser.getId());
         assertContains(mes, mGroup.getId());
+
+    }
+
+    @Test
+    public void groupUpdateNameRequestTest() {
+
+        String newName = "new name";
+        GroupUpdateNameRequest req = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
+        assertEquals(mGroup.getId(), req.getGroupId());
+        assertEquals(newName, req.getNewGroupName());
+        assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, mGroup.getId());
+        assertContains(mes, newName);
+
+    }
+
+    @Test
+    public void groupUpdateUsersRequestTest() {
+
+        List<User> newUsers = new ArrayList<>();
+        newUsers.add(mUser);
+        GroupUpdateUsersRequest req = new GroupUpdateUsersRequest(mUser.getId(), mGroup.getId(),
+                newUsers, GroupUpdateUsersRequest.UpdateType.ADD);
+        assertEquals(mGroup.getId(), req.getGroupId());
+        assertEquals(GroupUpdateUsersRequest.UpdateType.ADD, req.getUpdateType());
+        assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_USERS, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, mGroup.getId());
+
+    }
+
+    @Test
+    public void mediaMessageRequestTest() {
+
+        MediaMessageRequest req = new MediaMessageRequest(mMessage, mGroup.getId());
+        assertEquals(mGroup.getId(), req.getReceivingNodeId());
+        assertEquals(mMessage.getContent().getTextForRequest(),
+                req.getMessage().getContent().getTextForRequest());
+        assertEquals(ServiceRequest.RequestKind.MEDIA_MESSAGE, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, mGroup.getId());
+        assertContains(mes, mMessage.getContent().getTextForRequest());
 
     }
 
