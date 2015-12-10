@@ -409,6 +409,16 @@ public class ResponseHandler {
 
             mCacheHelper.addUser(user);
 
+            for (Group g : YieldsApplication.getUser().getUserGroups()) {
+                for (Message m : g.getLastMessages().values()) {
+                    if (m.getSender().equals(user.getId())) {
+                        m.recomputeView();
+                    }
+                }
+            }
+
+            mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+
             if (newUser) {
                 YieldsApplication.getUser().addUserToEntourage(user);
                 mService.notifyChange(NotifiableActivity.Change.ENTOURAGE_UPDATE);
