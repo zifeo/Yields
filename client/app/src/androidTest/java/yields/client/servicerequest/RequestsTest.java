@@ -1,31 +1,30 @@
 package yields.client.servicerequest;
 
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.test.InstrumentationRegistry;
-import android.test.mock.MockContext;
-import android.test.mock.MockResources;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 
 import org.junit.Test;
 
-import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import yields.client.generalhelpers.MockModel;
 import yields.client.id.Id;
-import yields.client.messages.Content;
 import yields.client.messages.Message;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
-import static junit.framework.Assert.*;
-import static yields.client.activities.MockFactory.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static yields.client.activities.MockFactory.generateFakeClientUser;
+import static yields.client.activities.MockFactory.generateFakeTextContent;
+import static yields.client.activities.MockFactory.generateFakeUser;
+import static yields.client.activities.MockFactory.generateMockGroups;
+import static yields.client.activities.MockFactory.generateMockImage;
+import static yields.client.activities.MockFactory.generateMockMessage;
 
 public class RequestsTest {
 
@@ -33,6 +32,7 @@ public class RequestsTest {
     private final Group mGroup;
     private final Message mMessage;
     private final Bitmap mImage;
+    private final ClientUser mClientUser;
 
     public RequestsTest() {
         new MockModel();
@@ -43,6 +43,7 @@ public class RequestsTest {
         mGroup.addNode(mGroup);
         mMessage = generateMockMessage("group", mGroup.getId(), mUser, generateFakeTextContent(0));
         mImage = generateMockImage();
+        mClientUser = generateFakeClientUser("name", new Id(-1), "test@yields.im", mImage);
     }
 
     @Test
@@ -141,6 +142,120 @@ public class RequestsTest {
         assertContains(mes, mUser.getId());
         assertContains(mes, mGroup.getId());
         assertContains(mes, mMessage.getContent().getTextForRequest());
+
+    }
+
+    @Test
+    public void nodeHistoryRequestTest() {
+
+        Date now = new Date();
+        NodeHistoryRequest req = new NodeHistoryRequest(mGroup.getId(), now);
+        assertEquals(mGroup.getId(), req.getGroup());
+        assertEquals(now, req.getDate());
+        assertEquals(ServiceRequest.RequestKind.NODE_HISTORY, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, mGroup.getId());
+
+    }
+
+    @Test
+    public void nodeSearchRequestTest() {
+
+        String pattern = "search pattern";
+        NodeSearchRequest req = new NodeSearchRequest(mUser.getId(), pattern);
+        assertEquals(ServiceRequest.RequestKind.NODE_SEARCH, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, pattern);
+
+    }
+
+    @Test
+    public void UserConnectRequestTest() {
+
+        UserConnectRequest req = new UserConnectRequest(mClientUser);
+        assertEquals(ServiceRequest.RequestKind.USER_CONNECT, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mClientUser.getId());
+
+    }
+
+    @Test
+    public void userEntourageAddRequestTest() {
+
+        UserEntourageAddRequest req = new UserEntourageAddRequest(mUser.getId(), mUser.getId());
+        assertEquals(mUser.getId(), req.getUserToAdd());
+        assertEquals(ServiceRequest.RequestKind.USER_ENTOURAGE_ADD, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+
+    }
+
+    @Test
+    public void userEntourageRemoveRequestTest() {
+
+        UserEntourageRemoveRequest req =
+                new UserEntourageRemoveRequest(mUser.getId(), mUser.getId());
+        assertEquals(mUser.getId(), req.getUserToRemove());
+        assertEquals(ServiceRequest.RequestKind.USER_ENTOURAGE_REMOVE, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+
+    }
+
+    @Test
+    public void userGroupListRequestRequestTest() {
+
+        UserGroupListRequest req = new UserGroupListRequest(mUser);
+        assertEquals(ServiceRequest.RequestKind.USER_GROUP_LIST, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+
+    }
+
+    @Test
+    public void userInfoRequestRequestTest() {
+
+        UserInfoRequest req = new UserInfoRequest(mUser, mUser.getId());
+        assertEquals(mUser.getId(), req.getUserInfoId());
+        assertEquals(ServiceRequest.RequestKind.USER_INFO, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+
+    }
+
+    @Test
+    public void userSearchRequestTest() {
+
+        String newEmail = "yes@yields.im";
+        UserSearchRequest req = new UserSearchRequest(mUser.getId(), newEmail);
+        assertEquals(ServiceRequest.RequestKind.USER_SEARCH, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, newEmail);
+
+    }
+
+    @Test
+    public void userUpdateNameRequestTest() {
+
+        UserUpdateNameRequest req = new UserUpdateNameRequest(mUser);
+        assertEquals(mUser.getId(), req.getUser().getId());
+        assertEquals(ServiceRequest.RequestKind.USER_UPDATE_NAME, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+
+    }
+
+    @Test
+    public void userUpdateRequestTest() {
+
+        UserUpdateRequest req = new UserUpdateRequest(mUser);
+        assertEquals(mUser.getId(), req.getUser().getId());
+        assertEquals(ServiceRequest.RequestKind.USER_UPDATE, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
 
     }
 
