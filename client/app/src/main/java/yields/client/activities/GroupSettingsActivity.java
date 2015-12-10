@@ -273,7 +273,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "Group name changed to \"" + newName + "\" !");
 
-                        mUser.setName(newName);
+                        mGroup.setName(newName);
 
                         ServiceRequest request = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
                         YieldsApplication.getBinder().sendRequest(request);
