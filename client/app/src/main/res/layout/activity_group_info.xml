@@ -13,10 +13,7 @@
         android:minHeight="?attr/actionBarSize"
         android:background="@color/barColor"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="-18sp"
-        android:paddingRight="0sp"
-        >
+        android:layout_height="wrap_content">
     </android.support.v7.widget.Toolbar>
 
     <ScrollView
@@ -30,6 +27,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="40dp"
             android:weightSum="1">
 
             <RelativeLayout
@@ -38,8 +36,8 @@
                 >
 
                 <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
                     android:id="@+id/imageViewGroup"
                     android:contentDescription="@string/groupImage"
                     android:src="@drawable/default_group_image"
