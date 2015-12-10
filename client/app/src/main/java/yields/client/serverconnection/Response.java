@@ -35,7 +35,7 @@ public class Response {
         PUBLISHER_INFO_RESPONSE("PublisherInfoRes"),
         PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"),
 
-        RSS_CREATE_RESPONSE("RssCreateRes"), RSS_CREATE_BCAST("RssCreateBrd"),
+        RSS_CREATE_RESPONSE("RSSCreateRes"), RSS_CREATE_BCAST("RSSCreateBrd"),
         RSS_INFO_RES("RSSInfoRes"),
 
         MEDIA_MESSAGE_RESPONSE("MediaMessageRes");

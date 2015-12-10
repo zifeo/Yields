@@ -339,17 +339,22 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             Id id = new Id(nid);
 
-            Node rss = YieldsApplication.getUser().getGroupFromRef(DateSerialization.dateSerializer
-                    .toDate(serverResponse.getMetadata().getString("ref")));
+            if (id.getId() != 0) {
+                Node rss = YieldsApplication.getUser().getGroupFromRef(DateSerialization.dateSerializer
+                        .toDate(serverResponse.getMetadata().getString("ref")));
 
-            rss.setId(id);
+                rss.setId(id);
 
-            Group group = new Group(rss.getName(), new Id(0), new ArrayList<Id>(), id);
-            YieldsApplication.getUser().addGroup(group);
+                Group group = new Group(rss.getName(), new Id(0), new ArrayList<Id>(), id);
+                YieldsApplication.getUser().addGroup(group);
 
-            ServiceRequest groupCreate = new GroupCreateRequest(YieldsApplication.getUser(), group);
-            mService.sendRequest(groupCreate);
+                ServiceRequest groupCreate = new GroupCreateRequest(YieldsApplication.getUser(), group);
+                mService.sendRequest(groupCreate);
 
+                mService.notifyChange(NotifiableActivity.Change.RSS_CREATE);
+            } else {
+                mService.notifyChange(NotifiableActivity.Change.RSS_FAIL);
+            }
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
