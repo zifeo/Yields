@@ -394,6 +394,24 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertEquals(true, runnableOnOption.getReturnedValue());
     }
 
+    @Test
+    public void testCancelImageSending(){
+        final MessageActivity messageActivity = getActivity();
+        String input = "Mock message #1";
+        messageActivity.simulateImageMessage();
+        messageActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                messageActivity.cancelImageSending(null);
+            }
+        });
+        sendInput(input);
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
+        Message message = (Message) messageList.getAdapter().getItem(0);
+        assertEquals(Content.ContentType.TEXT, message.getContent().getType());
+    }
+
     private void sendInput(String input){
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         onView(withId(R.id.sendButton)).perform(click());
