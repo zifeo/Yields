@@ -15,7 +15,7 @@ public abstract class ServiceRequest {
         USER_GROUP_LIST("UserNodeList"), USER_ENTOURAGE_ADD("UserEntourageAdd"),
         USER_ENTOURAGE_REMOVE("UserEntourageRemove"), USER_INFO("UserInfo"),
         GROUP_CREATE("GroupCreate"), GROUP_UPDATE("GroupUpdate"), GROUP_UPDATE_NAME("GroupUpdateName"),
-        GROUP_UPDATE_VISIBILITY("GroupUpdateVisibility"), GROUP_UPDATE_IMAGE("GroupUpdateImage"),
+        GROUP_UPDATE_IMAGE("GroupUpdateImage"),
         GROUP_INFO("GroupInfo"), NODE_HISTORY("NodeHistory"), NODE_SEARCH("NodeSearch"),
         PUBLISHER_CREATE("PublisherCreate"), GROUP_MESSAGE("GroupMessage"), MEDIA_MESSAGE("MediaMessage"),
         GROUP_UPDATE_USERS("GroupUpdate"), PUBLISHER_MESSAGE("PublisherMessage"),

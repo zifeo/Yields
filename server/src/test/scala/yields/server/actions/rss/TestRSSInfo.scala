@@ -13,7 +13,8 @@ class TestRSSInfo extends YieldsSpec {
     val action = RSSInfo(rss.nid)
 
     action.run(meta) match {
-      case RSSInfoRes(name, url, filter, _) =>
+      case RSSInfoRes(nid, name, url, filter, _) =>
+        nid should be (rss.nid)
         name should be (rss.name)
         url should be (rss.url)
         filter should be (rss.filter)

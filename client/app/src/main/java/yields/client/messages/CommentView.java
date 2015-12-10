@@ -74,6 +74,7 @@ public class CommentView extends LinearLayout {
         TextView messageInfos;
         DateFormat dateFormat;
         String time;
+
         switch (mMessage.getContent().getType()) {
             case IMAGE:
                 v = vi.inflate(R.layout.imagecommentlayout, null);
