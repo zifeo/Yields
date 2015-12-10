@@ -110,10 +110,7 @@ public class MessageActivity extends NotifiableActivity {
         mTextTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (mType == ContentType.MESSAGE_COMMENTS) {
-                    //Do nothing
-                } else {
+                if (mType == ContentType.GROUP_MESSAGES) {
                     YieldsApplication.setGroup(mGroup);
                     Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                     intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
