@@ -419,6 +419,40 @@ public class RequestBuilder {
      *
      * @param senderId The sender of the request.
      * @param groupId  Id of the group.
+     * @param newNodes  The user to add in this group.
+     * @return The request.
+     */
+    public static ServerRequest groupAddNodesRequest(Id senderId, Id groupId,
+                                                List<Id> newNodes) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newNodes);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, null, newNodes, null);
+    }
+
+    /**
+     * ServerRequest for removing a user from a group.
+     *
+     * @param senderId     The sender of the request.
+     * @param groupId      Id of the group.
+     * @param nodesToRemove The user to remove from  this group.
+     * @return The request.
+     */
+    public static ServerRequest groupRemoveNodesRequest(Id senderId, Id groupId,
+                                                        List<Id> nodesToRemove) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(nodesToRemove);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, null, null, nodesToRemove);
+    }
+
+    /**
+     * ServerRequest for adding a new user to a group.
+     *
+     * @param senderId The sender of the request.
+     * @param groupId  Id of the group.
      * @param newUser  The user to add in this group.
      * @return The request.
      */
