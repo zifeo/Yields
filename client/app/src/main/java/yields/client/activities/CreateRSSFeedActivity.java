@@ -9,8 +9,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
+import yields.client.id.Id;
+import yields.client.node.Group;
+import yields.client.node.Node;
+import yields.client.servicerequest.RSSCreateRequest;
+import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -75,8 +83,13 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
         }
         else {
+            Group rss = new Group(mGroupName, new Id(0), new ArrayList<Id>());
+            YieldsApplication.getUser().addNode(rss);
 
-            // TODO send request
+            ServiceRequest rssCreaterequest = new RSSCreateRequest(
+                    YieldsApplication.getUser().getId(), url, rss,
+                    mEditTextKeywords.getText().toString());
+            YieldsApplication.getBinder().sendRequest(rssCreaterequest);
         }
 
         return true;
@@ -88,17 +101,21 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
             //TODO Add right change type
 
             case GROUP_LIST:
-                String message = getString(R.string.messageRssCreated);
-                YieldsApplication.showToast(getApplicationContext(), message);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String message = getString(R.string.messageRssCreated);
+                        YieldsApplication.showToast(getApplicationContext(), message);
 
-                //TODO Check if new request is necessary
+                        //TODO Check if new request is necessary
 
-                Intent createGroupIntent = new Intent(this, GroupActivity.class);
-                createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        Intent createGroupIntent = new Intent(CreateRSSFeedActivity.this, GroupActivity.class);
+                        createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-                startActivity(createGroupIntent);
-
+                        startActivity(createGroupIntent);
+                    }
+                });
                 break;
 
             default:

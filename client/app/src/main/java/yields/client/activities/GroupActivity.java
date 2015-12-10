@@ -13,10 +13,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import yields.client.R;
 import yields.client.listadapter.ListAdapterGroups;
+import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -154,6 +157,7 @@ public class GroupActivity extends NotifiableActivity {
                     public void run() {
                         mGroups.clear();
                         mGroups.addAll(YieldsApplication.getUser().getUserGroups());
+                        Collections.sort(mGroups, mComparator);
                         mAdapterGroups.notifyDataSetChanged();
 
                         checkNoGroup();
@@ -225,4 +229,15 @@ public class GroupActivity extends NotifiableActivity {
             mTextViewNoGroup.setVisibility(View.GONE);
         }
     }
+
+    /**
+     * The group comparator.
+     */
+    private final Comparator<Group> mComparator = new Comparator<Group>() {
+
+        @Override
+        public int compare(Group lhs, Group rhs) {
+            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
+        }
+    };
 }

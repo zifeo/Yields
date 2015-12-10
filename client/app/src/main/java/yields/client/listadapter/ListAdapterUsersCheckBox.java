@@ -74,7 +74,7 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
 
         textViewUserName.setText(user.getName());
 
-        imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+        imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImage(),
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
         boolean b = mUsers.get(position).getValue();
