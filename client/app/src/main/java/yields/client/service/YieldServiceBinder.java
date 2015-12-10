@@ -5,6 +5,7 @@ import android.os.Binder;
 import java.util.Objects;
 
 import yields.client.activities.NotifiableActivity;
+import yields.client.id.Id;
 import yields.client.servicerequest.ServiceRequest;
 
 public class YieldServiceBinder extends Binder {
@@ -61,5 +62,9 @@ public class YieldServiceBinder extends Binder {
      */
     public void changeStatus(NotifiableActivity.Change newStatus) {
         connected = newStatus;
+    }
+
+    public void cancelNotificationFromId(Id groupId) {
+        mService.cancelNotificationForGroupId(groupId);
     }
 }

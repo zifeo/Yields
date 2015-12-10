@@ -44,7 +44,6 @@ public class Group extends Node {
     private boolean mValidated;
     private List<User> mUsers;
     private List<Group> mNodes;
-    private Bitmap mImage;
     private GroupType mType;
     private Set<Tag> mTags;
     private Date mDate;
@@ -62,18 +61,17 @@ public class Group extends Node {
      */
     public Group(String name, Id id, List<Id> users, Bitmap image, GroupType type,
                  boolean validated, Date lastUpdate) {
-        super(name, id);
-        Objects.requireNonNull(users);
-        Objects.requireNonNull(lastUpdate);
-        this.mMessages = new TreeMap<>();
-        mUsers = new ArrayList<>();
-        mImage = Objects.requireNonNull(image);
+        super(name, id, image);
+        mDate = Objects.requireNonNull(lastUpdate);
+        mMessages = new TreeMap<>();
         mValidated = validated;
         mType = type;
         mTags = new HashSet<>();
         mDate = lastUpdate;
         mNodes = new ArrayList<>();
 
+        Objects.requireNonNull(users);
+        mUsers = new ArrayList<>();
         for (Id uId : users) {
             mUsers.add(YieldsApplication.getUserFromId(uId));
         }
@@ -87,11 +85,10 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, Group group) {
-        super(name, id);
+        super(name, id, group.getImage());
         Objects.requireNonNull(group);
         this.mMessages = new TreeMap<>();
         mUsers = group.getUsers();
-        mImage = group.getImage();
         mValidated = false;
         mType = GroupType.PRIVATE;
         mTags = new HashSet<>();
@@ -124,6 +121,20 @@ public class Group extends Node {
     public Group(String name, Id id, List<Id> users) {
         this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
                 false, new Date());
+    }
+
+    /**
+     * Overloaded constructor.
+     *
+     * @param name  The name of the group
+     * @param id    The id of the group
+     * @param users The current users of the group
+     * @throws NodeException if one of the node is null.
+     */
+    public Group(String name, Id id, List<Id> users, Id node) {
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
+                false, new Date());
+        this.addNode(YieldsApplication.getUser().getNodeFromId(node));
     }
 
     /**
@@ -176,8 +187,10 @@ public class Group extends Node {
      *
      * @param date The date of the last update.
      */
-    public void setLastUpdate(Date date) {
-        mDate = new Date(date.getTime());
+    public void setLastUpdate(Date date){
+        if (date.compareTo(mDate) > 0) {
+            mDate = new Date(date.getTime());
+        }
     }
 
     /**
@@ -189,7 +202,7 @@ public class Group extends Node {
      * @return The group wrapper for this message.
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
-        return new Group("message comment", messageComment.getId(), group);
+        return new Group("message comment", messageComment.getCommentGroupId(), group);
     }
 
     /**
@@ -213,7 +226,7 @@ public class Group extends Node {
 
         if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
-            message.setId(contentId);
+            message.setCommentGroupId(contentId);
             message.recomputeView();
             mMessages.put(newDate, message);
             return message;
@@ -276,6 +289,18 @@ public class Group extends Node {
     }
 
     /**
+     * Changes/updates the users of the group
+     *
+     * @param nodeList
+     */
+    public void updateNodes(ArrayList<Id> nodeList) {
+        mNodes.clear();
+        for (Id uId : nodeList) {
+            mNodes.add(YieldsApplication.getUser().getNodeFromId(uId));
+        }
+    }
+
+    /**
      * Gets all nodes from a group.
      *
      * @return A list of group nodes.
@@ -290,7 +315,7 @@ public class Group extends Node {
      * @param node The group node to add.
      */
     public void addNode(Group node) {
-        mNodes.add(node);
+        mNodes.add(Objects.requireNonNull(node));
     }
 
     /**
@@ -320,6 +345,7 @@ public class Group extends Node {
      */
     synchronized public void addMessage(Message newMessage) {
         Message previous = mMessages.put(newMessage.getDate(), newMessage);
+        this.setLastUpdate(newMessage.getDate());
         String previousMessage;
         if (previous == null) {
             previousMessage = "null";
@@ -348,25 +374,6 @@ public class Group extends Node {
         if (!mMessages.isEmpty()) {
             setLastUpdate(mMessages.lastKey());
         }
-    }
-
-
-    /**
-     * Set the image to the group
-     *
-     * @param image A squared image which this method will make circular
-     */
-    public void setImage(Bitmap image) {
-        mImage = Objects.requireNonNull(image);
-    }
-
-    /**
-     * Returns the group's image
-     *
-     * @return the group's image, uncropped
-     */
-    public Bitmap getImage() {
-        return mImage;
     }
 
     /**
