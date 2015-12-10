@@ -375,7 +375,7 @@ public class MessageActivity extends NotifiableActivity {
             case R.id.actionSettingsGroup:
                 Log.d("MessageActivity", "actionSettingsGroup.");
 
-                if (getType() == ContentType.GROUP_MESSAGES){
+                if (getType() == ContentType.GROUP_MESSAGES) {
                     YieldsApplication.setInfoGroup(mGroup);
 
                     Intent intent = new Intent(this, GroupSettingsActivity.class);
@@ -656,13 +656,6 @@ public class MessageActivity extends NotifiableActivity {
             mGroupMessageAdapter.add(message);
         }
 
-        ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
-
-        if (mGroupMessageAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
-            listView.setSelection(mGroupMessageAdapter.getCount() - 1);
-        } else {
-            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
-        }
 
         mGroupMessageAdapter.notifyDataSetChanged();
     }
@@ -681,11 +674,7 @@ public class MessageActivity extends NotifiableActivity {
 
         ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();
 
-        if (mCommentAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
-            listView.setSelection(mCommentAdapter.getCount() - 1);
-        } else {
-            listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-        }
+        listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
 
         mCommentAdapter.notifyDataSetChanged();
     }
