@@ -152,7 +152,7 @@ public class ClientUser extends User {
      * @return The list of user connected to this user.
      */
     public List<User> getEntourage() {
-        return Collections.unmodifiableList(mEntourage);
+        return new ArrayList<>(mEntourage);
     }
 
     /**
