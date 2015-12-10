@@ -15,7 +15,6 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
@@ -23,6 +22,7 @@ import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeSearchRequest;
+import yields.client.servicerequest.RSSCreateRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -123,6 +123,9 @@ public class ServiceRequestController {
             case USER_CONNECT:
                 mRequestHandler.handleUserConnectRequest(serviceRequest);
                 break;
+            case RSS_CREATE:
+                mRequestHandler.handleRssCreateRequest((RSSCreateRequest) serviceRequest);
+                break;
             case USER_UPDATE:
                 mRequestHandler.handleUserUpdateRequest((UserUpdateRequest) serviceRequest);
                 break;
@@ -145,7 +148,7 @@ public class ServiceRequestController {
                 mRequestHandler.handleGroupCreateRequest((GroupCreateRequest) serviceRequest);
                 break;
             case GROUP_INFO:
-                mRequestHandler.handleGroupInfoRequest((GroupInfoRequest) serviceRequest);
+                mRequestHandler.handleGroupInfoRequest(serviceRequest);
                 break;
             case GROUP_UPDATE_NAME:
                 mRequestHandler.handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
@@ -249,6 +252,9 @@ public class ServiceRequestController {
                 break;
             case MEDIA_MESSAGE_RESPONSE:
                 mResponseHandler.handleMediaMessageResponse(serverResponse);
+                break;
+            case RSS_INFO_RES:
+                mResponseHandler.handleRSSInfoResponse(serverResponse);
                 break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "No such response kind : " +

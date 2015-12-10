@@ -100,7 +100,7 @@ public class SearchGroupActivity extends NotifiableActivity{
         mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                YieldsApplication.setGroup(mCurrentGroups.get(position));
+                YieldsApplication.setInfoGroup(mCurrentGroups.get(position));
 
                 Intent intent = new Intent(SearchGroupActivity.this, GroupInfoActivity.class);
                 intent.putExtra(SearchGroupActivity.MODE_KEY, mMode.ordinal());
