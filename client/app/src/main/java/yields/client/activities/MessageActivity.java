@@ -116,7 +116,8 @@ public class MessageActivity extends NotifiableActivity {
         });
 
         mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+
+
 
         mImagePickedFromGallery = null;
         mSendImage = false;
@@ -128,9 +129,28 @@ public class MessageActivity extends NotifiableActivity {
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
-        mType = ContentType.GROUP_MESSAGES;
         mFragmentManager = getFragmentManager();
-        createGroupMessageFragment();
+
+        if (this.getIntent().getBooleanExtra(YieldService.NOTIFICATION, false)) {
+            Id groupId = new Id(this.getIntent().getLongExtra(YieldService.GROUP_RECEIVING, 0));
+            if (groupId.getId() != 0) {
+                mGroup = mUser.getGroup(groupId);
+                if (mGroup == null) {
+                    mGroup = mUser.getCommentGroup(groupId);
+                    YieldsApplication.setGroup(mGroup);
+                    mType = ContentType.MESSAGE_COMMENTS;
+                    createCommentFragment();
+                } else {
+                    YieldsApplication.setGroup(mGroup);
+                    mType = ContentType.GROUP_MESSAGES;
+                    createGroupMessageFragment();
+                }
+            }
+        } else {
+            mGroup = YieldsApplication.getGroup();
+            mType = ContentType.GROUP_MESSAGES;
+            createGroupMessageFragment();
+        }
 
         if (YieldsApplication.getBinder() != null) {
             NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
@@ -555,7 +575,7 @@ public class MessageActivity extends NotifiableActivity {
                             // message
                             Group commentGroup = YieldsApplication.getUser()
                                     .getCommentGroup(mCommentMessage.getCommentGroupId());
-                            if(commentGroup == null){
+                            if (commentGroup == null) {
                                 commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
                                 YieldsApplication.getUser().addCommentGroup(commentGroup);
                             }
