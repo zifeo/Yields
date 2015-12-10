@@ -17,6 +17,7 @@ import yields.client.exceptions.ContentException;
 import yields.client.id.Id;
 import yields.client.messages.Content;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.servicerequest.ServiceRequest;
 
 /**
@@ -35,7 +36,8 @@ public class RequestBuilder {
         CONTENT_TYPE("contentType"), UID("uid"),
         TAG("tags"), DATE("date"), ADD_ENTOURAGE("addEntourage"),
         REMOVE_ENTOURAGE("removeEntourage"), PATTERN("pattern"), ADD_USERS("addUsers"),
-        REM_USERS("removeUsers"), ADD_NODES("addNodes"), REM_NODES("removeNodes");
+        REM_USERS("removeUsers"), ADD_NODES("addNodes"), REM_NODES("removeNodes"), URL("url"),
+        FILTER("filter");
 
         private final String name;
 
@@ -98,8 +100,7 @@ public class RequestBuilder {
      */
     public static ServerRequest userUpdateInfoRequest(Id sender, String name, String email,
                                                       Bitmap image) {
-        return userUpdateRequest(sender, name, email, image, null,
-                null);
+        return userUpdateRequest(sender, name, email, image, null, null);
     }
 
     /**
@@ -158,6 +159,23 @@ public class RequestBuilder {
         RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_INFO, sender);
 
         builder.addField(Fields.NID, groupId);
+
+        return builder.request();
+    }
+
+    /**
+     * ServerRequest for retrieving information on a Group.
+     *
+     * @param sender  The Id of the sender of the request, which wants the information.
+     * @param nodeId The Id of the Group.
+     * @return The appropriate ServerRequest.
+     */
+    public static ServerRequest nodeInfoRequest(Id sender, Id nodeId) {
+        Objects.requireNonNull(sender);
+
+        RequestBuilder builder = new RequestBuilder(ServiceRequest.RequestKind.NODE_INFO, sender);
+
+        builder.addField(Fields.NID, nodeId);
 
         return builder.request();
     }
@@ -250,45 +268,68 @@ public class RequestBuilder {
         return builder.request();
     }
 
-
-    //TODO : See with server why no public/private
-
     /**
      * Creates a Group create request.
      *
      * @param sender     The id of the sender.
-     * @param name       The new name of the group.
-     * @param visibility The visibility of the group.
+     * @param group      The group to create.
      * @param users      The users attached to the group.
      * @return The request itself.
      */
-    public static ServerRequest groupCreateRequest(Id sender, String name,
-                                                   Group.GroupType visibility,
+    public static ServerRequest groupCreateRequest(Id sender, Group group,
                                                    List<Id> users, List<Id> nodes) {
         Objects.requireNonNull(sender);
-        Objects.requireNonNull(name);
+        Objects.requireNonNull(group.getName());
         Objects.requireNonNull(users);
-        Objects.requireNonNull(visibility);
-
-        if (users.size() < 1) {
-            throw new IllegalArgumentException("No nodes to add...");
-        }
+        Objects.requireNonNull(group.getType());
 
         RequestBuilder builder;
 
-        if (visibility == Group.GroupType.PRIVATE) {
+        if (group.getType() == Group.GroupType.PRIVATE) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
         } else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
             builder.addField(Fields.TAG, new ArrayList<>());
         }
 
-        builder.addField(Fields.NAME, name);
+        builder.addField(Fields.NAME, group.getName());
         builder.addField(Fields.NODES, nodes);
         builder.addField(Fields.USERS, users);
 
+        group.setRef(new Date());
+        builder.addField(Fields.DATE, group.getRef());
+
         return builder.request();
     }
+
+    /**
+     * Creates a Group create request.
+     *
+     * @param sender     The id of the sender.
+     * @return The request itself.
+     */
+    public static ServerRequest rssCreateRequest(Id sender, Node rss,
+                                                   String url, String filter) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(rss.getName());
+        Objects.requireNonNull(url);
+        Objects.requireNonNull(filter);
+
+        RequestBuilder builder;
+
+        builder = new RequestBuilder(ServiceRequest.RequestKind.RSS_CREATE, sender);
+
+        builder.addField(Fields.NAME, rss.getName());
+        builder.addField(Fields.URL, url);
+        builder.addField(Fields.FILTER, filter);
+        builder.addField(Fields.TAG, new ArrayList<>());
+
+        rss.setRef(new Date());
+        builder.addField(Fields.DATE, rss.getRef());
+
+        return builder.request();
+    }
+
 
     /**
      * ServerRequest for updating the group name.

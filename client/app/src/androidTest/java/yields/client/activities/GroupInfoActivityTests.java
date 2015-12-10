@@ -56,7 +56,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
     public void testCorrectName(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
                 YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
 
         getActivity();
         onView(withId(R.id.textViewGroupName)).check(matches(withText("Kapoue")));
@@ -68,7 +68,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
     public void testCorrectNoTags(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
                 YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         onView(withId(R.id.textViewTags)).check(matches(withText(R.string.noTags)));
@@ -82,7 +82,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
                 YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         g.addTag(new Group.Tag("fun"));
 
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         onView(withId(R.id.textViewTags)).check(matches(withText("Tag : fun")));
@@ -97,7 +97,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         g.addTag(new Group.Tag("fun"));
         g.addTag(new Group.Tag("happy"));
 
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         String tags = ((TextView) getActivity().findViewById(R.id.textViewTags)).getText().toString();
@@ -120,7 +120,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         g.addUser(new Id(121));
         g.addUser(new Id(123));
 
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         onView(withText("Ratchet")).perform(click());
@@ -135,7 +135,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
                 YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
 
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         onView(withId(R.id.buttonSubscribeGroup)).perform(click());
@@ -152,7 +152,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         sub.addUser(YieldsApplication.getUser().getId());
         sub.addNode(g);
 
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         onView(withId(R.id.buttonUnsubscribeGroup)).perform(click());

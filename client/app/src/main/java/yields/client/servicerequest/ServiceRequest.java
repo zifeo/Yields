@@ -22,6 +22,7 @@ public abstract class ServiceRequest {
         USER_SEARCH("UserSearch"),
 
         NODE_HISTORY("NodeHistory"),
+        NODE_INFO("NodeInfo"),
         NODE_SEARCH("NodeSearch"),
 
         GROUP_CREATE("GroupCreate"),
@@ -33,6 +34,8 @@ public abstract class ServiceRequest {
         PUBLISHER_CREATE("PublisherCreate"),
         PUBLISHER_INFO("PublisherInfo"),
         PUBLISHER_MESSAGE("PublisherMessage"),
+
+        RSS_CREATE("RSSCreate"),
 
         MEDIA_MESSAGE("MediaMessage");
 
