@@ -129,7 +129,7 @@ public class ServiceRequestController {
             case USER_UPDATE_NAME:
                 mRequestHandler.handleUserUpdateNameRequest((UserUpdateNameRequest) serviceRequest);
                 break;
-            case USER_GROUP_LIST:
+            case USER_NODE_LIST:
                 mRequestHandler.handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
                 break;
             case USER_ENTOURAGE_ADD:
