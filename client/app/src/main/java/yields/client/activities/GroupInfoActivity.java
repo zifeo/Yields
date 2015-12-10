@@ -124,7 +124,7 @@ public class GroupInfoActivity extends NotifiableActivity {
 
             textViewUserName.setText(user.getName());
 
-            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImage(),
                     getApplicationContext().getResources().getInteger(R.integer.groupImageDiameter)));
 
             userView.setClickable(true);
