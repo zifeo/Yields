@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.text.Html;
@@ -199,11 +200,7 @@ public class CommentViewTests extends ActivityInstrumentationTestCase2<MessageAc
                 break;
             case URL:
                 content = new UrlContent("topkek 9gag.com");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                SystemClock.sleep(1000);
                 break;
         }
         mDate = new Date();
