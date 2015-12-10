@@ -24,8 +24,8 @@ import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.Response;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupInfoRequest;
-import yields.client.servicerequest.NodeInfoRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
+import yields.client.servicerequest.NodeInfoRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserGroupListRequest;
@@ -157,7 +157,7 @@ public class ResponseHandler {
                 Id nodeId = new Id(nodes.getLong(i));
                 nodeList.add(nodeId);
                 if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Group newNode = new Group("", nodeId,new ArrayList<Id>());
+                    Group newNode = new Group("", nodeId, new ArrayList<Id>());
                     YieldsApplication.getUser().addNode(newNode);
                     ServiceRequest nodeInfo =
                             new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
@@ -243,14 +243,6 @@ public class ResponseHandler {
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
-    protected void handlePublisherUpdateResponse(Response serverResponse) {
-        // Nothing to parse.
-        // TODO : decide what to do.
-    }
-
-    /**
-     * Handles the appropriate Response which is given to it by argument.
-     */
     protected void handlePublisherInfoResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
@@ -275,7 +267,7 @@ public class ResponseHandler {
                 Id nodeId = new Id(nodes.getLong(i));
                 nodeList.add(nodeId);
                 if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Group newNode = new Group("", nodeId,new ArrayList<Id>());
+                    Group newNode = new Group("", nodeId, new ArrayList<Id>());
                     YieldsApplication.getUser().addNode(newNode);
                     ServiceRequest nodeInfo =
                             new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
@@ -287,11 +279,11 @@ public class ResponseHandler {
             String name = response.getString("name");
             String image = response.getString("pic");
             Group group = YieldsApplication.getUser().getGroup(new Id(nid));
+
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
             }
-            group.updateUsers(userList);
             group.setType(Group.GroupType.PUBLISHER);
 
             ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
@@ -359,7 +351,6 @@ public class ResponseHandler {
                     serverResponse.object().toString());
         }
     }
-
 
 
     /**
@@ -515,17 +506,33 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             String name = response.getString("name");
             JSONArray users = response.getJSONArray("users");
-            //TODO: Ask for this !!!!
-            //JSONArray nodes = response.getJSONArray("nodes");
+            JSONArray nodes = response.getJSONArray("nodes");
 
             ArrayList<Id> userList = new ArrayList<>();
             for (int i = 0; i < users.length(); i++) {
                 userList.add(new Id(users.getLong(i)));
             }
 
-            Group newGroup = new Group(name, new Id(nid), userList);
-            newGroup.setLastUpdate(new Date());
+            ArrayList<Id> nodeList = new ArrayList<>();
+            for (int i = 0; i < nodes.length(); i++) {
+                userList.add(new Id(nodes.getLong(i)));
+            }
+
+            Bitmap image = YieldsApplication.getDefaultGroupImage();
+
+            Group newGroup = new Group(name, new Id(nid), userList, image, Group.GroupType.PUBLISHER, true, new Date());
+            newGroup.updateNodes(nodeList);
             YieldsApplication.getUser().addGroup(newGroup);
+
+            for (Id userId : userList) {
+                UserInfoRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(), userId);
+                mService.sendRequest(userInfoRequest);
+            }
+
+            for (Id nodeId : nodeList) {
+                NodeInfoRequest nodeInfoRequest = new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
+                mService.sendRequest(nodeInfoRequest);
+            }
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -537,51 +544,8 @@ public class ResponseHandler {
      * Handles the appropriate Response which is given to it by argument.
      */
     protected void handlePublisherUpdateBroadcast(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-            Id nid = new Id(response.getLong("nid"));
-            String name = response.getString("name");
-            JSONArray users = response.getJSONArray("users");
-            // TODO: Ask for this !!!
-            //JSONArray nodes = response.getJSONArray("nodes");
-
-            ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0; i < users.length(); i++) {
-                userList.add(new Id(users.getLong(i)));
-            }
-
-            Group group = YieldsApplication.getUser().getGroup(nid);
-            group.updateUsers(userList);
-            group.setImage(ImageSerialization.unSerializeImage(response.getString("pic")));
-            group.setName(name);
-
-            mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
-        } catch (JSONException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    /**
-     * Handles the appropriate Response which is given to it by argument.
-     */
-    protected void handlePublisherMessageBroadcast(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-
-            long contentNid = response.optLong("contentNid", -1);
-
-            Message message = new Message(response.getString("datetime"), contentNid,
-                    response.getLong("sender"), response.getString("text"),
-                    response.getString("contentType"), response.getString("content"));
-
-            Id groupId = new Id(response.getLong("nid"));
-
-            mService.receiveMessage(groupId, message);
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
+        UserGroupListRequest request = new UserGroupListRequest(YieldsApplication.getUser());
+        mService.sendRequest(request);
     }
 
     /**
