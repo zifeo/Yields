@@ -155,9 +155,8 @@ public class GroupActivity extends NotifiableActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mGroups.clear();
-                        mGroups.addAll(YieldsApplication.getUser().getUserGroups());
-                        Collections.sort(mGroups, mComparator);
+                        mAdapterGroups.clear();
+                        mAdapterGroups.addAll(YieldsApplication.getUser().getUserGroups());
                         mAdapterGroups.notifyDataSetChanged();
 
                         checkNoGroup();
@@ -229,15 +228,4 @@ public class GroupActivity extends NotifiableActivity {
             mTextViewNoGroup.setVisibility(View.GONE);
         }
     }
-
-    /**
-     * The group comparator.
-     */
-    private final Comparator<Group> mComparator = new Comparator<Group>() {
-
-        @Override
-        public int compare(Group lhs, Group rhs) {
-            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
-        }
-    };
 }
