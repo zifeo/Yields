@@ -59,7 +59,7 @@ public class MessageActivity extends NotifiableActivity {
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
     private static ClientUser mUser;
-    private static Group mGroup;
+    private Group mGroup;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImagePickedFromGallery;
     private boolean mSendImage;
@@ -137,14 +137,22 @@ public class MessageActivity extends NotifiableActivity {
                 mGroup = mUser.getGroup(groupId);
                 if (mGroup == null) {
                     mGroup = mUser.getCommentGroup(groupId);
-                    YieldsApplication.setGroup(mGroup);
-                    mType = ContentType.MESSAGE_COMMENTS;
-                    createCommentFragment();
+                    if (mGroup == null) {
+                        YieldsApplication.setGroup(mGroup);
+                        mType = ContentType.MESSAGE_COMMENTS;
+                        createCommentFragment();
+                    } else {
+                        throw new IllegalStateException("there is no group for id : " + groupId.getId() );
+                    }
                 } else {
                     YieldsApplication.setGroup(mGroup);
                     mType = ContentType.GROUP_MESSAGES;
                     createGroupMessageFragment();
                 }
+
+                Log.d("Delete", groupId.getId().toString());
+                YieldsApplication.getBinder().cancelNotificationFromId(groupId);
+
             }
         } else {
             mGroup = YieldsApplication.getGroup();
