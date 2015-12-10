@@ -30,6 +30,7 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateNodesRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -104,9 +105,13 @@ public class GroupSettingsActivity extends AppCompatActivity {
         super.onResume();
 
         if (YieldsApplication.isGroupAddedValid()){
+            List<Group> groups = new ArrayList<>();
             Group group = YieldsApplication.getGroupAdded();
+            groups.add(group);
 
-            // TODO Send the request to add the new group
+            ServiceRequest updateNode = new GroupUpdateNodesRequest(YieldsApplication.getUser().getId(),
+                    mGroup.getId(), groups, GroupUpdateNodesRequest.UpdateType.ADD);
+            YieldsApplication.getBinder().sendRequest(updateNode);
 
             String text = "Group \"" + group.getName() + "\" added";
             YieldsApplication.showToast(getApplicationContext(), text);

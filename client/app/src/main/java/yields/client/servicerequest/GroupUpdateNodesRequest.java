@@ -27,7 +27,8 @@ public class GroupUpdateNodesRequest extends ServiceRequest {
      * @param groupId  The Id of the Group that should be renamed.
      * @param groups   The users to add or delete from the group
      */
-    public GroupUpdateNodesRequest(Id senderId, Id groupId, List<Group> groups, UpdateType updateType) {
+    public GroupUpdateNodesRequest(Id senderId, Id groupId, List<Group> groups,
+                                   GroupUpdateNodesRequest.UpdateType updateType) {
         super();
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
@@ -46,7 +47,7 @@ public class GroupUpdateNodesRequest extends ServiceRequest {
      */
     @Override
     public ServiceRequest.RequestKind getType() {
-        return RequestKind.GROUP_UPDATE_USERS;
+        return RequestKind.GROUP_UPDATE_NODES;
     }
 
     /**

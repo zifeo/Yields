@@ -12,6 +12,7 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupCreateRequest;
+import yields.client.servicerequest.GroupUpdateNodesRequest;
 import yields.client.servicerequest.NodeInfoRequest;
 import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupMessageRequest;
@@ -180,6 +181,15 @@ public class RequestHandler {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }
+
+    /**
+     * Handles the appropriate ServiceRequest which is given to it by argument.
+     */
+    protected void handleGroupUpdateNodesRequest(GroupUpdateNodesRequest serviceRequest) {
+        ServerRequest serverRequest = serviceRequest.parseRequestForServer();
+        mController.sendToServer(serverRequest);
+    }
+
 
     /**
      * Handles the appropriate ServiceRequest which is given to it by argument.

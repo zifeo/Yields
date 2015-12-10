@@ -20,7 +20,7 @@ public abstract class ServiceRequest {
         PUBLISHER_CREATE("PublisherCreate"), GROUP_MESSAGE("GroupMessage"), MEDIA_MESSAGE("MediaMessage"),
         GROUP_UPDATE_USERS("GroupUpdate"), PUBLISHER_MESSAGE("PublisherMessage"),
         USER_UPDATE_NAME("UserUpdate"), PUBLISHER_INFO("PublisherInfo"), NODE_INFO("NodeInfo"),
-        RSS_CREATE("RSSCreate");
+        RSS_CREATE("RSSCreate"), GROUP_UPDATE_NODES("GroupUpdate");
 
         private final String mName;
 
