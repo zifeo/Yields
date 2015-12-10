@@ -247,8 +247,13 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             Group group = YieldsApplication.getUser().getGroup(groupId);
-
             group.addMessage(message);
+
+            if(!message.getCommentGroupId().equals(new Id(-1))){
+                Group commentGroup = Group.createGroupForMessageComment(message, group);
+                YieldsApplication.getUser().addCommentGroup(commentGroup);
+            }
+
             sendMessageNotification(group, message);
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
