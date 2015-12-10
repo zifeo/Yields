@@ -31,7 +31,7 @@ public class Response {
         GROUP_MESSAGE_RESPONSE("GroupMessageRes"),
 
         PUBLISHER_CREATE_RESPONSE("PublisherCreateRes"), PUBLISHER_CREATE_BCAST("PublisherCreateBrd"),
-        PUBLISHER_UPDATE_RESPONSE("PublisherUpdateRes"), PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"),
+        PUBLISHER_UPDATE_BCAST("PublisherUpdateBrd"),
         PUBLISHER_INFO_RESPONSE("PublisherInfoRes"),
         PUBLISHER_MESSAGE_RESPONSE("PublisherMessageRes"),
 
