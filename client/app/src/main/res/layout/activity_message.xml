@@ -76,10 +76,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/addImageButton"
-                android:src="@drawable/camera_icon"
-                android:background="#ffffff"
+                android:src="@drawable/ic_photo_camera_black_24dp"
                 android:onClick="onClickAddImage"
                 android:nestedScrollingEnabled="false"
+                android:background="#00FFFFFF"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
                 android:layout_margin="6dp" />
@@ -98,8 +98,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:id="@+id/sendButton"
-                android:src="@drawable/send_icon"
-                android:background="#ffffff"
+                android:src="@drawable/ic_send_black_24dp"
+                android:background="#00FFFFFF"
                 android:layout_weight="0.15"
                 android:layout_margin="6dp"
                 android:onClick="onSendMessage" />
