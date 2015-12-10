@@ -385,7 +385,7 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void run() {
                 if (mMenu != null) {
-                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.tick);
+                    mMenu.findItem(R.id.iconConnect).setVisible(false);
                 }
             }
         });
@@ -397,7 +397,8 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void run() {
                 if (mMenu != null) {
-                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.cross);
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.ic_cancel_black_24dp);
+                    mMenu.findItem(R.id.iconConnect).setVisible(true);
                 }
             }
         });
@@ -552,7 +553,7 @@ public class MessageActivity extends NotifiableActivity {
                             // Then we update the group currently displayed as it is the commented
                             // message
                             Group commentGroup = YieldsApplication.getUser().getCommentGroup(mCommentMessage.getId());
-                            if(commentGroup == null){
+                            if (commentGroup == null) {
                                 commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
                                 YieldsApplication.getUser().addCommentGroup(commentGroup);
                             }
