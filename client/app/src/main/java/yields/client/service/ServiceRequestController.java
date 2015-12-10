@@ -217,9 +217,6 @@ public class ServiceRequestController {
             case PUBLISHER_CREATE_RESPONSE:
                 mResponseHandler.handlePublisherCreateResponse(serverResponse);
                 break;
-            case PUBLISHER_UPDATE_RESPONSE:
-                mResponseHandler.handlePublisherUpdateResponse(serverResponse);
-                break;
             case PUBLISHER_INFO_RESPONSE:
                 mResponseHandler.handlePublisherInfoResponse(serverResponse);
                 break;
