@@ -89,7 +89,8 @@ public class RequestsTest {
     @Test
     public void groupUpdateImageRequestTest() {
 
-        GroupUpdateImageRequest req = new GroupUpdateImageRequest(mUser, mGroup.getId(), mImage);
+        GroupUpdateImageRequest req = new GroupUpdateImageRequest(mUser, mGroup.getId(), mImage,
+                Group.GroupType.PRIVATE);
         assertEquals(mGroup.getId(), req.getGroupId());
         assertEquals(mImage.getByteCount(), req.getNewGroupImage().getByteCount());
         assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_IMAGE, req.getType());
@@ -103,7 +104,8 @@ public class RequestsTest {
     public void groupUpdateNameRequestTest() {
 
         String newName = "new name";
-        GroupUpdateNameRequest req = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName);
+        GroupUpdateNameRequest req = new GroupUpdateNameRequest(mUser, mGroup.getId(), newName,
+                Group.GroupType.PRIVATE);;
         assertEquals(mGroup.getId(), req.getGroupId());
         assertEquals(newName, req.getNewGroupName());
         assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_NAME, req.getType());
@@ -120,7 +122,8 @@ public class RequestsTest {
         List<User> newUsers = new ArrayList<>();
         newUsers.add(mUser);
         GroupUpdateUsersRequest req = new GroupUpdateUsersRequest(mUser.getId(), mGroup.getId(),
-                newUsers, GroupUpdateUsersRequest.UpdateType.ADD);
+                newUsers, GroupUpdateUsersRequest.UpdateType.ADD,
+                Group.GroupType.PRIVATE);;
         assertEquals(mGroup.getId(), req.getGroupId());
         assertEquals(GroupUpdateUsersRequest.UpdateType.ADD, req.getUpdateType());
         assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_USERS, req.getType());
