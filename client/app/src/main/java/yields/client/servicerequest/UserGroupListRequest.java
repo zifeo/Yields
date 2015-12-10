@@ -1,12 +1,9 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**
@@ -35,7 +32,7 @@ public class UserGroupListRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.USER_GROUP_LIST;
+        return RequestKind.USER_NODE_LIST;
     }
 
     /**
