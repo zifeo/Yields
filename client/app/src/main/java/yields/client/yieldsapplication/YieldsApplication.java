@@ -26,6 +26,7 @@ public class YieldsApplication {
     private static List<User> mUserList;
     private static List<User> mNotKnown = new ArrayList<>();
     private static Group mGroup;
+    private static Group mInfoGroup;
 
     private static List<Group> mGroupsSearched = new ArrayList<>();
     private static Date mLastDateSearch;
@@ -205,6 +206,27 @@ public class YieldsApplication {
     public static void setGroup(Group g) {
         Objects.requireNonNull(g);
         mGroup = g;
+    }
+
+    /**
+     * Setter for the group to be displayed in the Message Activity.
+     *
+     * @param g The group.
+     */
+
+    public static void setInfoGroup(Group g) {
+        Objects.requireNonNull(g);
+        mInfoGroup = g;
+    }
+
+    /**
+     * Getter for the group to be displayed in the Message Activity.
+     *
+     * @return The group.
+     */
+
+    public static Group getInfoGroup() {
+        return mInfoGroup;
     }
 
     public static void nullGroup() {
