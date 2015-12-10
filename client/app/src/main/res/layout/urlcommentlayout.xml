@@ -5,12 +5,20 @@
     <LinearLayout
         android:id="@+id/captionholder"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/caption"
+        android:layout_height="93dp">
+
+        <ScrollView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp"/>
+            android:layout_height="match_parent"
+            android:id="@+id/scrollView2">
+
+            <TextView
+                android:id="@+id/caption"
+                android:layout_width="wrap_content"
+                android:layout_height="93dp"
+                android:layout_margin="6dp"
+                android:scrollIndicators="right"/>
+        </ScrollView>
     </LinearLayout>
 
     <LinearLayout
@@ -18,23 +26,26 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@+id/captionholder"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:id="@+id/webpageinfos">
 
         <ImageView
             android:id="@+id/pageicon"
             android:layout_width="93dp"
-            android:layout_height="93dp"/>
+            android:layout_height="93dp"
+            android:layout_marginLeft="6dp"/>
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="93dp"
             >
 
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_margin="6dp">
                 <TextView
                     android:id="@+id/title"
                     android:layout_width="fill_parent"
@@ -48,20 +59,22 @@
                     android:layout_marginLeft="6dp"/>
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/messageinfoholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/messageinfos"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3px"
-                    android:layout_marginBottom="3px"
-                    android:layout_marginLeft="6dp"/>
-            </LinearLayout>
-
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/messageinfoholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/webpageinfos">
+        <TextView
+            android:id="@+id/messageinfos"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3px"
+            android:layout_marginBottom="3px"
+            android:layout_marginLeft="6dp"/>
     </LinearLayout>
 
 </RelativeLayout>
