@@ -157,4 +157,21 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
 
         onView(withId(R.id.buttonUnsubscribeGroup)).perform(click());
     }
+
+    /**
+     * Test that add the node to the group.
+     */
+    public void testAddGroup(){
+        Intent intent = new Intent();
+        intent.putExtra(SearchGroupActivity.MODE_KEY, 2);
+        setActivityIntent(intent);
+
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
+        YieldsApplication.setInfoGroup(g);
+
+        getActivity();
+
+        onView(withId(R.id.buttonAddGroup)).perform(click());
+    }
 }
