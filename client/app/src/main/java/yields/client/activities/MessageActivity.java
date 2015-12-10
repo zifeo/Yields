@@ -59,7 +59,7 @@ public class MessageActivity extends NotifiableActivity {
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
     private static ClientUser mUser;
-    private static Group mGroup;
+    private Group mGroup;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Bitmap mImagePickedFromGallery;
     private boolean mSendImage;
@@ -105,18 +105,22 @@ public class MessageActivity extends NotifiableActivity {
 
         mTextTitle = (TextView) findViewById(R.id.toolbarTitle);
 
+        mType = ContentType.GROUP_MESSAGES;
+
         mTextTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                YieldsApplication.setGroup(mGroup);
-                Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
-                intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
-                startActivity(intent);
+                if (mType == ContentType.GROUP_MESSAGES) {
+                    YieldsApplication.setInfoGroup(mGroup);
+                    Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
+                    intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+                    startActivity(intent);
+                }
             }
         });
 
         mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+
 
         mImagePickedFromGallery = null;
         mSendImage = false;
@@ -128,9 +132,37 @@ public class MessageActivity extends NotifiableActivity {
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
-        mType = ContentType.GROUP_MESSAGES;
         mFragmentManager = getFragmentManager();
-        createGroupMessageFragment();
+
+        if (this.getIntent().getBooleanExtra(YieldService.NOTIFICATION, false)) {
+            Id groupId = new Id(this.getIntent().getLongExtra(YieldService.GROUP_RECEIVING, 0));
+            if (groupId.getId() != 0) {
+                mGroup = mUser.getGroup(groupId);
+                if (mGroup == null) {
+                    mGroup = mUser.getCommentGroup(groupId);
+                    if (mGroup == null) {
+                        YieldsApplication.setGroup(mGroup);
+                        mType = ContentType.MESSAGE_COMMENTS;
+                        createCommentFragment();
+                    } else {
+                        throw new IllegalStateException("there is no group for id : " + groupId.getId());
+                    }
+                } else {
+                    YieldsApplication.setGroup(mGroup);
+                    YieldsApplication.setInfoGroup(mGroup);
+                    mType = ContentType.GROUP_MESSAGES;
+                    createGroupMessageFragment();
+                }
+
+                Log.d("Delete", groupId.getId().toString());
+                YieldsApplication.getBinder().cancelNotificationFromId(groupId);
+
+            }
+        } else {
+            mGroup = YieldsApplication.getGroup();
+            mType = ContentType.GROUP_MESSAGES;
+            createGroupMessageFragment();
+        }
 
         if (YieldsApplication.getBinder() != null) {
             NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
@@ -161,6 +193,9 @@ public class MessageActivity extends NotifiableActivity {
             bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
 
+        mFragmentManager = getFragmentManager();
+        createGroupMessageFragment();
+
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
     }
@@ -169,7 +204,7 @@ public class MessageActivity extends NotifiableActivity {
     public void onResume() {
         super.onResume();
         mUser = YieldsApplication.getUser();
-        mGroup = YieldsApplication.getGroup();
+        YieldsApplication.setGroup(mGroup);
         setHeaderBar();
         runOnUiThread(new Runnable() {
             @Override
@@ -194,6 +229,7 @@ public class MessageActivity extends NotifiableActivity {
         super.onPause();
         mCommentAdapter.clear();
         mGroupMessageAdapter.clear();
+        YieldsApplication.nullGroup();
     }
 
     /**
@@ -202,7 +238,6 @@ public class MessageActivity extends NotifiableActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        YieldsApplication.nullGroup();
         if (mConnection != null) {
             unbindService(mConnection);
         }
@@ -257,7 +292,7 @@ public class MessageActivity extends NotifiableActivity {
                 Log.d("Y:" + this.getClass().toString(), "Create text content");
             }
 
-            Message message = new Message("message", new Id(-1), mUser.getId(), content, new Date());
+            Message message = new Message(new Id(-1), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
                 Log.d("Y:" + this.getClass().toString(), "Send group message to " + mGroup.getId().getId().toString());
                 mGroup.addMessage(message);
@@ -273,10 +308,11 @@ public class MessageActivity extends NotifiableActivity {
                 mGroup.addMessage(message);
                 mCommentAdapter.add(message);
                 mCommentAdapter.notifyDataSetChanged();
-                ((CommentFragment) mCurrentFragment)
-                        .getCommentListView().smoothScrollToPosition(mCommentAdapter.getCount() - 1);
 
-                MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId());
+                ((CommentFragment) mCurrentFragment).getCommentListView()
+                        .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+                MediaMessageRequest request = new MediaMessageRequest(message,
+                        mCommentMessage.getCommentGroupId());
                 YieldsApplication.getBinder().sendRequest(request);
             }
         }
@@ -397,8 +433,8 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void run() {
                 if (mMenu != null) {
-                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.ic_cancel_black_24dp);
                     mMenu.findItem(R.id.iconConnect).setVisible(true);
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.ic_cancel_black_24dp);
                 }
             }
         });
@@ -521,7 +557,8 @@ public class MessageActivity extends NotifiableActivity {
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
         YieldsApplication.getBinder().attachActivity(this);
-        NodeHistoryRequest request = new NodeHistoryRequest(mCommentMessage.getId(), new Date());
+        NodeHistoryRequest request = new NodeHistoryRequest(mCommentMessage.getCommentGroupId(),
+                new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
 
@@ -552,7 +589,9 @@ public class MessageActivity extends NotifiableActivity {
                             mLastApplicationGroup = mGroup;
                             // Then we update the group currently displayed as it is the commented
                             // message
-                            Group commentGroup = YieldsApplication.getUser().getCommentGroup(mCommentMessage.getId());
+                            Group commentGroup = YieldsApplication.getUser()
+                                    .getCommentGroup(mCommentMessage.getCommentGroupId());
+
                             if (commentGroup == null) {
                                 commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
                                 YieldsApplication.getUser().addCommentGroup(commentGroup);
