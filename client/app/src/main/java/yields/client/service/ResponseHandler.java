@@ -280,14 +280,18 @@ public class ResponseHandler {
             String image = response.getString("pic");
             Group group = YieldsApplication.getUser().getGroup(new Id(nid));
 
+            if (group == null) {
+                group = YieldsApplication.getUser().getNodeFromId(new Id(nid));
+            } else {
+                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
+                mService.sendRequest(historyRequest);
+            }
+
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
             }
             group.setType(Group.GroupType.PUBLISHER);
-
-            ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
-            mService.sendRequest(historyRequest);
 
             mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
