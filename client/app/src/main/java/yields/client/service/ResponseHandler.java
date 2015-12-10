@@ -387,13 +387,14 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
             User user;
+            Id newId = new Id(response.getLong("uid"));
             Boolean newUser = false;
 
-            if (YieldsApplication.getUserFromId(new Id(response.getLong("uid"))) == null) {
-                user = new User(new Id(response.getLong("uid")));
+            if (YieldsApplication.getUserFromId(newId) == null) {
+                user = new User(newId);
                 newUser = true;
             } else {
-                user = YieldsApplication.getUserFromId(new Id(response.getLong("uid")));
+                user = YieldsApplication.getUserFromId(newId);
             }
 
             user.setName(response.getString("name"));
@@ -409,7 +410,8 @@ public class ResponseHandler {
             mCacheHelper.addUser(user);
 
             if (newUser) {
-                //TODO : notify() to add user to entourage -> notification
+                YieldsApplication.getUser().addUserToEntourage(user);
+                mService.notifyChange(NotifiableActivity.Change.ENTOURAGE_UPDATE);
             }
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -617,7 +619,9 @@ public class ResponseHandler {
             } else {
                 if (YieldsApplication.getUser().getId().equals(infoId)) {
 
-                    YieldsApplication.getUser().update(response);
+                    ClientUser clientUser = YieldsApplication.getUser();
+
+                    clientUser.update(response);
 
                     Bitmap image;
                     if (!response.getString("pic").equals("")) {
@@ -636,12 +640,18 @@ public class ResponseHandler {
                     if (entourage != null && entourageRefreshedAt != null) {
                         for (int i = 0; i < entourage.length(); i++) {
                             // TODO : Improve this, add field in user  ?
+                            User newUser = new User(new Id(entourage.getLong(i)));
+                            clientUser.addUserToEntourage(newUser);
                             ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
                                     new Id(entourage.getLong(i)));
 
                             mService.sendRequest(userInfoRequest);
                         }
                     }
+
+                    ServiceRequest groupList = new UserGroupListRequest(clientUser);
+                    mService.sendRequest(groupList);
+
                 } else {
                     if (user == null) {
                         user = new User(response);
@@ -716,8 +726,6 @@ public class ResponseHandler {
                 ServiceRequest userInfoRequest = new UserInfoRequest(user, user.getId());
                 mService.sendRequest(userInfoRequest);
                 mService.notifyChange(NotifiableActivity.Change.CONNECTED);
-                ServiceRequest groupListRequest = new UserGroupListRequest(user);
-                mService.sendRequest(groupListRequest);
             } else {
                 mService.notifyChange(NotifiableActivity.Change.NEW_USER);
             }
