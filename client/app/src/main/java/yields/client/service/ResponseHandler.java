@@ -593,7 +593,8 @@ public class ResponseHandler {
             Id groupId = new Id(serverResponse.getMessage().getLong("nid"));
             YieldsApplication.getUser().activateGroup(DateSerialization.dateSerializer
                     .toDate(serverResponse.getMetadata().getString("ref")), groupId);
-            mCacheHelper.updateGroupValidity(groupId, true);
+            Group group = YieldsApplication.getUser().getGroup(groupId);
+            mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
