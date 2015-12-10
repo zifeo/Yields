@@ -369,17 +369,21 @@ public class RequestBuilder {
             builder.addField(Fields.REM_NODES, remNodes);
         }
         if (type == Group.GroupType.PUBLISHER) {
-            List<String> addTags = new ArrayList<>();
-            List<String> remTags = new ArrayList<>();
-            for (Group.Tag tag : addTag) {
-                addTags.add(tag.getText());
+            if (!builder.addNullIfNullField(Fields.ADD_TAGS, addTag)) {
+                List<String> addTags = new ArrayList<>();
+                for (Group.Tag tag : addTag) {
+                    addTags.add(tag.getText());
+                }
+                builder.addField(Fields.ADD_TAGS, addTags);
             }
-            for (Group.Tag tag : addTag) {
-                remTags.add(tag.getText());
-            }
+            if (!builder.addNullIfNullField(Fields.REM_TAGS, remTag)) {
+                List<String> remTags = new ArrayList<>();
+                for (Group.Tag tag : addTag) {
+                    remTags.add(tag.getText());
+                }
 
-            builder.addField(Fields.ADD_TAGS, addTags);
-            builder.addField(Fields.REM_TAGS, remTags);
+                builder.addField(Fields.REM_TAGS, remTags);
+            }
         }
 
         return builder.request();
