@@ -421,8 +421,10 @@ public class ResponseHandler {
 
             if (newUser) {
                 YieldsApplication.getUser().addUserToEntourage(user);
-                mService.notifyChange(NotifiableActivity.Change.ENTOURAGE_UPDATE);
             }
+
+            mService.notifyChange(NotifiableActivity.Change.ENTOURAGE_UPDATE);
+
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
