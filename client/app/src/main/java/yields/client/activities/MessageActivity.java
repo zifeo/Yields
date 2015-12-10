@@ -374,10 +374,14 @@ public class MessageActivity extends NotifiableActivity {
 
             case R.id.actionSettingsGroup:
                 Log.d("MessageActivity", "actionSettingsGroup.");
-                YieldsApplication.setInfoGroup(mGroup);
 
-                Intent intent = new Intent(this, GroupSettingsActivity.class);
-                startActivity(intent);
+                if (getType() == ContentType.GROUP_MESSAGES){
+                    YieldsApplication.setInfoGroup(mGroup);
+
+                    Intent intent = new Intent(this, GroupSettingsActivity.class);
+                    startActivity(intent);
+                }
+
                 return true;
 
             case R.id.iconConnect:
