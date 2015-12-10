@@ -231,9 +231,6 @@ public class ServiceRequestController {
             case RSS_CREATE_RESPONSE:
                 mResponseHandler.handleRSSCreateResponse(serverResponse);
                 break;
-            case NODE_MESSAGE_BCAST:
-                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
-                break;
             case USER_UPDATE_BCAST:
                 mResponseHandler.handleUserUpdateBroadcast(serverResponse);
                 break;
@@ -243,8 +240,8 @@ public class ServiceRequestController {
             case GROUP_UPDATE_BCAST:
                 mResponseHandler.handleGroupUpdateBroadcast(serverResponse);
                 break;
-            case GROUP_MESSAGE_BCAST:
-                mResponseHandler.handleGroupMessageBroadcast(serverResponse);
+            case NODE_MESSAGE_BCAST:
+                mResponseHandler.handleNodeMessageBroadcast(serverResponse);
                 break;
             case PUBLISHER_CREATE_BCAST:
                 mResponseHandler.handlePublisherCreateBroadcast(serverResponse);
@@ -255,15 +252,14 @@ public class ServiceRequestController {
             case PUBLISHER_MESSAGE_BCAST:
                 mResponseHandler.handlePublisherMessageBroadcast(serverResponse);
                 break;
-            case RSS_MESSAGE_BCAST:
-                mResponseHandler.handleRSSMessageBroadcast(serverResponse);
-                break;
             case MEDIA_MESSAGE_RESPONSE:
                 mResponseHandler.handleMediaMessageResponse(serverResponse);
                 break;
             case RSS_INFO_RES:
                 mResponseHandler.handleRSSInfoResponse(serverResponse);
                 break;
+            case MEDIA_MESSAGE_BCAST:
+                mResponseHandler.handleMediaMessageBroadcast(serverResponse);
             default:
                 Log.d("Y:" + this.getClass().getName(), "No such response kind : " +
                         serverResponse.getKind());

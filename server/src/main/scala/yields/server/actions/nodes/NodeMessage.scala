@@ -2,9 +2,8 @@ package yields.server.actions.nodes
 
 import java.time.OffsetDateTime
 
-import yields.server.Yields
-import yields.server.actions.exceptions.{UnauthorizedActionException, ActionArgumentException}
-import yields.server.actions.{Broadcast, Action, Result}
+import yields.server.actions.exceptions.{ActionArgumentException, UnauthorizedActionException}
+import yields.server.actions.{Action, Broadcast, Result}
 import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 import yields.server.utils.Temporal
@@ -51,10 +50,7 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
     val mediaNid = media.map(_.nid)
 
     node.addMessage((datetime, metadata.client, mediaNid, text.getOrElse("")))
-
-    Yields.broadcast(node.users.filter(_ != sender)) {
-      broadcast(datetime, sender, mediaNid)
-    }
+    broadcast(node.users.filter(_ != sender), datetime, sender, mediaNid)
 
     result(datetime, mediaNid)
 
@@ -73,8 +69,25 @@ abstract class NodeMessage(nid: NID, text: Option[String], contentType: Option[S
   /** Format the result. */
   def result(datetime: OffsetDateTime, contentNid: Option[NID]): Result
 
-  /** Format the broadcast. */
-  def broadcast(datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Broadcast
+  /** Sent the broadcast. */
+  def broadcast(users: List[UID], datetime: OffsetDateTime, uid: UID, contentNid: Option[NID]): Unit = ()
 
 }
 
+/**
+  * [[NodeMessage]] broadcast.
+  * @param nid node nid
+  * @param datetime time when message was registered
+  * @param sender message sender
+  * @param text text sent
+  * @param contentType content type if content is specified
+  * @param content content if a media was specified
+  * @param contentNid content id if a media was specified
+  */
+case class NodeMessageBrd(nid: NID,
+                          datetime: OffsetDateTime,
+                          sender: UID,
+                          text: Option[String],
+                          contentType: Option[String],
+                          content: Option[Blob],
+                          contentNid: Option[NID]) extends Broadcast

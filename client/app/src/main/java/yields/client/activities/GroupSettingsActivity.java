@@ -34,6 +34,8 @@ import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
+import static yields.client.gui.GraphicTransforms.getCroppedSquaredBitmap;
+
 /**
  * Activity where the user can change some parameters for the group, leave it and
  * where the admin can change its name, image, add users and nodes ...
@@ -80,7 +82,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
         itemList.add(Settings.LEAVE_GROUP.ordinal(), getResources().getString(R.string.leaveGroup));
 
-        if (mGroup.getVisibility() != Group.GroupVisibility.PRIVATE){
+        if (mGroup.getType() != Group.GroupType.PRIVATE){
             itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
         }
 
@@ -136,7 +138,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
                     YieldsApplication.showToast(getApplicationContext(), message);
 
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
-                    mGroup.setImage(Bitmap.createScaledBitmap(image, diameter, diameter, false));
+                    mGroup.setImage(Bitmap.createScaledBitmap(getCroppedSquaredBitmap(image), diameter, diameter, false));
 
                     ServiceRequest request = new GroupUpdateImageRequest(mUser, mGroup.getId(),
                             mGroup.getImage());
@@ -331,6 +333,9 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        YieldsApplication.getUser().removeGroup(mGroup);
+                        mGroup.removeUser(YieldsApplication.getUser().getId());
+
                         List<User> usersToRemove = new ArrayList<User>();
                         usersToRemove.add(YieldsApplication.getUser());
                         YieldsApplication.getBinder().sendRequest(

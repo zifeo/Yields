@@ -71,10 +71,4 @@ class GroupsJsonFormatSpecifications extends YieldsPropsSpec {
     }
   }
 
-  property("GroupMessageBrd") {
-    forAll() { (x: GroupMessageBrd) =>
-      checkToAndFromJson(x)
-    }
-  }
-
 }

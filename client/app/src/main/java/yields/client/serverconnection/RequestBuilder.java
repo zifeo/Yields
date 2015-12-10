@@ -32,7 +32,7 @@ public class RequestBuilder {
         EMAIL("email"), TEXT("text"), NAME("name"),
         NODES("nodes"), KIND("kind"), USERS("users"),
         LAST("datetime"), TO("to"), CONTENT("content"), COUNT("count"),
-        IMAGE("pic"), NID("nid"), VISIBILITY("visibility"),
+        IMAGE("pic"), NID("nid"),
         CONTENT_TYPE("contentType"), UID("uid"),
         TAG("tags"), DATE("date"), ADD_ENTOURAGE("addEntourage"),
         REMOVE_ENTOURAGE("removeEntourage"), PATTERN("pattern"), ADD_USERS("addUsers"),
@@ -281,11 +281,11 @@ public class RequestBuilder {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(group.getName());
         Objects.requireNonNull(users);
-        Objects.requireNonNull(group.getVisibility());
+        Objects.requireNonNull(group.getType());
 
         RequestBuilder builder;
 
-        if (group.getVisibility() == Group.GroupVisibility.PRIVATE) {
+        if (group.getType() == Group.GroupType.PRIVATE) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_CREATE, sender);
         } else {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_CREATE, sender);
@@ -295,7 +295,6 @@ public class RequestBuilder {
         builder.addField(Fields.NAME, group.getName());
         builder.addField(Fields.NODES, nodes);
         builder.addField(Fields.USERS, users);
-        builder.addField(Fields.VISIBILITY, group.getVisibility());
 
         group.setRef(new Date());
         builder.addField(Fields.DATE, group.getRef());
@@ -475,12 +474,14 @@ public class RequestBuilder {
      *
      * @param senderId The sender Id.
      * @param groupId  The group to send to.
+     * @param type     The type of the group being send to, if the type is null then this a MediaMessageRequest
+     *                 will be built.
      * @param content  The content of the message
-     * @param date     The reference date for the message (Id)
+     * @param date     The reference date for the message.
      * @return The request for the server
      */
     public static ServerRequest groupMessageRequest(Id senderId, Id groupId,
-                                                    Group.GroupVisibility visibility,
+                                                    Group.GroupType type,
                                                     Content content, Date date) {
 
         Objects.requireNonNull(senderId);
@@ -489,10 +490,12 @@ public class RequestBuilder {
 
         RequestBuilder builder;
 
-        if (visibility.equals(Group.GroupVisibility.PRIVATE)) {
-            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_MESSAGE, senderId);
-        } else {
+        if (type == null) {
+            builder = new RequestBuilder(ServiceRequest.RequestKind.MEDIA_MESSAGE, senderId);
+        } else if (type.equals(Group.GroupType.PUBLISHER)) {
             builder = new RequestBuilder(ServiceRequest.RequestKind.PUBLISHER_MESSAGE, senderId);
+        } else {
+            builder = new RequestBuilder(ServiceRequest.RequestKind.GROUP_MESSAGE, senderId);
         }
 
         builder.addField(Fields.NID, groupId);
@@ -577,7 +580,7 @@ public class RequestBuilder {
      * @return The request for the server
      */
     public static ServerRequest mediaMessageRequest(Id senderId, Id nodeId,
-                                                    Group.GroupVisibility visibility,
+                                                    Group.GroupType visibility,
                                                     Content content, Date date) {
 
         Objects.requireNonNull(senderId);
@@ -694,7 +697,7 @@ public class RequestBuilder {
                 formatDate(field));
     }
 
-    private void addField(Fields fieldType, Group.GroupVisibility field) {
+    private void addField(Fields fieldType, Group.GroupType field) {
         this.mConstructingMap.put(fieldType.getValue(), field.getValue().toLowerCase());
     }
 

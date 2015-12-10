@@ -72,19 +72,19 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
             YieldsApplication.showToast(getApplicationContext(), message);
         }
         else {
-            Group.GroupVisibility groupType;
+            Group.GroupType groupType;
             Intent intent;
 
             if (mRadioPrivate.isChecked()){
-                groupType = Group.GroupVisibility.PRIVATE;
+                groupType = Group.GroupType.PRIVATE;
                 intent = new Intent(this, CreateGroupActivity.class);
             }
             else if (mRadioPublic.isChecked()){
-                groupType = Group.GroupVisibility.PUBLIC;
+                groupType = Group.GroupType.PUBLISHER;
                 intent = new Intent(this, CreateGroupActivity.class);
             }
             else {
-                groupType = Group.GroupVisibility.RSS;
+                groupType = Group.GroupType.RSS;
                 intent = new Intent(this, CreateRSSFeedActivity.class);
             }
 

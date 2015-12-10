@@ -2,13 +2,12 @@ package yields.server
 
 import spray.json.DefaultJsonProtocol._
 import yields.server.actions.groups._
-import yields.server.actions.media.{MediaMessageBrd, MediaMessageRes, MediaMessage}
+import yields.server.actions.media.{MediaMessage, MediaMessageRes}
 import yields.server.actions.nodes._
 import yields.server.actions.publisher._
-import yields.server.actions.rss.{RSSInfoRes, RSSInfo, RSSCreateRes, RSSCreate}
+import yields.server.actions.rss.{RSSCreate, RSSCreateRes, RSSInfo, RSSInfoRes}
 import yields.server.actions.users._
-import yields.server.io.actions.{BroadcastJsonFormat, ActionJsonFormat, ResultJsonFormat}
-import yields.server.io.models.{GroupJsonFormat, NodeJsonFormat, UserJsonFormat}
+import yields.server.io.actions.{ActionJsonFormat, BroadcastJsonFormat, ResultJsonFormat}
 import yields.server.io.mpi.{NotificationJsonFormat, RequestJsonFormat, ResponseJsonFormat}
 import yields.server.mpi.Metadata
 
@@ -18,12 +17,6 @@ import yields.server.mpi.Metadata
 package object io {
 
   implicit lazy val offsetDateTimeJF = OffsetDateTimeJsonFormat
-
-  /** *** Models *****/
-
-  implicit lazy val nodeJF = NodeJsonFormat
-  implicit lazy val groupJF = GroupJsonFormat
-  implicit lazy val userJF = UserJsonFormat
 
   /** *** Actions  *****/
 
@@ -46,15 +39,18 @@ package object io {
 
   implicit lazy val groupMessageJF = jsonFormat4(GroupMessage)
   implicit lazy val groupMessageResJF = jsonFormat3(GroupMessageRes)
-  implicit lazy val groupMessageBrdJF = jsonFormat7(GroupMessageBrd)
 
   // Nodes
 
-  implicit lazy val groupSearchJF = jsonFormat1(NodeSearch)
-  implicit lazy val groupSearchResJF = jsonFormat3(NodeSearchRes)
+  implicit lazy val nodeSearchJF = jsonFormat1(NodeSearch)
+  implicit lazy val nodeSearchResJF = jsonFormat3(NodeSearchRes)
+
+  implicit lazy val nodeInfoJF = jsonFormat1(NodeInfo)
 
   implicit lazy val nodeHistoryJF = jsonFormat3(NodeHistory)
   implicit lazy val nodeHistoryResJF = jsonFormat7(NodeHistoryRes)
+
+  implicit lazy val nodeMessageBrdJF = jsonFormat7(NodeMessageBrd)
 
   // Users
 
@@ -89,9 +85,9 @@ package object io {
 
   implicit lazy val publisherMessageJF = jsonFormat4(PublisherMessage)
   implicit lazy val publisherMessageResJF = jsonFormat3(PublisherMessageRes)
-  implicit lazy val publisherMessageBrdJF = jsonFormat7(PublisherMessageBrd)
 
   // RSS
+
   implicit lazy val rssCreateJF = jsonFormat4(RSSCreate)
   implicit lazy val rssCreateResJF = jsonFormat1(RSSCreateRes)
 
@@ -99,10 +95,9 @@ package object io {
   implicit lazy val rssInfoResJF = jsonFormat4(RSSInfoRes)
 
   // Media
+
   implicit lazy val mediaMessageJF = jsonFormat4(MediaMessage)
   implicit lazy val mediaMessageResJF = jsonFormat2(MediaMessageRes)
-  implicit lazy val mediaMessageBrdJF = jsonFormat6(MediaMessageBrd)
-
 
   /** *** Message passing interface *****/
 

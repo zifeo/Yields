@@ -5,7 +5,7 @@ import yields.server.dbi.models._
 import yields.server.mpi.Metadata
 
 /**
-  * Get infos about a publisher.
+  * Get info about a publisher.
   * @param nid nid of the publisher
   */
 case class PublisherInfo(nid: NID) extends Action {
@@ -26,12 +26,13 @@ case class PublisherInfo(nid: NID) extends Action {
 
     publisher.hydrate()
     PublisherInfoRes(nid, publisher.name, publisher.pic, users, publisher.nodes, publisher.tags)
+
   }
 
 }
 
 /**
-  * Publisher infos broadcast.
+  * Publisher info result.
   * @param nid nid of publisher broadcasting
   * @param name name of publisher
   * @param pic content of publisher's profile pic

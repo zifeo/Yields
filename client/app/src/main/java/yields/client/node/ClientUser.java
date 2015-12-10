@@ -1,13 +1,13 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import yields.client.id.Id;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -18,6 +18,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class ClientUser extends User {
 
     private List<Group> mGroups;
+    private List<Group> mCommentGroups;
     private final List<User> mEntourage;
     private final List<Group> mNodes;
 
@@ -34,6 +35,7 @@ public class ClientUser extends User {
         mGroups = new ArrayList<>();
         mEntourage = new ArrayList<>();
         mNodes = new ArrayList<>();
+        mCommentGroups = new ArrayList<>();
     }
 
     /**
@@ -51,8 +53,9 @@ public class ClientUser extends User {
      * @param groups the groups to add
      */
     public void addGroups(List<Group> groups) {
-        mGroups.clear();
-        mGroups.addAll(groups);
+        for (Group group : groups) {
+            addGroup(group);
+        }
     }
 
     /**
@@ -88,6 +91,29 @@ public class ClientUser extends User {
             }
         }
         mNodes.add(node);
+    }
+
+    /**
+     * Add a comment group to the user
+     *
+     * @param group The comment group to add.
+     */
+    public void addCommentGroup(Group group) {
+        for (Group prevGroup : mCommentGroups) {
+            if (prevGroup.getId().getId().equals(group.getId().getId())) {
+                return;
+            }
+        }
+        mCommentGroups.add(group);
+    }
+
+    /**
+     * Remove a group from the user's list.
+     *
+     * @param group the group to remove.
+     */
+    public void removeGroup(Group group) {
+        mGroups.remove(Objects.requireNonNull(group));
     }
 
     /**
@@ -139,6 +165,22 @@ public class ClientUser extends User {
      */
     public Group getGroup(Id groupId) {
         for (Group group : mGroups) {
+            if (group.getId().equals(groupId)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Getter for a Comment Group by it's ID, returns null if there is no group for
+     * the given Id.
+     *
+     * @param groupId The Id of the wanted comment Group.
+     * @return The Group or null if there is no such comment Group.
+     */
+    public Group getCommentGroup(Id groupId) {
+        for (Group group : mCommentGroups) {
             if (group.getId().equals(groupId)) {
                 return group;
             }

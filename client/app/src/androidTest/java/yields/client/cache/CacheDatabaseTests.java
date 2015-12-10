@@ -207,11 +207,46 @@ public class CacheDatabaseTests {
     }
 
     /**
+     * Tests if it can update valid Users and if the the Users are correctly updated in the database.
+     * (Test for CacheDatabaseHelper.updateUser(User user)
+     */
+    @Test
+    public void testDatabaseCanUpdateUser() {
+        List<Id> users = MockFactory.generateMockUsers(6);
+        for (Id user : users) {
+            mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
+        }
+
+        Id userToUpdate = users.get(3);
+        User updatedUser = YieldsApplication.getUserFromId(userToUpdate);
+
+        updatedUser.setName("Johhny Cash");
+        updatedUser.setEmail("rialtoGaming@jpg.com");
+        updatedUser.setImg(YieldsApplication.getDefaultGroupImage());
+
+        mDatabaseHelper.updateUser(updatedUser);
+
+        User userFromDatabase = mDatabaseHelper.getUser(userToUpdate);
+
+        assertEquals(updatedUser.getName(),
+                userFromDatabase.getName());
+
+        assertEquals(updatedUser.getEmail(),
+                userFromDatabase.getEmail());
+
+        assertEquals(updatedUser.getId().getId(),
+                userFromDatabase.getId().getId());
+
+        assertTrue(compareImages(updatedUser.getImg(),
+                userFromDatabase.getImg()));
+    }
+
+    /**
      * Tests if it can rename valid Users and if the the Users are correctly renamed in the database.
      * (Test for CacheDatabaseHelper.updateUserName(Id userId, String newUserName))
      */
     @Test
-    public void testDatabaseCanUpdtaeUserName() {
+    public void testDatabaseCanUpdateUserName() {
         List<Id> users = MockFactory.generateMockUsers(6);
         for (Id user : users) {
             mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
@@ -238,10 +273,40 @@ public class CacheDatabaseTests {
 
     /**
      * Tests if it can update valid Users image and if the the Users are correctly updated in the database.
-     * (Test for CacheDatabaseHelper.updateUserName(Id userId, String newUserName))
+     * (Test for CacheDatabaseHelper.updateUserImage(Id userId, String newUserEmail))
      */
     @Test
     public void testDatabaseCanUpdateUserImage() {
+        List<Id> users = MockFactory.generateMockUsers(6);
+        for (Id user : users) {
+            mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
+        }
+
+        Id userToUpdateEmail = users.get(3);
+        String newEmail = "THEBEST@gmail.com";
+        mDatabaseHelper.updateUserEmail(userToUpdateEmail, newEmail);
+
+        User userFromDatabase = mDatabaseHelper.getUser(userToUpdateEmail);
+
+        assertEquals(YieldsApplication.getUserFromId(userToUpdateEmail).getName(),
+                userFromDatabase.getName());
+
+        assertEquals(newEmail,
+                userFromDatabase.getEmail());
+
+        assertEquals(userToUpdateEmail.getId(),
+                userFromDatabase.getId().getId());
+
+        assertTrue(compareImages(YieldsApplication.getUserFromId(userToUpdateEmail).getImg(),
+                userFromDatabase.getImg()));
+    }
+
+    /**
+     * Tests if it can update valid Users email and if the the Users are correctly updated in the database.
+     * (Test for CacheDatabaseHelper.updateUserEmail(Id userId, String newUserName))
+     */
+    @Test
+    public void testDatabaseCanUpdateUserEmail() {
         List<Id> users = MockFactory.generateMockUsers(6);
         for (Id user : users) {
             mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
@@ -402,8 +467,51 @@ public class CacheDatabaseTests {
     }
 
     /**
+     * Tests if a Group can be entirely updated.
+     * (Test for CacheDatabaseHelper.updateGroup(Group group))
+     */
+    @Test
+    public void testDatabaseCanUpdateGroup() {
+        Group group = MockFactory.generateMockGroups(5).get(3);
+        mDatabaseHelper.addGroup(group);
+
+        User newUser = new User("Johny", new Id(-99999), "john@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.addNotKnown(newUser);
+        group.addUser(newUser.getId());
+
+        String updatedName = "Updated !";
+        group.setName(updatedName);
+
+        Bitmap updatedImage = YieldsApplication.getDefaultUserImage();
+        group.setImage(updatedImage);
+
+        group.setType(Group.GroupType.RSS);
+
+        mDatabaseHelper.updateGroup(group);
+        Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
+
+        assertEquals(updatedName,
+                fromDatabase.getName());
+
+        assertEquals(group.getId().getId(),
+                fromDatabase.getId().getId());
+
+        assertEquals(group.getType(),
+                fromDatabase.getType());
+
+        assertTrue(compareImages(group.getImage(),
+                fromDatabase.getImage()));
+
+        assertTrue(compareUsers(group.getUsers(),
+                fromDatabase.getUsers()));
+
+        assertEquals(group.isValidated(),
+                fromDatabase.isValidated());
+    }
+
+    /**
      * Tests if a Group can be renamed.
-     * (Test for updateGroupName(Id groupId, String newGroupName,))
+     * (Test for updateGroupName(Id groupId, String newGroupName))
      */
     @Test
     public void testDatabaseCanUpdateGroupName() {
@@ -418,8 +526,8 @@ public class CacheDatabaseTests {
         assertEquals(group.getId().getId(),
                 fromDatabase.getId().getId());
 
-        assertEquals(Group.GroupVisibility.PRIVATE,
-                fromDatabase.getVisibility());
+        assertEquals(Group.GroupType.PRIVATE,
+                fromDatabase.getType());
 
         assertTrue(compareImages(group.getImage(),
                 fromDatabase.getImage()));
@@ -445,7 +553,7 @@ public class CacheDatabaseTests {
         assertEquals(fromDatabase.getName(), group.getName());
         assertEquals(fromDatabase.getId().getId(), group.getId().getId());
         assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
-        assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PRIVATE);
+        assertEquals(fromDatabase.getType(), Group.GroupType.PRIVATE);
         assertTrue(compareImages(Bitmap.createBitmap(60, 60, Bitmap.Config.RGB_565),
                 fromDatabase.getImage()));
         assertEquals(group.isValidated(), fromDatabase.isValidated());
@@ -453,20 +561,20 @@ public class CacheDatabaseTests {
 
     /**
      * Tests if a Group can have it's visibility changed.
-     * (Test for updateGroupVisibility(Id groupId, Group.GroupVisibility visibility))
+     * (Test for updateGroupType(Id groupId, Group.GroupType type))
      */
     @Test
-    public void testDatabaseCanUpdateGroupVisibility() {
+    public void testDatabaseCanUpdateGroupType() {
         Group group = MockFactory.generateMockGroups(1).get(0);
         mDatabaseHelper.addGroup(group);
-        mDatabaseHelper.updateGroupVisibility(group.getId(), Group.GroupVisibility.PUBLIC);
+        mDatabaseHelper.updateGroupType(group.getId(), Group.GroupType.PUBLISHER);
         Group fromDatabase = mDatabaseHelper.getGroup(group.getId());
         assertEquals(fromDatabase.getName(), group.getName());
         assertEquals(fromDatabase.getId().getId(), group.getId().getId());
         assertTrue(compareUsers(fromDatabase.getUsers(), group.getUsers()));
         assertTrue(compareImages(group.getImage(),
                 fromDatabase.getImage()));
-        assertEquals(fromDatabase.getVisibility(), Group.GroupVisibility.PUBLIC);
+        assertEquals(fromDatabase.getType(), Group.GroupType.PUBLISHER);
         assertEquals(group.isValidated(), fromDatabase.isValidated());
     }
 
@@ -486,7 +594,7 @@ public class CacheDatabaseTests {
         assertTrue(compareImages(group.getImage(),
                 fromDatabase.getImage()));
         assertEquals(true, fromDatabase.isValidated());
-        assertEquals(fromDatabase.getVisibility(), group.getVisibility());
+        assertEquals(fromDatabase.getType(), group.getType());
     }
 
     /**
