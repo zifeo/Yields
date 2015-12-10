@@ -75,6 +75,7 @@ object RSS {
     )
     assert(redis(_.hmset(rss.NodeKey.node, infos)))
     assert(Indexes.rssRegister(rss.nid))
+    assert(Indexes.searchableRegister(name, rss.nid))
     rss
   }
 
