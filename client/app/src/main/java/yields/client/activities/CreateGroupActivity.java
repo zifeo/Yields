@@ -20,7 +20,6 @@ import yields.client.listadapter.ListAdapterUsersGroupsCheckBox;
 import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -34,7 +33,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     private ListView mListView;
 
     private String mGroupName;
-    private Group.GroupVisibility mGroupType;
+    private Group.GroupType mGroupType;
 
     private static final String TAG = "CreateGroupActivity";
     private static final int REQUEST_ADD_CONTACT = 1;
@@ -65,7 +64,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
 
         mGroupName = intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY);
-        mGroupType = Group.GroupVisibility.valueOf(
+        mGroupType = Group.GroupType.valueOf(
                 intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
         Log.d("CreateGroupActivity", "Group type = " +
                 intent.getStringExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY));
@@ -97,7 +96,14 @@ public class CreateGroupActivity extends AppCompatActivity {
         if (YieldsApplication.isGroupAddedValid()){
             Group group = YieldsApplication.getGroupAdded();
 
-            if (!mGroups.contains(group)) {
+            boolean isAlreadyAdded = false;
+            for (Group g : mGroups){
+                if (g.getId().equals(group.getId())){
+                    isAlreadyAdded = true;
+                }
+            }
+
+            if (!isAlreadyAdded) {
                 mGroups.add(group);
             }
 
@@ -161,7 +167,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
-                group.setVisibility(mGroupType);
+                group.setType(mGroupType);
                 YieldsApplication.getUser().addGroup(group);
                 YieldsApplication.getBinder().sendRequest(
                         new GroupCreateRequest(YieldsApplication.getUser(), group));
@@ -222,7 +228,9 @@ public class CreateGroupActivity extends AppCompatActivity {
                 User user = YieldsApplication.getUserFromId(currentId);
                 // There shouldn't be multiple identical users in entourage
                 if (user != null) {
-                    mUsers.add(user);
+                    if (!mUsers.contains(user)){
+                        mUsers.add(user);
+                    }
                 } else {
                     throw new IllegalStateException("Not possible to add a non existant user");
                 }

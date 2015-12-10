@@ -4,8 +4,6 @@ import yields.server.dbi.models.{NID, UID}
 import yields.server.utils.Config
 import com.redis.serialization.Parse.Implicits._
 
-import scala.collection.mutable
-
 /**
   * Regroup all indexes.
   *
@@ -48,7 +46,18 @@ private[dbi] object Indexes {
     */
   def searchableRegister(name: String, nid: NID): Boolean = {
     val base = Key.searchable
-    valueOrException(redis(_.sadd(s"$base:$name", nid))) == 1
+    valueOrException(redis(_.sadd(s"$base:$name".toLowerCase, nid))) == 1
+  }
+
+  /**
+    * Unregister a given name and nid in the index.
+    * @param name key name
+    * @param nid value node id
+    * @return true on success
+    */
+  def searchableUnregister(name: String, nid: NID): Boolean = {
+    val base = Key.searchable
+    valueOrException(redis(_.srem(s"$base:$name".toLowerCase, nid))) == 1
   }
 
   /**
@@ -58,7 +67,11 @@ private[dbi] object Indexes {
     */
   def searchableFuzyLookup(name: String): Set[NID] = {
     val base = Key.searchable
-    val lookup = redis[Option[(Option[Int], Option[List[Option[String]]])]](_.scan[String](0, s"$base:*$name*", fuzycount))
+    val lookup = redis[Option[(Option[Int], Option[List[Option[String]]])]] (_.scan[String](
+      0,
+      s"$base:*$name*".toLowerCase,
+      fuzycount)
+    )
 
     val keys = lookup match {
       case Some((_, Some(matches))) => matches.flatten
@@ -66,15 +79,7 @@ private[dbi] object Indexes {
     }
 
     val fetched = redisPipeline[Option[Set[Option[NID]]]](r => keys.map(r.smembers[NID](_)))
-    val res = mutable.Set.empty[NID]
-    for {
-      result <- fetched
-      setOpt <- result
-      set <- setOpt
-      nidOpt <- set
-      nid <- nidOpt
-    } res += nid
-    res.toSet
+    fetched.toList.flatten.flatten.flatten.flatten.toSet
   }
 
   /**

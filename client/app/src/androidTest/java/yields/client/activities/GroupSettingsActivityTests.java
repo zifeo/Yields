@@ -10,7 +10,6 @@ import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -44,13 +43,15 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
+        ServiceTestConnection.connectActivityToService();
+
         ClientUser user = MockFactory.generateFakeClientUser("User", new Id(123), "a@b.c", YieldsApplication.getDefaultUserImage());
         user.addUserToEntourage(MockFactory.generateFakeClientUser("Friend", new Id(125), "a@b.d", YieldsApplication.getDefaultUserImage()));
 
         YieldsApplication.setUser(user);
 
         Group g = new Group("Group", new Id(124), new ArrayList<Id>());
-        g.setVisibility(Group.GroupVisibility.PUBLIC);
+        g.setType(Group.GroupType.PUBLISHER);
         YieldsApplication.setGroup(g);
     }
 
@@ -170,5 +171,18 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withText("Ok")).perform(click());
 
         onView(withId(R.id.actionDiscover)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that add a new user.
+     */
+    public void testAddUser() {
+        getActivity();
+        onView(withText(R.string.addUsers)).perform(click());
+
+        onView(withId(R.id.checkboxUser)).perform(click());
+        onView(withId(R.id.actionDoneSelectUser)).perform(click());
+
+        onView(withText(R.string.addUsers)).check(matches(isDisplayed()));
     }
 }

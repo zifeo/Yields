@@ -26,12 +26,12 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 public class Group extends Node {
 
-    public enum GroupVisibility {
-        PRIVATE("PRIVATE"), PUBLIC("PUBLIC"), RSS("RSS");
+    public enum GroupType {
+        PRIVATE("PRIVATE"), PUBLISHER("PUBLISHER"), RSS("RSS");
 
         private final String mName;
 
-        GroupVisibility(String name) {
+        GroupType(String name) {
             mName = name;
         }
 
@@ -44,28 +44,29 @@ public class Group extends Node {
     private boolean mValidated;
     private List<User> mUsers;
     private List<Group> mNodes;
-    private GroupVisibility mVisibility;
+    private Bitmap mImage;
+    private GroupType mType;
     private Set<Tag> mTags;
     private Date mDate;
 
     /**
      * Constructor for groups
      *
-     * @param name       The name of the group
-     * @param id         The id of the group
-     * @param users      The current users of the group
-     * @param image      The current image of the group
-     * @param visibility The visibility of the group
-     * @param validated  If the group has been validated by the server
+     * @param name      The name of the group
+     * @param id        The id of the group
+     * @param users     The current users of the group
+     * @param image     The current image of the group
+     * @param type      The type of the group
+     * @param validated If the group has been validated by the server
      * @throws NodeException If nodes or image is null
      */
-    public Group(String name, Id id, List<Id> users, Bitmap image, GroupVisibility visibility,
+    public Group(String name, Id id, List<Id> users, Bitmap image, GroupType type,
                  boolean validated, Date lastUpdate) {
         super(name, id, image);
         mDate = Objects.requireNonNull(lastUpdate);
         mMessages = new TreeMap<>();
         mValidated = validated;
-        mVisibility = visibility;
+        mType = type;
         mTags = new HashSet<>();
         mDate = lastUpdate;
         mNodes = new ArrayList<>();
@@ -80,8 +81,8 @@ public class Group extends Node {
     /**
      * Constructor for groups
      *
-     * @param name       The name of the group
-     * @param id         The id of the group
+     * @param name The name of the group
+     * @param id   The id of the group
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, Group group) {
@@ -90,14 +91,14 @@ public class Group extends Node {
         this.mMessages = new TreeMap<>();
         mUsers = group.getUsers();
         mValidated = false;
-        mVisibility = GroupVisibility.PRIVATE;
+        mType = GroupType.PRIVATE;
         mTags = new HashSet<>();
         mDate = new Date();
         mNodes = new ArrayList<>();
     }
 
     /**
-     * Overloaded constructor for groups for default visibility.
+     * Overloaded constructor for groups for default type.
      * By default a group is set to private.
      *
      * @param name  The name of the group
@@ -107,7 +108,7 @@ public class Group extends Node {
      * @throws NodeException If nodes or image is null
      */
     public Group(String name, Id id, List<Id> users, Bitmap image) {
-        this(name, id, users, image, GroupVisibility.PRIVATE, false, new Date());
+        this(name, id, users, image, GroupType.PRIVATE, false, new Date());
     }
 
     /**
@@ -119,7 +120,7 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<Id> users) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
                 false, new Date());
     }
 
@@ -132,7 +133,7 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<Id> users, Id node) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
                 false, new Date());
         this.addNode(YieldsApplication.getUser().getNodeFromId(node));
     }
@@ -146,7 +147,7 @@ public class Group extends Node {
      * @throws NodeException if one of the node is null.
      */
     public Group(String name, Id id, List<Id> users, Boolean validated, Date lastUpdate) {
-        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupVisibility.PRIVATE,
+        this(name, id, users, YieldsApplication.getDefaultGroupImage(), GroupType.PRIVATE,
                 validated, lastUpdate);
     }
 
@@ -156,15 +157,16 @@ public class Group extends Node {
      * @param jsonGroup The JsonArray containing the group.
      * @throws JSONException
      */
-    public Group(JSONArray jsonGroup) throws JSONException, ParseException{
+    public Group(JSONArray jsonGroup) throws JSONException, ParseException {
         this(jsonGroup.getString(1), new Id(jsonGroup.getLong(0)), new ArrayList<Id>(), true,
                 DateSerialization.dateSerializer.toDate(jsonGroup.getString(2)));
     }
 
     /**
      * Construct a Group from the Id and the name recieved from the server.
-     * @param groupId The Id of the group in String format.
-     * @param name The name of the group.
+     *
+     * @param groupId     The Id of the group in String format.
+     * @param name        The name of the group.
      * @param refreshedAt Last date the group has been refreshed.
      */
     public Group(String groupId, String name, String refreshedAt) throws ParseException {
@@ -174,14 +176,16 @@ public class Group extends Node {
 
     /**
      * Get the last time the group was updated.
+     *
      * @return The sus-mentioned date.
      */
-    public Date getLastUpdate(){
+    public Date getLastUpdate() {
         return new Date(mDate.getTime());
     }
 
     /**
      * Set's the last time the group was updated.
+     *
      * @param date The date of the last update.
      */
     public void setLastUpdate(Date date){
@@ -193,8 +197,9 @@ public class Group extends Node {
     /**
      * Create a wrapper for the comment message in order to be able to send and retreive comment
      * for this message.
+     *
      * @param messageComment The message commented.
-     * @param group The parent group containing the message.
+     * @param group          The parent group containing the message.
      * @return The group wrapper for this message.
      */
     public static Group createGroupForMessageComment(Message messageComment, Group group) {
@@ -203,41 +208,53 @@ public class Group extends Node {
 
     /**
      * Validates a message received at a certain date and changes the date to the server side date.
-     * @param date The old Date of the Message.
-     * @param newDate The newDate of the Message.
+     * The message also sees it's Id updated if acts as a Node on the server side.
+     * The message status is always set to SENT.
+     *
+     * @param contentId The Id of the Message if there is one.
+     * @param date      The old Date of the Message.
+     * @param newDate   The newDate of the Message.
      * @return The Message updated.
      */
-    public Message validateMessage(Date date, Date newDate){
-        Message message =  mMessages.remove(date);
+    public Message updateMessageIdDateAndStatus(Id contentId, Date date, Date newDate) {
+        Integer size = this.mMessages.size();
+        Log.d("Y:" + this.getClass().getName(), size.toString());
 
-        if (message != null){
+        Message message = mMessages.remove(date);
+
+        size = this.mMessages.size();
+        Log.d("Y:" + this.getClass().getName(), size.toString());
+
+        if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
+            message.setCommentGroupId(contentId);
             message.recomputeView();
             mMessages.put(newDate, message);
             return message;
         } else {
-            Log.d("Y:" + this.getClass().getName(), "Couldn't validate message as not existant in " +
-                    mMessages.firstKey().getTime() + "or " + mMessages.lastKey().getTime());
+            Log.d("Y:" + this.getClass().getName(), DateSerialization.dateSerializer.toString(date));
+            Log.d("Y:" + this.getClass().getName(), "Couldn't update message " + contentId.getId().toString()
+                    + " as it was not in the group with id " + this.getId().getId().toString());
             return null;
         }
     }
 
     /**
-     * Set the visibility of a group.
+     * Set the type of a group.
      *
-     * @param visibility The new visibility.
+     * @param type The new type.
      */
-    public void setVisibility(GroupVisibility visibility) {
-        mVisibility = visibility;
+    public void setType(GroupType type) {
+        mType = type;
     }
 
     /**
-     * Getter for the group visibility.
+     * Getter for the group type.
      *
-     * @return The visibility attribute of the group.
+     * @return The type attribute of the group.
      */
-    public GroupVisibility getVisibility() {
-        return mVisibility;
+    public GroupType getType() {
+        return mType;
     }
 
     /**
@@ -249,11 +266,21 @@ public class Group extends Node {
         Objects.requireNonNull(user);
         mUsers.add(YieldsApplication.getUserFromId(user));
     }
+    /**
+     * Remove a user from the group.
+     *
+     * @param user The user we want to remove.
+     */
+    public void removeUser(Id user) {
+        Objects.requireNonNull(user);
+        mUsers.remove(YieldsApplication.getUserFromId(user));
+    }
+
 
     /**
      * Changes/updates the users of the group
      *
-     * @param userList
+     * @param userList The new list of Users for the group.
      */
     public void updateUsers(ArrayList<Id> userList) {
         mUsers.clear();
@@ -318,8 +345,21 @@ public class Group extends Node {
      * @param newMessage Message to be added
      */
     synchronized public void addMessage(Message newMessage) {
-        mMessages.put(newMessage.getDate(), newMessage);
+        Message previous = mMessages.put(newMessage.getDate(), newMessage);
         this.setLastUpdate(newMessage.getDate());
+        String previousMessage;
+        if (previous == null) {
+            previousMessage = "null";
+        } else {
+            previousMessage = previous.getContent().getTextForRequest();
+        }
+        Integer size = mMessages.size();
+        Log.d("Y:" + this.getClass().toString(), "New message count in Group is : " + size.toString());
+        Log.d("Y:" + this.getClass().toString(), DateSerialization.dateSerializer.toString(newMessage.getDate()));
+
+        Log.d("Y:" + this.getClass().toString(), "Added message to group: " + this.getId().getId().toString()
+                + ", this message was replaced: " + previousMessage);
+        Log.d("Y:" + this.getClass().toString(), "Message added had text " + newMessage.getContent().getTextForRequest());
     }
 
     /**
@@ -329,7 +369,7 @@ public class Group extends Node {
      */
     synchronized public void addMessages(List<Message> newMessageList) {
         for (Message newMessage : newMessageList) {
-            mMessages.put(newMessage.getDate(), newMessage);
+            addMessage(newMessage);
         }
 
         if (!mMessages.isEmpty()) {
@@ -386,7 +426,6 @@ public class Group extends Node {
      * Returns the lasts messages of the group (up to a certain date util the user scrolls up).
      *
      * @return A sorted map containing the messages sorted by date.
-     * @throws IOException In case the user cannot retreive the messages.
      */
     synchronized public SortedMap<Date, Message> getLastMessages() {
         return Collections.unmodifiableSortedMap(mMessages);

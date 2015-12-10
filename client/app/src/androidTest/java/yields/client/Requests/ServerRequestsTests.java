@@ -148,9 +148,9 @@ public class ServerRequestsTests {
             }
 
             Group group = new Group(groupName, new Id(0), userIds, YieldsApplication.getDefaultGroupImage(),
-                    Group.GroupVisibility.PRIVATE, true, new Date());
-
-            ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId, group, userIds, nodeIds);
+                    Group.GroupType.PRIVATE, true, new Date());
+            ServerRequest serverRequest = RequestBuilder.groupCreateRequest(senderId,
+                    group, userIds, nodeIds);
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -302,7 +302,7 @@ public class ServerRequestsTests {
                     ImageSerialization.SIZE_IMAGE_NODE);
 
             ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
-                    Group.GroupVisibility.PRIVATE, textContent, new Date());
+                    Group.GroupType.PRIVATE, textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -317,7 +317,7 @@ public class ServerRequestsTests {
                     text);
 
             serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
-                    Group.GroupVisibility.PRIVATE, imageContent, new Date());
+                    Group.GroupType.PRIVATE, imageContent, new Date());
             json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -350,7 +350,7 @@ public class ServerRequestsTests {
             TextContent textContent = new TextContent(text);
 
             ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
-                    Group.GroupVisibility.PRIVATE, textContent, new Date());
+                    Group.GroupType.PRIVATE, textContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -385,7 +385,7 @@ public class ServerRequestsTests {
                     ImageSerialization.SIZE_IMAGE);
 
             ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
-                    Group.GroupVisibility.PRIVATE, imageContent, new Date());
+                    Group.GroupType.PRIVATE, imageContent, new Date());
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),

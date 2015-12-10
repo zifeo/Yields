@@ -201,14 +201,18 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             Id id = new Id(nid);
 
+            long contentNid = response.optLong("contentNid", -1);
+
             if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
                 YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
-            Message copyMessage = new Message( message.getCommentGroupId(), message.getSender(),
+            Message message = YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(contentNid),
+                    prevDatetime, serverDatetime);
+            Message copyMessage = new Message(message.getCommentGroupId(), message.getSender(),
                     message.getContent(), prevDatetime, message.getStatus());
+
             mCacheHelper.deleteMessage(copyMessage, id);
             mCacheHelper.addMessage(message, id);
 
@@ -288,7 +292,7 @@ public class ResponseHandler {
                 group.setImage(ImageSerialization.unSerializeImage(image));
             }
             group.updateUsers(userList);
-            group.setVisibility(Group.GroupVisibility.PUBLIC);
+            group.setType(Group.GroupType.PUBLISHER);
 
             ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
             mService.sendRequest(historyRequest);
@@ -314,12 +318,15 @@ public class ResponseHandler {
                     .toDate(response.getString("datetime"));
             Id id = new Id(nid);
 
+            long contentNid = response.optLong("contentNid", -1);
+
             if (YieldsApplication.getUser().getGroup(id).getLastUpdate().before(serverDatetime)) {
                 YieldsApplication.getUser().getGroup(id)
                         .setLastUpdate(serverDatetime);
             }
 
-            YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            YieldsApplication.getUser().getGroup(id).updateMessageIdDateAndStatus(new Id(contentNid),
+                    prevDatetime, serverDatetime);
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -353,6 +360,8 @@ public class ResponseHandler {
         }
     }
 
+
+
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
@@ -360,7 +369,10 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            Message message = new Message(response.getString("datetime"),
+            long contentNid = response.optLong("contentNid", -1);
+
+
+            Message message = new Message(response.getString("datetime"), contentNid,
                     response.getLong("sender"), response.getString("text"),
                     response.optString("contentType"), response.optString("content"));
 
@@ -370,7 +382,7 @@ public class ResponseHandler {
             mService.receiveMessage(groupId, message);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
+                    serverResponse.object().toString() + " because of : " + e.getMessage());
         }
     }
 
@@ -478,7 +490,10 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            Message message = new Message(response.getString("datetime"),
+            long contentNid = response.optLong("contentNid", -1);
+
+
+            Message message = new Message(response.getString("datetime"), contentNid,
                     response.getLong("sender"), response.getString("text"),
                     response.optString("contentType"), response.optString("content"));
 
@@ -555,35 +570,15 @@ public class ResponseHandler {
         try {
             JSONObject response = serverResponse.getMessage();
 
-            Message message = new Message(response.getString("datetime"),
+            long contentNid = response.optLong("contentNid", -1);
+
+            Message message = new Message(response.getString("datetime"), contentNid,
                     response.getLong("sender"), response.getString("text"),
                     response.getString("contentType"), response.getString("content"));
 
             Id groupId = new Id(response.getLong("nid"));
 
             mService.receiveMessage(groupId, message);
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    /**
-     * Handles the appropriate Response which is given to it by argument.
-     */
-    protected void handleRSSMessageBroadcast(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-
-            long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
-            long senderId = response.getLong("sender");
-            String text = response.getString("text");
-            String contentType = response.getString("contentType");
-            String content = response.getString("content");
-
-            Message message = new Message(datetime.toString(), senderId, text,
-                    contentType, content);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -758,6 +753,7 @@ public class ResponseHandler {
             JSONArray texts = serverResponse.getMessage().getJSONArray("texts");
             JSONArray contentTypes = serverResponse.getMessage().getJSONArray("contentTypes");
             JSONArray contents = serverResponse.getMessage().getJSONArray("contents");
+            JSONArray contentNids = serverResponse.getMessage().getJSONArray("contentNids");
 
             int count = datetimes.length();
             assert (count == senders.length() && count == texts.length() && count == contentTypes
@@ -766,13 +762,13 @@ public class ResponseHandler {
             Id groupId = new Id(nid);
             ArrayList<Message> messageList = new ArrayList<>();
             for (int i = 0; i < count; i++) {
+                Long contentNid = contentNids.optLong(i, -1);
 
-                Message message = new Message(datetimes.getString(i), senders.getLong(i), texts
+                Message message = new Message(datetimes.getString(i), contentNid, senders.getLong(i), texts
                         .getString(i), contentTypes.getString(i), contents.getString(i));
                 messageList.add(message);
                 mCacheHelper.addMessage(message, groupId);
             }
-
             mService.receiveMessages(groupId, messageList);
         } catch (JSONException | ParseException e) {
             e.printStackTrace();
@@ -782,7 +778,7 @@ public class ResponseHandler {
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
-    protected void handleMediaMessageResponse(Response serverResponse) {
+    protected void handleMediaMessageBroadcast(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
             Date prevDatetime = DateSerialization.dateSerializer
@@ -793,16 +789,39 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             Id id = new Id(nid);
 
-            Message message = YieldsApplication.getUser().getGroup(id).validateMessage(prevDatetime, serverDatetime);
+            Message message = YieldsApplication.getUser().getCommentGroup(id).updateMessageIdDateAndStatus(new Id(-1),
+                    prevDatetime, serverDatetime);
             Message copyMessage = new Message(message.getCommentGroupId(), message.getSender(),
                     message.getContent(), prevDatetime, message.getStatus());
+
             mCacheHelper.deleteMessage(copyMessage, id);
             mCacheHelper.addMessage(message, id);
-
             mService.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
+        }
+    }
+
+    /**
+     * Handles the appropriate Response which is given to it by argument.
+     */
+    protected void handleMediaMessageResponse(Response serverResponse) {
+        try {
+            JSONObject response = serverResponse.getMessage();
+
+            Message message = new Message(response.getString("datetime"), Long.valueOf("-1"),
+                    response.getLong("sender"), response.getString("text"),
+                    response.optString("contentType"), response.optString("content"));
+
+            Id groupId = new Id(response.getLong("nid"));
+
+            mCacheHelper.addMessage(message, groupId);
+            mService.receiveMessage(groupId, message);
+        } catch (JSONException | ParseException e) {
+            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
+                    serverResponse.object().toString() + " because of : " + e.getMessage());
         }
     }
 }

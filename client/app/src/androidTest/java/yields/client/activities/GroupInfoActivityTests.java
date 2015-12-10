@@ -40,6 +40,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
+        ServiceTestConnection.connectActivityToService();
+
         YieldsApplication.setUser(MockFactory.generateFakeClientUser("Arnaud", new Id(1), "aa",
                 YieldsApplication.getDefaultUserImage()));
 
@@ -53,7 +55,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectName(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         YieldsApplication.setInfoGroup(g);
 
         getActivity();
@@ -65,8 +67,8 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectNoTags(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
-        YieldsApplication.setGroup(g);
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
+        YieldsApplication.setInfoGroup(g);
         getActivity();
 
         onView(withId(R.id.textViewTags)).check(matches(withText(R.string.noTags)));
@@ -77,7 +79,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectTag(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         g.addTag(new Group.Tag("fun"));
 
         YieldsApplication.setInfoGroup(g);
@@ -91,7 +93,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectTags(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         g.addTag(new Group.Tag("fun"));
         g.addTag(new Group.Tag("happy"));
 
@@ -110,7 +112,7 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
      */
     public void testCorrectUsers(){
         Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
-                YieldsApplication.getDefaultGroupImage(), Group.GroupVisibility.PUBLIC, false, new Date());
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
         User u1 = new User("Ratchet", new Id(123), "r@veldin.com", YieldsApplication.getDefaultUserImage());
         User u2 = new User("Clank", new Id(121), "c@veldin.com", YieldsApplication.getDefaultUserImage());
         YieldsApplication.getUser().addUserToEntourage(u1);
@@ -121,9 +123,38 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         YieldsApplication.setInfoGroup(g);
         getActivity();
 
-        onView(withId(R.id.buttonUsers)).perform(click());
         onView(withText("Ratchet")).perform(click());
 
         onView(withId(R.id.textViewUserName)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that subscribe to the group.
+     */
+    public void testSubscribe(){
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
+
+        YieldsApplication.setInfoGroup(g);
+        getActivity();
+
+        onView(withId(R.id.buttonSubscribeGroup)).perform(click());
+    }
+
+    /**
+     * Test that unsubscribe from the group.
+     */
+    public void testUnsubscribe(){
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
+        Group sub = new Group("sub", new Id(1), new ArrayList<Id>());
+        YieldsApplication.getUser().addGroup(sub);
+        sub.addUser(YieldsApplication.getUser().getId());
+        sub.addNode(g);
+
+        YieldsApplication.setInfoGroup(g);
+        getActivity();
+
+        onView(withId(R.id.buttonUnsubscribeGroup)).perform(click());
     }
 }

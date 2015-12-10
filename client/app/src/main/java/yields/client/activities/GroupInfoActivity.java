@@ -5,10 +5,13 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,7 +21,10 @@ import java.util.Objects;
 import yields.client.R;
 import yields.client.exceptions.IllegalIntentExtraException;
 import yields.client.exceptions.MissingIntentExtraException;
+import yields.client.gui.GraphicTransforms;
 import yields.client.id.Id;
+import yields.client.listadapter.ListAdapterUsers;
+import yields.client.listadapter.ListAdapterUsersCheckBox;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.node.User;
@@ -86,7 +92,7 @@ public class GroupInfoActivity extends NotifiableActivity {
 
         TextView textViewTags = (TextView) findViewById(R.id.textViewTags);
 
-        if (mGroup.getVisibility() == Group.GroupVisibility.PRIVATE){
+        if (mGroup.getType() == Group.GroupType.PRIVATE){
             textViewTags.setVisibility(View.GONE);
         }
         else if (tags.isEmpty()){
@@ -105,34 +111,71 @@ public class GroupInfoActivity extends NotifiableActivity {
             textViewTags.setText(builder.toString());
         }
 
-        Button usersButton = (Button) findViewById(R.id.buttonUsers);
-
-        usersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(GroupInfoActivity.this, UserListActivity.class);
-                String title = "Users of " + mGroup.getName();
-                intent.putExtra(UserListActivity.TITLE_KEY, title);
-                intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, false);
-                startActivity(intent);
-            }
-        });
-
-        YieldsApplication.setUserList(mGroup.getUsers());
-
-        Button nodesButton = (Button) findViewById(R.id.buttonNodes);
-
-        nodesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(GroupInfoActivity.this, NodeListActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        YieldsApplication.setGroupsSearched(mGroup.getNodes());
-
         checkButtons();
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.linearLayoutUsersAndNodes);
+
+        for (final User user : mGroup.getUsers()){
+            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+            View userView = inflater.inflate(R.layout.user_layout_separator, layout, false);
+
+            TextView textViewUserName = (TextView) userView.findViewById(R.id.textViewUserName);
+            ImageView imageUser = (ImageView) userView.findViewById(R.id.imageUser);
+
+            textViewUserName.setText(user.getName());
+
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+                    getApplicationContext().getResources().getInteger(R.integer.groupImageDiameter)));
+
+            userView.setClickable(true);
+            userView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    YieldsApplication.setUserSearched(user);
+
+                    Intent intent = new Intent(GroupInfoActivity.this, UserInfoActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            layout.addView(userView);
+        }
+
+        for (final Group group : mGroup.getNodes()){
+            LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+            View groupView = inflater.inflate(R.layout.user_layout_separator, layout, false);
+
+            TextView textViewUserName = (TextView) groupView.findViewById(R.id.textViewUserName);
+            ImageView imageUser = (ImageView) groupView.findViewById(R.id.imageUser);
+
+            textViewUserName.setText(group.getName());
+
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(group.getImage(),
+                    getApplicationContext().getResources().getInteger(R.integer.groupImageDiameter)));
+
+            groupView.setClickable(true);
+            groupView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    YieldsApplication.setGroup(group);
+
+                    Intent intent = new Intent(GroupInfoActivity.this, GroupInfoActivity.class);
+                    intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+                    startActivity(intent);
+                }
+            });
+
+            layout.addView(groupView);
+        }
+    }
+
+    /**
+     * Automatically called when the activity is resumed
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        YieldsApplication.setGroup(mGroup);
     }
 
     /**
@@ -213,10 +256,12 @@ public class GroupInfoActivity extends NotifiableActivity {
                     Group newGroup = new Group(mGroup.getName(), new Id(0), userList);
                     newGroup.addNode(mGroup);
 
-                        ServiceRequest request =new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
-                        YieldsApplication.getBinder().sendRequest(request);
+                    YieldsApplication.getUser().addGroup(newGroup);
 
-                        subscribeButton.setEnabled(false);
+                    ServiceRequest request = new GroupCreateRequest(YieldsApplication.getUser(), newGroup);
+                    YieldsApplication.getBinder().sendRequest(request);
+
+                    subscribeButton.setEnabled(false);
                     }
                 });
 
@@ -239,26 +284,32 @@ public class GroupInfoActivity extends NotifiableActivity {
                         assert subscriptionGroup != null : "subscriptionGroup should " +
                                 "never be null when unsubscribeButton is clickable";
 
-                                ArrayList<User> list = new ArrayList<>();
+                        YieldsApplication.getUser().removeGroup(subscriptionGroup);
+                        subscriptionGroup.removeUser(YieldsApplication.getUser().getId());
+
+                        ArrayList<User> list = new ArrayList<>();
                         list.add(YieldsApplication.getUser());
-                                ServiceRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId
-                                        (),
-                                subscriptionGroup
-                                        .getId(), list,
-                                        GroupUpdateUsersRequest.UpdateType.REMOVE);
+                        ServiceRequest request = new GroupUpdateUsersRequest(
+                                YieldsApplication.getUser().getId(),
+                                subscriptionGroup.getId(), list,
+                                GroupUpdateUsersRequest.UpdateType.REMOVE);
                         YieldsApplication.getBinder().sendRequest(request);
 
-
                         unsubscribeButton.setEnabled(false);
+
+                        //TODO Remove this when the response is handled
+                        GroupInfoActivity.this.notifyChange(Change.GROUP_LEAVE);
                     }
                 });
 
                 if (alreadySubscribed){
                     subscribeButton.setVisibility(View.GONE);
                     unsubscribeButton.setVisibility(View.VISIBLE);
+                    unsubscribeButton.setEnabled(true);
                 }
                 else {
                     subscribeButton.setVisibility(View.VISIBLE);
+                    subscribeButton.setEnabled(true);
                     unsubscribeButton.setVisibility(View.GONE);
                 }
             }
