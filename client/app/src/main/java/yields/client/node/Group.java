@@ -335,7 +335,12 @@ public class Group extends Node {
      */
     public boolean containsNode(Group group) {
         Objects.requireNonNull(group);
-        return mNodes.contains(group);
+        for (Group g : mNodes){
+            if (g.getId().equals(group.getId())){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
