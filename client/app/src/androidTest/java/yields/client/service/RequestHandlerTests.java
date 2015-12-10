@@ -3,6 +3,7 @@ package yields.client.service;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
@@ -14,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +28,7 @@ import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
+import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
 
@@ -81,10 +84,11 @@ public class RequestHandlerTests {
         ArrayList<Id> list = new ArrayList<>();
         list.add(YieldsApplication.getUser().getId());
         Group group = new Group("Nice meme", new Id(888), list);
+        YieldsApplication.getUser().addGroup(group);
         mCacheDatabaseHelper.addGroup(group);
     }
 
-    @Test
+   /* @Test
     public void testHandleUserGroupListRequest(){
         // Request
         UserGroupListRequest request = new UserGroupListRequest(YieldsApplication.getUser());
@@ -110,7 +114,7 @@ public class RequestHandlerTests {
         } catch (JSONException e) {
             fail("Invalid request");
         }
-    }
+    }*/
 
     @Test
     public void testHandleUserEntourageRemoveRequest(){
@@ -435,42 +439,135 @@ public class RequestHandlerTests {
     }
 
     @Test
-    public void testHandleNodeMessageRequest() {
+    public void testHandleNodeMessageRequestText() {
         String newName = "Holy cow !";
         User user = new User(newName, new Id(11111), "NEW EMAIL", Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
 
+        Date sendingDate = new Date();
         Message message = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new TextContent
-                ("topkek"), new Date());
+                ("topkek"), sendingDate);
 
         GroupMessageRequest request = new GroupMessageRequest(message, new Id(888), Group.GroupType.PRIVATE);
 
         RequestHandler handler = createRequestHandler();
         handler.handleNodeMessageRequest(request);
 
-        assertEquals(user.getId().getId(), mCacheDatabaseHelper.mLastGroupIdMessageAdded.getId());
+        assertEquals(Long.valueOf(888), mCacheDatabaseHelper.mLastGroupIdMessageAdded.getId());
         assertEquals(message, mCacheDatabaseHelper.mLastMessageAdded);
+        assertEquals(sendingDate, YieldsApplication.getUser().getGroup(new Id(888)).getLastUpdate());
 
         ServerRequest sReq = mServiceRequestController.mLastRequest;
         Log.d("RequestHandlerTests", sReq.message());
         JSONObject reqObject = null;
         try {
+            //{"metadata":{"client":999999,"ref":"2015-12-10T23:00:03.230+01:00","datetime":"2015-12-10T23:00:03.240+01:00"},
+            // "kind":"GroupMessage","message":{"contentType":null,"nid":888,"date":"2015-12-10T23:00:03.230+01:00",
+            // "text":"topkek","content":null}}
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
-            assertEquals(11111, metadata.getLong("client"));
+            assertEquals(999999, metadata.getLong("client"));
             assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
-            assertEquals("UserUpdate", reqObject.getString("kind"));
-            JSONObject message = reqObject.getJSONObject("message");
-            assertEquals("Holy cow !", message.getString("name"));
-            assertEquals("null", message.getString("email"));
-            assertEquals("null", message.getString("pic"));
-            assertEquals(0, message.getJSONArray("addEntourage").length());
-            assertEquals(0, message.getJSONArray("removeEntourage").length());
+            assertEquals("GroupMessage", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals("null", messageObj.getString("contentType"));
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(sendingDate, DateSerialization.dateSerializer.toDate(messageObj.getString("date")));
+            assertEquals("topkek", messageObj.getString("text"));
+            assertEquals("null", messageObj.getString("content"));
         } catch (JSONException e) {
             fail("Invalid request");
+        } catch (ParseException e) {
+            fail("cannot parse date.");
         }
     }
 
+    @Test
+    public void testHandleNodeMessageRequestURL() {
+        String newName = "Holy cow !";
+        User user = new User(newName, new Id(11111), "NEW EMAIL", Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
 
+        Date sendingDate = new Date();
+        Message message = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new UrlContent
+                ("topkek 4chan.org"), sendingDate);
+
+        GroupMessageRequest request = new GroupMessageRequest(message, new Id(888), Group.GroupType.PRIVATE);
+
+        RequestHandler handler = createRequestHandler();
+        handler.handleNodeMessageRequest(request);
+
+        assertEquals(Long.valueOf(888), mCacheDatabaseHelper.mLastGroupIdMessageAdded.getId());
+        assertEquals(message, mCacheDatabaseHelper.mLastMessageAdded);
+        assertEquals(sendingDate, YieldsApplication.getUser().getGroup(new Id(888)).getLastUpdate());
+
+        ServerRequest sReq = mServiceRequestController.mLastRequest;
+        Log.d("RequestHandlerTests", sReq.message());
+        JSONObject reqObject = null;
+        try {
+            //{"metadata":{"client":999999,"ref":"2015-12-10T23:00:03.230+01:00","datetime":"2015-12-10T23:00:03.240+01:00"},
+            // "kind":"GroupMessage","message":{"contentType":null,"nid":888,"date":"2015-12-10T23:00:03.230+01:00",
+            // "text":"topkek","content":null}}
+            reqObject = new JSONObject(sReq.message());
+            JSONObject metadata = reqObject.getJSONObject("metadata");
+            assertEquals(999999, metadata.getLong("client"));
+            assertEquals("GroupMessage", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals("url", messageObj.getString("contentType"));
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(sendingDate, DateSerialization.dateSerializer.toDate(messageObj.getString("date")));
+            assertEquals("topkek 4chan.org", messageObj.getString("text"));
+            assertEquals("https://www.4chan.org", messageObj.getString("content"));
+        } catch (JSONException e) {
+            fail("Invalid request");
+        } catch (ParseException e) {
+            fail("cannot parse date.");
+        }
+    }
+
+    @Test
+    public void testHandleNodeMessageRequestImage() {
+        String newName = "Holy cow !";
+        User user = new User(newName, new Id(11111), "NEW EMAIL", Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
+
+        Date sendingDate = new Date();
+        ImageContent content = new ImageContent(Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565), "Nice caption " +
+                "m8.");
+        Message message = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), content, sendingDate);
+
+        GroupMessageRequest request = new GroupMessageRequest(message, new Id(888), Group.GroupType.PRIVATE);
+
+        RequestHandler handler = createRequestHandler();
+        handler.handleNodeMessageRequest(request);
+
+        assertEquals(Long.valueOf(888), mCacheDatabaseHelper.mLastGroupIdMessageAdded.getId());
+        assertEquals(message, mCacheDatabaseHelper.mLastMessageAdded);
+        assertEquals(sendingDate, YieldsApplication.getUser().getGroup(new Id(888)).getLastUpdate());
+
+        ServerRequest sReq = mServiceRequestController.mLastRequest;
+        Log.d("RequestHandlerTests", sReq.message());
+        JSONObject reqObject = null;
+        try {
+            //{"metadata":{"client":999999,"ref":"2015-12-10T23:00:03.230+01:00","datetime":"2015-12-10T23:00:03.240+01:00"},
+            // "kind":"GroupMessage","message":{"contentType":null,"nid":888,"date":"2015-12-10T23:00:03.230+01:00",
+            // "text":"topkek","content":null}}
+            reqObject = new JSONObject(sReq.message());
+            JSONObject metadata = reqObject.getJSONObject("metadata");
+            assertEquals(999999, metadata.getLong("client"));
+            assertEquals("GroupMessage", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals("image", messageObj.getString("contentType"));
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(sendingDate, DateSerialization.dateSerializer.toDate(messageObj.getString("date")));
+            assertEquals("Nice caption m8.", messageObj.getString("text"));
+            String contentField = messageObj.getString("content");
+            String expectedContentField = ImageSerialization.serializeImage(Bitmap.createBitmap(100, 100, Bitmap
+                    .Config.RGB_565), ImageSerialization.SIZE_IMAGE_NODE);
+            assertEquals(expectedContentField, contentField);
+        } catch (JSONException e) {
+            fail("Invalid request");
+        } catch (ParseException e) {
+            fail("cannot parse date.");
+        }
+    }
 
     private RequestHandler createRequestHandler(){
         return new RequestHandler(mCacheDatabaseHelper, mService, mServiceRequestController);
