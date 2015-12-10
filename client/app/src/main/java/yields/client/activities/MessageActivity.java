@@ -66,6 +66,7 @@ public class MessageActivity extends NotifiableActivity {
     private static EditText mInputField;
     private static ActionBar mActionBar;
     private static TextView mTextTitle;
+    private Group mPrevGroup;
     private Menu mMenu;
 
     private ServiceConnection mConnection;
@@ -112,6 +113,7 @@ public class MessageActivity extends NotifiableActivity {
             public void onClick(View v) {
                 if (mType == ContentType.GROUP_MESSAGES) {
                     YieldsApplication.setInfoGroup(mGroup);
+                    mPrevGroup = mGroup;
                     Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                     intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
                     startActivity(intent);
@@ -532,12 +534,14 @@ public class MessageActivity extends NotifiableActivity {
                         case IMAGE:
                             YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).
                                     getImage());
+                            mPrevGroup = mGroup;
                             startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
                             break;
 
                         case URL:
                             String url = ((UrlContent) mCommentMessage.getContent()).getUrl();
                             Log.d("MessageActivity", "Open URL in browser : " + url);
+                            mPrevGroup = mGroup;
                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                             startActivity(browserIntent);
                             break;
@@ -638,24 +642,23 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveGroupMessages() {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
-         /*
-        if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
-            mGroupMessageAdapter.clear();
-            Log.d("Y:" + this.getClass().getName(), "Cleared message adapter");
 
-            for (Message message : messagesTree.values()) {
-                mGroupMessageAdapter.add(message);
-            }
-            Log.d("Y:" + this.getClass().getName(), "Added most recent messages in adapter");
-        }
-*/
+        ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
+
+        int count = mGroupMessageAdapter.getCount();
 
         mGroupMessageAdapter.clear();
 
         for (Message message : messagesTree.values()) {
             mGroupMessageAdapter.add(message);
         }
+        mGroupMessageAdapter.notifyDataSetChanged();
 
+        if (mGroupMessageAdapter.getCount() - count > 3) {
+            listView.setSelection(mGroupMessageAdapter.getCount());
+        } else {
+            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount());
+        }
 
         mGroupMessageAdapter.notifyDataSetChanged();
     }
