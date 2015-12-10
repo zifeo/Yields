@@ -374,6 +374,8 @@ public class MessageActivity extends NotifiableActivity {
 
             case R.id.actionSettingsGroup:
                 Log.d("MessageActivity", "actionSettingsGroup.");
+                YieldsApplication.setInfoGroup(mGroup);
+
                 Intent intent = new Intent(this, GroupSettingsActivity.class);
                 startActivity(intent);
                 return true;
@@ -419,7 +421,7 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void run() {
                 if (mMenu != null) {
-                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.tick);
+                    mMenu.findItem(R.id.iconConnect).setVisible(false);
                 }
             }
         });
@@ -431,7 +433,8 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void run() {
                 if (mMenu != null) {
-                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.cross);
+                    mMenu.findItem(R.id.iconConnect).setVisible(true);
+                    mMenu.findItem(R.id.iconConnect).setIcon(R.drawable.ic_cancel_black_24dp);
                 }
             }
         });
