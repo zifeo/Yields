@@ -512,7 +512,7 @@ public class MessageActivity extends NotifiableActivity {
         YieldsApplication.getBinder().attachActivity(this);
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mTextTitle.setText("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
+        mTextTitle.setText("Message from " + YieldsApplication.getNodeFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         retrieveCommentMessages();
