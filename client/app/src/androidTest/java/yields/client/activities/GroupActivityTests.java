@@ -282,4 +282,13 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
             fail("Error group not found");
         }
     }
+
+    /**
+     * Simple test which just goes to SearchGroupActivity
+     */
+    public void testGoToSearch() {
+        onView(withId(R.id.actionDiscover)).perform(click());
+
+        onView(withId(R.id.textViewInfoSearch)).check(matches(isDisplayed()));
+    }
 }
