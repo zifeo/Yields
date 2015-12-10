@@ -103,15 +103,6 @@ class TestGroupUpdate extends YieldsSpec {
 
   }
 
-  "updating the group" should "also update updated_at field" in {
-    val meta = Metadata.now(0)
-    val group = Group.create("name", meta.client)
-    val up1 = group.updatedAt
-    val action = GroupUpdate(group.nid, Some("newName"), None, List.empty, List.empty, List.empty, List.empty)
-    action.run(meta)
-    group.updatedAt should not be up1
-  }
-
   it should "not be changed by someone out of the users" in {
 
     val meta = Metadata.now(0)
