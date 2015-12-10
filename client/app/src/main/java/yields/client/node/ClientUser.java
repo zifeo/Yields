@@ -169,7 +169,7 @@ public class ClientUser extends User {
                 return group;
             }
         }
-        return null;
+        return getCommentGroup(groupId);
     }
 
     /**

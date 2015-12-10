@@ -39,4 +39,11 @@ public class Id {
             return ((Id) other).getId().equals(this.getId());
         }
     }
+
+    /** Print backing number. */
+    @Override
+    public String toString() {
+        return mId.toString();
+    }
+
 }

@@ -88,6 +88,10 @@ public class MockFactory {
 
     }
 
+    public static Bitmap generateMockImage() {
+        return Bitmap.createBitmap(10, 10, Bitmap.Config.RGB_565);
+    }
+
     private static class FakeClientUser extends ClientUser {
 
         public FakeClientUser(String name, Id id, String email, Bitmap img) throws NodeException, InstantiationException {

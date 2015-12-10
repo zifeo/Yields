@@ -207,7 +207,7 @@ public class RequestBuilder {
         Objects.requireNonNull(senderId);
 
         RequestBuilder builder = new RequestBuilder(
-                ServiceRequest.RequestKind.USER_GROUP_LIST, senderId);
+                ServiceRequest.RequestKind.USER_NODE_LIST, senderId);
 
         return builder.request();
     }
