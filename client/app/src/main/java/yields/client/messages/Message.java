@@ -87,8 +87,8 @@ public class Message extends Node {
      * @param content     The content of the message.
      * @throws ParseException In case of parse exception with the date serialization.
      */
-    public Message(String dateTime, Long senderID, String text, String contentType, String content) throws ParseException {
-        super("message", new Id(DateSerialization.dateSerializer.toDate(Objects.requireNonNull(dateTime)).getTime()));
+    public Message(String dateTime, Long contentId, Long senderID, String text, String contentType, String content) throws ParseException {
+        super("message", new Id(contentId));
 
         this.mSender = new Id(senderID);
 

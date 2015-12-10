@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,21 +51,23 @@ import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
- * Activity used to display messages for a group
+ * Activity used to display messages for a group, or comments of a Message.
  */
 public class MessageActivity extends NotifiableActivity {
+
+
     public enum ContentType {GROUP_MESSAGES, MESSAGE_COMMENTS}
 
     private static ClientUser mUser;
     private static Group mGroup;
     private static final int PICK_IMAGE_REQUEST = 1;
-    private Bitmap mImage; // Image taken from the gallery.
+    private Bitmap mImagePickedFromGallery;
     private boolean mSendImage;
     private static EditText mInputField;
     private static ActionBar mActionBar;
     private static TextView mTextTitle;
     private Menu mMenu;
-    private ImageButton mSendButton;
+
     private ServiceConnection mConnection;
 
     private static ContentType mType;
@@ -108,7 +109,6 @@ public class MessageActivity extends NotifiableActivity {
             @Override
             public void onClick(View v) {
                 YieldsApplication.setGroup(mGroup);
-
                 Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                 intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
                 startActivity(intent);
@@ -118,7 +118,7 @@ public class MessageActivity extends NotifiableActivity {
         mUser = YieldsApplication.getUser();
         mGroup = YieldsApplication.getGroup();
 
-        mImage = null;
+        mImagePickedFromGallery = null;
         mSendImage = false;
 
         mGroupMessageAdapter = new ListAdapterMessages(YieldsApplication
@@ -128,9 +128,6 @@ public class MessageActivity extends NotifiableActivity {
 
         mInputField = (EditText) findViewById(R.id.inputMessageField);
 
-        mSendButton = (ImageButton) findViewById(R.id.sendButton);
-
-        // By default, we show the messages of the group.
         mType = ContentType.GROUP_MESSAGES;
         mFragmentManager = getFragmentManager();
         createGroupMessageFragment();
@@ -143,6 +140,7 @@ public class MessageActivity extends NotifiableActivity {
 
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
+                    YieldsApplication.setGroup(mGroup);
                     YieldsApplication.setBinder((YieldServiceBinder) service);
                     YieldsApplication.getBinder().attachActivity(MessageActivity.this);
                     YieldsApplication.getBinder().connectionStatus();
@@ -162,7 +160,6 @@ public class MessageActivity extends NotifiableActivity {
 
             bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
-
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -241,44 +238,47 @@ public class MessageActivity extends NotifiableActivity {
     public void onSendMessage(View v) {
         String inputMessage = mInputField.getText().toString().trim();
         mInputField.setText("");
+
         if (!inputMessage.isEmpty() || mSendImage) {
             Content content;
-            if (mSendImage && mImage != null) {
-                Log.d("MessageActivity", "Create image content");
-                content = new ImageContent(mImage, inputMessage);
+
+            if (mSendImage && mImagePickedFromGallery != null) {
+                content = new ImageContent(mImagePickedFromGallery, inputMessage);
+                Log.d("Y:" + this.getClass().toString(), "Created image content");
                 mSendImage = false;
-                mImage = null;
+                mImagePickedFromGallery = null;
                 mImageThumbnail.setImageBitmap(null);
                 mImageThumbnail.setPadding(0, 0, 0, 0);
             } else if (UrlContent.containsUrl(inputMessage)) {
-                Log.d("MessageActivity", "Create URL content.");
                 content = new UrlContent(inputMessage);
-                Log.d("MessageActivity", "URL content created.");
+                Log.d("Y:" + this.getClass().toString(), "Created url content");
             } else {
-                Log.d("MessageActivity", "Create text content");
                 content = new TextContent(inputMessage);
+                Log.d("Y:" + this.getClass().toString(), "Create text content");
             }
-            Message message = new Message("message", new Id(0), mUser.getId(), content, new Date());
+
+            Message message = new Message("message", new Id(-1), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
-                Log.d("MessageActivity", "Send group message");
+                Log.d("Y:" + this.getClass().toString(), "Send group message to " + mGroup.getId().getId().toString());
+                mGroup.addMessage(message);
                 mGroupMessageAdapter.add(message);
                 mGroupMessageAdapter.notifyDataSetChanged();
                 ((GroupMessageFragment) mCurrentFragment).getMessageListView()
                         .smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
-                GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(),
-                        mGroup.getVisibility());
+
+                GroupMessageRequest request = new GroupMessageRequest(message, mGroup.getId(), mGroup.getType());
                 YieldsApplication.getBinder().sendRequest(request);
             } else {
+                Log.d("Y:" + this.getClass().toString(), "Send media message to " + mGroup.getId().getId().toString());
+                mGroup.addMessage(message);
                 mCommentAdapter.add(message);
                 mCommentAdapter.notifyDataSetChanged();
-                ((CommentFragment) mCurrentFragment).getCommentListView()
-                        .smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-                MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId(),
-                        Group.GroupVisibility.PRIVATE);
+                ((CommentFragment) mCurrentFragment)
+                        .getCommentListView().smoothScrollToPosition(mCommentAdapter.getCount() - 1);
+
+                MediaMessageRequest request = new MediaMessageRequest(message, mCommentMessage.getId());
                 YieldsApplication.getBinder().sendRequest(request);
             }
-
-            mGroup.addMessage(message);
         }
     }
 
@@ -308,13 +308,13 @@ public class MessageActivity extends NotifiableActivity {
             Uri uri = data.getData();
 
             try {
-                mImage = MediaStore.Images.Media.getBitmap(getContentResolver(),
+                mImagePickedFromGallery = MediaStore.Images.Media.getBitmap(getContentResolver(),
                         uri);
-                if (mImage != null) {
+                if (mImagePickedFromGallery != null) {
                     Log.d("MessageActivity", "Update Thumbnail");
                     mImageThumbnail.setPadding(THUMBNAIL_PADDING, THUMBNAIL_PADDING,
                             THUMBNAIL_PADDING, THUMBNAIL_PADDING);
-                    mImageThumbnail.setImageBitmap(mImage);
+                    mImageThumbnail.setImageBitmap(mImagePickedFromGallery);
                     String message = "Image added to message";
                     YieldsApplication.showToast(getApplicationContext(), message);
                 }
@@ -374,7 +374,7 @@ public class MessageActivity extends NotifiableActivity {
                 });
                 break;
             default:
-                Log.d("Y:" + this.getClass().getName(), "useless notify change...");
+                Log.d("Y:" + this.getClass().getName(), "Useless notify change...");
         }
 
     }
@@ -448,7 +448,7 @@ public class MessageActivity extends NotifiableActivity {
      * them.
      */
     public void simulateImageMessage() {
-        mImage = YieldsApplication.getDefaultGroupImage();
+        mImagePickedFromGallery = YieldsApplication.getDefaultGroupImage();
         mSendImage = true;
     }
 
@@ -463,7 +463,7 @@ public class MessageActivity extends NotifiableActivity {
         mImageThumbnail.setPadding(0, 0, 0, 0);
         mSendImage = false;
         mImageThumbnail.setImageBitmap(null);
-        mImage = null;
+        mImagePickedFromGallery = null;
     }
 
     /**
@@ -473,13 +473,13 @@ public class MessageActivity extends NotifiableActivity {
     private void createCommentFragment() {
         Log.d("MessageActivity", "createCommentFragment");
         mInputField.setText("");
-        FragmentTransaction fragmentTransaction = mFragmentManager.
-                beginTransaction();
+        YieldsApplication.getBinder().attachActivity(this);
+        FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
         mTextTitle.setText("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
-        mCommentAdapter.clear();
+        retrieveCommentMessages();
         ((CommentFragment) mCurrentFragment).setAdapter(mCommentAdapter);
         ((CommentFragment) mCurrentFragment).setMessage(mCommentMessage);
         ((CommentFragment) mCurrentFragment).setCommentViewOnClickListener(new View.OnClickListener() {
@@ -519,16 +519,16 @@ public class MessageActivity extends NotifiableActivity {
      */
     private void loadComments() {
         Log.d("MessageActivity", "loadComments");
-        NodeHistoryRequest request = new NodeHistoryRequest(mGroup.getId(), new Date());
+        YieldsApplication.getBinder().attachActivity(this);
+        NodeHistoryRequest request = new NodeHistoryRequest(mCommentMessage.getId(), new Date());
         YieldsApplication.getBinder().sendRequest(request);
     }
 
     /**
-     * Creates a group message fragment and put it in the fragment container of
+     * Creates a group message fragment and put it in the fragment container ofg
      * the MessageActivity (id fragmentPlaceHolder).
      */
     private void createGroupMessageFragment() {
-        Log.d("MessageActivity", "createGroupMessageFragment");
         mInputField.setText("");
         FragmentTransaction fragmentTransaction = mFragmentManager.
                 beginTransaction();
@@ -551,7 +551,12 @@ public class MessageActivity extends NotifiableActivity {
                             mLastApplicationGroup = mGroup;
                             // Then we update the group currently displayed as it is the commented
                             // message
-                            mGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
+                            Group commentGroup = YieldsApplication.getUser().getCommentGroup(mCommentMessage.getId());
+                            if(commentGroup == null){
+                                commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
+                                YieldsApplication.getUser().addCommentGroup(commentGroup);
+                            }
+                            mGroup = commentGroup;
                             YieldsApplication.setGroup(mGroup);
                             mType = ContentType.MESSAGE_COMMENTS;
                             createCommentFragment();
@@ -560,6 +565,7 @@ public class MessageActivity extends NotifiableActivity {
                 });
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
+        Log.d("Y:" + this.getClass().toString(), "Created group message fragment");
     }
 
     /**
@@ -571,12 +577,11 @@ public class MessageActivity extends NotifiableActivity {
     @Override
     public void onBackPressed() {
         if (mType == ContentType.GROUP_MESSAGES) {
-            Log.d("MessageActivity", "Quit activity");
+            Log.d("Y:" + this.getClass().toString(), "Back button pressed");
             super.onBackPressed();
         } else {
-            Log.d("MessageActivity", "Back to group message fragment");
+            Log.d("Y:" + this.getClass().toString(), "Back button pressed, going back to Group Messages");
             mType = ContentType.GROUP_MESSAGES;
-            // We need to go back to the last reference of mGroup.
             mGroup = mLastApplicationGroup;
             YieldsApplication.setGroup(mGroup);
             createGroupMessageFragment();
@@ -591,14 +596,13 @@ public class MessageActivity extends NotifiableActivity {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
         if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
-            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
             mGroupMessageAdapter.clear();
+            Log.d("Y:" + this.getClass().getName(), "Cleared message adapter");
 
             for (Message message : messagesTree.values()) {
                 mGroupMessageAdapter.add(message);
             }
-
-            Log.d("Y:" + this.getClass().getName(), "retrieveGroupMessages");
+            Log.d("Y:" + this.getClass().getName(), "Added most recent messages in adapter");
         }
 
         ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
@@ -618,13 +622,10 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveCommentMessages() {
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if (mCommentAdapter.getCount() < messagesTree.size()) {
-            Log.d("Y:" + this.getClass().getName(), "retrieveCommentMessages");
-            mCommentAdapter.clear();
+        mCommentAdapter.clear();
 
-            for (Message message : messagesTree.values()) {
-                mCommentAdapter.add(message);
-            }
+        for (Message message : messagesTree.values()) {
+            mCommentAdapter.add(message);
         }
 
         ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();

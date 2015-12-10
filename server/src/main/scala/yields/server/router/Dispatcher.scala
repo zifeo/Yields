@@ -32,10 +32,14 @@ final class Dispatcher extends Actor with ActorLogging {
 
     case InitConnection(uid) =>
       val newPool = add(uid, sender(), pool)
+      log.debug(s"dispatch pool (add): $pool")
+      log.debug(s"dispatch pool (add): $newPool")
       context become state(newPool)
 
     case TerminateConnection =>
       val newPool = remove(sender(), pool)
+      log.debug(s"dispatch pool (rem): $pool")
+      log.debug(s"dispatch pool (rem): $newPool")
       context become state(newPool)
 
     case Notify(uids, broadcast) =>
