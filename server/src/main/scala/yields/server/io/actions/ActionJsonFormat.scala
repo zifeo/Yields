@@ -5,7 +5,7 @@ import spray.json._
 import yields.server.actions._
 import yields.server.actions.groups._
 import yields.server.actions.media.MediaMessage
-import yields.server.actions.nodes.{NodeMessage, NodeSearch, NodeHistory}
+import yields.server.actions.nodes.{NodeInfo, NodeMessage, NodeSearch, NodeHistory}
 import yields.server.actions.publisher.{PublisherMessage, PublisherInfo, PublisherUpdate, PublisherCreate}
 import yields.server.actions.rss.{RSSInfo, RSSCreate}
 import yields.server.actions.users._
@@ -41,6 +41,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
 
     case x: NodeSearch => packWithKind(x)
     case x: NodeHistory => packWithKind(x)
+    case x: NodeInfo => packWithKind(x)
 
     case x: UserConnect => packWithKind(x)
     case x: UserUpdate => packWithKind(x)
@@ -74,6 +75,7 @@ object ActionJsonFormat extends RootJsonFormat[Action] {
 
           case "NodeSearch" => message.convertTo[NodeSearch]
           case "NodeHistory" => message.convertTo[NodeHistory]
+          case "NodeInfo" => message.convertTo[NodeInfo]
 
           case "UserConnect" => message.convertTo[UserConnect]
           case "UserUpdate" => message.convertTo[UserUpdate]

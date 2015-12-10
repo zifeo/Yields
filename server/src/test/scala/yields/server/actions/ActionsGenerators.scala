@@ -10,7 +10,7 @@ with PublishersGenerators with RSSGenerators {
   implicit lazy val actionArb: Arbitrary[Action] = Arbitrary {
     val arbs = Seq(
       groupCreateArb, groupUpdateArb, groupInfoArb, groupMessageArb,
-      nodeHistoryArb, nodeSearchArb,
+      nodeHistoryArb, nodeSearchArb, nodeInfoArb,
       userConnectArb, userUpdateArb, userInfoArb, userGroupListArb,
       mediaMessageArb,
       publisherCreateArb, publisherInfoArb, publisherMessageArb, publisherUpdateArb,

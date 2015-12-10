@@ -7,21 +7,22 @@ import yields.server.tests.YieldsSpec
 
 class TestUserUpdate extends YieldsSpec {
 
-  "UserUpdate" should "change only name" in {
+  "UserUpdate" should "change only name and updated_at field" in {
 
     val start = User.create("email12344321@email.com")
     val meta = Metadata.now(start.uid)
     start.name = "name"
 
     val newName = "jacques"
+    val updatedStart = start.updated_at
     val action = UserUpdate(None, Some(newName), None, List.empty, List.empty)
     action.run(meta)
-
     val end = User(start.uid)
-    end.email should be (start.email)
-    end.name should be (newName)
-    end.pic should be (start.pic)
-    end.entourage should be (start.entourage)
+    updatedStart should not be end.updated_at
+    end.email should be(start.email)
+    end.name should be(newName)
+    end.pic should be(start.pic)
+    end.entourage should be(start.entourage)
 
   }
 
@@ -36,10 +37,10 @@ class TestUserUpdate extends YieldsSpec {
     action.run(meta)
 
     val end = User(start.uid)
-    end.email should be (start.email)
-    end.name should be (start.name)
-    end.pic should be (newPic)
-    end.entourage should be (start.entourage)
+    end.email should be(start.email)
+    end.name should be(start.name)
+    end.pic should be(newPic)
+    end.entourage should be(start.entourage)
 
   }
 
@@ -53,20 +54,20 @@ class TestUserUpdate extends YieldsSpec {
     addAction.run(meta)
 
     val middle = User(start.uid)
-    middle.email should be (start.email)
-    middle.name should be (start.name)
-    middle.pic should be (start.pic)
-    middle.entourage should be (newUsers)
+    middle.email should be(start.email)
+    middle.name should be(start.name)
+    middle.pic should be(start.pic)
+    middle.entourage should be(newUsers)
 
     val oldUsers = List[UID](3)
     val removeAction = UserUpdate(None, None, None, List.empty, oldUsers)
     removeAction.run(meta)
 
     val end = User(start.uid)
-    end.email should be (start.email)
-    middle.name should be (start.name)
-    end.pic should be (start.pic)
-    end.entourage should be (newUsers.diff(oldUsers))
+    end.email should be(start.email)
+    middle.name should be(start.name)
+    end.pic should be(start.pic)
+    end.entourage should be(newUsers.diff(oldUsers))
 
   }
 
@@ -78,8 +79,8 @@ class TestUserUpdate extends YieldsSpec {
     val badEmail = "jacques@oups"
     val action = UserUpdate(Some(badEmail), None, None, List.empty, List.empty)
 
-    val thrown = the [ActionArgumentException] thrownBy action.run(meta)
-    thrown.getMessage should include (badEmail)
+    val thrown = the[ActionArgumentException] thrownBy action.run(meta)
+    thrown.getMessage should include(badEmail)
 
   }
 
