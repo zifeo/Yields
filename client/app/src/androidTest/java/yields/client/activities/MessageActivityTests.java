@@ -2,13 +2,20 @@ package yields.client.activities;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
+import android.view.ActionProvider;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,6 +32,7 @@ import yields.client.R;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.messages.CommentView;
+import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
@@ -35,6 +43,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.unregisterIdlingResources;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
@@ -141,8 +150,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testWrittenTextMessageIsCorrect() {
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
-        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput("Mock input message 1");
         ListView listView = messageActivity.getCurrentFragmentListView();
         int i = listView.getChildCount();
         MessageView messageView = (MessageView) listView.getChildAt(i - 1);
@@ -186,9 +194,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
         YieldsApplication.setGroup(MOCK_GROUP);
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput(input);
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -204,9 +211,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         YieldsApplication.setGroup(MOCK_GROUP);
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput("Mock input message 1");
 
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
@@ -236,8 +242,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock comment";
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput(input);
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -259,8 +264,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput(input);
         input = "Should be flushed";
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         Fragment fragment = messageActivity.getCurrentFragment();
@@ -279,8 +283,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput(input);
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -303,7 +306,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testCannotSendEmptyTextMessage() {
         final MessageActivity messageActivity = getActivity();
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput("");
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
     }
@@ -312,7 +315,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testCaptionForImageIsNotMandatory() {
         final MessageActivity messageActivity = getActivity();
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput("");
         assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
     }
@@ -322,8 +325,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         final MessageActivity messageActivity = getActivity();
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        onView(withId(R.id.sendButton)).perform(click());
+        sendInput(input);
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -348,4 +350,281 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         TextContent content = (TextContent) m.getContent();
         assertEquals("topkek", content.getText());
     }*/
+
+    @Test
+    public void testGroupIdGetter(){
+        final MessageActivity messageActivity = getActivity();
+        assertEquals(Long.valueOf(11111), messageActivity.getGroupId().getId());
+    }
+
+    @Test
+    public void testSendUrlMessage() {
+        final MessageActivity messageActivity = getActivity();
+        sendInput("www.reddit.com");
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
+        Message message = (Message) messageList.getAdapter().getItem(0);
+        assertEquals(Content.ContentType.URL, message.getContent().getType());
+    }
+
+    @Test
+    public void testOnOptionsItemSelectedHome(){
+        final MessageActivity messageActivity = getActivity();
+        RunnableOnOption runnableOnOption = new RunnableOnOption(messageActivity, android.R.id.home);
+        messageActivity.runOnUiThread(runnableOnOption);
+        SystemClock.sleep(1000);
+        assertEquals(true, runnableOnOption.getReturnedValue());
+    }
+
+    @Test
+    public void testOnOptionsItemSelectedActionSettingsGroup(){
+        final MessageActivity messageActivity = getActivity();
+        RunnableOnOption runnableOnOption = new RunnableOnOption(messageActivity, R.id.actionSettingsGroup);
+        messageActivity.runOnUiThread(runnableOnOption);
+        SystemClock.sleep(1000);
+        assertEquals(true, runnableOnOption.getReturnedValue());
+    }
+
+    @Test
+    public void testOnOptionsItemSelectedActionIconConnect(){
+        final MessageActivity messageActivity = getActivity();
+        RunnableOnOption runnableOnOption = new RunnableOnOption(messageActivity, R.id.iconConnect);
+        messageActivity.runOnUiThread(runnableOnOption);
+        SystemClock.sleep(1000);
+        assertEquals(true, runnableOnOption.getReturnedValue());
+    }
+
+    private void sendInput(String input){
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+    }
+
+    private MenuItem createMenuItem(final int itemId){
+        return new MenuItem() {
+            @Override
+            public int getItemId() {
+                return itemId;
+            }
+
+            @Override
+            public int getGroupId() {
+                return 0;
+            }
+
+            @Override
+            public int getOrder() {
+                return 0;
+            }
+
+            @Override
+            public MenuItem setTitle(CharSequence title) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setTitle(int title) {
+                return null;
+            }
+
+            @Override
+            public CharSequence getTitle() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setTitleCondensed(CharSequence title) {
+                return null;
+            }
+
+            @Override
+            public CharSequence getTitleCondensed() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setIcon(Drawable icon) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setIcon(int iconRes) {
+                return null;
+            }
+
+            @Override
+            public Drawable getIcon() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setIntent(Intent intent) {
+                return null;
+            }
+
+            @Override
+            public Intent getIntent() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setShortcut(char numericChar, char alphaChar) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setNumericShortcut(char numericChar) {
+                return null;
+            }
+
+            @Override
+            public char getNumericShortcut() {
+                return 0;
+            }
+
+            @Override
+            public MenuItem setAlphabeticShortcut(char alphaChar) {
+                return null;
+            }
+
+            @Override
+            public char getAlphabeticShortcut() {
+                return 0;
+            }
+
+            @Override
+            public MenuItem setCheckable(boolean checkable) {
+                return null;
+            }
+
+            @Override
+            public boolean isCheckable() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setChecked(boolean checked) {
+                return null;
+            }
+
+            @Override
+            public boolean isChecked() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setVisible(boolean visible) {
+                return null;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setEnabled(boolean enabled) {
+                return null;
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return false;
+            }
+
+            @Override
+            public boolean hasSubMenu() {
+                return false;
+            }
+
+            @Override
+            public SubMenu getSubMenu() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setOnMenuItemClickListener(OnMenuItemClickListener menuItemClickListener) {
+                return null;
+            }
+
+            @Override
+            public ContextMenu.ContextMenuInfo getMenuInfo() {
+                return null;
+            }
+
+            @Override
+            public void setShowAsAction(int actionEnum) {
+
+            }
+
+            @Override
+            public MenuItem setShowAsActionFlags(int actionEnum) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setActionView(View view) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setActionView(int resId) {
+                return null;
+            }
+
+            @Override
+            public View getActionView() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setActionProvider(ActionProvider actionProvider) {
+                return null;
+            }
+
+            @Override
+            public ActionProvider getActionProvider() {
+                return null;
+            }
+
+            @Override
+            public boolean expandActionView() {
+                return false;
+            }
+
+            @Override
+            public boolean collapseActionView() {
+                return false;
+            }
+
+            @Override
+            public boolean isActionViewExpanded() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setOnActionExpandListener(OnActionExpandListener listener) {
+                return null;
+            }
+        };
+    }
+
+    class RunnableOnOption implements Runnable {
+        private boolean mReturnValue;
+        private MenuItem mItemId;
+        private MessageActivity mActivity;
+
+        public RunnableOnOption(MessageActivity activity, int itemId){
+            mItemId = createMenuItem(itemId);
+            mActivity = activity;
+        }
+
+        @Override
+        public void run() {
+            mReturnValue = mActivity.onOptionsItemSelected(mItemId);
+        }
+
+        public boolean getReturnedValue(){
+            return mReturnValue;
+        }
+    }
 }
