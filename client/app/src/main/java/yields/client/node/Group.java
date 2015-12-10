@@ -122,6 +122,7 @@ public class Group extends Node {
                 false, new Date());
     }
 
+
     /**
      * Overloaded constructor.
      *
@@ -287,7 +288,7 @@ public class Group extends Node {
      *
      * @param nodeList
      */
-    public void updateNodes(ArrayList<Id> nodeList) {
+    public void updateNodes(List<Id> nodeList) {
         mNodes.clear();
         for (Id uId : nodeList) {
             mNodes.add(YieldsApplication.getUser().getNodeFromId(uId));
