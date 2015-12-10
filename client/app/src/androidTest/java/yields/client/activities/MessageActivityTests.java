@@ -84,8 +84,11 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
-        YieldsApplication.setGroup(MOCK_GROUP);
+
+        Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
+        YieldsApplication.setGroup(mockGroup);
         assertTrue(YieldsApplication.getUser().getImage() != null);
+
     }
 
     /**
