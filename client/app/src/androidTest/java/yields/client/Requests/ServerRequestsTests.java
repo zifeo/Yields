@@ -1,4 +1,4 @@
-package yields.client.Requests;
+package yields.client.requests;
 
 import android.graphics.Bitmap;
 
@@ -49,7 +49,7 @@ public class ServerRequestsTests {
 
             JSONObject json = new JSONObject(serverRequest.message());
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
-                    ServiceRequest.RequestKind.USER_GROUP_LIST.getValue());
+                    ServiceRequest.RequestKind.USER_NODE_LIST.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
         } catch (JSONException e) {
@@ -299,7 +299,7 @@ public class ServerRequestsTests {
             Content imageContent = new ImageContent(YieldsApplication.getDefaultGroupImage(), text);
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             String imageEncoded = ImageSerialization.serializeImage(newImage,
-                    ImageSerialization.SIZE_IMAGE_NODE);
+                    ImageSerialization.SIZE_IMAGE);
 
             ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     Group.GroupType.PRIVATE, textContent, new Date());

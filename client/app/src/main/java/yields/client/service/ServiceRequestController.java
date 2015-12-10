@@ -15,14 +15,12 @@ import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupInfoRequest;
-import yields.client.servicerequest.NodeInfoRequest;
+import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.MediaMessageRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
-import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.NodeSearchRequest;
 import yields.client.servicerequest.RSSCreateRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -134,7 +132,7 @@ public class ServiceRequestController {
             case USER_UPDATE_NAME:
                 mRequestHandler.handleUserUpdateNameRequest((UserUpdateNameRequest) serviceRequest);
                 break;
-            case USER_GROUP_LIST:
+            case USER_NODE_LIST:
                 mRequestHandler.handleUserGroupListRequest((UserGroupListRequest) serviceRequest);
                 break;
             case USER_ENTOURAGE_ADD:
@@ -195,7 +193,7 @@ public class ServiceRequestController {
             case USER_CONNECT_RESPONSE:
                 mResponseHandler.handleUserConnectResponse(serverResponse); /* DONE */
                 break;
-            case USER_GROUP_LIST_RESPONSE:
+            case USER_NODE_LIST_RESPONSE:
                 mResponseHandler.handleUserGroupListResponse(serverResponse); /* DONE */
                 break;
             case USER_INFO_RESPONSE:
@@ -249,8 +247,8 @@ public class ServiceRequestController {
             case PUBLISHER_UPDATE_BCAST:
                 mResponseHandler.handlePublisherUpdateBroadcast(serverResponse);
                 break;
-            case PUBLISHER_MESSAGE_BCAST:
-                mResponseHandler.handlePublisherMessageBroadcast(serverResponse);
+            case RSS_CREATE_BCAST:
+                mResponseHandler.handleRSSCreateBroadcast(serverResponse);
                 break;
             case MEDIA_MESSAGE_RESPONSE:
                 mResponseHandler.handleMediaMessageResponse(serverResponse);
@@ -258,8 +256,6 @@ public class ServiceRequestController {
             case RSS_INFO_RES:
                 mResponseHandler.handleRSSInfoResponse(serverResponse);
                 break;
-            case MEDIA_MESSAGE_BCAST:
-                mResponseHandler.handleMediaMessageBroadcast(serverResponse);
             default:
                 Log.d("Y:" + this.getClass().getName(), "No such response kind : " +
                         serverResponse.getKind());

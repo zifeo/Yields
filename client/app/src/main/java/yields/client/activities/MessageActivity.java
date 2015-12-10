@@ -105,18 +105,21 @@ public class MessageActivity extends NotifiableActivity {
 
         mTextTitle = (TextView) findViewById(R.id.toolbarTitle);
 
+        mType = ContentType.GROUP_MESSAGES;
+
         mTextTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                YieldsApplication.setInfoGroup(mGroup);
-                Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
-                intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
-                startActivity(intent);
+                if (mType == ContentType.GROUP_MESSAGES) {
+                    YieldsApplication.setGroup(mGroup);
+                    Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
+                    intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
+                    startActivity(intent);
+                }
             }
         });
 
         mUser = YieldsApplication.getUser();
-
 
 
         mImagePickedFromGallery = null;
@@ -142,7 +145,7 @@ public class MessageActivity extends NotifiableActivity {
                         mType = ContentType.MESSAGE_COMMENTS;
                         createCommentFragment();
                     } else {
-                        throw new IllegalStateException("there is no group for id : " + groupId.getId() );
+                        throw new IllegalStateException("there is no group for id : " + groupId.getId());
                     }
                 } else {
                     YieldsApplication.setGroup(mGroup);
@@ -188,6 +191,9 @@ public class MessageActivity extends NotifiableActivity {
 
             bindService(serviceBindingIntent, mConnection, Context.BIND_AUTO_CREATE);
         }
+
+        mFragmentManager = getFragmentManager();
+        createGroupMessageFragment();
 
         mImageThumbnail = (ImageView) findViewById(R.id.imagethumbnail);
         mImageThumbnail.setPadding(0, 0, 0, 0);
@@ -285,7 +291,7 @@ public class MessageActivity extends NotifiableActivity {
                 Log.d("Y:" + this.getClass().toString(), "Create text content");
             }
 
-            Message message = new Message( new Id(-1), mUser.getId(), content, new Date());
+            Message message = new Message(new Id(-1), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
                 Log.d("Y:" + this.getClass().toString(), "Send group message to " + mGroup.getId().getId().toString());
                 mGroup.addMessage(message);
@@ -583,6 +589,7 @@ public class MessageActivity extends NotifiableActivity {
                             // message
                             Group commentGroup = YieldsApplication.getUser()
                                     .getCommentGroup(mCommentMessage.getCommentGroupId());
+
                             if (commentGroup == null) {
                                 commentGroup = Group.createGroupForMessageComment(mCommentMessage, mGroup);
                                 YieldsApplication.getUser().addCommentGroup(commentGroup);
