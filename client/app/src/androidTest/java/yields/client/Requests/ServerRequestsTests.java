@@ -297,7 +297,7 @@ public class ServerRequestsTests {
             Content imageContent = new ImageContent(YieldsApplication.getDefaultGroupImage(), text);
             Bitmap newImage = YieldsApplication.getDefaultGroupImage();
             String imageEncoded = ImageSerialization.serializeImage(newImage,
-                    ImageSerialization.SIZE_IMAGE_NODE);
+                    ImageSerialization.SIZE_IMAGE);
 
             ServerRequest serverRequest = RequestBuilder.groupMessageRequest(senderId, groupId,
                     Group.GroupType.PRIVATE, textContent, new Date());
