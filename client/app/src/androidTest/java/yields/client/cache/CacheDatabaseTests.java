@@ -147,7 +147,7 @@ public class CacheDatabaseTests {
         try {
             ImageContent content = new ImageContent(YieldsApplication.getDefaultGroupImage(), "hello");
             Id user = MockFactory.generateMockUsers(2).get(1);
-            Message message = new Message("Bob", new Id(2), user, content, new Date());
+            Message message = new Message( new Id(2), user, content, new Date());
             Group group = MockFactory.generateMockGroups(2).get(0);
             group.addUser(message.getSender());
             mDatabaseHelper.addMessage(message, group.getId());
@@ -222,7 +222,7 @@ public class CacheDatabaseTests {
 
         updatedUser.setName("Johhny Cash");
         updatedUser.setEmail("rialtoGaming@jpg.com");
-        updatedUser.setImg(YieldsApplication.getDefaultGroupImage());
+        updatedUser.setImage(YieldsApplication.getDefaultGroupImage());
 
         mDatabaseHelper.updateUser(updatedUser);
 
@@ -237,8 +237,8 @@ public class CacheDatabaseTests {
         assertEquals(updatedUser.getId().getId(),
                 userFromDatabase.getId().getId());
 
-        assertTrue(compareImages(updatedUser.getImg(),
-                userFromDatabase.getImg()));
+        assertTrue(compareImages(updatedUser.getImage(),
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -297,8 +297,8 @@ public class CacheDatabaseTests {
         assertEquals(userToUpdateEmail.getId(),
                 userFromDatabase.getId().getId());
 
-        assertTrue(compareImages(YieldsApplication.getUserFromId(userToUpdateEmail).getImg(),
-                userFromDatabase.getImg()));
+        assertTrue(compareImages(YieldsApplication.getUserFromId(userToUpdateEmail).getImage(),
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -713,13 +713,13 @@ public class CacheDatabaseTests {
             mDatabaseHelper.addGroup(group);
 
             for (int i = 0; i < 30; i++) {
-                Message message = new Message("Mock node name User1 " + i, new Id(-i),
+                Message message = new Message(new Id(-i),
                         user1.getId(), MockFactory.generateFakeTextContent(i), new Date());
                 mDatabaseHelper.addMessage(message, group.getId());
                 Thread.sleep(15);
             }
             for (int i = 0; i < 30; i++) {
-                Message message = new Message("Mock node name User2 " + i, new Id(-i - 30),
+                Message message = new Message( new Id(-i - 30),
                         user2.getId(), MockFactory.generateFakeTextContent(i + 30), new Date());
                 mDatabaseHelper.addMessage(message, group.getId());
                 Thread.sleep(15);

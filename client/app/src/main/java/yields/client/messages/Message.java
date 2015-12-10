@@ -65,14 +65,13 @@ public class Message{
     /**
      * Constructor for a Message, sets it's MessageStatus to NOT_SENT.
      *
-     * @param nodeName Name of the Node.
      * @param nodeID   ID of the Node.
      * @param sender   The sender of the message.
      * @param content  The content of the message.
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
-    public Message(String nodeName, Id nodeID, Id sender, Content content, Date date) {
+    public Message(Id nodeID, Id sender, Content content, Date date) {
         this(nodeID, sender, content, date, MessageStatus.NOT_SENT);
     }
 

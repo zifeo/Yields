@@ -65,7 +65,7 @@ public class MockFactory {
     }
 
     public static Message generateMockMessage(String nodeName, Id nodeID, User sender, Content content) {
-        return new Message(nodeName, nodeID, sender.getId(), content, new Date());
+        return new Message( nodeID, sender.getId(), content, new Date());
     }
 
     public static TextContent generateFakeTextContent(int i) {

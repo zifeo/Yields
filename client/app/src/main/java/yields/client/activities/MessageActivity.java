@@ -257,7 +257,7 @@ public class MessageActivity extends NotifiableActivity {
                 Log.d("Y:" + this.getClass().toString(), "Create text content");
             }
 
-            Message message = new Message("message", new Id(-1), mUser.getId(), content, new Date());
+            Message message = new Message( new Id(-1), mUser.getId(), content, new Date());
             if (mType == ContentType.GROUP_MESSAGES) {
                 Log.d("Y:" + this.getClass().toString(), "Send group message to " + mGroup.getId().getId().toString());
                 mGroup.addMessage(message);
