@@ -58,7 +58,6 @@ public class User extends Node {
      * @throws JSONException In case of trouble parsing the response.
      */
     public void update(JSONObject response) throws JSONException{
-        // TODO : change profil pic
         this.setName(response.getString("name"));
         this.setEmail(response.getString("email"));
 
