@@ -518,27 +518,6 @@ public class ResponseHandler {
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
-    protected void handleRSSMessageBroadcast(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-
-            long nid = response.getLong("nid");
-            Date datetime = DateSerialization.dateSerializer.toDate(response.getString("datetime"));
-            long senderId = response.getLong("sender");
-            String text = response.getString("text");
-            String contentType = response.getString("contentType");
-            String content = response.getString("content");
-
-            // TODO : Create Message and add it to where the f*ck it need to be added.
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString());
-        }
-    }
-
-    /**
-     * Handles the appropriate Response which is given to it by argument.
-     */
     protected void handleGroupCreateResponse(Response serverResponse) {
         try {
             // TODO : Change behaviour so that you don't go quit activity as long as group is not accepted.
@@ -730,7 +709,7 @@ public class ResponseHandler {
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
-    protected void handleMediaMessageBroadcast(Response serverResponse) {
+    protected void handleMediaMessageResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
             Date prevDatetime = DateSerialization.dateSerializer
@@ -753,27 +732,6 @@ public class ResponseHandler {
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
-        }
-    }
-
-    /**
-     * Handles the appropriate Response which is given to it by argument.
-     */
-    protected void handleMediaMessageResponse(Response serverResponse) {
-        try {
-            JSONObject response = serverResponse.getMessage();
-
-            Message message = new Message(response.getString("datetime"), Long.valueOf("-1"),
-                    response.getLong("sender"), response.getString("text"),
-                    response.optString("contentType"), response.optString("content"));
-
-            Id groupId = new Id(response.getLong("nid"));
-
-            mCacheHelper.addMessage(message, groupId);
-            mService.receiveMessage(groupId, message);
-        } catch (JSONException | ParseException e) {
-            Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
-                    serverResponse.object().toString() + " because of : " + e.getMessage());
         }
     }
 
