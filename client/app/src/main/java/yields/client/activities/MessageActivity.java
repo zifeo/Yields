@@ -153,16 +153,14 @@ public class MessageActivity extends NotifiableActivity {
                     mType = ContentType.GROUP_MESSAGES;
                     createGroupMessageFragment();
                 }
-
-                Log.d("Delete", groupId.getId().toString());
-                YieldsApplication.getBinder().cancelNotificationFromId(groupId);
-
             }
         } else {
             mGroup = YieldsApplication.getGroup();
             mType = ContentType.GROUP_MESSAGES;
             createGroupMessageFragment();
         }
+
+        YieldsApplication.getBinder().cancelNotificationFromId(mGroup.getId());
 
         if (YieldsApplication.getBinder() != null) {
             NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
