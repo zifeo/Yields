@@ -117,7 +117,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
             MessageView messageView = (MessageView) listView.getChildAt(i);
 
             //Sender Info
-            assertEquals(id, messageView.getMessage().getSender());
+            assertEquals(id.getId(), messageView.getMessage().getSender().getId());
 
             //Node Info
             assertEquals(id.getId(), messageView.getMessage().getCommentGroupId().getId());
