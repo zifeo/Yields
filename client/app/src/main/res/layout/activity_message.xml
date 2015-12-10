@@ -11,9 +11,7 @@
         android:background="@color/barColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp"
-        android:paddingLeft="-18sp"
-        android:paddingRight="0sp">
+        android:elevation="4dp">
 
         <TextView
             android:layout_width="wrap_content"
