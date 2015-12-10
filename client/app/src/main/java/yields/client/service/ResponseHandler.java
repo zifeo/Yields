@@ -229,10 +229,11 @@ public class ResponseHandler {
     protected void handlePublisherCreateResponse(Response serverResponse) {
         try {
             // TODO : Change behaviour so that you don't go quit activity as long as group is not accepted.
-
+            Id nid = new Id(serverResponse.getMessage().getLong("nid"));
             YieldsApplication.getUser().activateGroup(DateSerialization.dateSerializer
-                            .toDate(serverResponse.getMetadata().getString("ref")),
-                    new Id(serverResponse.getMessage().getLong("nid")));
+                    .toDate(serverResponse.getMetadata().getString("ref")), nid);
+            Group group = YieldsApplication.getUser().getGroup(nid);
+            mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
         } catch (JSONException | ParseException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
@@ -356,7 +357,6 @@ public class ResponseHandler {
 
                 ServiceRequest groupCreate = new GroupCreateRequest(YieldsApplication.getUser(), group);
                 mService.sendRequest(groupCreate);
-
                 mService.notifyChange(NotifiableActivity.Change.RSS_CREATE);
             } else {
                 mService.notifyChange(NotifiableActivity.Change.RSS_FAIL);
@@ -468,6 +468,7 @@ public class ResponseHandler {
             Group newGroup = new Group(name, new Id(nid), userList, image, Group.GroupType.PRIVATE, true, new Date());
             newGroup.updateNodes(nodeList);
             YieldsApplication.getUser().addGroup(newGroup);
+            mCacheHelper.addGroup(newGroup);
 
             for (Id userId : userList) {
                 UserInfoRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(), userId);
@@ -543,6 +544,7 @@ public class ResponseHandler {
             Group newGroup = new Group(name, new Id(nid), userList, image, Group.GroupType.PUBLISHER, true, new Date());
             newGroup.updateNodes(nodeList);
             YieldsApplication.getUser().addGroup(newGroup);
+            mCacheHelper.addGroup(newGroup);
 
             for (Id userId : userList) {
                 UserInfoRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(), userId);

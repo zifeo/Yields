@@ -12,8 +12,6 @@ import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.ServerRequest;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.NodeInfoRequest;
-import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
@@ -129,8 +127,6 @@ public class RequestHandler {
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleRssCreateRequest(RSSCreateRequest serviceRequest) {
-
-
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }
