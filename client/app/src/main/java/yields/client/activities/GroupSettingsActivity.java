@@ -68,7 +68,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Group Settings");
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-        mGroup = YieldsApplication.getGroup();
+        mGroup = YieldsApplication.getInfoGroup();
         mUser = YieldsApplication.getUser();
 
         assert mGroup != null : "The group in YieldsApplication cannot be null when this activity is created";
