@@ -100,7 +100,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
         switch (change) {
             //TODO Add right change type
 
-            case GROUP_LIST:
+            case RSS_CREATE:
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -117,7 +117,9 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
                     }
                 });
                 break;
-
+            case RSS_FAIL:
+                YieldsApplication.showToast(getApplicationContext(), "The RSS cannot be found");
+                break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "useless notify change...");
         }
