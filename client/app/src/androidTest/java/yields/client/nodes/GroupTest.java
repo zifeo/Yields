@@ -124,7 +124,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
                 ("topkek"));
         g.addMessage(message);
         Date validatedDate = new Date(message.getDate().getTime() + 1000);
-        Message validated = g.validateMessage(message.getDate(), validatedDate);
+        Message validated = g.updateMessageIdDateAndStatus(g.getId(), message.getDate(), validatedDate);
         assertEquals(message.getDate(), validatedDate);
         assertEquals(message.getStatus(), Message.MessageStatus.SENT);
         assertEquals(message, validated);
@@ -133,7 +133,7 @@ public class GroupTest extends ActivityInstrumentationTestCase2<MessageActivity>
     @Test
     public void testValidateMessageNotPresentInGroup() throws JSONException, ParseException {
         Group g = new Group(jsonGroup);
-        Message validated = g.validateMessage(new Date(), new Date());
+        Message validated = g.updateMessageIdDateAndStatus(g.getId(), new Date(), new Date());
         assertEquals(null, validated);
     }
 
