@@ -157,7 +157,7 @@ public class GroupInfoActivity extends NotifiableActivity {
             groupView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    YieldsApplication.setGroup(group);
+                    YieldsApplication.setInfoGroup(group);
 
                     Intent intent = new Intent(GroupInfoActivity.this, GroupInfoActivity.class);
                     intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
