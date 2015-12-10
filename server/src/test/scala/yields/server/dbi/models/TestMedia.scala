@@ -47,5 +47,4 @@ class TestMedia extends YieldsSpec {
     mediaAfter.creator should be(0)
 
   }
-
 }
