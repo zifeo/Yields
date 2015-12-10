@@ -2,12 +2,14 @@ package yields.client.node;
 
 import android.graphics.Bitmap;
 import android.media.Image;
+import android.util.Log;
 
 import java.util.Date;
 import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
+import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -103,7 +105,7 @@ public class Node {
      * @param id The new id of the node.
      */
     public void setId(Id id) {
-        mId = id;
+        mId = Objects.requireNonNull(id);
     }
 
 }

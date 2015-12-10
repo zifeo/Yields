@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,14 +75,16 @@ public class ClientUser extends User {
      * @param node the node to add.
      */
     public void addNode(Group node) {
-        for (Group prevGroup : mGroups) {
-            if (prevGroup.getId().getId().equals(node.getId().getId())) {
-                return;
+        if (node.getId().getId() != 0) {
+            for (Group prevGroup : mGroups) {
+                if (prevGroup.getId().getId().equals(node.getId().getId())) {
+                    return;
+                }
             }
-        }
-        for (Node prevGroup : mNodes) {
-            if (prevGroup.getId().getId().equals(node.getId().getId())) {
-                return;
+            for (Node prevGroup : mNodes) {
+                if (prevGroup.getId().getId().equals(node.getId().getId())) {
+                    return;
+                }
             }
         }
         mNodes.add(node);
@@ -116,17 +119,6 @@ public class ClientUser extends User {
     }
 
     /**
-     * The group comparator.
-     */
-    private final Comparator<Group> mComparator = new Comparator<Group>() {
-
-        @Override
-        public int compare(Group lhs, Group rhs) {
-            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
-        }
-    };
-
-    /**
      * Activates the group when we received confirmation from the server.
      *
      * @param id The id of the group to activate.
@@ -135,6 +127,7 @@ public class ClientUser extends User {
         Group group = getGroupFromRef(ref);
         group.setId(id);
         group.setValidated();
+        group.setLastUpdate(new Date());
     }
 
     /**
@@ -211,6 +204,15 @@ public class ClientUser extends User {
         return null;
     }
 
+    /**
+     * The group comparator.
+     */
+    private final Comparator<Group> mComparator = new Comparator<Group>() {
 
+        @Override
+        public int compare(Group lhs, Group rhs) {
+            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
+        }
+    };
 
 }

@@ -160,7 +160,6 @@ public class YieldService extends Service {
      * @param serviceRequest The serviceRequest to send
      */
     public void sendRequest(ServiceRequest serviceRequest) {
-        Log.d("REQIGSAUHVDUASVDAZSGFGUZA", "SENDING REQUEST 3");
         new SendRequestTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, serviceRequest);
     }
 
@@ -239,7 +238,6 @@ public class YieldService extends Service {
             Group group = YieldsApplication.getUser().getGroup(groupId);
 
             group.addMessage(message);
-            group.setLastUpdate(message.getDate());
             sendMessageNotification(group, message);
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -265,6 +263,7 @@ public class YieldService extends Service {
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
             }
+            Log.d("Y:" + this.getClass().getName(), "nothing to notify");
             YieldsApplication.getUser().getGroup(groupId).addMessages(messages);
         }
     }
@@ -291,7 +290,7 @@ public class YieldService extends Service {
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setLargeIcon(group.getImage())
                         .setContentTitle("Message from " + YieldsApplication
-                                .getUserFromId(message.getSender()).getName())
+                                .getNodeFromId(message.getSender()).getName())
                         .setContentText(message.getContent().getTextForRequest().substring(0,
                                 message.getContent().getTextForRequest().length() > 50 ?
                                         50 : message.getContent().getTextForRequest().length()));

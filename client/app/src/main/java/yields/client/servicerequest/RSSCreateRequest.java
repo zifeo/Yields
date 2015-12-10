@@ -21,7 +21,7 @@ public class RSSCreateRequest extends ServiceRequest {
 
     @Override
     public RequestKind getType() {
-        return null;
+        return RequestKind.RSS_CREATE;
     }
 
     @Override

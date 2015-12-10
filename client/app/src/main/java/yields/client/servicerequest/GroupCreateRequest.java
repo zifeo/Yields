@@ -1,5 +1,7 @@
 package yields.client.servicerequest;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -59,6 +61,7 @@ public class GroupCreateRequest extends ServiceRequest {
         }
 
         for (Node node : mGroup.getNodes()) {
+            Log.d("NODE_NAME", node.getName());
             nodeIds.add(node.getId());
         }
 

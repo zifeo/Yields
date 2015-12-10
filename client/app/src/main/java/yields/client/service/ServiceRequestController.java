@@ -261,6 +261,9 @@ public class ServiceRequestController {
             case MEDIA_MESSAGE_RESPONSE:
                 mResponseHandler.handleMediaMessageResponse(serverResponse);
                 break;
+            case RSS_INFO_RES:
+                mResponseHandler.handleRSSInfoResponse(serverResponse);
+                break;
             default:
                 Log.d("Y:" + this.getClass().getName(), "No such response kind : " +
                         serverResponse.getKind());

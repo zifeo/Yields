@@ -100,8 +100,7 @@ public class RequestBuilder {
      */
     public static ServerRequest userUpdateInfoRequest(Id sender, String name, String email,
                                                       Bitmap image) {
-        return userUpdateRequest(sender, name, email, image, null,
-                null);
+        return userUpdateRequest(sender, name, email, image, null, null);
     }
 
     /**
@@ -283,10 +282,6 @@ public class RequestBuilder {
         Objects.requireNonNull(group.getName());
         Objects.requireNonNull(users);
         Objects.requireNonNull(group.getVisibility());
-
-        if (users.size() < 1) {
-            throw new IllegalArgumentException("No nodes to add...");
-        }
 
         RequestBuilder builder;
 

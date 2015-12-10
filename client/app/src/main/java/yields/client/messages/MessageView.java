@@ -64,7 +64,6 @@ public class MessageView extends LinearLayout {
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
-        Log.d("DEBUG", mMessage.getContent().getTextForRequest());
         final Node sender = YieldsApplication.getNodeFromId(mMessage.getSender());
         boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
         final Context applicationContext = YieldsApplication.getApplicationContext();
