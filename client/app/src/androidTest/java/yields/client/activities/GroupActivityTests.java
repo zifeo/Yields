@@ -241,11 +241,13 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
 
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
 
+        onView(withId(R.id.actionDoneSelectName)).perform(click());
+
         // Simulate the node added
         YieldsApplication.setGroupAdded(new Group("group", new Id(1), new ArrayList<Id>()));
         YieldsApplication.setGroupAddedValid(true);
-
-        onView(withId(R.id.actionDoneSelectName)).perform(click());
+        onView(withId(R.id.actionAddContactToGroup)).perform(click());
+        onView(withId(R.id.actionDoneSelectUser)).perform(click());
 
         onView(withId(R.id.actionDoneCreateGroup)).perform(click());
 
