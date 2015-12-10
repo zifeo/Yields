@@ -638,7 +638,7 @@ public class MessageActivity extends NotifiableActivity {
     private void retrieveGroupMessages() {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
-
+         /*
         if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
             mGroupMessageAdapter.clear();
             Log.d("Y:" + this.getClass().getName(), "Cleared message adapter");
@@ -647,6 +647,13 @@ public class MessageActivity extends NotifiableActivity {
                 mGroupMessageAdapter.add(message);
             }
             Log.d("Y:" + this.getClass().getName(), "Added most recent messages in adapter");
+        }
+*/
+
+        mGroupMessageAdapter.clear();
+
+        for (Message message : messagesTree.values()) {
+            mGroupMessageAdapter.add(message);
         }
 
         ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
