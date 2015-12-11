@@ -248,8 +248,10 @@ public class GroupSettingsActivity extends AppCompatActivity {
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
             editTextName.setId(R.id.editText);
             editTextName.setText(mGroup.getName());
+            editTextName.setSingleLine();
 
             final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
+            final int maximumSize = getResources().getInteger(R.integer.maximumNameSize);
 
             final AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
                     .setTitle("Change the group's name")
@@ -272,9 +274,13 @@ public class GroupSettingsActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     String newName = editTextName.getText().toString();
 
-                    if (newName.length() < 2) {
+                    if (newName.length() < minimumSize) {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "The new name is too short");
+                    }
+                    else if (newName.length() > maximumSize) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The new name is too long");
                     } else {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "Group name changed to \"" + newName + "\" !");
