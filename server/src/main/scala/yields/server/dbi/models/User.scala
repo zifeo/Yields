@@ -128,12 +128,16 @@ final class User private(val uid: UID) {
   }
 
   /** Adds a group and returns whether this group has been added. */
-  def addNode(newNode: NID): Boolean =
+  def addNode(newNode: NID): Boolean = {
+    _nodes = Some((newNode :: nodes).distinct)
     addWithTime(Key.nodes, newNode)
+  }
 
   /** Remove a group and returns whether this group has been removed. */
-  def removeNode(oldNode: NID): Boolean =
+  def removeNode(oldNode: NID): Boolean = {
+    _nodes = Some(nodes.filter(_ != oldNode))
     remWithTime(Key.nodes, oldNode)
+  }
 
   /** Entourage getter. */
   def entourage: List[UID] = _entourage.getOrElse {
@@ -156,23 +160,30 @@ final class User private(val uid: UID) {
   }
 
   /** Adds a user and returns whether this user has been added. */
-  def addEntourage(newUser: UID): Boolean =
+  def addEntourage(newUser: UID): Boolean = {
+    _entourage = Some((newUser :: entourage).distinct)
     if (newUser == uid) false
     else addWithTime(Key.entourage, newUser)
+  }
 
   /** Add multiple users. */
   def addEntourage(newUsers: List[UID]): Boolean = {
+    _entourage = Some((newUsers ++ entourage).distinct)
     if (newUsers == List(uid)) false
     else addWithTime(Key.entourage, newUsers.filterNot(_ == uid))
   }
 
   /** Remove a user and returns whether this user has been removed. */
-  def removeEntourage(oldUser: UID): Boolean =
+  def removeEntourage(oldUser: UID): Boolean = {
+    _entourage = Some(entourage.filter(_ != oldUser))
     remWithTime(Key.entourage, oldUser)
+  }
 
   /** Add multiple users. */
-  def removeEntourage(oldUsers: List[UID]): Boolean =
+  def removeEntourage(oldUsers: List[UID]): Boolean = {
+    _entourage = Some(entourage.diff(oldUsers))
     remWithTime(Key.entourage, oldUsers)
+  }
 
   /**
     * Loads the entire model for intensive usage (except entourage and groups).

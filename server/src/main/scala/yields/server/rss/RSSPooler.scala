@@ -3,7 +3,7 @@ package yields.server.rss
 import akka.actor._
 import yields.server.Yields
 import yields.server.actions.nodes.NodeMessageBrd
-import yields.server.dbi.models.{Node, RSS}
+import yields.server.dbi.models.{Media, Node, RSS}
 import yields.server.utils.{Config, FaultTolerance, Temporal}
 
 import scala.concurrent.ExecutionContext.Implicits._
@@ -60,10 +60,13 @@ final class RSSPooler extends Actor with ActorLogging {
 
       news.map { case RSSEntry(title, author, link, entry, _) =>
         val now = Temporal.now
-        rss.addMessage((now, rss.nid, None, s"$title $link"))
-        rss.receivers.map(Node(_)).foreach { node =>
+        rss.receivers.map(Node(_)).foreach { case node if node.users.nonEmpty =>
+          val media = Media.create(Media.ContentType.url, link, rss.nid)
+          media.addUser(node.users)
+          val text = s"$title $link"
           Yields.broadcast(node.users) {
-            NodeMessageBrd(node.nid, now, rss.nid, Some(title), None, None, None)
+            NodeMessageBrd(node.nid, now, rss.nid, Some(text),
+              Some(media.contentType), Some(media.content), Some(media.nid))
           }
         }
         (rss.name, title)
