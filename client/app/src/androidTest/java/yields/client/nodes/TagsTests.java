@@ -7,7 +7,6 @@ import java.util.List;
 
 import yields.client.id.Id;
 import yields.client.node.Group;
-import yields.client.node.User;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;

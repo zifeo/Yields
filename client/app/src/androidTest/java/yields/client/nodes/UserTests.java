@@ -1,7 +1,5 @@
 package yields.client.nodes;
 
-import android.graphics.Bitmap;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -9,7 +7,6 @@ import org.junit.Test;
 
 import yields.client.id.Id;
 import yields.client.node.User;
-import yields.client.serverconnection.ImageSerialization;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
