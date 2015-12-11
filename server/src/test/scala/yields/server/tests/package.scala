@@ -30,7 +30,7 @@ package object tests {
 
   /** Blocks 4 second until result is available. */
   def await[T](run: Future[T]): T = {
-    Await.result(run, 4 seconds)
+    Await.result(run, 10 seconds)
   }
 
   /** Serialize and deserialize a given element and return true on equality. */

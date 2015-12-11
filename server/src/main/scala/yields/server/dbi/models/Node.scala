@@ -38,6 +38,7 @@ class Node protected(val nid: NID) {
   private var _creator: Option[UID] = None
   private var _users: Option[List[UID]] = None
   private var _nodes: Option[List[NID]] = None
+  private var _receivers: Option[List[NID]] = None
   private var _feed: Option[List[FeedContent]] = None
   private var _pic: Option[Media] = None
 
@@ -110,34 +111,46 @@ class Node protected(val nid: NID) {
   }
 
   /** Add user. */
-  def addUser(newUser: UID): Boolean =
+  def addUser(newUser: UID): Boolean = {
+    _users = Some((newUser :: users).distinct)
     addWithTime(NodeKey.users, newUser)
+  }
 
   /** Add multiple users. */
-  def addUser(newUsers: List[UID]): Boolean =
+  def addUser(newUsers: List[UID]): Boolean = {
+    _users = Some((users ++ newUsers).distinct)
     addWithTime(NodeKey.users, newUsers)
+  }
 
   /** Remove user. */
-  def removeUser(oldUser: UID): Boolean =
+  def removeUser(oldUser: UID): Boolean = {
+    _users = Some(users.filter(_ != oldUser))
     remWithTime(NodeKey.users, oldUser)
+  }
 
   /** Remove multiple users. */
-  def removeUser(oldUsers: List[UID]): Boolean =
+  def removeUser(oldUsers: List[UID]): Boolean = {
+    _users = Some(users.diff(oldUsers))
     remWithTime(NodeKey.users, oldUsers)
+  }
 
   /** Receivers getter. */
   def receivers: List[NID] = _nodes.getOrElse {
-    _nodes = redis(_.hkeys[NID](NodeKey.receivers))
-    valueOrDefault(_nodes, List.empty)
+    _receivers = redis(_.hkeys[NID](NodeKey.receivers))
+    valueOrDefault(_receivers, List.empty)
   }
 
   /** Add receiver. */
-  def addReceiver(newReceiver: NID): Boolean =
+  def addReceiver(newReceiver: NID): Boolean = {
+    _receivers = Some((newReceiver :: receivers).distinct)
     addWithTime(NodeKey.receivers, newReceiver)
+  }
 
   /** Remove receiver. */
-  def removeReceiver(oldReceiver: NID): Boolean =
+  def removeReceiver(oldReceiver: NID): Boolean = {
+    _receivers = Some(receivers.filter(_ != oldReceiver))
     remWithTime(NodeKey.receivers, oldReceiver)
+  }
 
   /** Nodes getter. */
   def nodes: List[NID] = _nodes.getOrElse {
@@ -147,6 +160,7 @@ class Node protected(val nid: NID) {
 
   /** Add node. */
   def addNode(newNode: NID): Boolean = {
+    _nodes = Some((newNode :: nodes).distinct)
     Node(newNode).addReceiver(nid)
     if (newNode == nid) false
     else addWithTime(NodeKey.nodes, newNode)
@@ -154,6 +168,7 @@ class Node protected(val nid: NID) {
 
   /** Add multiple nodes. */
   def addNode(newNodes: List[NID]): Boolean = {
+    _nodes = Some((nodes ++ newNodes).distinct)
     newNodes.foreach(Node(_).addReceiver(nid))
     if (newNodes == List(nid)) false
     else addWithTime(NodeKey.nodes, newNodes.filterNot(_ == nid))
@@ -161,13 +176,15 @@ class Node protected(val nid: NID) {
 
   /** Remove node. */
   def removeNode(oldNode: NID): Boolean = {
-    Node(oldNode).addReceiver(nid)
+    _nodes = Some(nodes.filter(_ != oldNode))
+    Node(oldNode).removeReceiver(nid)
     remWithTime(NodeKey.nodes, oldNode)
   }
 
   /** Remove multiple nodes. */
   def removeNode(oldNode: List[NID]): Boolean = {
-    oldNode.foreach(Node(_).addReceiver(nid))
+    _nodes = Some(nodes.diff(oldNode))
+    oldNode.foreach(Node(_).removeReceiver(nid))
     remWithTime(NodeKey.nodes, oldNode)
   }
 

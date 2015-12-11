@@ -77,6 +77,11 @@ class Media private(nid: NID) extends Node(nid) {
   */
 object Media {
 
+  object ContentType {
+    val image = "image"
+    val url = "url"
+  }
+
   /**
     * Create a new media from a base64 string content
     * @param content base64 media
@@ -91,7 +96,7 @@ object Media {
     media.content = content
     media.contentType = contentType
     media.creator = creator
-    media.kind = this.getClass.getSimpleName
+    media.kind = classOf[Media].getSimpleName
 
     media
   }
