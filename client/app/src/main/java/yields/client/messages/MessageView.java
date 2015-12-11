@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ import yields.client.activities.UserInfoActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.gui.GraphicTransforms;
+import yields.client.node.ClientUser;
 import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -64,6 +66,7 @@ public class MessageView extends LinearLayout {
      */
     private View createMessageView() throws MessageViewException {
         final Node sender = YieldsApplication.getNodeFromId(mMessage.getSender());
+
         boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
         final Context applicationContext = YieldsApplication.getApplicationContext();
 
@@ -89,7 +92,7 @@ public class MessageView extends LinearLayout {
             }
         });
 
-
+        ClientUser user = YieldsApplication.getUser();
         Bitmap image = sender.getImage();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
