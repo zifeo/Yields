@@ -47,6 +47,9 @@ import static android.support.test.espresso.Espresso.onView;
 
 import static android.support.test.espresso.Espresso.unregisterIdlingResources;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
+import static android.support.test.espresso.Espresso.unregisterIdlingResources;
+import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
+
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
