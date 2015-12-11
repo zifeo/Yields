@@ -28,6 +28,7 @@ public abstract class ServiceRequest {
         GROUP_CREATE("GroupCreate"), GROUP_UPDATE_NODES("GroupUpdate"),
         GROUP_UPDATE("GroupUpdate"), GROUP_UPDATE_NAME("GroupUpdate"),
         GROUP_UPDATE_IMAGE("GroupUpdate"), GROUP_UPDATE_USERS("GroupUpdate"),
+        GROUP_UPDATE_TAGS("GroupUpdate"),
         GROUP_INFO("GroupInfo"),
         GROUP_MESSAGE("GroupMessage"),
 
