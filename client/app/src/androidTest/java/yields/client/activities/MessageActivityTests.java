@@ -2,12 +2,21 @@ package yields.client.activities;
 
 import android.app.Activity;
 import android.app.Fragment;
+
+import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
+import android.view.ActionProvider;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -24,7 +33,9 @@ import yields.client.R;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.messages.CommentView;
+import yields.client.messages.Content;
 import yields.client.messages.ImageContent;
+import yields.client.messages.Message;
 import yields.client.messages.MessageView;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
@@ -33,6 +44,12 @@ import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
+
+import static android.support.test.espresso.Espresso.unregisterIdlingResources;
+import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
+import static android.support.test.espresso.Espresso.unregisterIdlingResources;
+import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
+
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -47,8 +64,8 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
-    private static final ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
+    private  final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
+    private  final ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
             new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
 
     public MessageActivityTests() {
@@ -70,8 +87,11 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
-        YieldsApplication.setGroup(MOCK_GROUP);
+
+        Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
+        YieldsApplication.setGroup(mockGroup);
         assertTrue(YieldsApplication.getUser().getImage() != null);
+
     }
 
     /**
@@ -103,7 +123,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
             MessageView messageView = (MessageView) listView.getChildAt(i);
 
             //Sender Info
-            assertEquals(id, messageView.getMessage().getSender());
+            assertEquals(id.getId(), messageView.getMessage().getSender().getId());
 
             //Node Info
             assertEquals(id.getId(), messageView.getMessage().getCommentGroupId().getId());
@@ -177,10 +197,9 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testPressingOnMessageChangeType() {
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
-        String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
         YieldsApplication.setGroup(MOCK_GROUP);
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message #1"));
         onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
@@ -197,8 +216,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
         messageActivity.simulateImageMessage();
-        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         YieldsApplication.setGroup(MOCK_GROUP);
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
         onView(withId(R.id.sendButton)).perform(click());
 
         Fragment fragment = messageActivity.getCurrentFragment();
@@ -295,6 +314,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testCannotSendEmptyTextMessage() {
         final MessageActivity messageActivity = getActivity();
+        onView(withId(R.id.inputMessageField)).perform(typeText(""));
         onView(withId(R.id.sendButton)).perform(click());
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
@@ -304,6 +324,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testCaptionForImageIsNotMandatory() {
         final MessageActivity messageActivity = getActivity();
         messageActivity.simulateImageMessage();
+        onView(withId(R.id.inputMessageField)).perform(typeText(""));
         onView(withId(R.id.sendButton)).perform(click());
         assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
@@ -327,17 +348,310 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         assertTrue(list.getCount() == 0);
         messageActivity.finish();
     }
-/*
+
     @Test
-    public void testNotifyChange() throws InterruptedException {
+    public void testGroupIdGetter(){
         final MessageActivity messageActivity = getActivity();
-        MOCK_GROUP.addMessage(MockFactory.generateMockMessage("", new Id(2), MOCK_CLIENT_USER, new TextContent("topkek")));
-        Log.d("MessageActivityTest", "Notify changes");
-        messageActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+        assertEquals(Long.valueOf(11111), messageActivity.getGroupId().getId());
+    }
+
+    @Test
+    public void testSendUrlMessage() {
+        final MessageActivity messageActivity = getActivity();
+        onView(withId(R.id.inputMessageField)).perform(typeText("www.reddit.com"));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
-        Message m = (Message) messageList.getAdapter().getItem(0);
-        TextContent content = (TextContent) m.getContent();
-        assertEquals("topkek", content.getText());
-    }*/
+        Message message = (Message) messageList.getAdapter().getItem(0);
+        assertEquals(Content.ContentType.URL, message.getContent().getType());
+    }
+
+    @Test
+    public void testOnOptionsItemSelectedHome(){
+        final MessageActivity messageActivity = getActivity();
+        RunnableOnOption runnableOnOption = new RunnableOnOption(messageActivity, android.R.id.home);
+        messageActivity.runOnUiThread(runnableOnOption);
+        SystemClock.sleep(1000);
+        assertEquals(true, runnableOnOption.getReturnedValue());
+    }
+
+    @Test
+    public void testOnOptionsItemSelectedActionSettingsGroup(){
+        final MessageActivity messageActivity = getActivity();
+        RunnableOnOption runnableOnOption = new RunnableOnOption(messageActivity, R.id.actionSettingsGroup);
+        messageActivity.runOnUiThread(runnableOnOption);
+        SystemClock.sleep(1000);
+        assertEquals(true, runnableOnOption.getReturnedValue());
+    }
+
+    @Test
+    public void testOnOptionsItemSelectedActionIconConnect(){
+        final MessageActivity messageActivity = getActivity();
+        RunnableOnOption runnableOnOption = new RunnableOnOption(messageActivity, R.id.iconConnect);
+        messageActivity.runOnUiThread(runnableOnOption);
+        SystemClock.sleep(1000);
+        assertEquals(true, runnableOnOption.getReturnedValue());
+    }
+
+    @Test
+    public void testCancelImageSending(){
+        final MessageActivity messageActivity = getActivity();
+        String input = "Mock message #1";
+        messageActivity.simulateImageMessage();
+        messageActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                messageActivity.cancelImageSending(null);
+            }
+        });
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
+        Fragment fragment = messageActivity.getCurrentFragment();
+        ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
+        Message message = (Message) messageList.getAdapter().getItem(0);
+        assertEquals(Content.ContentType.TEXT, message.getContent().getType());
+    }
+
+    @Test
+    public void testNotifyNewMessages(){
+        YieldsApplication.setGroup(MOCK_GROUP);
+        final MessageActivity messageActivity = getActivity();
+        for (int i = 0 ; i < 30 ; i ++){
+            MOCK_GROUP.addMessage(MockFactory.generateMockMessage("", new Id(2), MOCK_CLIENT_USER, new TextContent("topkek")));
+            SystemClock.sleep(50);
+        }
+        assertEquals(0, messageActivity.getCurrentFragmentListView().getCount());
+        messageActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
+        SystemClock.sleep(1000);
+        assertEquals(30, messageActivity.getCurrentFragmentListView().getCount());
+    }
+
+    private MenuItem createMenuItem(final int itemId){
+        return new MenuItem() {
+            @Override
+            public int getItemId() {
+                return itemId;
+            }
+
+            @Override
+            public int getGroupId() {
+                return 0;
+            }
+
+            @Override
+            public int getOrder() {
+                return 0;
+            }
+
+            @Override
+            public MenuItem setTitle(CharSequence title) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setTitle(int title) {
+                return null;
+            }
+
+            @Override
+            public CharSequence getTitle() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setTitleCondensed(CharSequence title) {
+                return null;
+            }
+
+            @Override
+            public CharSequence getTitleCondensed() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setIcon(Drawable icon) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setIcon(int iconRes) {
+                return null;
+            }
+
+            @Override
+            public Drawable getIcon() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setIntent(Intent intent) {
+                return null;
+            }
+
+            @Override
+            public Intent getIntent() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setShortcut(char numericChar, char alphaChar) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setNumericShortcut(char numericChar) {
+                return null;
+            }
+
+            @Override
+            public char getNumericShortcut() {
+                return 0;
+            }
+
+            @Override
+            public MenuItem setAlphabeticShortcut(char alphaChar) {
+                return null;
+            }
+
+            @Override
+            public char getAlphabeticShortcut() {
+                return 0;
+            }
+
+            @Override
+            public MenuItem setCheckable(boolean checkable) {
+                return null;
+            }
+
+            @Override
+            public boolean isCheckable() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setChecked(boolean checked) {
+                return null;
+            }
+
+            @Override
+            public boolean isChecked() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setVisible(boolean visible) {
+                return null;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setEnabled(boolean enabled) {
+                return null;
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return false;
+            }
+
+            @Override
+            public boolean hasSubMenu() {
+                return false;
+            }
+
+            @Override
+            public SubMenu getSubMenu() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setOnMenuItemClickListener(OnMenuItemClickListener menuItemClickListener) {
+                return null;
+            }
+
+            @Override
+            public ContextMenu.ContextMenuInfo getMenuInfo() {
+                return null;
+            }
+
+            @Override
+            public void setShowAsAction(int actionEnum) {
+
+            }
+
+            @Override
+            public MenuItem setShowAsActionFlags(int actionEnum) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setActionView(View view) {
+                return null;
+            }
+
+            @Override
+            public MenuItem setActionView(int resId) {
+                return null;
+            }
+
+            @Override
+            public View getActionView() {
+                return null;
+            }
+
+            @Override
+            public MenuItem setActionProvider(ActionProvider actionProvider) {
+                return null;
+            }
+
+            @Override
+            public ActionProvider getActionProvider() {
+                return null;
+            }
+
+            @Override
+            public boolean expandActionView() {
+                return false;
+            }
+
+            @Override
+            public boolean collapseActionView() {
+                return false;
+            }
+
+            @Override
+            public boolean isActionViewExpanded() {
+                return false;
+            }
+
+            @Override
+            public MenuItem setOnActionExpandListener(OnActionExpandListener listener) {
+                return null;
+            }
+        };
+    }
+
+    class RunnableOnOption implements Runnable {
+        private boolean mReturnValue;
+        private MenuItem mItemId;
+        private MessageActivity mActivity;
+
+        public RunnableOnOption(MessageActivity activity, int itemId){
+            mItemId = createMenuItem(itemId);
+            mActivity = activity;
+        }
+
+        @Override
+        public void run() {
+            mReturnValue = mActivity.onOptionsItemSelected(mItemId);
+        }
+
+        public boolean getReturnedValue(){
+            return mReturnValue;
+        }
+    }
 }

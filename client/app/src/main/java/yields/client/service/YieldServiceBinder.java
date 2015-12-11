@@ -67,4 +67,8 @@ public class YieldServiceBinder extends Binder {
     public void cancelNotificationFromId(Id groupId) {
         mService.cancelNotificationForGroupId(groupId);
     }
+
+    public boolean hasPending(Id id) {
+        return mService.hasPending(id);
+    }
 }

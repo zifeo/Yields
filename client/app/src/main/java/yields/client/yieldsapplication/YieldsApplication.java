@@ -252,7 +252,7 @@ public class YieldsApplication {
 
     public static void setGroupsSearched(List<Group> groups) {
         Objects.requireNonNull(groups);
-        mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
+        mGroupsSearched = new ArrayList<>(Objects.requireNonNull(groups));
     }
 
     /**
@@ -279,7 +279,7 @@ public class YieldsApplication {
      * @param users The user list.
      */
     public static void setUserList(List<User> users) {
-        mUserList = Collections.unmodifiableList(Objects.requireNonNull(users));
+        mUserList = new ArrayList<>(Objects.requireNonNull(users));
     }
 
     /**
@@ -449,6 +449,10 @@ public class YieldsApplication {
                     return userN;
                 }
             }
+        }
+
+        if(node == null) {
+            return mUser.getGroup(nodeId);
         }
 
         return node;

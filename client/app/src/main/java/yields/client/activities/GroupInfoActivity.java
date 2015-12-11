@@ -206,7 +206,10 @@ public class GroupInfoActivity extends NotifiableActivity {
                     @Override
                     public void run() {
                         checkButtons();
-                        YieldsApplication.showToast(getApplicationContext(), "Subscription added !");
+                        View buttonSubscribe = findViewById(R.id.buttonSubscribeGroup);
+                        if (buttonSubscribe.getVisibility() == View.VISIBLE && !buttonSubscribe.isEnabled()){
+                            YieldsApplication.showToast(getApplicationContext(), "Subscription added !");
+                        }
                     }
                 });
                 break;
