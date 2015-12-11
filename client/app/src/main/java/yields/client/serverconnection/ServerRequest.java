@@ -15,7 +15,7 @@ public class ServerRequest {
      *
      * @param request The ServerRequest in Json format
      */
-    public ServerRequest(JSONObject request){
+    public ServerRequest(JSONObject request) {
         this.mRequest = Objects.requireNonNull(request);
     }
 

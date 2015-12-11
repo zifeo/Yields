@@ -11,7 +11,6 @@ import java.util.List;
 import yields.client.exceptions.MessageViewException;
 import yields.client.messages.Message;
 import yields.client.messages.MessageView;
-import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Adapter used for a ListView which allows it to display MessageViews as items.

@@ -84,7 +84,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
         itemList.add(Settings.ADD_NODE.ordinal(), getResources().getString(R.string.addNode));
         itemList.add(Settings.LEAVE_GROUP.ordinal(), getResources().getString(R.string.leaveGroup));
 
-        if (mGroup.getType() != Group.GroupType.PRIVATE){
+        if (mGroup.getType() != Group.GroupType.PRIVATE) {
             itemList.add(Settings.ADD_TAG.ordinal(), getResources().getString(R.string.addTag));
         }
 
@@ -105,7 +105,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        if (YieldsApplication.isGroupAddedValid()){
+        if (YieldsApplication.isGroupAddedValid()) {
             List<Group> groups = new ArrayList<>();
             Group group = YieldsApplication.getGroupAdded();
             groups.add(group);
@@ -180,7 +180,8 @@ public class GroupSettingsActivity extends AppCompatActivity {
         }
     }
 
-    /** Method used to take care of clicks on the tool bar.
+    /**
+     * Method used to take care of clicks on the tool bar.
      *
      * @param item The tool bar item clicked.
      * @return true iff the click is not propagated.
@@ -341,35 +342,35 @@ public class GroupSettingsActivity extends AppCompatActivity {
          */
         private void leaveGroupListener() {
             AlertDialog dialog = new AlertDialog.Builder(GroupSettingsActivity.this)
-                .setTitle("Leave group")
-                .setMessage("Are you sure you want to leave this group ?")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        YieldsApplication.getUser().removeGroup(mGroup);
-                        mGroup.removeUser(YieldsApplication.getUser().getId());
+                    .setTitle("Leave group")
+                    .setMessage("Are you sure you want to leave this group ?")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            YieldsApplication.getUser().removeGroup(mGroup);
+                            mGroup.removeUser(YieldsApplication.getUser().getId());
 
-                        List<User> usersToRemove = new ArrayList<User>();
-                        usersToRemove.add(YieldsApplication.getUser());
-                        YieldsApplication.getBinder().sendRequest(
-                                new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), mGroup.getId(),
-                                        usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE,
-                                        mGroup.getType()));
+                            List<User> usersToRemove = new ArrayList<User>();
+                            usersToRemove.add(YieldsApplication.getUser());
+                            YieldsApplication.getBinder().sendRequest(
+                                    new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), mGroup.getId(),
+                                            usersToRemove, GroupUpdateUsersRequest.UpdateType.REMOVE,
+                                            mGroup.getType()));
 
-                        YieldsApplication.showToast(getApplicationContext(), "Group left !");
+                            YieldsApplication.showToast(getApplicationContext(), "Group left !");
 
-                        Intent intent = new Intent(GroupSettingsActivity.this, GroupActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            Intent intent = new Intent(GroupSettingsActivity.this, GroupActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .create();
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .create();
             dialog.show();
         }
 

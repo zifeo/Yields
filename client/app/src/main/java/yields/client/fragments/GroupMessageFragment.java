@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import java.util.Objects;
 
@@ -20,7 +19,7 @@ import yields.client.listadapter.ListAdapterMessages;
  * given group.
  * The Fragment is a Simple ListView containing the messages.
  */
-public class GroupMessageFragment extends Fragment{
+public class GroupMessageFragment extends Fragment {
     private static View mLayout;
     private static ListAdapterMessages mAdapter;
     private static ListView mMessageList;
@@ -29,9 +28,10 @@ public class GroupMessageFragment extends Fragment{
     /**
      * Setter for the adapter to be used in the list view containing the
      * messages.
+     *
      * @param adapterMessages The adpater.
      */
-    public void setAdapter(ListAdapterMessages adapterMessages){
+    public void setAdapter(ListAdapterMessages adapterMessages) {
         Objects.requireNonNull(adapterMessages);
         mAdapter = adapterMessages;
 
@@ -40,10 +40,11 @@ public class GroupMessageFragment extends Fragment{
     /**
      * Setter for the OnItemClickListener of the List View containing the
      * messages.
+     *
      * @param ocl The listener.
      */
     public void setMessageListOnClickListener(AdapterView.OnItemClickListener
-                                                      ocl){
+                                                      ocl) {
         Objects.requireNonNull(ocl);
         mListOnClickListener = ocl;
     }
@@ -52,14 +53,15 @@ public class GroupMessageFragment extends Fragment{
     /**
      * Override of the onCreateView method, called every time the fragment is
      * created and put into a fragment container.
-     * @param inflater The inflater used to create the layout of this fragment.
-     * @param container The container if this fragment.
+     *
+     * @param inflater           The inflater used to create the layout of this fragment.
+     * @param container          The container if this fragment.
      * @param savedInstanceState The bundle to be used during the construction.
      * @return The View of the fragment.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+                             Bundle savedInstanceState) {
         Objects.requireNonNull(inflater);
 
         Log.d("GroupMessageFragment", "onCreateView");
@@ -73,9 +75,10 @@ public class GroupMessageFragment extends Fragment{
 
     /**
      * Getter for the ListView containing the messages.
+     *
      * @return The list view containing the messages.
      */
-    public ListView getMessageListView(){
+    public ListView getMessageListView() {
         Objects.requireNonNull(mMessageList, "Error : MessageList not yet " +
                 "created");
         return mMessageList;

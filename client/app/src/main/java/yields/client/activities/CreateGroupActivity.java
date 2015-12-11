@@ -40,6 +40,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -53,12 +54,12 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY)){
+        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY)) {
             throw new MissingIntentExtraException(
                     "Group name extra is missing from intent in CreateGroupActivity");
         }
 
-        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY)){
+        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_TYPE_KEY)) {
             throw new MissingIntentExtraException(
                     "Group type extra is missing from intent in CreateGroupActivity");
         }
@@ -93,12 +94,12 @@ public class CreateGroupActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        if (YieldsApplication.isGroupAddedValid()){
+        if (YieldsApplication.isGroupAddedValid()) {
             Group group = YieldsApplication.getGroupAdded();
 
             boolean isAlreadyAdded = false;
-            for (Group g : mGroups){
-                if (g.getId().equals(group.getId())){
+            for (Group g : mGroups) {
+                if (g.getId().equals(group.getId())) {
                     isAlreadyAdded = true;
                 }
             }
@@ -115,6 +116,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -125,7 +127,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -135,12 +138,12 @@ public class CreateGroupActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.actionCancelCreateGroup:
                 finish();
-            break;
+                break;
 
             case R.id.actionAddContactToGroup:
                 ArrayList<String> emailList = new ArrayList<>();
 
-                for (int i = 0; i < mUsers.size(); i++){
+                for (int i = 0; i < mUsers.size(); i++) {
                     emailList.add(mUsers.get(i).getEmail());
                 }
 
@@ -149,7 +152,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                         EMAIL_LIST_INPUT_KEY, emailList);
 
                 startActivityForResult(intentSelectUsers, REQUEST_ADD_CONTACT);
-            break;
+                break;
 
             case R.id.actionAddNodeToGroup:
                 Intent intent = new Intent(this, SearchGroupActivity.class);
@@ -162,7 +165,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             case R.id.actionDoneCreateGroup:
                 List<Id> userList = new ArrayList<>();
 
-                for (int i = 0; i < mUsers.size(); i++){
+                for (int i = 0; i < mUsers.size(); i++) {
                     userList.add(mUsers.get(i).getId());
                 }
 
@@ -186,7 +189,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
                 startActivity(createGroupIntent);
 
-            break;
+                break;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -197,9 +200,10 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     /**
      * Method called when the user returns to it after adding contacts
+     *
      * @param requestCode the code for the request
-     * @param resultCode code indicating if the operation was successful or not
-     * @param data the data sent by the other activity
+     * @param resultCode  code indicating if the operation was successful or not
+     * @param data        the data sent by the other activity
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -213,7 +217,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 User user = YieldsApplication.getUserFromId(currentId);
                 // There shouldn't be multiple identical users in entourage
                 if (user != null) {
-                    if (!mUsers.contains(user)){
+                    if (!mUsers.contains(user)) {
                         mUsers.add(user);
                     }
                 } else {

@@ -258,7 +258,7 @@ public class UrlContent extends Content {
             }
         }
 
-        if (!found){
+        if (!found) {
             if (imgBlockPos != -1) {
                 int srcBegin = pageBody.indexOf("src=\"");
                 int srcEnd = pageBody.indexOf("\"", srcBegin + 5);
@@ -267,7 +267,7 @@ public class UrlContent extends Content {
                 return YieldsApplication.getDefaultThumbnail();
             }
         }
-        if (found){
+        if (found) {
             URL url = null;
             try {
                 url = new URL(path);
@@ -282,8 +282,7 @@ public class UrlContent extends Content {
             } catch (IOException e) {
                 return YieldsApplication.getDefaultThumbnail();
             }
-        }
-        else{
+        } else {
             return YieldsApplication.getDefaultThumbnail();
         }
     }

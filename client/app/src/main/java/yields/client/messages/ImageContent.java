@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.util.Base64;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -14,7 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 
 import yields.client.exceptions.ContentException;
@@ -90,7 +88,7 @@ public class ImageContent extends Content {
         layout.setLayoutParams(params);
         layout.setOrientation(LinearLayout.VERTICAL);
         ImageView img = new ImageView(YieldsApplication.getApplicationContext());
-        if (mImage.getWidth() > (screenWidth - 200)) { // TODO : remove hardcoded value
+        if (mImage.getWidth() > (screenWidth - 200)) {
             float scalefactor = ((float) (screenWidth - 200)) / mImage.getWidth();
             img.setImageBitmap(Bitmap.createScaledBitmap(mImage, (screenWidth - 200), (int) (scalefactor * mImage.getHeight()), false));
         } else {

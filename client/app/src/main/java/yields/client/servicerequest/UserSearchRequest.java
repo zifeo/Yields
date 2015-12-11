@@ -1,7 +1,6 @@
 package yields.client.servicerequest;
 
 import yields.client.id.Id;
-import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 

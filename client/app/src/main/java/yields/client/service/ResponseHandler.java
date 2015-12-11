@@ -17,7 +17,6 @@ import yields.client.id.Id;
 import yields.client.messages.Message;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
@@ -227,7 +226,6 @@ public class ResponseHandler {
      */
     protected void handlePublisherCreateResponse(Response serverResponse) {
         try {
-            // TODO : Change behaviour so that you don't go quit activity as long as group is not accepted.
             Id nid = new Id(serverResponse.getMessage().getLong("nid"));
             YieldsApplication.getUser().activateGroup(DateSerialization.dateSerializer
                     .toDate(serverResponse.getMetadata().getString("ref")), nid);
@@ -594,9 +592,6 @@ public class ResponseHandler {
             long nid = response.getLong("nid");
             String name = response.getString("name");
             String url = response.getString("url");
-
-            // TODO : Create instance of RSS.
-            // TODO : (Nico) Notify activity.
         } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
@@ -608,7 +603,6 @@ public class ResponseHandler {
      */
     protected void handleGroupCreateResponse(Response serverResponse) {
         try {
-            // TODO : Change behaviour so that you don't go quit activity as long as group is not accepted.
             Id groupId = new Id(serverResponse.getMessage().getLong("nid"));
             YieldsApplication.getUser().activateGroup(DateSerialization.dateSerializer
                     .toDate(serverResponse.getMetadata().getString("ref")), groupId);
@@ -671,7 +665,6 @@ public class ResponseHandler {
 
                     if (entourage != null && entourageRefreshedAt != null) {
                         for (int i = 0; i < entourage.length(); i++) {
-                            // TODO : Improve this, add field in user  ?
                             User newUser = new User(new Id(entourage.getLong(i)));
                             clientUser.addUserToEntourage(newUser);
                             ServiceRequest userInfoRequest = new UserInfoRequest(YieldsApplication.getUser(),
@@ -750,7 +743,6 @@ public class ResponseHandler {
      * Handles the appropriate Response which is given to it by argument.
      */
     protected void handleUserConnectResponse(Response serverResponse) {
-        // TODO : Parse the new field.
         ClientUser user = YieldsApplication.getUser();
         try {
             user.setId(new Id(serverResponse.getMessage().getLong("uid")));

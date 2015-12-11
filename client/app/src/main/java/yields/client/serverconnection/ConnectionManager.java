@@ -14,7 +14,7 @@ import java.net.SocketTimeoutException;
 import java.util.Objects;
 
 /**
- *The connection manager manages the connection from which we can send and receive messages
+ * The connection manager manages the connection from which we can send and receive messages
  */
 public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
     private Socket mSocket;
@@ -25,7 +25,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
      * @param socketProvider The socket provider
      * @throws IOException If there is a connection problem
      */
-    public ConnectionManager(SocketProvider socketProvider) throws IOException{
+    public ConnectionManager(SocketProvider socketProvider) throws IOException {
         Objects.requireNonNull(socketProvider);
         mSocket = socketProvider.getConnection();
     }
@@ -36,7 +36,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
      * @return true if the connection works false otherwise
      */
     @Override
-    public boolean working(){
+    public boolean working() {
         return mSocket.isConnected() && mSocket.isBound()
                 && !mSocket.isOutputShutdown() && !mSocket.isInputShutdown();
     }
@@ -48,10 +48,10 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
      * @throws IOException In case of IO error with the server
      */
     @Override
-    public CommunicationChannel getCommunicationChannel() throws IOException{
+    public CommunicationChannel getCommunicationChannel() throws IOException {
         BufferedWriter sender = new BufferedWriter(
-                        new OutputStreamWriter(
-                                mSocket.getOutputStream()));
+                new OutputStreamWriter(
+                        mSocket.getOutputStream()));
 
         return new ServerChannel(sender, this);
     }
@@ -64,7 +64,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
         BufferedReader receiver = null;
 
         try {
-           receiver = new BufferedReader(
+            receiver = new BufferedReader(
                     new InputStreamReader(mSocket.getInputStream()));
         } catch (IOException e) {
             subscriber.updateOnConnectionProblem(e);
@@ -76,7 +76,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
             try {
                 pushMessage = null;
                 pushMessage = receiver.readLine();
-                if(pushMessage != null) {
+                if (pushMessage != null) {
                     Log.d("Y:" + this.getClass().getName(), "response : " + pushMessage);
                     Response response = new Response(pushMessage);
                     subscriber.updateOn(response);
@@ -94,7 +94,7 @@ public class ConnectionManager implements ConnectionStatus, ConnectionProvider {
         try {
             this.close();
         } catch (IOException e) {
-            Log.d("Y:" + this.getClass().getName(),"Connection was already closed.");
+            Log.d("Y:" + this.getClass().getName(), "Connection was already closed.");
         } finally {
             subscriber.updateOnConnectionProblem(new IOException("Server input is shutdown"));
         }

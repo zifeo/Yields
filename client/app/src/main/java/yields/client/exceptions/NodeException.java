@@ -5,15 +5,15 @@ package yields.client.exceptions;
  */
 public class NodeException extends RuntimeException {
 
-    public NodeException(){
+    public NodeException() {
         super();
     }
 
-    public NodeException(String message){
+    public NodeException(String message) {
         super(message);
     }
 
-    public NodeException(Throwable th){
+    public NodeException(Throwable th) {
         super(th);
     }
 }

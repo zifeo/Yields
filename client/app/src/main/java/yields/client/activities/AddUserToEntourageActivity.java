@@ -32,6 +32,7 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -42,7 +43,9 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method called when the user clicks on 'Done'
+    /**
+     * Method called when the user clicks on 'Done'
+     *
      * @param item The tool bar item clicked
      * @return true
      */
@@ -54,8 +57,7 @@ public class AddUserToEntourageActivity extends NotifiableActivity {
         if (!matcher.matches()) {
             String message = getString(R.string.messageWrongEmail);
             YieldsApplication.showToast(getApplicationContext(), message);
-        }
-        else {
+        } else {
             YieldsApplication.getBinder().sendRequest(
                     new UserSearchRequest(YieldsApplication.getUser().getId(), email));
         }

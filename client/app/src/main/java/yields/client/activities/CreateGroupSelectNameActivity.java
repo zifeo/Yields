@@ -28,6 +28,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -48,6 +49,7 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -58,7 +60,8 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -67,27 +70,24 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String groupName = mEditText.getText().toString();
 
-        if (groupName.length() < getResources().getInteger(R.integer.minimumNameSize)){
+        if (groupName.length() < getResources().getInteger(R.integer.minimumNameSize)) {
             String message = getString(R.string.messageGroupNameTooShort);
             YieldsApplication.showToast(getApplicationContext(), message);
-        }
-        else if (groupName.length() > getResources().getInteger(R.integer.maximumNameSize)){
+
+        } else if (groupName.length() > getResources().getInteger(R.integer.maximumNameSize)) {
             String message = getString(R.string.messageGroupNameTooLong);
             YieldsApplication.showToast(getApplicationContext(), message);
-        }
-        else {
+        } else {
             Group.GroupType groupType;
             Intent intent;
 
-            if (mRadioPrivate.isChecked()){
+            if (mRadioPrivate.isChecked()) {
                 groupType = Group.GroupType.PRIVATE;
                 intent = new Intent(this, CreateGroupActivity.class);
-            }
-            else if (mRadioPublic.isChecked()){
+            } else if (mRadioPublic.isChecked()) {
                 groupType = Group.GroupType.PUBLISHER;
                 intent = new Intent(this, CreateGroupActivity.class);
-            }
-            else {
+            } else {
                 groupType = Group.GroupType.RSS;
                 intent = new Intent(this, CreateRSSFeedActivity.class);
             }

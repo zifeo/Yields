@@ -35,8 +35,10 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the user can search for new groups, based
  * on their name or tags.
  */
-public class SearchGroupActivity extends NotifiableActivity{
-    public enum Mode {SEARCH, ADD_NODE_NEW_GROUP, ADD_NODE_EXISTING_GROUP};
+public class SearchGroupActivity extends NotifiableActivity {
+    public enum Mode {SEARCH, ADD_NODE_NEW_GROUP, ADD_NODE_EXISTING_GROUP}
+
+    ;
 
     public final static String MODE_KEY = "MODE";
 
@@ -51,8 +53,8 @@ public class SearchGroupActivity extends NotifiableActivity{
 
     private Mode mMode;
 
-     /*Used to not launch requests each time the user types a new character
-     but rather waits a second before doing it */
+    /*Used to not launch requests each time the user types a new character
+    but rather waits a second before doing it */
     private Timer mTimer = null;
     private int mRequestsCount;
 
@@ -60,6 +62,7 @@ public class SearchGroupActivity extends NotifiableActivity{
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -81,10 +84,10 @@ public class SearchGroupActivity extends NotifiableActivity{
 
         int indexMode = intent.getIntExtra(MODE_KEY, 0);
 
-        if (indexMode < 0 || indexMode >= Mode.values().length){
+        if (indexMode < 0 || indexMode >= Mode.values().length) {
             throw new IllegalIntentExtraException(
                     "Mode extra must be between 0 and "
-                            + (Mode.values().length - 1) +  " in SearchGroupActivity");
+                            + (Mode.values().length - 1) + " in SearchGroupActivity");
         }
 
         mMode = Mode.values()[indexMode];
@@ -116,6 +119,7 @@ public class SearchGroupActivity extends NotifiableActivity{
 
     /**
      * Method automatically called for the tool bar items.
+     *
      * @param menu The tool bar menu.
      */
     @Override
@@ -127,6 +131,7 @@ public class SearchGroupActivity extends NotifiableActivity{
 
     /**
      * Method automatically called when the tool bar is created.
+     *
      * @param menu The menu of the activity.
      */
     @Override
@@ -138,7 +143,8 @@ public class SearchGroupActivity extends NotifiableActivity{
         return super.onPrepareOptionsMenu(menu);
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -159,11 +165,11 @@ public class SearchGroupActivity extends NotifiableActivity{
     /**
      * Called when the user clicks on the 'Search' button
      */
-    private void openSearch(){
+    private void openSearch() {
         mActionBar.setDisplayShowCustomEnabled(true);
         mActionBar.setCustomView(R.layout.search_bar_layout);
 
-        mEditTextSearch = (EditText)mActionBar.getCustomView().findViewById(R.id.editTextSearch);
+        mEditTextSearch = (EditText) mActionBar.getCustomView().findViewById(R.id.editTextSearch);
         mEditTextSearch.requestFocus();
 
         mEditTextSearch.addTextChangedListener(new TextWatcher() {
@@ -199,9 +205,10 @@ public class SearchGroupActivity extends NotifiableActivity{
 
     /**
      * Method called when the text in the tool bar is modified
+     *
      * @param text The new text to search for
      */
-    private void launchSearch(final String text){
+    private void launchSearch(final String text) {
         // Need to run on the UI thread because some views are modified
         runOnUiThread(new Runnable() {
             @Override
@@ -220,7 +227,7 @@ public class SearchGroupActivity extends NotifiableActivity{
      * This methods changes the look of the activity to 'starting',
      * with a message indicating that the user can search for groups
      */
-    private void setStartingState(){
+    private void setStartingState() {
         mTextViewInfo.setVisibility(View.VISIBLE);
         mTextViewInfo.setText(getText(R.string.startSearchInfo));
 
@@ -231,7 +238,7 @@ public class SearchGroupActivity extends NotifiableActivity{
     /**
      * This methods changes the look of the activity to 'waiting'
      */
-    private void setWaitingState(){
+    private void setWaitingState() {
         mTextViewInfo.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
         mListView.setVisibility(View.GONE);
@@ -241,7 +248,7 @@ public class SearchGroupActivity extends NotifiableActivity{
      * This methods sets the appropriate views to visible or invisible
      * when new result is received
      */
-    private void setNewResultsState(){
+    private void setNewResultsState() {
         mTextViewInfo.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.GONE);
         mListView.setVisibility(View.VISIBLE);
@@ -251,7 +258,7 @@ public class SearchGroupActivity extends NotifiableActivity{
      * This methods sets the appropriate views to visible or invisible when
      * no groups match the query
      */
-    private void setNoResultsState(){
+    private void setNoResultsState() {
         mTextViewInfo.setVisibility(View.VISIBLE);
         mProgressBar.setVisibility(View.GONE);
         mListView.setVisibility(View.GONE);

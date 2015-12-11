@@ -20,6 +20,7 @@ public class SelectUsernameActivity extends AppCompatActivity {
 
     /**
      * OnCreate method for the SelectUsernameActivity.
+     *
      * @param savedInstanceState The bundle.
      */
     @Override
@@ -36,6 +37,7 @@ public class SelectUsernameActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -46,7 +48,9 @@ public class SelectUsernameActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method called when the user clicks on 'Done'
+    /**
+     * Method called when the user clicks on 'Done'
+     *
      * @param item The tool bar item clicked
      * @return true
      */
@@ -54,13 +58,13 @@ public class SelectUsernameActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String username = mEditTextCreateAccount.getText().toString();
 
-        if (username.contains(" ")){
+        if (username.contains(" ")) {
             String message = getString(R.string.messageUsernameContainsSpaces);
             YieldsApplication.showToast(getApplicationContext(), message);
-        }
-        else if (username.length() < getResources().getInteger(R.integer.minimumNameSize)){
+        } else if (username.length() < getResources().getInteger(R.integer.minimumNameSize)) {
             String message = getString(R.string.messageUsernameTooShort);
             YieldsApplication.showToast(getApplicationContext(), message);
+
         }
         else if (username.length() > getResources().getInteger(R.integer.maximumNameSize)){
             String message = getString(R.string.messageUsernameTooLong);
