@@ -1,5 +1,6 @@
 package yields.server.actions.nodes
 
+import yields.server.actions.groups.GroupInfoRes
 import yields.server.actions.publisher.PublisherInfoRes
 import yields.server.actions.rss.RSSInfoRes
 import yields.server.dbi.models._
@@ -13,9 +14,11 @@ class TestNodeInfo extends YieldsSpec {
     val meta = Metadata.now(0)
     val publisher = Publisher.create("name", meta.client)
     val rss = RSS.create("name", "", "")
+    val group = Group.create("name", 0)
 
     NodeInfo(publisher.nid).run(meta) should be (a [PublisherInfoRes])
     NodeInfo(rss.nid).run(meta) should be (a [RSSInfoRes])
+    NodeInfo(group.nid).run(meta) should be (a [GroupInfoRes])
 
   }
 
