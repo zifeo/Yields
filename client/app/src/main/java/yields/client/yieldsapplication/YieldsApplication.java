@@ -451,6 +451,10 @@ public class YieldsApplication {
             }
         }
 
+        if(node == null) {
+            return mUser.getGroup(nodeId);
+        }
+
         return node;
     }
 
