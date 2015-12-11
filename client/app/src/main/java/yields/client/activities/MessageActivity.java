@@ -531,18 +531,11 @@ public class MessageActivity extends NotifiableActivity {
                 if (mCommentMessage.getContent().isCommentable()) {
                     switch (mCommentMessage.getContent().getType()) {
                         case IMAGE:
-                            YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).
-                                    getImage());
-                            mPrevGroup = mGroup;
-                            startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+                            showImage(((ImageContent) mCommentMessage.getContent()).getImage());
                             break;
 
                         case URL:
-                            String url = ((UrlContent) mCommentMessage.getContent()).getUrl();
-                            Log.d("MessageActivity", "Open URL in browser : " + url);
-                            mPrevGroup = mGroup;
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(browserIntent);
+                            openLinkInBrowser(((UrlContent) mCommentMessage.getContent()).getUrl());
                             break;
 
                         default:
@@ -552,9 +545,38 @@ public class MessageActivity extends NotifiableActivity {
                 }
             }
         });
+        ((CommentFragment) mCurrentFragment).setListOnClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Message clickedMessage = mCommentAdapter.getItem(position);
+                switch (clickedMessage.getContent().getType()) {
+                    case IMAGE:
+                        showImage(((ImageContent) clickedMessage.getContent()).getImage());
+                        break;
+
+                    case URL:
+                        openLinkInBrowser(((UrlContent) clickedMessage.getContent()).getUrl());
+                        break;
+
+                    default:
+                        Log.d("MessageActivity", "Clicking on text comment does nothing");
+                }
+            }
+        });
         fragmentTransaction.replace(R.id.fragmentPlaceHolder, mCurrentFragment);
         fragmentTransaction.commit();
         loadComments();
+    }
+
+    private void showImage(Bitmap image){
+        YieldsApplication.setShownImage(image);
+        startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
+    }
+
+    private void openLinkInBrowser(String url){
+        Log.d("MessageActivity", "Open URL in browser : " + url);
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 
     /**

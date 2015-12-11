@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -28,9 +29,9 @@ public class CommentFragment extends Fragment{
     private static View mLayout;
     private static ListView mCommentList;
     private static Message mMessage;
-    private static View mMessageView;
     private static ListAdapterMessages mAdapter;
     private static View.OnClickListener mCommentViewOCL;
+    private static AdapterView.OnItemClickListener mCommentListOnClickListener;
 
     /**
      * Default constructor for the comment fragment.
@@ -39,7 +40,6 @@ public class CommentFragment extends Fragment{
         mLayout = new LinearLayout(YieldsApplication.getApplicationContext());
         mCommentList = new ListView(YieldsApplication.getApplicationContext());
         mMessage = null;
-        mMessageView = null;
         mAdapter = null;
     }
 
@@ -50,8 +50,6 @@ public class CommentFragment extends Fragment{
      */
     public void setMessage(Message m){
         mMessage = m;
-        mMessageView = new MessageView(YieldsApplication
-                .getApplicationContext(), mMessage);
     }
 
     /**
@@ -65,6 +63,10 @@ public class CommentFragment extends Fragment{
 
     public void setCommentViewOnClickListener(View.OnClickListener ocl){
         mCommentViewOCL = ocl;
+    }
+
+    public void setListOnClickListener(AdapterView.OnItemClickListener ocl){
+        mCommentListOnClickListener = ocl;
     }
 
     /**
@@ -87,8 +89,9 @@ public class CommentFragment extends Fragment{
         messageContainer.addView(commentView);
         commentView.setClickable(true);
         commentView.setOnClickListener(mCommentViewOCL);
-        ListView listView = (ListView) mLayout.findViewById(R.id.commentList);
-        listView.setAdapter(mAdapter);
+        mCommentList = (ListView) mLayout.findViewById(R.id.commentList);
+        mCommentList.setAdapter(mAdapter);
+        mCommentList.setOnItemClickListener(mCommentListOnClickListener);
         return mLayout;
     }
 
