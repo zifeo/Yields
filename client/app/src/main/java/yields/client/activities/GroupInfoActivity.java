@@ -343,4 +343,13 @@ public class GroupInfoActivity extends NotifiableActivity {
             }
         }
     }
+
+    /**
+     * Listener for the click on the group Image.
+     * @param v The View.
+     */
+    public void showGroupImage(View v){
+        YieldsApplication.setShownImage(mGroup.getImage());
+        startActivity(new Intent(GroupInfoActivity.this, ImageShowPopUp.class));
+    }
 }
