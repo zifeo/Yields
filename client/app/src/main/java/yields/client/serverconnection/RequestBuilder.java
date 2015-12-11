@@ -37,7 +37,7 @@ public class RequestBuilder {
         TAG("tags"), DATE("date"), ADD_ENTOURAGE("addEntourage"),
         REMOVE_ENTOURAGE("removeEntourage"), PATTERN("pattern"), ADD_USERS("addUsers"),
         REM_USERS("removeUsers"), ADD_NODES("addNodes"), REM_NODES("removeNodes"), URL("url"),
-        FILTER("filter");
+        FILTER("filter"), ADD_TAGS("addNodes"), REM_TAGS("removeNodes");
 
         private final String name;
 
@@ -342,7 +342,8 @@ public class RequestBuilder {
     private static ServerRequest groupUpdateRequest(Id sender, Id groupId, String newName,
                                                     Bitmap image, List<Id> addusers,
                                                     List<Id> remUsers, List<Id> addNodes,
-                                                    List<Id> remNodes) {
+                                                    List<Id> remNodes, List<Group.Tag> addTag,
+                                                    List<Group.Tag> remTag, Group.GroupType type) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
 
@@ -367,14 +368,33 @@ public class RequestBuilder {
         if (!builder.addNullIfNullField(Fields.REM_NODES, remNodes)) {
             builder.addField(Fields.REM_NODES, remNodes);
         }
+        if (type == Group.GroupType.PUBLISHER) {
+            if (!builder.addNullIfNullField(Fields.ADD_TAGS, addTag)) {
+                List<String> addTags = new ArrayList<>();
+                for (Group.Tag tag : addTag) {
+                    addTags.add(tag.getText());
+                }
+                builder.addField(Fields.ADD_TAGS, addTags);
+            }
+            if (!builder.addNullIfNullField(Fields.REM_TAGS, remTag)) {
+                List<String> remTags = new ArrayList<>();
+                for (Group.Tag tag : addTag) {
+                    remTags.add(tag.getText());
+                }
+
+                builder.addField(Fields.REM_TAGS, remTags);
+            }
+        }
 
         return builder.request();
     }
 
-    public static ServerRequest groupUpdateNameRequest(Id senderId, Id groupId, String name) {
+    public static ServerRequest groupUpdateNameRequest(Id senderId, Id groupId, String name,
+                                                       Group.GroupType type) {
         Objects.requireNonNull(name);
 
-        return groupUpdateRequest(senderId, groupId, name, null, null, null, null, null);
+        return groupUpdateRequest(senderId, groupId, name, null, null, null, null, null,
+                null, null, Objects.requireNonNull(type));
     }
 
     /**
@@ -386,10 +406,12 @@ public class RequestBuilder {
      * @return The request.
      */
     public static ServerRequest groupUpdateImageRequest(Id senderId, Id groupId,
-                                                        Bitmap newImage) {
+                                                        Bitmap newImage,
+                                                        Group.GroupType type) {
         Objects.requireNonNull(newImage);
 
-        return groupUpdateRequest(senderId, groupId, null, newImage, null, null, null, null);
+        return groupUpdateRequest(senderId, groupId, null, newImage, null, null, null, null,
+                null, null, type);
     }
 
 
@@ -402,7 +424,8 @@ public class RequestBuilder {
      * @return The request.
      */
     public static ServerRequest groupAddRequest(Id senderId, Id groupId,
-                                                Id newUser) {
+                                                Id newUser,
+                                                Group.GroupType type) {
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newUser);
@@ -411,7 +434,84 @@ public class RequestBuilder {
 
         addUsers.add(newUser);
 
-        return groupUpdateRequest(senderId, groupId, null, null, addUsers, null, null, null);
+        return groupUpdateRequest(senderId, groupId, null, null, addUsers, null, null, null,
+                null, null, type);
+    }
+
+    /**
+     * ServerRequest for adding a new user to a group.
+     *
+     * @param senderId The sender of the request.
+     * @param groupId  Id of the group.
+     * @param newNodes  The user to add in this group.
+     * @return The request.
+     */
+    public static ServerRequest groupAddNodesRequest(Id senderId, Id groupId,
+                                                     List<Id> newNodes,
+                                                     Group.GroupType type) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(newNodes);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, null, newNodes, null,
+                null, null, type);
+    }
+
+    /**
+     * ServerRequest for removing a user from a group.
+     *
+     * @param senderId     The sender of the request.
+     * @param groupId      Id of the group.
+     * @param nodesToRemove The user to remove from  this group.
+     * @return The request.
+     */
+    public static ServerRequest groupRemoveNodesRequest(Id senderId, Id groupId,
+                                                        List<Id> nodesToRemove,
+                                                        Group.GroupType type) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(nodesToRemove);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, null, null, nodesToRemove,
+                null, null, type);
+    }
+
+    /**
+     * ServerRequest for adding a new user to a group.
+     *
+     * @param senderId The sender of the request.
+     * @param groupId  Id of the group.
+     * @param addTags  The tags to add in this group.
+     * @return The request.
+     */
+    public static ServerRequest groupAddTagsRequest(Id senderId, Id groupId,
+                                                     List<Group.Tag> addTags,
+                                                     Group.GroupType type) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(addTags);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, null, null, null,
+                addTags, null, type);
+    }
+
+    /**
+     * ServerRequest for removing a user from a group.
+     *
+     * @param senderId      The sender of the request.
+     * @param groupId       Id of the group.
+     * @param removeTags    The tags to remove from  this group.
+     * @return The request.
+     */
+    public static ServerRequest groupRemoveTagsRequest(Id senderId, Id groupId,
+                                                        List<Group.Tag> removeTags,
+                                                        Group.GroupType type) {
+        Objects.requireNonNull(senderId);
+        Objects.requireNonNull(groupId);
+        Objects.requireNonNull(removeTags);
+
+        return groupUpdateRequest(senderId, groupId, null, null, null, null, null, null,
+                null, removeTags, type);
     }
 
     /**
@@ -423,12 +523,14 @@ public class RequestBuilder {
      * @return The request.
      */
     public static ServerRequest groupAddRequest(Id senderId, Id groupId,
-                                                List<Id> newUser) {
+                                                List<Id> newUser,
+                                                Group.GroupType type) {
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(newUser);
 
-        return groupUpdateRequest(senderId, groupId, null, null, newUser, null, null, null);
+        return groupUpdateRequest(senderId, groupId, null, null, newUser, null, null, null,
+                null, null, type);
     }
 
     /**
@@ -440,7 +542,8 @@ public class RequestBuilder {
      * @return The request.
      */
     public static ServerRequest groupRemoveRequest(Id senderId, Id groupId,
-                                                   Id userToRemove) {
+                                                   Id userToRemove,
+                                                   Group.GroupType type) {
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(userToRemove);
@@ -449,7 +552,8 @@ public class RequestBuilder {
 
         remUsers.add(userToRemove);
 
-        return groupUpdateRequest(senderId, groupId, null, null, null, remUsers, null, null);
+        return groupUpdateRequest(senderId, groupId, null, null, null, remUsers, null, null,
+                null, null, type);
     }
 
     /**
@@ -461,12 +565,14 @@ public class RequestBuilder {
      * @return The request.
      */
     public static ServerRequest groupRemoveRequest(Id senderId, Id groupId,
-                                                   List<Id> userToRemove) {
+                                                   List<Id> userToRemove,
+                                                   Group.GroupType type) {
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(userToRemove);
 
-        return groupUpdateRequest(senderId, groupId, null, null, null, userToRemove, null, null);
+        return groupUpdateRequest(senderId, groupId, null, null, null, userToRemove, null, null,
+                null, null, type);
     }
 
     /**
