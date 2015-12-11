@@ -720,7 +720,7 @@ public class ResponseHandler {
 
                 YieldsApplication.getUser().addGroup(group);
                 ServiceRequest groupInfo =
-                        new GroupInfoRequest(YieldsApplication.getUser().getId(), group.getId());
+                        new NodeInfoRequest(YieldsApplication.getUser().getId(), group.getId());
                 mService.sendRequest(groupInfo);
             }
 
