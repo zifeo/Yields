@@ -126,7 +126,7 @@ public class ClientUser extends User {
      */
     public List<Group> getUserGroups() {
         Collections.sort(mGroups, mComparator);
-        return Collections.unmodifiableList(mGroups);
+        return new ArrayList<>(mGroups);
     }
 
     /**
