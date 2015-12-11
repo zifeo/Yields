@@ -80,17 +80,6 @@ public class ResponseHandlerTests {
         assertEquals(NotifiableActivity.Change.ADD_ENTOURAGE, mService.mLastChange);
     }
 
-
-    @Test
-    public void handleNodeSearchResponseTest() throws JSONException {
-        String response = "{\"kind\":\"NodeSearchRes\",\"message\":{\"nodes\":[228],\"names\":[\"publiush\"" +
-                "],\"pics\":[\"\"]},\"metadata\":{\"client\":2,\"datetime\":\"2015-12-10T20:27:59.552Z\",\"" +
-                "ref\":\"2015-12-10T21:27:59.590+01:00\"}}";
-        mHandler.handleNodeSearchResponse(new Response(response));
-        assertEquals(NotifiableActivity.Change.GROUP_SEARCH, mService.mLastChange);
-        assertEquals(1, YieldsApplication.getGroupsSearched().size());
-    }
-
     @Test
     public void handleGroupInfoResponseTest() throws JSONException {
         String response = "{\"kind\":\"GroupInfoRes\",\"message\":{\"name\":\"Stack\",\"users\":[2],\"nodes\"" +
