@@ -28,9 +28,10 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
     /**
      * Constructor for ListAdapterUsersGroupsCheckBox
+     *
      * @param context The context of the app
-     * @param users The list of users
-     * @param groups The list of groups
+     * @param users   The list of users
+     * @param groups  The list of groups
      */
     public ListAdapterUsersGroupsCheckBox(Context context, int resource, List<User> users,
                                           List<Group> groups) {
@@ -42,6 +43,7 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
     /**
      * Return the number of item in this adapter
+     *
      * @return the number of item in this adapter
      */
     @Override
@@ -52,6 +54,7 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
     /**
      * Get an item of the list
      * (Must be overridden to avoid access to non-existing users)
+     *
      * @param unused
      * @return The first user
      */
@@ -62,27 +65,28 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
     /**
      * Returns the View of the adapter.
-     * @param position Position of the element.
+     *
+     * @param position    Position of the element.
      * @param convertView The View to convert.
-     * @param parent The parent of the view to be converted.
+     * @param parent      The parent of the view to be converted.
      * @return The new View respecting the layout.
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (position < mUsers.size()){
+        if (position < mUsers.size()) {
             return getUserView(position, parent);
-        }
-        else {
+        } else {
             return getGroupView(position - mUsers.size(), parent);
         }
     }
 
     /**
      * Gets the view for the specified user
+     *
      * @param pos The pos of the user we want to have a view for
      * @return The view associated with the user
      */
-    private View getUserView(final int pos, ViewGroup parent){
+    private View getUserView(final int pos, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View userView = inflater.inflate(R.layout.add_user_layout, parent, false);
 
@@ -106,8 +110,7 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
                 if (pos != 0) {
                     mUsers.remove(pos);
                     ListAdapterUsersGroupsCheckBox.this.notifyDataSetChanged();
-                }
-                else {
+                } else {
                     buttonView.setChecked(true);
                 }
             }
@@ -118,10 +121,11 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
 
     /**
      * Gets the view for the specified group
-     * @param  pos The pos of the group we want to have a view for
+     *
+     * @param pos The pos of the group we want to have a view for
      * @return The view associated with the group
      */
-    private View getGroupView(final int pos, ViewGroup parent){
+    private View getGroupView(final int pos, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View groupView = inflater.inflate(R.layout.add_group_layout, parent, false);
 

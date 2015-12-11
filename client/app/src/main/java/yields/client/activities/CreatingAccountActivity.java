@@ -13,6 +13,7 @@ public class CreatingAccountActivity extends AppCompatActivity {
 
     /**
      * onCreate method for the CreatingAccountActivity.
+     *
      * @param savedInstanceState bundle.
      */
     @Override
@@ -28,10 +29,11 @@ public class CreatingAccountActivity extends AppCompatActivity {
         goToGroupActivity();
 
     }
+
     /**
      * Method called by clientUser when the server creates the account
      */
-    public void goToGroupActivity(){
+    public void goToGroupActivity() {
         Intent intent = new Intent(this, GroupActivity.class);
         startActivity(intent);
     }

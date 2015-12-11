@@ -354,7 +354,6 @@ public class YieldsApplication {
 
     /**
      * nulls the binder to the service
-     *
      */
     public static void nullBinder() {
         mBinder = null;
@@ -451,7 +450,7 @@ public class YieldsApplication {
             }
         }
 
-        if(node == null) {
+        if (node == null) {
             return mUser.getGroup(nodeId);
         }
 
@@ -460,17 +459,19 @@ public class YieldsApplication {
 
     /**
      * Setter for the default thumbnail.
+     *
      * @param thumbnail The default thumbnail to use.
      */
-    public static void setDefaultTheumbnail(Bitmap thumbnail){
+    public static void setDefaultTheumbnail(Bitmap thumbnail) {
         mDefaultThumbnail = Objects.requireNonNull(thumbnail);
     }
 
     /**
      * Getter for the default thumbnail.
+     *
      * @return the default thumbnail.
      */
-    public static Bitmap getDefaultThumbnail(){
+    public static Bitmap getDefaultThumbnail() {
         return mDefaultThumbnail;
     }
 }

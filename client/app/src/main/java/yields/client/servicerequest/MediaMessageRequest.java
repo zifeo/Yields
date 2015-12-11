@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import yields.client.id.Id;
 import yields.client.messages.Message;
-import yields.client.node.Group;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 

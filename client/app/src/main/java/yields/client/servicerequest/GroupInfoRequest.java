@@ -1,11 +1,10 @@
 package yields.client.servicerequest;
 
 import yields.client.id.Id;
-import yields.client.node.Group;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 
-public class GroupInfoRequest extends ServiceRequest{
+public class GroupInfoRequest extends ServiceRequest {
     private final Id mGroupId;
     private final Id mSender;
 

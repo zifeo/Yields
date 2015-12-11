@@ -24,9 +24,10 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
 
     /**
      * Constructor for the ListAdapterGroupSettings.
-     * @param context The context of the application.
+     *
+     * @param context       The context of the application.
      * @param settingLayout The layout Settings.
-     * @param settings Text for the icons.
+     * @param settings      Text for the icons.
      */
     public ListAdapterGroupSettings(Context context, int settingLayout, List<String> settings) {
         super(context, settingLayout, settings);
@@ -37,9 +38,10 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
 
     /**
      * Returns the View of the adapter.
-     * @param position Position of the element.
+     *
+     * @param position    Position of the element.
      * @param convertView The View to convert.
-     * @param parent The parent of the view to be converted.
+     * @param parent      The parent of the view to be converted.
      * @return The new View respecting the layout.
      */
     @Override
@@ -51,7 +53,7 @@ public class ListAdapterGroupSettings extends ArrayAdapter<String> {
 
         int idDrawable;
         GroupSettingsActivity.Settings[] settings = GroupSettingsActivity.Settings.values();
-        switch(settings[position]){
+        switch (settings[position]) {
             case NAME:
                 idDrawable = R.drawable.ic_mode_edit_black_24dp;
                 break;

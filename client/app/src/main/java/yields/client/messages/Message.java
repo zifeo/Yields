@@ -19,7 +19,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Message is a {@code Node} which is shared as a message in a conversation.
  */
-public class Message{
+public class Message {
 
     public enum MessageStatus {
         SENT("SENT"), SEEN("SEEN"), NOT_SENT("NOT_SENT");
@@ -45,10 +45,10 @@ public class Message{
     /**
      * Main constructor for a Message.
      *
-     * @param nodeID   ID of the Node for a commentGroup.
-     * @param sender   The sender of the message.
-     * @param content  The content of the message.
-     * @param status   The status of the message.
+     * @param nodeID  ID of the Node for a commentGroup.
+     * @param sender  The sender of the message.
+     * @param content The content of the message.
+     * @param status  The status of the message.
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
@@ -65,9 +65,9 @@ public class Message{
     /**
      * Constructor for a Message, sets it's MessageStatus to NOT_SENT.
      *
-     * @param nodeID   ID of the Node.
-     * @param sender   The sender of the message.
-     * @param content  The content of the message.
+     * @param nodeID  ID of the Node.
+     * @param sender  The sender of the message.
+     * @param content The content of the message.
      * @throws MessageException If the message content or sender is incorrect.
      * @throws NodeException    If the Node information is incorrect.
      */
@@ -98,11 +98,9 @@ public class Message{
                 mContent = new ImageContent(img, text);
             }
 
-        }
-        else if (contentType.equals("url")){
+        } else if (contentType.equals("url")) {
             this.mContent = new UrlContent(text);
-        }
-        else {
+        } else {
             this.mContent = new TextContent(text);
         }
 

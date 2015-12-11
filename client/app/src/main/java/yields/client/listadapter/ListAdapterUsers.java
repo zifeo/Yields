@@ -26,9 +26,10 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
 
     /**
      * Constructor for ListAdapterUsersCheckBox
-     * @param context The context of the app
+     *
+     * @param context    The context of the app
      * @param userLayout The id of the basic view
-     * @param users The list of users
+     * @param users      The list of users
      */
     public ListAdapterUsers(Context context, int userLayout, List<User> users, boolean showAddUser) {
         super(context, userLayout, users);
@@ -40,11 +41,12 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
 
     /**
      * Return the number of item in this adapter
+     *
      * @return the number of item in this adapter
      */
     @Override
     public int getCount() {
-        if (mShowAddUser){
+        if (mShowAddUser) {
             return mUsers.size() + 1;
         }
         return mUsers.size();
@@ -52,14 +54,15 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
 
     /**
      * Returns the View of the adapter.
-     * @param position Position of the element.
+     *
+     * @param position    Position of the element.
      * @param convertView The View to convert.
-     * @param parent The parent of the view to be converted.
+     * @param parent      The parent of the view to be converted.
      * @return The new View respecting the layout.
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (position < mUsers.size()){
+        if (position < mUsers.size()) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             View userView = inflater.inflate(mUserLayout, parent, false);
 
@@ -74,8 +77,7 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
                     mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
             return userView;
-        }
-        else {
+        } else {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             View view = inflater.inflate(R.layout.group_settings_layout, parent, false);
 

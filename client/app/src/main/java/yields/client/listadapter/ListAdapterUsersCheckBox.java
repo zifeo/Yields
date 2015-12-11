@@ -31,11 +31,12 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
 
     /**
      * Constructor for ListAdapterUsersCheckBox
-     * @param context The context of the app
-     * @param addUserLayout The id of the basic view
-     * @param users The list of users, each with a boolean, indicating if the user should be checked
+     *
+     * @param context             The context of the app
+     * @param addUserLayout       The id of the basic view
+     * @param users               The list of users, each with a boolean, indicating if the user should be checked
      * @param removeWhenUnchecked If the user should be removed when the checkbox becomes unchecked
-     * (used only to prevent the removing of the first user)
+     *                            (used only to prevent the removing of the first user)
      */
     public ListAdapterUsersCheckBox(Context context,
                                     int addUserLayout,
@@ -47,8 +48,8 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
         mRemoveWhenUnchecked = removeWhenUnchecked;
         mOriginalUsers = new ArrayList<>();
 
-        for (int i = 0; i < users.size(); i++){
-            if (users.get(i).getValue()){
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getValue()) {
                 mOriginalUsers.add(users.get(i).getKey());
             }
         }
@@ -56,9 +57,10 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
 
     /**
      * Returns the View of the adapter.
-     * @param position Position of the element.
+     *
+     * @param position    Position of the element.
      * @param convertView The View to convert.
-     * @param parent The parent of the view to be conveted.
+     * @param parent      The parent of the view to be conveted.
      * @return The new View respecting the layout.
      */
     @Override
@@ -84,20 +86,19 @@ public class ListAdapterUsersCheckBox extends ArrayAdapter<Map.Entry<User, Boole
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (mOriginalUsers.contains(mUsers.get(pos).getKey())){
+                if (mOriginalUsers.contains(mUsers.get(pos).getKey())) {
                     buttonView.setChecked(true);
-                }
-                else {
+                } else {
                     mUsers.get(pos).setValue(isChecked);
 
                     // Cannot remove the first user
-                    if (mRemoveWhenUnchecked && !isChecked && pos!=0){
+                    if (mRemoveWhenUnchecked && !isChecked && pos != 0) {
                         mUsers.remove(pos);
                         ListAdapterUsersCheckBox.this.notifyDataSetChanged();
                     }
 
                     // Cannot remove the first user, need to recheck the box
-                    if (mRemoveWhenUnchecked  && pos==0){
+                    if (mRemoveWhenUnchecked && pos == 0) {
                         buttonView.setChecked(!isChecked);
                     }
                 }

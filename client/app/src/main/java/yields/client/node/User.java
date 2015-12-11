@@ -37,7 +37,7 @@ public class User extends Node {
      * @param response The response from the server.
      * @throws JSONException
      */
-    public User(JSONObject response) throws JSONException{
+    public User(JSONObject response) throws JSONException {
         this(response.getString("name"), new Id(response.getLong("uid")),
                 response.getString("email"), YieldsApplication.getDefaultUserImage());
 
@@ -55,7 +55,7 @@ public class User extends Node {
      * @param response the JSONObject from the response
      * @throws JSONException In case of trouble parsing the response.
      */
-    public void update(JSONObject response) throws JSONException{
+    public void update(JSONObject response) throws JSONException {
         this.setName(response.getString("name"));
         this.setEmail(response.getString("email"));
 
@@ -80,6 +80,7 @@ public class User extends Node {
 
     /**
      * constructs a shell for a User waiting for update from server.
+     *
      * @param id The id of the user.
      */
     public User(Id id) {
@@ -113,7 +114,7 @@ public class User extends Node {
      * @return True if the equality holds, false otherwise.
      */
     @Override
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
         if (!(other instanceof User)) {
             return false;
         } else {
@@ -123,6 +124,7 @@ public class User extends Node {
 
     /**
      * Override hashcode method.
+     *
      * @return hash of Id
      */
     @Override

@@ -3,17 +3,17 @@ package yields.client.exceptions;
 /**
  * Exception class thrown by the messages package.
  */
-public class MessageException extends RuntimeException{
+public class MessageException extends RuntimeException {
 
-    public MessageException(){
+    public MessageException() {
         super();
     }
 
-    public MessageException(String message){
+    public MessageException(String message) {
         super(message);
     }
 
-    public MessageException(Throwable th){
+    public MessageException(Throwable th) {
         super(th);
     }
 }

@@ -5,17 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.IBinder;
-import android.renderscript.RenderScript;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +31,7 @@ import yields.client.servicerequest.UserConnectRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 public class YieldService extends Service {
-    // This is necessary as mServiceRequestController can't be final.
+
     public final static String GROUP_RECEIVING = "groupReceiving";
     public final static String NOTIFICATION = "notification";
     private final Object serviceControllerLock = new Object();
@@ -47,7 +43,7 @@ public class YieldService extends Service {
     private ServiceRequestController mServiceRequestController;
     private ConnectControllerTask mConnectControllerTask;
     private boolean mWasConnected;
-    private final Map<Long,List<Integer>> mNotificationMap = new HashMap<>();
+    private final Map<Long, List<Integer>> mNotificationMap = new HashMap<>();
 
     /**
      * Connects the service to the server when it is created and
@@ -73,7 +69,6 @@ public class YieldService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //TODO : to be defined what to do when starting a connection
         if (intent != null) {
             String email = intent.getStringExtra("email");
             if (email == null) {
@@ -182,7 +177,6 @@ public class YieldService extends Service {
     public void onDestroy() {
         Log.d("Y:" + this.getClass().getName(), "Yield service has been disconnected");
         receiveError("Yield service has been disconnected");
-        //TODO : disconnect from server
     }
 
     /**
@@ -226,12 +220,9 @@ public class YieldService extends Service {
             if (YieldsApplication.getUser() != null) {
                 request = new UserConnectRequest(YieldsApplication.getUser());
                 this.sendRequest(request);
-            } else {
-                //TODO : getUser from cache
             }
 
             mWasConnected = true;
-
         }
         if (mCurrentNotifiableActivity != null) {
             mCurrentNotifiableActivity.notifyOnServerConnected();
@@ -250,7 +241,7 @@ public class YieldService extends Service {
             Group group = YieldsApplication.getUser().getGroup(groupId);
             group.addMessage(message);
 
-            if(!message.getCommentGroupId().equals(new Id(-1))){
+            if (!message.getCommentGroupId().equals(new Id(-1))) {
                 Group commentGroup = Group.createGroupForMessageComment(message, group);
                 YieldsApplication.getUser().addCommentGroup(commentGroup);
             }
@@ -304,8 +295,6 @@ public class YieldService extends Service {
         }
     }
 
-    // TODO : receive a response from server (an error message)
-
     /**
      * Create notification for message.
      *
@@ -316,39 +305,32 @@ public class YieldService extends Service {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setLargeIcon(group.getImage())
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentTitle("Message from " + YieldsApplication
                                 .getNodeFromId(message.getSender()).getName())
-                        .setContentText(message.getContent().getTextForRequest().substring(0,
-                                message.getContent().getTextForRequest().length() > 50 ?
-                                        50 : message.getContent().getTextForRequest().length()));
+                        .setContentText(message.getContent().getTextForRequest())
+                        .setStyle(new NotificationCompat.InboxStyle()
+                                .addLine(message.getContent().getTextForRequest()))
+                        .setDefaults(Notification.DEFAULT_VIBRATE)
+                        .setDefaults(Notification.DEFAULT_SOUND);
 
-        // Creates an explicit intent for an Activity in your app
         YieldsApplication.setGroup(group);
 
         Intent resultIntent;
-        if(YieldsApplication.getApplicationContext() == null){
+        if (YieldsApplication.getApplicationContext() == null) {
             resultIntent = new Intent(this, MessageActivity.class);
-        }
-        else{
+        } else {
             resultIntent = new Intent(YieldsApplication.getApplicationContext(), MessageActivity.class);
         }
         resultIntent.putExtra(NOTIFICATION, true);
         resultIntent.putExtra(GROUP_RECEIVING, group.getId().getId().longValue());
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(GroupActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT);
         notificationBuilder.setContentIntent(resultPendingIntent);
-        // mId allows you to update the notification later on.
         mIdLastNotification++;
         List<Integer> list = mNotificationMap.get(group.getId().getId());
         Log.d("MAP : ", mNotificationMap.toString());

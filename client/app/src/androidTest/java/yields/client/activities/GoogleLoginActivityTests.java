@@ -18,10 +18,10 @@ public class GoogleLoginActivityTests extends ActivityInstrumentationTestCase2<G
     }
 
     /**
-     * TODO: Discuss usefulness of this test... (not working if too many requests)
      * Test that simply launches the activity.
+     * We cannot test anything here unfortunaltey.
      */
     public void testLaunch(){
-        //getActivity();
+        getActivity();
     }
 }

@@ -37,8 +37,8 @@ public class DateSerialization {
      * @return The corresponding Date object.
      * @throws ParseException In case of parsing error.
      */
-    public Date toDate(String date) throws ParseException{
-        date = date.replace("Z","+00:00");
+    public Date toDate(String date) throws ParseException {
+        date = date.replace("Z", "+00:00");
         if (date.length() < 28) {
             date = date.substring(0, 19) + ".000" + date.substring(19);
         }

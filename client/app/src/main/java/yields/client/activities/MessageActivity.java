@@ -204,7 +204,7 @@ public class MessageActivity extends NotifiableActivity {
         super.onResume();
         mUser = YieldsApplication.getUser();
         YieldsApplication.setGroup(mGroup);
-        Log.d("Y:" + this.getClass().getName(),"Resume message Activity");
+        Log.d("Y:" + this.getClass().getName(), "Resume message Activity");
         setHeaderBar();
         runOnUiThread(new Runnable() {
             @Override
@@ -569,12 +569,12 @@ public class MessageActivity extends NotifiableActivity {
         loadComments();
     }
 
-    private void showImage(Bitmap image){
+    private void showImage(Bitmap image) {
         YieldsApplication.setShownImage(image);
         startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
     }
 
-    private void openLinkInBrowser(String url){
+    private void openLinkInBrowser(String url) {
         Log.d("MessageActivity", "Open URL in browser : " + url);
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);

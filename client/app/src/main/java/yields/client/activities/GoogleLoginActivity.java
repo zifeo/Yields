@@ -50,6 +50,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
 
     /**
      * On click Listener.
+     *
      * @param v The View instance.
      */
     @Override
@@ -59,6 +60,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
 
     /**
      * onCreate method for the GoogleLoginActivity.
+     *
      * @param savedInstanceState The bundle.
      */
     @Override
@@ -133,6 +135,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
      * account has granted any requested permissions to our app and that we
      * were able to
      * establish a service connection to Google Play services.
+     *
      * @param bundle The bundle.
      */
     @Override
@@ -149,6 +152,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
      * attempt to re-connect. Any UI elements that depend on connection t
      * Google APIs should
      * be hidden or disabled until onConnected is called again.
+     *
      * @param unused
      */
     @Override
@@ -160,6 +164,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
      * Could not connect to Google Play Services.  The user needs to select an account,
      * grant permissions or resolve an error in order to sign in. Refer to the
      * javadoc for ConnectionResult to see possible error codes.
+     *
      * @param connectionResult result of the connection.
      */
     @Override
@@ -189,9 +194,10 @@ public class GoogleLoginActivity extends AppCompatActivity implements
 
     /**
      * Method called when the connection has ended, successful or not
+     *
      * @param requestCode The code for the request
-     * @param resultCode Code indicating if the operation was successful or not
-     * @param data The data containing the information on the connection
+     * @param resultCode  Code indicating if the operation was successful or not
+     * @param data        The data containing the information on the connection
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -213,7 +219,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     /**
      * Connect to the google servers
      */
-    private void connect(){
+    private void connect() {
         mGoogleSingInButton.setVisibility(View.INVISIBLE);
         mTextViewGoogleConnecting.setVisibility(View.VISIBLE);
         mButtonCancelGoogleConnection.setVisibility(View.VISIBLE);
@@ -226,7 +232,7 @@ public class GoogleLoginActivity extends AppCompatActivity implements
     /**
      * Disconnect from the google servers
      */
-    private void disconnect(){
+    private void disconnect() {
         mGoogleSingInButton.setVisibility(View.VISIBLE);
         mTextViewGoogleConnecting.setVisibility(View.INVISIBLE);
         mButtonCancelGoogleConnection.setVisibility(View.INVISIBLE);
@@ -235,7 +241,9 @@ public class GoogleLoginActivity extends AppCompatActivity implements
         mGoogleApiClient.disconnect();
     }
 
-    /** Called when the user clicks the "Cancel" button */
+    /**
+     * Called when the user clicks the "Cancel" button
+     */
     public void cancelConnection(View view) {
         disconnect();
     }

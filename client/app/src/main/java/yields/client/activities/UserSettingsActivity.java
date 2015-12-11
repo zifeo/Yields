@@ -45,6 +45,7 @@ public class UserSettingsActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -80,7 +81,8 @@ public class UserSettingsActivity extends AppCompatActivity {
                 "getUser() in YieldsApplication cannot be null when UserSettingsActivity is created");
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -119,7 +121,7 @@ public class UserSettingsActivity extends AppCompatActivity {
 
                     String message = "User picture changed";
                     YieldsApplication.showToast(getApplicationContext(), message);
-                    
+
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
 
                     mUser.setImage(Bitmap.createScaledBitmap(getCroppedSquaredBitmap(image),
