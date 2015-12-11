@@ -85,4 +85,6 @@
     <string name="messageNoGroup">Search for publishers, RSS feed, or create a new group to start using Yields !</string>
     <string name="nodes">Nodes</string>
     <string name="userInfo">See your info</string>
+    <string name="messageGroupNameTooLong">The group name is too long</string>
+    <string name="messageUsernameTooLong">The username is too long</string>
 </resources>
