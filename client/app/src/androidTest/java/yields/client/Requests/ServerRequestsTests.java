@@ -178,7 +178,7 @@ public class ServerRequestsTests {
             String newGroupName = "What a great group.jpg";
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateNameRequest(senderId, groupId,
-                    newGroupName);
+                    newGroupName, Group.GroupType.PUBLISHER);
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -209,7 +209,7 @@ public class ServerRequestsTests {
                     ImageSerialization.SIZE_IMAGE_NODE);
 
             ServerRequest serverRequest = RequestBuilder.groupUpdateImageRequest(senderId, groupId,
-                    newImage);
+                    newImage, Group.GroupType.PRIVATE);
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -238,7 +238,7 @@ public class ServerRequestsTests {
             Id newUserId = new Id(14);
 
             ServerRequest serverRequest = RequestBuilder.groupAddRequest(senderId, groupId,
-                    newUserId);
+                    newUserId, Group.GroupType.PRIVATE);
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),
@@ -267,7 +267,7 @@ public class ServerRequestsTests {
             Id userToRemoveId = new Id(14);
 
             ServerRequest serverRequest = RequestBuilder.groupRemoveRequest(senderId, groupId,
-                    userToRemoveId);
+                    userToRemoveId, Group.GroupType.PRIVATE);
             JSONObject json = new JSONObject(serverRequest.message());
 
             assertEquals(json.getString(RequestBuilder.Fields.KIND.getValue()),

@@ -52,7 +52,7 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
 
         Group g = new Group("Group", new Id(124), new ArrayList<Id>());
         g.setType(Group.GroupType.PUBLISHER);
-        YieldsApplication.setGroup(g);
+        YieldsApplication.setInfoGroup(g);
     }
 
     @Override
@@ -184,5 +184,20 @@ public class GroupSettingsActivityTests extends ActivityInstrumentationTestCase2
         onView(withId(R.id.actionDoneSelectUser)).perform(click());
 
         onView(withText(R.string.addUsers)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that add a new user.
+     */
+    public void testAddNode() {
+        getActivity();
+
+        // Simulate the node added
+        YieldsApplication.setGroupAdded(new Group("group", new Id(1), new ArrayList<Id>()));
+        YieldsApplication.setGroupAddedValid(true);
+        onView(withText(R.string.addUsers)).perform(click());
+        onView(withId(R.id.actionDoneSelectUser)).perform(click());
+
+        onView(withText(R.string.addNodeToGroup)).check(matches(isDisplayed()));
     }
 }

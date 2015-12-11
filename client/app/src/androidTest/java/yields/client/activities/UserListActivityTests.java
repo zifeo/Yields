@@ -5,9 +5,11 @@ import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import yields.client.R;
 import yields.client.generalhelpers.ServiceTestConnection;
+import yields.client.id.Id;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -38,7 +40,9 @@ public class UserListActivityTests extends ActivityInstrumentationTestCase2<User
         intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, true);
         setActivityIntent(intent);
 
-        YieldsApplication.setUserList(new ArrayList<User>());
+        List<User> userList = new ArrayList<User>();
+        userList.add(new User("Poto", new Id(1), "", YieldsApplication.getDefaultUserImage()));
+        YieldsApplication.setUserList(userList);
     }
 
     @Override
@@ -47,12 +51,22 @@ public class UserListActivityTests extends ActivityInstrumentationTestCase2<User
     }
 
     /**
-     * Test that the correct name is displayed
+     * Test that add a user to the entourage.
      */
     public void testAddUser(){
         getActivity();
         onView(withText("Add a new contact")).perform(click());
 
         onView(withId(R.id.editTextEmail)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Test that see the user's info.
+     */
+    public void testSeeInfo(){
+        getActivity();
+        onView(withText("Poto")).perform(click());
+
+        onView(withId(R.id.textViewUserName)).check(matches(withText("Poto")));
     }
 }

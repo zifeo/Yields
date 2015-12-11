@@ -167,6 +167,14 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
 
                 Group group = new Group(mGroupName, new Id(1), userList);
+
+                List<Id> groupIds = new ArrayList<>();
+
+                for (Group node : mGroups) {
+                    groupIds.add(node.getId());
+                }
+
+                group.updateNodes(groupIds);
                 group.setType(mGroupType);
                 YieldsApplication.getUser().addGroup(group);
                 YieldsApplication.getBinder().sendRequest(
@@ -196,29 +204,6 @@ public class CreateGroupActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ADD_CONTACT && resultCode == RESULT_OK) {
-
-            /* TODO: To be discuss with @DelamareA
-            ArrayList<String> emailList = data.getStringArrayListExtra(
-                    AddUsersFromEntourageActivity.EMAIL_LIST_KEY);
-
-            List<User> entourage = YieldsApplication.getUser().getEntourage();
-            for (int i = 0; i < emailList.size(); i++){
-
-                boolean found = false;
-                for (int j = 0; j < mUsers.size(); j++){ // check if user is already present
-                    if (mUsers.get(j).getEmail().equals(emailList.get(i))){
-                        found = true;
-                    }
-                }
-
-                if (!found){
-                    for (int j = 0; j < entourage.size(); j++){ // find the user from its email
-                        if (entourage.get(j).getEmail().equals(emailList.get(i))){
-                            mUsers.add(entourage.get(j));
-                        }
-                    }
-                }
-            }*/
 
             ArrayList<String> idList = data.getStringArrayListExtra(
                     AddUsersFromEntourageActivity.ID_LIST_KEY);

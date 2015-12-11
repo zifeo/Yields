@@ -1,6 +1,7 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,7 +133,17 @@ public class ClientUser extends User {
      * @param user the user to add.
      */
     public void addUserToEntourage(User user) {
+        Log.d("ENTOURAGE","test " + user.getEmail());
         mEntourage.add(user);
+    }
+
+    /**
+     * Remove a User from the entourage.
+     *
+     * @param user the user to remove.
+     */
+    public void removeUserFromEntourage(User user) {
+        mEntourage.remove(Objects.requireNonNull(user));
     }
 
     /**
@@ -141,7 +152,7 @@ public class ClientUser extends User {
      * @return The list of user connected to this user.
      */
     public List<User> getEntourage() {
-        return Collections.unmodifiableList(mEntourage);
+        return new ArrayList<>(mEntourage);
     }
 
     /**

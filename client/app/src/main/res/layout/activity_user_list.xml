@@ -12,10 +12,7 @@
         android:minHeight="?attr/actionBarSize"
         android:background="@color/barColor"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="-18sp"
-        android:paddingRight="0sp"
-        >
+        android:layout_height="wrap_content">
     </android.support.v7.widget.Toolbar>
 
     <ListView
