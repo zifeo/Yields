@@ -539,7 +539,7 @@ public class RequestHandlerTests {
     @Test
     public void testHandleNodeHistoryRequest(){
         Date sendingDate = new Date();
-        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new
+        MOCK_RECEIVED_MESSAGE = new Message(new Id(90), YieldsApplication.getUser().getId(), new
                 TextContent("top kek"), new Date());
         SystemClock.sleep(2000);
         NodeHistoryRequest request = new NodeHistoryRequest(new Id(888), new Date());
@@ -568,7 +568,7 @@ public class RequestHandlerTests {
     @Test
     public void testHandleMediaMessageRequestText() {
         Date sendingDate = new Date();
-        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new
+        MOCK_RECEIVED_MESSAGE = new Message(new Id(90), YieldsApplication.getUser().getId(), new
                 TextContent("top kek"), sendingDate);
         SystemClock.sleep(2000);
         MediaMessageRequest request = new MediaMessageRequest(MOCK_RECEIVED_MESSAGE, new Id(888));
@@ -602,7 +602,7 @@ public class RequestHandlerTests {
     @Test
     public void testHandleMediaMessageRequestURL() {
         Date sendingDate = new Date();
-        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new UrlContent("topkek 4chan.org"),
+        MOCK_RECEIVED_MESSAGE = new Message(new Id(90), YieldsApplication.getUser().getId(), new UrlContent("topkek 4chan.org"),
                 sendingDate);
         SystemClock.sleep(2000);
         MediaMessageRequest request = new MediaMessageRequest(MOCK_RECEIVED_MESSAGE, new Id(888));
@@ -638,7 +638,7 @@ public class RequestHandlerTests {
         Date sendingDate = new Date();
         ImageContent content = new ImageContent(Bitmap.createBitmap(100, 100, Bitmap
                 .Config.RGB_565), "Nice caption m8.");
-        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(),content, sendingDate);
+        MOCK_RECEIVED_MESSAGE = new Message(new Id(90), YieldsApplication.getUser().getId(),content, sendingDate);
         SystemClock.sleep(2000);
         MediaMessageRequest request = new MediaMessageRequest(MOCK_RECEIVED_MESSAGE, new Id(888));
 
