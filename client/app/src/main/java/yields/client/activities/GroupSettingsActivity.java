@@ -248,6 +248,7 @@ public class GroupSettingsActivity extends AppCompatActivity {
             final EditText editTextName = new EditText(GroupSettingsActivity.this);
             editTextName.setId(R.id.editText);
             editTextName.setText(mGroup.getName());
+            editTextName.setSingleLine();
 
             final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
             final int maximumSize = getResources().getInteger(R.integer.maximumNameSize);

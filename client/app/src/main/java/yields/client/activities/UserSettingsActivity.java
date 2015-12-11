@@ -196,6 +196,7 @@ public class UserSettingsActivity extends AppCompatActivity {
             editTextUsername.setId(R.id.editText);
             editTextUsername.setText(mUser.getName());
             editTextUsername.setSelection(editTextUsername.length());
+            editTextUsername.setSingleLine();
 
             final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
             final int maximumSize = getResources().getInteger(R.integer.maximumNameSize);
