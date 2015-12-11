@@ -10,9 +10,11 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import yields.client.activities.MockFactory;
@@ -23,6 +25,7 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.Response;
@@ -151,9 +154,18 @@ public class ResponseHandlerTests {
 
     @Test
     public void handlePublisherMessageResponseTest() throws JSONException, ParseException {
-        String response = "{\"kind\":\"PublisherMessageRes\",\"message\":{\"nid\":10,\"datetime\":" +
+        String response = "{\"kind\":\"PublisherMessageRes\",\"message\":{\"nid\":999,\"datetime\":" +
                 "\"2015-12-10T20:31:52.079Z\"},\"metadata\":{\"client\":1,\"datetime\":\"2015-12-10T20:31:52.080Z\"" +
                 ",\"ref\":\"2015-12-10T21:31:51.784+01:00\"}}";
+        User user2 = new User("Johny", new Id(1), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(999));
+        YieldsApplication.getUser().addGroup(node3);
+
+        Message message = new Message(new Id(-1), user2.getId(), MockFactory.generateFakeTextContent(2),
+                DateSerialization.dateSerializer.toDate("2015-12-10T21:31:51.784+01:00"), Message.MessageStatus.NOT_SENT);
+        node3.addMessage(message);
         mHandler.handlePublisherMessageResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.MESSAGES_RECEIVE, mService.mLastChange);
         assertEquals(DateSerialization.dateSerializer.toDate("2015-12-10T20:31:52.079Z"),
@@ -161,9 +173,17 @@ public class ResponseHandlerTests {
     }
 
     @Test
-    public void handleRSSCreateResponseTest() throws JSONException {
-        String response = "{\"kind\":\"RSSCreateRes\",\"message\":{\"nid\":10},\"metadata\":{\"client\"" +
+    public void handleRSSCreateResponseTest() throws JSONException, ParseException {
+        String response = "{\"kind\":\"RSSCreateRes\",\"message\":{\"nid\":999},\"metadata\":{\"client\"" +
                 ":2,\"datetime\":\"2015-12-10T23:17:22.044Z\",\"ref\":\"2015-12-11T00:17:20.749+01:00\"}}";
+        User user2 = new User("Johny", new Id(2), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(999));
+        node3.setRef(DateSerialization.dateSerializer.toDate("2015-12-11T00:17:20.749+01:00"));
+        YieldsApplication.getUser().addGroup(node3);
+        YieldsApplication.getUser().addNode(node3);
+
         mHandler.handleRSSCreateResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.RSS_CREATE, mService.mLastChange);
     }
@@ -185,6 +205,12 @@ public class ResponseHandlerTests {
         String response = "{\"kind\":\"GroupCreateBrd\",\"message\":{\"nid\":10,\"name\":\"test\"," +
                 "\"users\":[2,4],\"nodes\":[3]},\"metadata\":{\"client\":0,\"datetime\":" +
                 "\"2015-12-10T23:41:07.453Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
+        User user2 = new User("Johny", new Id(2), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(3));
+        YieldsApplication.getUser().addNode(node3);
+
         mHandler.handleGroupCreateBroadcast(new Response(response));
         assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
         assertEquals("test", mCacheDatabaseHelper.mLastGroupAdded.getName());
@@ -206,6 +232,13 @@ public class ResponseHandlerTests {
         String response = "{\"kind\":\"PublisherCreateBrd\",\"message\":{\"nid\":10,\"name\":\"tewt\"" +
                 ",\"users\":[2],\"nodes\":[3,4]},\"metadata\":{\"client\":0,\"datetime\":" +
                 "\"2015-12-10T23:48:12.124Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
+
+        User user2 = new User("Johny", new Id(2), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(3));
+        YieldsApplication.getUser().addNode(node3);
+
         mHandler.handlePublisherCreateBroadcast(new Response(response));
         assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
         assertEquals("tewt", mCacheDatabaseHelper.mLastGroupAdded.getName());
@@ -243,12 +276,19 @@ public class ResponseHandlerTests {
     }
 
     @Test
-    public void handleGroupCreateResponseTest() throws JSONException {
-        String response = "{\"kind\":\"GroupCreateRes\",\"message\":{\"nid\":10},\"metadata\":{" +
+    public void handleGroupCreateResponseTest() throws JSONException, ParseException {
+        String response = "{\"kind\":\"GroupCreateRes\",\"message\":{\"nid\":999},\"metadata\":{" +
                 "\"client\":10,\"datetime\":\"2015-12-10T22:48:23.553Z\",\"ref\":\"2015-12-10T22:48:23.553Z\"}}";
+        User user2 = new User("Johny", new Id(1), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(999));
+        node3.setRef(DateSerialization.dateSerializer.toDate("2015-12-10T22:48:23.553Z"));
+        YieldsApplication.getUser().addGroup(node3);
+
         mHandler.handleGroupCreateResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
-        assertEquals("10", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
+        assertEquals("999", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
     }
 
     @Test
@@ -335,7 +375,7 @@ public class ResponseHandlerTests {
 
         public NotifiableActivity.Change mLastChange;
 
-        public MockYieldsService(){
+        public MockYieldsService() {
             super();
         }
 
@@ -372,64 +412,64 @@ public class ResponseHandlerTests {
         public Message mLastMessageAdded;
         public Id mLastGroupIdMessageAdded;
 
-        public MockCacheDatabaseHelper(){
+        public MockCacheDatabaseHelper() {
             super();
         }
 
         @Override
-        public void updateEntourage(Id userId, boolean inEntourage){
+        public void updateEntourage(Id userId, boolean inEntourage) {
             mLastIdUpdated = userId;
         }
 
         @Override
-        public void addGroup(Group group){
+        public void addGroup(Group group) {
             mLastGroupAdded = group;
         }
 
         @Override
-        public void updateGroupImage(Id groupId, Bitmap newGroupImage){
+        public void updateGroupImage(Id groupId, Bitmap newGroupImage) {
             mLastGroupIdImageChange = groupId;
             mLastImageChangeForGroup = newGroupImage;
         }
 
         @Override
-        public void updateGroupName(Id groupId, String newGroupName){
+        public void updateGroupName(Id groupId, String newGroupName) {
             mLastGroupIdNameChanged = groupId;
             mLastGroupNameUpdated = newGroupName;
         }
 
         @Override
-        public void addUsersToGroup(Id groupId, List<User> users){
+        public void addUsersToGroup(Id groupId, List<User> users) {
             mLastUsersAdded = users;
             mLastGroupReceivingNeUser = groupId;
         }
 
         @Override
-        public void removeUsersFromGroup(Id groupId, List<User> users){
+        public void removeUsersFromGroup(Id groupId, List<User> users) {
             mLastUsersRemoved = users;
             mLastGroupRemovingNeUser = groupId;
         }
 
         @Override
-        public void addUser(User user){
+        public void addUser(User user) {
             mLastUserAdded = user;
         }
 
         @Override
-        public void updateUserName(Id userId, String newUserName){
+        public void updateUserName(Id userId, String newUserName) {
             mLastUserIdNameUpdated = userId;
             mLastNameChanged = newUserName;
         }
 
         @Override
-        public void addMessage(Message message, Id groupId){
+        public void addMessage(Message message, Id groupId) {
             mLastMessageAdded = message;
             mLastGroupIdMessageAdded = groupId;
         }
 
     }
 
-    private class MockServiceRequestController extends ServiceRequestControlle {
+    private class MockServiceRequestController extends ServiceRequestController {
 
         public ServerRequest mLastRequest;
 
