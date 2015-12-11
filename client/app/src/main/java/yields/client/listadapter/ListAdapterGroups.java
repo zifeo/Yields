@@ -2,6 +2,11 @@ package yields.client.listadapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,6 +63,32 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         Bitmap groupImage = group.getImage();
         imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(groupImage,
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
+
+        Bitmap pastille = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_message_black_24dp);
+
+        int [] pixels = new int [pastille.getHeight()*pastille.getWidth()];
+
+        pastille.getPixels(pixels, 0, pastille.getWidth(), 0, 0,
+                pastille.getWidth(), pastille.getHeight());
+
+        for(int i = 0; i < pixels.length; i++) {
+            if(pixels[i] == Color.BLACK) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    pixels[i] = mContext.getResources().getColor(R.color.barColor, mContext.getTheme());
+                }
+                else {
+                    pixels[i] = mContext.getResources().getColor(R.color.barColor);
+                }
+            }
+            else {
+                pixels[i] = Color.TRANSPARENT;
+            }
+        }
+
+        pastille.setPixels(pixels, 0, pastille.getWidth(), 0, 0,
+                pastille.getWidth(), pastille.getHeight());
+
+        imagePastille.setImageBitmap(pastille);
 
         Log.d("hello", "erqhir");
         if (YieldsApplication.getBinder().hasPending(group.getId())) {
