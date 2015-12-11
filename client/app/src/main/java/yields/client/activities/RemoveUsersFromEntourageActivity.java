@@ -104,6 +104,8 @@ public class RemoveUsersFromEntourageActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
 
                             for (User u : usersToBeRemoved) {
+                                YieldsApplication.getUser().removeUserFromEntourage(u);
+
                                 ServiceRequest request =
                                         new UserEntourageRemoveRequest(YieldsApplication.getUser().getId(), u.getId());
 

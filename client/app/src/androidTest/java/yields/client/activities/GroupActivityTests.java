@@ -13,6 +13,7 @@ import yields.client.generalhelpers.MockModel;
 import yields.client.generalhelpers.ServiceTestConnection;
 import yields.client.id.Id;
 import yields.client.node.Group;
+import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -43,15 +44,25 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         super.setUp();
         injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
+        new MockModel();
         ServiceTestConnection.connectActivityToService();
 
-        new MockModel();
         getActivity();
     }
 
     @Override
     public void tearDown() {
         YieldsApplication.cancelToast();
+    }
+
+    /**
+     * Test that runs through all activities related to group creation
+     */
+    public void testNotify() {
+        YieldsApplication.getUser().addGroup(new Group("Group12345", new Id(1), new ArrayList<Id>()));
+        getActivity().notifyChange(NotifiableActivity.Change.GROUP_LIST);
+
+        onView(withId(R.id.textViewGroupName)).check(matches(withText("Group12345")));
     }
 
     /**
@@ -85,13 +96,16 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
      * Test that runs through all activities related to group creation, including adding users
      */
     public void testGroupCreationWithContactAdded() {
+        YieldsApplication.getUser().addUserToEntourage(new User("Poto", new Id(1), "",
+                YieldsApplication.getDefaultUserImage()));
+
         onView(withId(R.id.actionCreate)).perform(click());
 
         onView(withId(R.id.editTextSelectGroupName)).perform(typeText("SWENG discussion2"), closeSoftKeyboard());
         onView(withId(R.id.actionDoneSelectName)).perform(click());
 
         onView(withId(R.id.actionAddContactToGroup)).perform(click());
-
+        onView(withId(R.id.checkboxUser)).perform(click());
         onView(withId(R.id.actionDoneSelectUser)).perform(click());
 
         onView(withId(R.id.actionDoneCreateGroup)).perform(click());
@@ -239,11 +253,13 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
 
         onView(withId(R.id.radioButtonPrivateGroup)).perform(click());
 
+        onView(withId(R.id.actionDoneSelectName)).perform(click());
+
         // Simulate the node added
         YieldsApplication.setGroupAdded(new Group("group", new Id(1), new ArrayList<Id>()));
         YieldsApplication.setGroupAddedValid(true);
-
-        onView(withId(R.id.actionDoneSelectName)).perform(click());
+        onView(withId(R.id.actionAddContactToGroup)).perform(click());
+        onView(withId(R.id.actionDoneSelectUser)).perform(click());
 
         onView(withId(R.id.actionDoneCreateGroup)).perform(click());
 
@@ -263,5 +279,14 @@ public class GroupActivityTests extends ActivityInstrumentationTestCase2<GroupAc
         if (!found) {
             fail("Error group not found");
         }
+    }
+
+    /**
+     * Simple test which just goes to SearchGroupActivity
+     */
+    public void testGoToSearch() {
+        onView(withId(R.id.actionDiscover)).perform(click());
+
+        onView(withId(R.id.textViewInfoSearch)).check(matches(isDisplayed()));
     }
 }
