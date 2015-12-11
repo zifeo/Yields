@@ -169,8 +169,6 @@ public class RequestHandlerTests {
         RequestHandler handler = createRequestHandler();
         // Call the method to be tested.
         handler.handleGroupCreateRequest(request);
-        // Testing the changes in helper
-        assertEquals(group, mCacheDatabaseHelper.mLastGroupAdded);
         // Testing the last request sent
         ServerRequest sReq = mServiceRequestController.mLastRequest;
         JSONObject reqObject = null;
@@ -229,7 +227,7 @@ public class RequestHandlerTests {
         Bitmap newImage = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565);
         // Request
         GroupUpdateImageRequest request = new GroupUpdateImageRequest(YieldsApplication.getUser(), new Id(888),
-                newImage);
+                newImage, Group.GroupType.PRIVATE);
         // Handler
         RequestHandler handler = createRequestHandler();
         // Call the method to be tested.
@@ -265,7 +263,7 @@ public class RequestHandlerTests {
         String newName = "TOP KEK";
         // Request
         GroupUpdateNameRequest request = new GroupUpdateNameRequest(YieldsApplication.getUser(), new Id(888),
-                newName);
+                newName, Group.GroupType.PRIVATE);
         // Handler
         RequestHandler handler = createRequestHandler();
         // Call the method to be tested.
@@ -298,7 +296,7 @@ public class RequestHandlerTests {
         ArrayList<User> userList = new ArrayList<>();
         userList.add(MockFactory.generateFakeUser("Tux", new Id(111), "topkek"));
         GroupUpdateUsersRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), new Id
-                (888), userList, GroupUpdateUsersRequest.UpdateType.ADD);
+                (888), userList, GroupUpdateUsersRequest.UpdateType.ADD, Group.GroupType.PRIVATE);
         // Handler
         RequestHandler handler = createRequestHandler();
         // Call the method to be tested.
@@ -332,7 +330,7 @@ public class RequestHandlerTests {
         ArrayList<User> userList = new ArrayList<>();
         userList.add(MockFactory.generateFakeUser("Tux", new Id(111), "topkek"));
         GroupUpdateUsersRequest request = new GroupUpdateUsersRequest(YieldsApplication.getUser().getId(), new Id
-                (888), userList, GroupUpdateUsersRequest.UpdateType.REMOVE);
+                (888), userList, GroupUpdateUsersRequest.UpdateType.REMOVE, Group.GroupType.PRIVATE);
         // Handler
         RequestHandler handler = createRequestHandler();
         // Call the method to be tested.
