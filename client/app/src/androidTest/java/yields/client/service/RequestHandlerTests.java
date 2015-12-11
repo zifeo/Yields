@@ -4,6 +4,7 @@ package yields.client.service;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.media.Image;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
@@ -46,6 +47,8 @@ import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
+import yields.client.servicerequest.MediaMessageRequest;
+import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserEntourageAddRequest;
 import yields.client.servicerequest.UserEntourageRemoveRequest;
@@ -64,6 +67,8 @@ public class RequestHandlerTests {
     private static MockCacheDatabaseHelper mCacheDatabaseHelper;
     private static MockServiceRequestController mServiceRequestController;
     private SQLiteDatabase mDatabase;
+
+    private Message MOCK_RECEIVED_MESSAGE;
 
 
     @Before
@@ -88,7 +93,7 @@ public class RequestHandlerTests {
         mCacheDatabaseHelper.addGroup(group);
     }
 
-   /* @Test
+    @Test
     public void testHandleUserGroupListRequest(){
         // Request
         UserGroupListRequest request = new UserGroupListRequest(YieldsApplication.getUser());
@@ -114,7 +119,7 @@ public class RequestHandlerTests {
         } catch (JSONException e) {
             fail("Invalid request");
         }
-    }*/
+    }
 
     @Test
     public void testHandleUserEntourageRemoveRequest(){
@@ -131,16 +136,12 @@ public class RequestHandlerTests {
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
-            // Expected :
-            // {"metadata":{"client":999999,"ref":<date>,"datetime":<date>},
-            // "kind":"UserUpdate","message":{"addEntourage":[],"pic":null,"name":null,"email":null,"removeEntourage":[117]}}
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
             assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("UserUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("addEntourage").length());
-            log(message.get("pic").toString());
             assertEquals("null", message.getString("pic"));
             assertEquals("null", message.getString("name"));
             assertEquals("null", message.getString("email"));
@@ -172,13 +173,9 @@ public class RequestHandlerTests {
         assertEquals(group, mCacheDatabaseHelper.mLastGroupAdded);
         // Testing the last request sent
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        log(sReq.message());
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
-            // Expected :
-            // {"metadata":{"client":999999,"ref":"2015-12-10T18:22:20.428+01:00","datetime":"2015-12-10T18:22:20.428+01:00"},
-            // "kind":"GroupCreate","message":{"name":"mock group 420","nodes":[],"users":[999999]}}
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
             assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
@@ -216,7 +213,6 @@ public class RequestHandlerTests {
             assertEquals("UserUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("removeEntourage").length());
-            log(message.get("pic").toString());
             assertEquals("null", message.getString("pic"));
             assertEquals("null", message.getString("name"));
             assertEquals("null", message.getString("email"));
@@ -243,14 +239,11 @@ public class RequestHandlerTests {
         assertTrue(newImage.sameAs(mCacheDatabaseHelper.mLastImageChangeForGroup));
         // Testing the last request sent
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        log(sReq.message());
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            // Next one is not tested as the request is longer than the other ones and can lead to time differences.
-            //assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("GroupUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals("null", message.getString("name"));
@@ -282,14 +275,11 @@ public class RequestHandlerTests {
         assertEquals(newName, mCacheDatabaseHelper.mLastGroupNameUpdated);
         // Testing the last request sent
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        log(sReq.message());
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            // Next one is not tested as the request is longer than the other ones and can lead to time differences.
-            //assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("GroupUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("addNodes").length());
@@ -319,13 +309,11 @@ public class RequestHandlerTests {
         assertEquals(userList.get(0), mCacheDatabaseHelper.mLastUsersAdded.get(0));
         // Testing the last request sent
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        log(sReq.message());
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            //{"metadata":{"client":999999,"ref":"2015-12-10T18:52:34.218+01:00","datetime":"2015-12-10T18:52:34.218+01:00"},"kind":"GroupUpdate","message":{"addNodes":[],"addUsers":[],"removeNodes":[],"removeUsers":[],"nid":888,"pic":"\/9j\/4AAQSkZJRgABAQAAAQABAAD\/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+A\njIqgtObDoKrarYqMyP\/L2u71\/\/\/\/m8H\/\/\/\/6\/+b9\/\/j\/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4\n+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj\/wAARCABkAGQDASIA\nAhEBAxEB\/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL\/8QAtRAAAgEDAwIEAwUFBAQA\nAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3\nODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm\np6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6\/8QAHwEA\nAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL\/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx\nBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK\nU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3\nuLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6\/9oADAMBAAIRAxEAPwDFoooo\nAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA\nooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACi\niigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKK\nKACiiigAooooAKKKKACiiigAooooA\/\/Z\n","name":null}}
             assertEquals("GroupUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("addNodes").length());
@@ -355,13 +343,11 @@ public class RequestHandlerTests {
         assertEquals(userList.get(0), mCacheDatabaseHelper.mLastUsersRemoved.get(0));
         // Testing the last request sent
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        log(sReq.message());
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            //{"metadata":{"client":999999,"ref":"2015-12-10T18:52:34.218+01:00","datetime":"2015-12-10T18:52:34.218+01:00"},"kind":"GroupUpdate","message":{"addNodes":[],"addUsers":[],"removeNodes":[],"removeUsers":[],"nid":888,"pic":"\/9j\/4AAQSkZJRgABAQAAAQABAAD\/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+A\njIqgtObDoKrarYqMyP\/L2u71\/\/\/\/m8H\/\/\/\/6\/+b9\/\/j\/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4\n+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj\/wAARCABkAGQDASIA\nAhEBAxEB\/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL\/8QAtRAAAgEDAwIEAwUFBAQA\nAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3\nODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm\np6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6\/8QAHwEA\nAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL\/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx\nBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK\nU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3\nuLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6\/9oADAMBAAIRAxEAPwDFoooo\nAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA\nooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACi\niigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKK\nKACiiigAooooAKKKKACiiigAooooA\/\/Z\n","name":null}}
             assertEquals("GroupUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("addNodes").length());
@@ -385,14 +371,8 @@ public class RequestHandlerTests {
         assertEquals(user.getId(), mCacheDatabaseHelper.mLastUserAdded.getId());
 
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        Log.d("RequestHandlerTests", sReq.message());
         JSONObject reqObject = null;
         try {
-            //
-            //{"metadata":{"client":101,"ref":"2015-12-10T21:44:44.562+01:00","datetime":"2015-12-10T21:44:44.562+01:00"}
-            // ,"kind":"UserUpdate","message":{"addEntourage":[],
-            // "pic":"\/9j\/4AAQSkZJRgABAQAAAQABAAD\/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+A\njIqgtObDoKrarYqMyP\/L2u71\/\/\/\/m8H\/\/\/\/6\/+b9\/\/j\/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4\n+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj\/wAARCABQAFADASIA\nAhEBAxEB\/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL\/8QAtRAAAgEDAwIEAwUFBAQA\nAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3\nODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWm\np6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6\/8QAHwEA\nAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL\/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSEx\nBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElK\nU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3\nuLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6\/9oADAMBAAIRAxEAPwDFoooo\nAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA\nooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA\/\/Z\n",
-            // "name":"","email":"","removeEntourage":[]}}
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(11111, metadata.getLong("client"));
@@ -419,7 +399,6 @@ public class RequestHandlerTests {
         assertEquals(user.getId().getId(), mCacheDatabaseHelper.mLastUserIdNameUpdated.getId());
 
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        Log.d("RequestHandlerTests", sReq.message());
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
@@ -457,12 +436,8 @@ public class RequestHandlerTests {
         assertEquals(sendingDate, YieldsApplication.getUser().getGroup(new Id(888)).getLastUpdate());
 
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        Log.d("RequestHandlerTests", sReq.message());
         JSONObject reqObject = null;
         try {
-            //{"metadata":{"client":999999,"ref":"2015-12-10T23:00:03.230+01:00","datetime":"2015-12-10T23:00:03.240+01:00"},
-            // "kind":"GroupMessage","message":{"contentType":null,"nid":888,"date":"2015-12-10T23:00:03.230+01:00",
-            // "text":"topkek","content":null}}
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
@@ -500,12 +475,8 @@ public class RequestHandlerTests {
         assertEquals(sendingDate, YieldsApplication.getUser().getGroup(new Id(888)).getLastUpdate());
 
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        Log.d("RequestHandlerTests", sReq.message());
         JSONObject reqObject = null;
         try {
-            //{"metadata":{"client":999999,"ref":"2015-12-10T23:00:03.230+01:00","datetime":"2015-12-10T23:00:03.240+01:00"},
-            // "kind":"GroupMessage","message":{"contentType":null,"nid":888,"date":"2015-12-10T23:00:03.230+01:00",
-            // "text":"topkek","content":null}}
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
@@ -543,16 +514,147 @@ public class RequestHandlerTests {
         assertEquals(sendingDate, YieldsApplication.getUser().getGroup(new Id(888)).getLastUpdate());
 
         ServerRequest sReq = mServiceRequestController.mLastRequest;
-        Log.d("RequestHandlerTests", sReq.message());
         JSONObject reqObject = null;
         try {
-            //{"metadata":{"client":999999,"ref":"2015-12-10T23:00:03.230+01:00","datetime":"2015-12-10T23:00:03.240+01:00"},
-            // "kind":"GroupMessage","message":{"contentType":null,"nid":888,"date":"2015-12-10T23:00:03.230+01:00",
-            // "text":"topkek","content":null}}
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
             assertEquals("GroupMessage", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals("image", messageObj.getString("contentType"));
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(sendingDate, DateSerialization.dateSerializer.toDate(messageObj.getString("date")));
+            assertEquals("Nice caption m8.", messageObj.getString("text"));
+            String contentField = messageObj.getString("content");
+            String expectedContentField = ImageSerialization.serializeImage(Bitmap.createBitmap(100, 100, Bitmap
+                    .Config.RGB_565), ImageSerialization.SIZE_IMAGE_NODE);
+            assertEquals(expectedContentField, contentField);
+        } catch (JSONException e) {
+            fail("Invalid request");
+        } catch (ParseException e) {
+            fail("cannot parse date.");
+        }
+    }
+
+    @Test
+    public void testHandleNodeHistoryRequest(){
+        Date sendingDate = new Date();
+        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new
+                TextContent("top kek"), new Date());
+        SystemClock.sleep(2000);
+        NodeHistoryRequest request = new NodeHistoryRequest(new Id(888), new Date());
+
+        RequestHandler handler = createRequestHandler();
+        handler.handleNodeHistoryRequest(request);
+
+        assertEquals(Long.valueOf(888), mService.mLastReceivingNodeId.getId());
+        assertEquals(MOCK_RECEIVED_MESSAGE, mService.mLastReceivedMessages.get(0));
+
+        ServerRequest sReq = mServiceRequestController.mLastRequest;
+        JSONObject reqObject = null;
+        try {
+            reqObject = new JSONObject(sReq.message());
+            JSONObject metadata = reqObject.getJSONObject("metadata");
+            assertEquals(999999, metadata.getLong("client"));
+            assertEquals("NodeHistory", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(10, messageObj.getInt("count"));
+        } catch (JSONException e) {
+            fail("Invalid request");
+        }
+    }
+
+    @Test
+    public void testHandleMediaMessageRequestText() {
+        Date sendingDate = new Date();
+        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new
+                TextContent("top kek"), sendingDate);
+        SystemClock.sleep(2000);
+        MediaMessageRequest request = new MediaMessageRequest(MOCK_RECEIVED_MESSAGE, new Id(888));
+
+        RequestHandler handler = createRequestHandler();
+        handler.handleMediaMessageRequest(request);
+
+        assertEquals(MOCK_RECEIVED_MESSAGE, mCacheDatabaseHelper.mLastMessageAdded);
+        assertEquals(new Id(888), mCacheDatabaseHelper.mLastGroupIdMessageAdded);
+
+        ServerRequest sReq = mServiceRequestController.mLastRequest;
+        JSONObject reqObject = null;
+        try {
+            reqObject = new JSONObject(sReq.message());
+            JSONObject metadata = reqObject.getJSONObject("metadata");
+            assertEquals(999999, metadata.getLong("client"));
+            assertEquals("MediaMessage", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals("null", messageObj.getString("contentType"));
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(sendingDate, DateSerialization.dateSerializer.toDate(messageObj.getString("date")));
+            assertEquals("top kek", messageObj.getString("text"));
+            assertEquals("null", messageObj.getString("content"));
+        } catch (JSONException e) {
+            fail("Invalid request");
+        } catch (ParseException e) {
+            fail("cannot parse date.");
+        }
+    }
+
+    @Test
+    public void testHandleMediaMessageRequestURL() {
+        Date sendingDate = new Date();
+        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new UrlContent("topkek 4chan.org"),
+                sendingDate);
+        SystemClock.sleep(2000);
+        MediaMessageRequest request = new MediaMessageRequest(MOCK_RECEIVED_MESSAGE, new Id(888));
+
+        RequestHandler handler = createRequestHandler();
+        handler.handleMediaMessageRequest(request);
+
+        assertEquals(MOCK_RECEIVED_MESSAGE, mCacheDatabaseHelper.mLastMessageAdded);
+        assertEquals(new Id(888), mCacheDatabaseHelper.mLastGroupIdMessageAdded);
+
+        ServerRequest sReq = mServiceRequestController.mLastRequest;
+        JSONObject reqObject = null;
+        try {
+            reqObject = new JSONObject(sReq.message());
+            JSONObject metadata = reqObject.getJSONObject("metadata");
+            assertEquals(999999, metadata.getLong("client"));
+            assertEquals("MediaMessage", reqObject.getString("kind"));
+            JSONObject messageObj = reqObject.getJSONObject("message");
+            assertEquals("url", messageObj.getString("contentType"));
+            assertEquals(888, messageObj.getLong("nid"));
+            assertEquals(sendingDate, DateSerialization.dateSerializer.toDate(messageObj.getString("date")));
+            assertEquals("topkek 4chan.org", messageObj.getString("text"));
+            assertEquals("https://www.4chan.org", messageObj.getString("content"));
+        } catch (JSONException e) {
+            fail("Invalid request");
+        } catch (ParseException e) {
+            fail("cannot parse date.");
+        }
+    }
+
+    @Test
+    public void testHandleMediaMessageRequestImage() {
+        Date sendingDate = new Date();
+        ImageContent content = new ImageContent(Bitmap.createBitmap(100, 100, Bitmap
+                .Config.RGB_565), "Nice caption m8.");
+        MOCK_RECEIVED_MESSAGE = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(),content, sendingDate);
+        SystemClock.sleep(2000);
+        MediaMessageRequest request = new MediaMessageRequest(MOCK_RECEIVED_MESSAGE, new Id(888));
+
+        RequestHandler handler = createRequestHandler();
+        handler.handleMediaMessageRequest(request);
+
+        assertEquals(MOCK_RECEIVED_MESSAGE, mCacheDatabaseHelper.mLastMessageAdded);
+        assertEquals(new Id(888), mCacheDatabaseHelper.mLastGroupIdMessageAdded);
+
+        ServerRequest sReq = mServiceRequestController.mLastRequest;
+        JSONObject reqObject = null;
+        try {
+            reqObject = new JSONObject(sReq.message());
+            JSONObject metadata = reqObject.getJSONObject("metadata");
+            assertEquals(999999, metadata.getLong("client"));
+            assertEquals("MediaMessage", reqObject.getString("kind"));
             JSONObject messageObj = reqObject.getJSONObject("message");
             assertEquals("image", messageObj.getString("contentType"));
             assertEquals(888, messageObj.getLong("nid"));
@@ -575,6 +677,8 @@ public class RequestHandlerTests {
 
     private class MockYieldsService extends YieldService{
         public NotifiableActivity.Change mLastChange;
+        public List<Message> mLastReceivedMessages;
+        public Id mLastReceivingNodeId;
 
         public MockYieldsService(){
             super();
@@ -584,6 +688,12 @@ public class RequestHandlerTests {
         public void notifyChange(NotifiableActivity.Change change){
             //super.notifyChange(change);
             mLastChange = change;
+        }
+
+        @Override
+        synchronized public void receiveMessages(Id groupId, List<Message> messages){
+            mLastReceivedMessages = messages;
+            mLastReceivingNodeId = groupId;
         }
     }
 
@@ -622,6 +732,7 @@ public class RequestHandlerTests {
 
         @Override
         public void addGroup(Group group){
+            super.addGroup(group);
             mLastGroupAdded = group;
         }
 
@@ -665,6 +776,13 @@ public class RequestHandlerTests {
             mLastMessageAdded = message;
             mLastGroupIdMessageAdded = groupId;
         }
+
+        @Override
+        public List<Message> getMessagesForGroup(Id nodeId, Date furthestDate, int messageCount){
+            ArrayList<Message> messages = new ArrayList<>();
+            messages.add(MOCK_RECEIVED_MESSAGE);
+            return messages;
+        }
     }
 
     private class MockServiceRequestController extends ServiceRequestController{
@@ -686,7 +804,4 @@ public class RequestHandlerTests {
         }
     }
 
-    private void log(String message){
-        Log.d("RequestHandlerTests", message);
-    }
 }
