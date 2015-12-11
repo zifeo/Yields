@@ -345,15 +345,11 @@ public class YieldService extends Service {
         // mId allows you to update the notification later on.
         mIdLastNotification++;
         List<Integer> list = mNotificationMap.get(group.getId().getId());
-        Log.d("MAP : ", mNotificationMap.toString());
-        if (list != null)
-            Log.d("LIST : ", list.toString());
 
         if (list == null) {
             list = new LinkedList<>();
             list.add(mIdLastNotification);
             mNotificationMap.put(group.getId().getId(), list);
-            Log.d("AT", group.getId().getId().toString());
         } else {
             list.add(mIdLastNotification);
         }
