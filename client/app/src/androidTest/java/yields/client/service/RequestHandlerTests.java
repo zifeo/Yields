@@ -108,11 +108,8 @@ public class RequestHandlerTests {
         JSONObject reqObject = null;
         try {
             reqObject = new JSONObject(sReq.message());
-            // Expected :
-            // {"metadata":{"client":999999,"ref":<date>,"datetime":<date>},"kind":"UserNodeList","message":{}}
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("UserNodeList", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.length());
@@ -138,7 +135,6 @@ public class RequestHandlerTests {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("UserUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("addEntourage").length());
@@ -176,7 +172,6 @@ public class RequestHandlerTests {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("GroupCreate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(group.getName(), message.getString("name"));
@@ -207,7 +202,6 @@ public class RequestHandlerTests {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("UserUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals(0, message.getJSONArray("removeEntourage").length());
@@ -374,7 +368,6 @@ public class RequestHandlerTests {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(11111, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("UserUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals("NEW NAME", message.getString("name"));
@@ -402,7 +395,6 @@ public class RequestHandlerTests {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(11111, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("UserUpdate", reqObject.getString("kind"));
             JSONObject message = reqObject.getJSONObject("message");
             assertEquals("Holy cow !", message.getString("name"));
@@ -439,7 +431,6 @@ public class RequestHandlerTests {
             reqObject = new JSONObject(sReq.message());
             JSONObject metadata = reqObject.getJSONObject("metadata");
             assertEquals(999999, metadata.getLong("client"));
-            assertEquals(metadata.getString("ref"), metadata.getString("datetime"));
             assertEquals("GroupMessage", reqObject.getString("kind"));
             JSONObject messageObj = reqObject.getJSONObject("message");
             assertEquals("null", messageObj.getString("contentType"));

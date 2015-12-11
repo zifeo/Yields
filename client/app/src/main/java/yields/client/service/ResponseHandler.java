@@ -352,7 +352,7 @@ public class ResponseHandler {
 
                 rss.setId(id);
 
-                Group group = new Group(rss.getName(), new Id(0), new ArrayList<Id>(), id);
+                Group group = new Group(rss.getName(), new Id(-1), new ArrayList<Id>(), id);
                 YieldsApplication.getUser().addGroup(group);
 
                 ServiceRequest groupCreate = new GroupCreateRequest(YieldsApplication.getUser(), group);
@@ -460,7 +460,7 @@ public class ResponseHandler {
 
             ArrayList<Id> nodeList = new ArrayList<>();
             for (int i = 0; i < nodes.length(); i++) {
-                userList.add(new Id(nodes.getLong(i)));
+                nodeList.add(new Id(nodes.getLong(i)));
             }
 
             Bitmap image = YieldsApplication.getDefaultGroupImage();
@@ -536,7 +536,7 @@ public class ResponseHandler {
 
             ArrayList<Id> nodeList = new ArrayList<>();
             for (int i = 0; i < nodes.length(); i++) {
-                userList.add(new Id(nodes.getLong(i)));
+                nodeList.add(new Id(nodes.getLong(i)));
             }
 
             Bitmap image = YieldsApplication.getDefaultGroupImage();
