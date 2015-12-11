@@ -275,7 +275,7 @@ public class SearchGroupActivity extends NotifiableActivity{
                         mCurrentGroups.clear();
                         mCurrentGroups.addAll(YieldsApplication.getGroupsSearched());
 
-                        if (mRequestsCount == 0) {
+                        if (mRequestsCount <= 0) {
                             if (mCurrentGroups.size() == 0) {
                                 setNoResultsState();
                             } else {

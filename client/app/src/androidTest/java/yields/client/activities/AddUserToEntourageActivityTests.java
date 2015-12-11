@@ -54,4 +54,28 @@ public class AddUserToEntourageActivityTests extends ActivityInstrumentationTest
         onView(withText(R.string.messageWrongEmail)).inRoot(withDecorView(not(is(getActivity().
                 getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
+
+    /**
+     * Test that the correct email is sent.
+     */
+    public void testCorrectAdd(){
+        getActivity();
+
+        onView(withId(R.id.editTextEmail)).perform(typeText("a@a.c"), closeSoftKeyboard());
+        getActivity().notifyChange(NotifiableActivity.Change.ADD_ENTOURAGE);
+    }
+
+    /**
+     * Test that the correct email is sent, but
+     * it simulates that the user is not found.
+     */
+    public void testCorrectAddNotFound(){
+        getActivity();
+
+        onView(withId(R.id.editTextEmail)).perform(typeText("a@a.c"), closeSoftKeyboard());
+        getActivity().notifyChange(NotifiableActivity.Change.NOT_EXIST);
+
+        onView(withText(R.string.messageNoUser)).inRoot(withDecorView(not(is(getActivity().
+                getWindow().getDecorView())))).check(matches(isDisplayed()));
+    }
 }
