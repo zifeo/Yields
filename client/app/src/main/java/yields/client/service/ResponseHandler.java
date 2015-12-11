@@ -23,7 +23,6 @@ import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.Response;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeInfoRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -249,6 +248,13 @@ public class ResponseHandler {
             JSONObject response = serverResponse.getMessage();
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
+            JSONArray tags = response.getJSONArray("tags");
+            String name = response.getString("name");
+            long nid = response.getLong("nid");
+            String image = response.getString("pic");
+
+            Bitmap pic = image.equals("") ? YieldsApplication.getDefaultGroupImage() : ImageSerialization
+                    .unSerializeImage(image);
 
             ArrayList<Id> userList = new ArrayList<>();
             for (int i = 0; i < users.length(); i++) {
@@ -276,23 +282,31 @@ public class ResponseHandler {
                 }
             }
 
-            long nid = response.getLong("nid");
-            String name = response.getString("name");
-            String image = response.getString("pic");
             Group group = YieldsApplication.getUser().getGroup(new Id(nid));
 
             if (group == null) {
                 group = YieldsApplication.getUser().getNodeFromId(new Id(nid));
-            } else {
-                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
-                mService.sendRequest(historyRequest);
+            }
+
+            if (group == null) {
+                group = new Group(name, new Id(nid), userList, pic, Group.GroupType.PUBLISHER, true, new Date());
+                group.updateNodes(nodeList);
+                for (int i = 0; i < tags.length(); i++) {
+                    group.addTag(new Group.Tag(tags.getString(i)));
+                }
+                YieldsApplication.getUser().addGroup(group);
+                YieldsApplication.getUser().addNode(group);
+
             }
 
             group.setName(name);
-            if (!image.equals("")) {
-                group.setImage(ImageSerialization.unSerializeImage(image));
-            }
+            group.setImage(pic);
+            group.updateNodes(nodeList);
+            group.updateUsers(userList);
             group.setType(Group.GroupType.PUBLISHER);
+
+            ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
+            mService.sendRequest(historyRequest);
 
             mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -699,7 +713,7 @@ public class ResponseHandler {
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
-    protected void handleUserGroupListResponse(Response serverResponse) {
+    protected void handleUserNodeListResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
             JSONArray groupsId = response.getJSONArray("groups");
