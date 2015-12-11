@@ -5,20 +5,15 @@
     <LinearLayout
         android:id="@+id/captionholder"
         android:layout_width="fill_parent"
-        android:layout_height="93dp">
+        android:layout_height="wrap_content">
 
-        <ScrollView
+        <TextView
+            android:id="@+id/caption"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/scrollView2">
-
-            <TextView
-                android:id="@+id/caption"
-                android:layout_width="wrap_content"
-                android:layout_height="93dp"
-                android:layout_margin="6dp"
-                android:scrollIndicators="right"/>
-        </ScrollView>
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:scrollIndicators="right"
+            />
     </LinearLayout>
 
     <LinearLayout
