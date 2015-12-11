@@ -6,14 +6,10 @@ import java.util.Objects;
 
 import yields.client.id.Id;
 import yields.client.node.Group;
-import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 
-/**
- * ServiceRequest asking the Service to update the users in the Group (adding or removing).
- */
-public class GroupUpdateUsersRequest extends ServiceRequest {
+public class GroupUpdateNodesRequest extends ServiceRequest {
 
     public enum UpdateType {
         ADD, REMOVE
@@ -21,7 +17,7 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
 
     private final Id mSender;
     private final Id mGroupId;
-    private final List<User> mUsers;
+    private final List<Group> mGroups;
     private final UpdateType mUpdateType;
     private final Group.GroupType mType;
 
@@ -30,10 +26,11 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
      *
      * @param senderId The Id of the User that created this request.
      * @param groupId  The Id of the Group that should be renamed.
-     * @param users    The users to add or delete from the group
+     * @param groups   The users to add or delete from the group
      */
-    public GroupUpdateUsersRequest(Id senderId, Id groupId, List<User> users,
-                                   UpdateType updateType, Group.GroupType groupType) {
+    public GroupUpdateNodesRequest(Id senderId, Id groupId, List<Group> groups,
+                                   GroupUpdateNodesRequest.UpdateType updateType,
+                                   Group.GroupType groupType) {
         super();
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
@@ -41,7 +38,7 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
 
         mSender = senderId;
         mGroupId = groupId;
-        mUsers = users;
+        mGroups = groups;
         mUpdateType = updateType;
         mType = groupType;
     }
@@ -53,7 +50,7 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
      */
     @Override
     public ServiceRequest.RequestKind getType() {
-        return RequestKind.GROUP_UPDATE_USERS;
+        return RequestKind.GROUP_UPDATE_NODES;
     }
 
     /**
@@ -64,44 +61,17 @@ public class GroupUpdateUsersRequest extends ServiceRequest {
     @Override
     public ServerRequest parseRequestForServer() {
         List<Id> toRequest = new ArrayList<>();
-        for (User user : mUsers) {
-            toRequest.add(user.getId());
+        for (Group group : mGroups) {
+            toRequest.add(group.getId());
         }
 
         switch (mUpdateType) {
             case ADD:
-                return RequestBuilder.groupAddRequest(mSender, mGroupId, toRequest, mType);
+                return RequestBuilder.groupAddNodesRequest(mSender, mGroupId, toRequest, mType);
             case REMOVE:
-                return RequestBuilder.groupRemoveRequest(mSender, mGroupId, toRequest, mType);
+                return RequestBuilder.groupRemoveNodesRequest(mSender, mGroupId, toRequest, mType);
             default:
                 throw new IllegalStateException("no known state : " + mUpdateType);
         }
-    }
-
-    /**
-     * Returns the Id of the Group that will be renamed.
-     *
-     * @return The Id of the Group that will be renamed.
-     */
-    public Id getGroupId() {
-        return mGroupId;
-    }
-
-    /**
-     * Returns the type of the Request, either adding or removing User from a Group.
-     *
-     * @return The type of the Request, either adding or removing User from a Group
-     */
-    public UpdateType getUpdateType() {
-        return mUpdateType;
-    }
-
-    /**
-     * Returns the Ids of the Users that will be updated in the Group (either added or removed).
-     *
-     * @return The Ids of the Users that will be updated in the Group (either added or removed).
-     */
-    public List<User> getUsersToUpdate() {
-        return mUsers;
     }
 }

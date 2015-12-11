@@ -1,7 +1,5 @@
 package yields.client.activities;
 
-import android.content.Intent;
-import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 

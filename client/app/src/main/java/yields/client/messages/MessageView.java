@@ -116,12 +116,12 @@ public class MessageView extends LinearLayout {
             switch (mMessage.getStatus()) {
                 case SEEN:
                     sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                            R.drawable.ic_check_circle_black_24dp);
+                            R.drawable.ic_check_black_24dp);
                     sentIndicator.setImageBitmap(sentImage);
                     break;
                 case SENT:
                     sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                            R.drawable.ic_check_circle_black_24dp);
+                            R.drawable.ic_check_black_24dp);
                     sentIndicator.setImageBitmap(sentImage);
                     break;
                 case NOT_SENT:

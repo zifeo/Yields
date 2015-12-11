@@ -120,4 +120,13 @@ public class User extends Node {
             return ((User) other).getId().equals(this.getId());
         }
     }
+
+    /**
+     * Override hashcode method.
+     * @return hash of Id
+     */
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
 }
