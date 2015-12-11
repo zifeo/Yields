@@ -143,7 +143,6 @@ public class MessageActivity extends NotifiableActivity {
                 if (mGroup == null) {
                     mGroup = mUser.getCommentGroup(groupId);
                     if (mGroup == null) {
-                        YieldsApplication.setGroup(mGroup);
                         mType = ContentType.MESSAGE_COMMENTS;
                         createCommentFragment();
                     } else {
