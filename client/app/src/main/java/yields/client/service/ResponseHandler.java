@@ -253,6 +253,9 @@ public class ResponseHandler {
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
+            long nid = response.getLong("nid");
+            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
+
             ArrayList<Id> userList = new ArrayList<>();
             for (int i = 0; i < users.length(); i++) {
                 Id userId = new Id(users.getLong(i));
@@ -279,10 +282,8 @@ public class ResponseHandler {
                 }
             }
 
-            long nid = response.getLong("nid");
             String name = response.getString("name");
             String image = response.getString("pic");
-            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
 
             if (group == null) {
                 group = YieldsApplication.getUser().getNodeFromId(new Id(nid));
