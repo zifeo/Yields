@@ -45,12 +45,13 @@ import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.unregisterIdlingResources;
 import static android.support.test.espresso.action.ViewActions.actionWithAssertions;
+
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withTagValue;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -82,9 +83,10 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
+
         Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
         YieldsApplication.setGroup(mockGroup);
-        assertTrue(YieldsApplication.getUser().getImg() != null);
+        assertTrue(YieldsApplication.getUser().getImage() != null);
     }
 
     /**
@@ -119,8 +121,7 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
             assertEquals(id.getId(), messageView.getMessage().getSender().getId());
 
             //Node Info
-            assertEquals(nodeName, messageView.getMessage().getName());
-            assertEquals(id.getId(), messageView.getMessage().getId().getId());
+            assertEquals(id.getId(), messageView.getMessage().getCommentGroupId().getId());
 
             //Content Info
             assertEquals("text", messageView.getMessage().getContent().getType());
@@ -135,11 +136,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testGroupInfo() {
         MessageActivity messageActivity = getActivity();
-
         onView(withId(R.id.toolbarTitle)).perform(click());
-
-        onView(withId(R.id.textViewGroupName)).check(matches(withText("Mock group")));
-
+        onView(withId(R.id.textViewGroupName)).check(matches(isDisplayed()));
         messageActivity.finish();
     }
 

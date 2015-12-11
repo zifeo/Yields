@@ -423,7 +423,7 @@ public class RequestHandlerTests {
         User user = new User(newName, new Id(11111), "NEW EMAIL", Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
 
         Date sendingDate = new Date();
-        Message message = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new TextContent
+        Message message = new Message(new Id(90), YieldsApplication.getUser().getId(), new TextContent
                 ("topkek"), sendingDate);
 
         GroupMessageRequest request = new GroupMessageRequest(message, new Id(888), Group.GroupType.PRIVATE);
@@ -462,7 +462,7 @@ public class RequestHandlerTests {
         User user = new User(newName, new Id(11111), "NEW EMAIL", Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
 
         Date sendingDate = new Date();
-        Message message = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), new UrlContent
+        Message message = new Message(new Id(90), YieldsApplication.getUser().getId(), new UrlContent
                 ("topkek 4chan.org"), sendingDate);
 
         GroupMessageRequest request = new GroupMessageRequest(message, new Id(888), Group.GroupType.PRIVATE);
@@ -502,7 +502,7 @@ public class RequestHandlerTests {
         Date sendingDate = new Date();
         ImageContent content = new ImageContent(Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565), "Nice caption " +
                 "m8.");
-        Message message = new Message("Mess.", new Id(90), YieldsApplication.getUser().getId(), content, sendingDate);
+        Message message = new Message(new Id(90), YieldsApplication.getUser().getId(), content, sendingDate);
 
         GroupMessageRequest request = new GroupMessageRequest(message, new Id(888), Group.GroupType.PRIVATE);
 

@@ -70,7 +70,7 @@ public class ListAdapterUsers extends ArrayAdapter<User> {
 
             textViewUserName.setText(user.getName());
 
-            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+            imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImage(),
                     mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
             return userView;
