@@ -18,7 +18,6 @@ import yields.client.messages.ImageContent;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.RequestBuilder;

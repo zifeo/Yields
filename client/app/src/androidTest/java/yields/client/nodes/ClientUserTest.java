@@ -11,7 +11,6 @@ import java.util.List;
 import yields.client.id.Id;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.User;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

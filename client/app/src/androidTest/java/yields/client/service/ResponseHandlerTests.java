@@ -10,11 +10,9 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import yields.client.activities.MockFactory;
@@ -25,7 +23,6 @@ import yields.client.messages.Message;
 import yields.client.messages.TextContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.Response;
