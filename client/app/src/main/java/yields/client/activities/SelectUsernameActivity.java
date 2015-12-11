@@ -62,6 +62,10 @@ public class SelectUsernameActivity extends AppCompatActivity {
             String message = getString(R.string.messageUsernameTooShort);
             YieldsApplication.showToast(getApplicationContext(), message);
         }
+        else if (username.length() > getResources().getInteger(R.integer.maximumNameSize)){
+            String message = getString(R.string.messageUsernameTooLong);
+            YieldsApplication.showToast(getApplicationContext(), message);
+        }
         else {
             Intent intent = new Intent(this, CreatingAccountActivity.class);
 

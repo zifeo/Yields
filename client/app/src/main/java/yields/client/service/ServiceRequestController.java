@@ -16,7 +16,6 @@ import yields.client.serverconnection.ServerRequest;
 import yields.client.serverconnection.YieldsSocketProvider;
 import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupUpdateNodesRequest;
-import yields.client.servicerequest.GroupUpdateTagsRequest;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
@@ -202,7 +201,7 @@ public class ServiceRequestController {
                 mResponseHandler.handleUserConnectResponse(serverResponse); /* DONE */
                 break;
             case USER_NODE_LIST_RESPONSE:
-                mResponseHandler.handleUserGroupListResponse(serverResponse); /* DONE */
+                mResponseHandler.handleUserNodeListResponse(serverResponse); /* DONE */
                 break;
             case USER_INFO_RESPONSE:
                 mResponseHandler.handleUserInfoResponse(serverResponse); /* DONE */

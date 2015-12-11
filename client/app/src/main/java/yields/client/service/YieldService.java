@@ -298,9 +298,9 @@ public class YieldService extends Service {
         List<Integer> list = mNotificationMap.get(groupId.getId());
         if (list != null) {
             for (Integer notificationId : list) {
-                Log.d("DELETE", notificationId.toString());
                 mNotificationManager.cancel(notificationId);
             }
+            list.clear();
         }
     }
 
@@ -318,7 +318,6 @@ public class YieldService extends Service {
                         .setLargeIcon(group.getImage())
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                         .setContentTitle("Message from " + YieldsApplication
                                 .getNodeFromId(message.getSender()).getName())
                         .setContentText(message.getContent().getTextForRequest().substring(0,
@@ -327,7 +326,14 @@ public class YieldService extends Service {
 
         // Creates an explicit intent for an Activity in your app
         YieldsApplication.setGroup(group);
-        Intent resultIntent = new Intent(this, MessageActivity.class);
+
+        Intent resultIntent;
+        if(YieldsApplication.getApplicationContext() == null){
+            resultIntent = new Intent(this, MessageActivity.class);
+        }
+        else{
+            resultIntent = new Intent(YieldsApplication.getApplicationContext(), MessageActivity.class);
+        }
         resultIntent.putExtra(NOTIFICATION, true);
         resultIntent.putExtra(GROUP_RECEIVING, group.getId().getId().longValue());
 
@@ -361,6 +367,18 @@ public class YieldService extends Service {
      */
     public void reconnectServer() {
         mServiceRequestController.notifyConnector();
+    }
+
+    public boolean hasPending(Id id) {
+        List res = mNotificationMap.get(id.getId());
+
+        if (res == null) {
+            Log.d("LOSADSHFIAGSF", "bonjour : " + id.getId());
+            return false;
+        } else {
+            Log.d("LOSADSHFIAGSF", "bonjour : " + id.getId() + " - " + res.toString());
+            return !res.isEmpty();
+        }
     }
 
     /**
