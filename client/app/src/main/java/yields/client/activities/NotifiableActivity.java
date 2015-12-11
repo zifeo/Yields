@@ -9,7 +9,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  * notifyChange() method, which tells the activity
  * that the data set it holds has changed
  */
-public abstract class NotifiableActivity extends AppCompatActivity{
+public abstract class NotifiableActivity extends AppCompatActivity {
 
     /**
      * Represents the changes that can be done to the model and need
@@ -25,7 +25,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
      * activity was displayed.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         if (YieldsApplication.getBinder() != null) {
             YieldsApplication.getBinder().attachActivity(this);
@@ -37,7 +37,7 @@ public abstract class NotifiableActivity extends AppCompatActivity{
      * Called when the activity is paused.
      */
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         if (YieldsApplication.getBinder() != null) {
             YieldsApplication.getBinder().unsetNotifiableActivity();

@@ -166,7 +166,7 @@ public class RequestBuilder {
     /**
      * ServerRequest for retrieving information on a Group.
      *
-     * @param sender  The Id of the sender of the request, which wants the information.
+     * @param sender The Id of the sender of the request, which wants the information.
      * @param nodeId The Id of the Group.
      * @return The appropriate ServerRequest.
      */
@@ -271,9 +271,9 @@ public class RequestBuilder {
     /**
      * Creates a Group create request.
      *
-     * @param sender     The id of the sender.
-     * @param group      The group to create.
-     * @param users      The users attached to the group.
+     * @param sender The id of the sender.
+     * @param group  The group to create.
+     * @param users  The users attached to the group.
      * @return The request itself.
      */
     public static ServerRequest groupCreateRequest(Id sender, Group group,
@@ -305,11 +305,11 @@ public class RequestBuilder {
     /**
      * Creates a Group create request.
      *
-     * @param sender     The id of the sender.
+     * @param sender The id of the sender.
      * @return The request itself.
      */
     public static ServerRequest rssCreateRequest(Id sender, Node rss,
-                                                   String url, String filter) {
+                                                 String url, String filter) {
         Objects.requireNonNull(sender);
         Objects.requireNonNull(rss.getName());
         Objects.requireNonNull(url);
@@ -443,7 +443,7 @@ public class RequestBuilder {
      *
      * @param senderId The sender of the request.
      * @param groupId  Id of the group.
-     * @param newNodes  The user to add in this group.
+     * @param newNodes The user to add in this group.
      * @return The request.
      */
     public static ServerRequest groupAddNodesRequest(Id senderId, Id groupId,
@@ -460,8 +460,8 @@ public class RequestBuilder {
     /**
      * ServerRequest for removing a user from a group.
      *
-     * @param senderId     The sender of the request.
-     * @param groupId      Id of the group.
+     * @param senderId      The sender of the request.
+     * @param groupId       Id of the group.
      * @param nodesToRemove The user to remove from  this group.
      * @return The request.
      */
@@ -485,8 +485,8 @@ public class RequestBuilder {
      * @return The request.
      */
     public static ServerRequest groupAddTagsRequest(Id senderId, Id groupId,
-                                                     List<Group.Tag> addTags,
-                                                     Group.GroupType type) {
+                                                    List<Group.Tag> addTags,
+                                                    Group.GroupType type) {
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(addTags);
@@ -498,14 +498,14 @@ public class RequestBuilder {
     /**
      * ServerRequest for removing a user from a group.
      *
-     * @param senderId      The sender of the request.
-     * @param groupId       Id of the group.
-     * @param removeTags    The tags to remove from  this group.
+     * @param senderId   The sender of the request.
+     * @param groupId    Id of the group.
+     * @param removeTags The tags to remove from  this group.
      * @return The request.
      */
     public static ServerRequest groupRemoveTagsRequest(Id senderId, Id groupId,
-                                                        List<Group.Tag> removeTags,
-                                                        Group.GroupType type) {
+                                                       List<Group.Tag> removeTags,
+                                                       Group.GroupType type) {
         Objects.requireNonNull(senderId);
         Objects.requireNonNull(groupId);
         Objects.requireNonNull(removeTags);

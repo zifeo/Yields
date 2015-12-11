@@ -150,11 +150,6 @@ public class RequestHandlerTests {
     }
 
     @Test
-    public void testHandleUserInfoRequest(){
-        // TODO : Long ass test.
-    }
-
-    @Test
     public void testGroupCreateRequest(){
         ArrayList<Id> users = new ArrayList<>();
         users.add(YieldsApplication.getUser().getId());

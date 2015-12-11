@@ -26,7 +26,7 @@ import yields.client.yieldsapplication.YieldsApplication;
  */
 public class AddUsersFromEntourageActivity extends AppCompatActivity {
     private ListAdapterUsersCheckBox mAdapterEntourage;
-    private List<Map.Entry<User, Boolean> > mEntourageChecked;
+    private List<Map.Entry<User, Boolean>> mEntourageChecked;
     private ListView mListView;
 
     public static final String ID_LIST_KEY = "ID_LIST";
@@ -34,6 +34,7 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -47,7 +48,7 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        if (!intent.hasExtra(EMAIL_LIST_INPUT_KEY)){
+        if (!intent.hasExtra(EMAIL_LIST_INPUT_KEY)) {
             throw new MissingIntentExtraException(
                     "Email list extra is missing from intent in AddUsersFromEntourageActivity");
         }
@@ -57,7 +58,7 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
         mEntourageChecked = new ArrayList<>();
         List<User> entourage = YieldsApplication.getUser().getEntourage();
 
-        for (int i = 0; i < entourage.size(); i++){
+        for (int i = 0; i < entourage.size(); i++) {
             mEntourageChecked.add(new AbstractMap.SimpleEntry<User, Boolean>(entourage.get(i),
                     inputEmailList.contains(entourage.get(i).getEmail())));
         }
@@ -84,6 +85,7 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -94,7 +96,9 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method called when the user clicks on 'Done'
+    /**
+     * Method called when the user clicks on 'Done'
+     *
      * @param item The tool bar item clicked
      * @return true
      */
@@ -102,8 +106,8 @@ public class AddUsersFromEntourageActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         ArrayList<String> idList = new ArrayList<>();
 
-        for (int i = 0; i < mEntourageChecked.size(); i++){
-            if (mEntourageChecked.get(i).getValue()){
+        for (int i = 0; i < mEntourageChecked.size(); i++) {
+            if (mEntourageChecked.get(i).getValue()) {
                 idList.add(mEntourageChecked.get(i).getKey().getId().getId().toString());
             }
         }

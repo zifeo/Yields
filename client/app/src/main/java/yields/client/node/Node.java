@@ -1,15 +1,12 @@
 package yields.client.node;
 
 import android.graphics.Bitmap;
-import android.media.Image;
-import android.util.Log;
 
 import java.util.Date;
 import java.util.Objects;
 
 import yields.client.exceptions.NodeException;
 import yields.client.id.Id;
-import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -25,7 +22,7 @@ public class Node {
      * Creates a node.
      *
      * @param name The name of the node.
-     * @param id The Id of the node.
+     * @param id   The Id of the node.
      * @throws NodeException In case of trouble making the node.
      */
     public Node(String name, Id id, Bitmap image) throws NodeException {
@@ -60,7 +57,7 @@ public class Node {
      *
      * @param name The name of the node.
      */
-    public void setName(String name){
+    public void setName(String name) {
         mName = Objects.requireNonNull(name);
     }
 

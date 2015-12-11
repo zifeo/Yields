@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,7 +23,6 @@ import yields.client.exceptions.MessageViewException;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.ClientUser;
 import yields.client.node.Node;
-import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**

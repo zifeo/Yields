@@ -5,15 +5,15 @@ package yields.client.exceptions;
  */
 public class ContentException extends RuntimeException {
 
-    public ContentException(){
+    public ContentException() {
         super();
     }
 
-    public ContentException(String message){
+    public ContentException(String message) {
         super(message);
     }
 
-    public ContentException(Throwable th){
+    public ContentException(Throwable th) {
         super(th);
     }
 }

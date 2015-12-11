@@ -14,6 +14,7 @@ public class CenteredToolBar extends Toolbar {
 
     /**
      * Constructor for the CenteredToolBar.
+     *
      * @param context The context of the app.
      */
     public CenteredToolBar(Context context) {
@@ -22,8 +23,9 @@ public class CenteredToolBar extends Toolbar {
 
     /**
      * Constructor for the CenteredToolBar.
+     *
      * @param context The context of the app.
-     * @param attrs The set of attributes.
+     * @param attrs   The set of attributes.
      */
     public CenteredToolBar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -31,8 +33,9 @@ public class CenteredToolBar extends Toolbar {
 
     /**
      * Constructor for the CenteredToolBar.
-     * @param context The context of the app.
-     * @param attrs The set of attributes.
+     *
+     * @param context      The context of the app.
+     * @param attrs        The set of attributes.
      * @param defStyleAttr The default style attribute.
      */
     public CenteredToolBar(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -41,7 +44,8 @@ public class CenteredToolBar extends Toolbar {
 
     /**
      * Add a View to the toolbar.
-     * @param child The View to be added.
+     *
+     * @param child  The View to be added.
      * @param params The Layout params for the child.
      */
     @Override

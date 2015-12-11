@@ -14,6 +14,7 @@ public class YieldServiceBinder extends Binder {
 
     /**
      * Creates the binder and links it to the service
+     *
      * @param service The Service concerned
      */
     public YieldServiceBinder(YieldService service) {
@@ -23,6 +24,7 @@ public class YieldServiceBinder extends Binder {
 
     /**
      * Binds the activity to the service which permits it to receive incoming messages directly
+     *
      * @param activity the current messagingActivity
      */
     public void attachActivity(NotifiableActivity activity) {
@@ -30,26 +32,27 @@ public class YieldServiceBinder extends Binder {
         mService.setNotifiableActivity(activity);
     }
 
-    public void unsetNotifiableActivity(){
+    public void unsetNotifiableActivity() {
         mService.unsetNotifiableActivity();
     }
 
     /**
      * Can be used to know if the server is connected to the server
      */
-    public void connectionStatus(){
+    public void connectionStatus() {
         mService.connectionStatusResponse();
     }
 
     /**
      * Asks the service to try and reconnect the server
      */
-    public void reconnect(){
+    public void reconnect() {
         mService.reconnectServer();
     }
 
     /**
      * Send a request to server via the Service.
+     *
      * @param request The request to be sent.
      */
     public void sendRequest(ServiceRequest request) {

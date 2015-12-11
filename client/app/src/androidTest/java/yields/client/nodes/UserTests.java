@@ -145,8 +145,6 @@ public class UserTests {
         assertEquals(Long.valueOf(420), user.getId().getId());
         assertEquals("Flash", user.getName());
         assertEquals("asd.asd@qwe.kr", user.getEmail());
-
-        // TODO : Compare images from the base64 in this class, and from the user.
     }
 
     @Test
@@ -156,7 +154,6 @@ public class UserTests {
         assertEquals("Jaedong", user.getName());
         assertNotEquals(Long.valueOf(200), user.getId().getId());
         assertEquals("ez.skin@ez.life", user.getEmail());
-        // TODO : compare image update.
     }
 
     @Test
@@ -167,7 +164,6 @@ public class UserTests {
         assertEquals("Jaedong", user.getName());
         assertNotEquals(Long.valueOf(200), user.getId().getId());
         assertEquals("ez.skin@ez.life", user.getEmail());
-        // TODO : compare image update.
     }
 
     @Test

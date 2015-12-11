@@ -13,13 +13,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import yields.client.R;
 import yields.client.listadapter.ListAdapterGroups;
-import yields.client.node.ClientUser;
 import yields.client.node.Group;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -38,6 +35,7 @@ public class GroupActivity extends NotifiableActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -86,6 +84,7 @@ public class GroupActivity extends NotifiableActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -96,7 +95,8 @@ public class GroupActivity extends NotifiableActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated
@@ -113,31 +113,30 @@ public class GroupActivity extends NotifiableActivity {
                 intent.putExtra(UserListActivity.SHOW_ADD_ENTOURAGE_KEY, true);
 
                 YieldsApplication.setUserList(YieldsApplication.getUser().getEntourage());
-            break;
+                break;
 
             case R.id.actionDiscover:
                 intent = new Intent(this, SearchGroupActivity.class);
                 intent.putExtra(SearchGroupActivity.MODE_KEY,
                         SearchGroupActivity.Mode.SEARCH.ordinal());
-            break;
+                break;
 
             case R.id.actionCreate:
                 intent = new Intent(this, CreateGroupSelectNameActivity.class);
-            break;
+                break;
 
             case R.id.actionSettings:
                 intent = new Intent(this, UserSettingsActivity.class);
-            break;
+                break;
 
             default:
                 return super.onOptionsItemSelected(item);
 
         }
 
-        if (intent == null){
+        if (intent == null) {
             throw new IllegalStateException("Itent should never be null at this point");
-        }
-        else {
+        } else {
             startActivity(intent);
         }
 
@@ -149,7 +148,7 @@ public class GroupActivity extends NotifiableActivity {
      * data set has changed
      */
     @Override
-    public void notifyChange(Change change){
+    public void notifyChange(Change change) {
         switch (change) {
             case GROUP_LIST:
                 runOnUiThread(new Runnable() {
@@ -198,7 +197,7 @@ public class GroupActivity extends NotifiableActivity {
      * Automatically called when the activity is started
      */
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
 
     }
@@ -220,11 +219,10 @@ public class GroupActivity extends NotifiableActivity {
      * Method that sets the right visibility to the
      * textView depending on the number of groups
      */
-    private void checkNoGroup(){
-        if (mGroups.isEmpty()){
+    private void checkNoGroup() {
+        if (mGroups.isEmpty()) {
             mTextViewNoGroup.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             mTextViewNoGroup.setVisibility(View.GONE);
         }
     }
