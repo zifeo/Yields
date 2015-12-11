@@ -326,7 +326,14 @@ public class YieldService extends Service {
 
         // Creates an explicit intent for an Activity in your app
         YieldsApplication.setGroup(group);
-        Intent resultIntent = new Intent(this, MessageActivity.class);
+
+        Intent resultIntent;
+        if(YieldsApplication.getApplicationContext() == null){
+            resultIntent = new Intent(this, MessageActivity.class);
+        }
+        else{
+            resultIntent = new Intent(YieldsApplication.getApplicationContext(), MessageActivity.class);
+        }
         resultIntent.putExtra(NOTIFICATION, true);
         resultIntent.putExtra(GROUP_RECEIVING, group.getId().getId().longValue());
 

@@ -98,7 +98,6 @@ public class ResponseHandlerTests {
                 ",\"ref\":\"2015-12-11T00:18:33.668+01:00\"}}";
         mHandler.handleGroupInfoResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
-        assertEquals(1, YieldsApplication.getGroupsSearched().size());
         assertEquals("Stack", mCacheDatabaseHelper.mLastGroupAdded.getName());
         assertEquals("2", mCacheDatabaseHelper.mLastGroupAdded.getUsers().get(0).getId().getId().toString());
         assertEquals("9", mCacheDatabaseHelper.mLastGroupAdded.getNodes().get(0).getId().getId().toString());
@@ -128,7 +127,7 @@ public class ResponseHandlerTests {
         String response = "{\"kind\":\"PublisherCreateRes\",\"message\":{\"nid\":10},\"metadata\":{\"client\":1," +
                 "\"datetime\":\"2015-12-10T20:27:41.692Z\",\"ref\":\"2015-12-10T21:27:41.732+01:00\"}}";
         mHandler.handlePublisherCreateResponse(new Response(response));
-        assertEquals(NotifiableActivity.Change.MESSAGES_RECEIVE, mService.mLastChange);
+        assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
         assertEquals("10", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
     }
 
@@ -140,16 +139,27 @@ public class ResponseHandlerTests {
     }
 
     @Test
-    public void handlePublisherInfoResponseTest() throws JSONException {
+    public void handlePublisherInfoResponseTest() throws JSONException, ParseException {
         String response = "{\"kind\":\"PublisherInfoRes\",\"message\":{\"name\":\"Toto\",\"tags\":[],\"" +
-                "users\":[2],\"nodes\":[3],\"pic\":\"\",\"nid\":258},\"metadata\":{\"client\":6,\"datetime\"" +
+                "users\":[2],\"nodes\":[999],\"pic\":\"\",\"nid\":258},\"metadata\":{\"client\":6,\"datetime\"" +
                 ":\"2015-12-10T18:20:48.005Z\",\"ref\":\"2015-12-10T19:20:47.204+01:00\"}}";
+
+        User user2 = new User("Johny", new Id(2400), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node258 = MockFactory.generateMockGroups(18).get(10);
+        node258.setId(new Id(258));
+        YieldsApplication.getUser().addGroup(node258);
+
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(3));
+        node3.setRef(DateSerialization.dateSerializer.toDate("2015-12-10T19:20:47.204+01:00"));
+        YieldsApplication.getUser().addNode(node3);
+
         mHandler.handlePublisherInfoResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
         assertEquals("Toto", mCacheDatabaseHelper.mLastGroupAdded.getName());
         assertEquals("2", mCacheDatabaseHelper.mLastGroupAdded.getUsers().get(0).getId().getId().toString());
-        assertEquals("3", mCacheDatabaseHelper.mLastGroupAdded.getNodes().get(0).getId().getId().toString());
-        assertEquals("258", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
+        assertEquals("999", mCacheDatabaseHelper.mLastGroupAdded.getNodes().get(0).getId().getId().toString());
     }
 
     @Test
@@ -279,7 +289,8 @@ public class ResponseHandlerTests {
     public void handleGroupCreateResponseTest() throws JSONException, ParseException {
         String response = "{\"kind\":\"GroupCreateRes\",\"message\":{\"nid\":999},\"metadata\":{" +
                 "\"client\":10,\"datetime\":\"2015-12-10T22:48:23.553Z\",\"ref\":\"2015-12-10T22:48:23.553Z\"}}";
-        User user2 = new User("Johny", new Id(1), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+
+        User user2 = new User("Johny", new Id(2), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
         YieldsApplication.getUser().addUserToEntourage(user2);
         Group node3 = MockFactory.generateMockGroups(2).get(1);
         node3.setId(new Id(999));
@@ -317,7 +328,7 @@ public class ResponseHandlerTests {
 
     @Test
     public void handleUserGroupListResponseTest() throws JSONException {
-        String response = "{\"kind\":\"UserNodeListRes\",\"message\":{\"groups\":[4,7],\"kinds\":[\"" +
+        String response = "{\"kind\":\"UserNodeListRes\",\"message\":{\"nodes\":[4,7],\"kinds\":[\"" +
                 "Group\",\"Group\"],\"updatedAt\":[\"2015-12-10T20:55:21.121Z\",\"2015-12-10T21:00:47.771Z\"" +
                 "],\"refreshedAt\":[\"2015-12-10T20:55:21.121Z\",\"2015-12-10T21:00:47.771Z\"]},\"metadata\"" +
                 ":{\"client\":1,\"datetime\":\"2015-12-10T22:33:30.942Z\",\"ref\":\"2015-12-10T23:33:30.199+01:00\"}}";
@@ -331,43 +342,45 @@ public class ResponseHandlerTests {
                 "\"metadata\":{\"client\":0,\"datetime\":\"2015-12-10T23:28:14.147Z\",\"ref\":" +
                 "\"2015-12-11T00:28:13.137+01:00\"}}";
         mHandler.handleUserConnectResponse(new Response(response));
-        assertEquals(NotifiableActivity.Change.NEW_USER, mService.mLastChange);
+        assertEquals(NotifiableActivity.Change.CONNECTED, mService.mLastChange);
     }
 
     @Test
     public void handleNodeHistoryResponseTest() throws JSONException {
         String response = "{\"kind\":\"NodeHistoryRes\",\"message\":{\"texts\":[],\"datetimes\":[]," +
-                "\"contents\":[],\"senders\":[],\"contentTypes\":[],\"nid\":33,\"contentNids\":[]}," +
+                "\"contents\":[],\"senders\":[],\"contentTypes\":[],\"nid\":999,\"contentNids\":[]}," +
                 "\"metadata\":{\"client\":2,\"datetime\":\"2015-12-10T23:28:05.105Z\",\"ref\":" +
                 "\"2015-12-11T00:28:04.068+01:00\"}}";
+
+        User user2 = new User("Johny", new Id(2), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(999));
+        YieldsApplication.getUser().addGroup(node3);
+
         mHandler.handleNodeHistoryResponse(new Response(response));
     }
 
     @Test
-    public void handleMediaMessageBroadcastTest() throws JSONException {
-        String response = "";
-        //mHandler.handleMediaMessageBroadcast(new Response(response));
-
-    }
-
-    @Test
     public void handleMediaMessageResponseTest() throws JSONException, ParseException {
-        String response = "{\"kind\":\"MediaMessageRes\",\"message\":{\"nid\":10,\"datetime\":" +
+        String response = "{\"kind\":\"MediaMessageRes\",\"message\":{\"nid\":999,\"datetime\":" +
                 "\"2015-12-10T18:01:51.460Z\"},\"metadata\":{\"client\":1,\"datetime\":" +
                 "\"2015-12-10T18:01:51.461Z\",\"ref\":\"2015-12-10T19:01:51.412+01:00\"}}";
+
+        User user2 = new User("Johny", new Id(1), "aksdf@gmail.com", YieldsApplication.getDefaultUserImage());
+        YieldsApplication.getUser().addUserToEntourage(user2);
+        Group node3 = MockFactory.generateMockGroups(2).get(1);
+        node3.setId(new Id(999));
+        node3.setRef(DateSerialization.dateSerializer.toDate("2015-12-10T22:48:23.553Z"));
+        YieldsApplication.getUser().addCommentGroup(node3);
+
+        Message message = new Message(new Id(-1), user2.getId(), MockFactory.generateFakeTextContent(2),
+                DateSerialization.dateSerializer.toDate("2015-12-10T19:01:51.412+01:00"), Message.MessageStatus.NOT_SENT);
+        node3.addMessage(message);
+
         mHandler.handleMediaMessageResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.MESSAGES_RECEIVE, mService.mLastChange);
         assertEquals(DateSerialization.dateSerializer.toDate("2015-12-10T18:01:51.460Z"),
-                mCacheDatabaseHelper.mLastMessageAdded.getDate());
-    }
-
-    @Test
-    public void handleNodeMessageBroadcastTest() throws JSONException, ParseException {
-        String response = "{\"kind\":\"NodeMessageBrd\",\"message\":{\"nid\":10,\"datetime\":" +
-                "\"2015-12-10T23:39:34.013Z\",\"sender\":2,\"text\":\"hcjcjvcjcjcj\"},\"metadata\"" +
-                ":{\"client\":0,\"datetime\":\"2015-12-10T23:39:34.019Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
-        mHandler.handleNodeMessageBroadcast(new Response(response));
-        assertEquals(DateSerialization.dateSerializer.toDate("2015-12-10T23:39:34.013Z"),
                 mCacheDatabaseHelper.mLastMessageAdded.getDate());
     }
 
@@ -381,7 +394,6 @@ public class ResponseHandlerTests {
 
         @Override
         public void notifyChange(NotifiableActivity.Change change) {
-            //super.notifyChange(change);
             mLastChange = change;
         }
 
