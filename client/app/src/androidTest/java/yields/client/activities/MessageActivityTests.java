@@ -215,7 +215,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         fragment = messageActivity.getCurrentFragment();
         ListView listView = (ListView) fragment.getView().findViewById(R.id.commentList);
         int i = listView.getChildCount();
-        Log.d("MessageActivityTests", "i = " + i);
         MessageView messageView = (MessageView) listView.getChildAt(i - 1);
         assertEquals("Mock comment message 1", ((TextContent) messageView.getMessage().getContent()).getText());
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
