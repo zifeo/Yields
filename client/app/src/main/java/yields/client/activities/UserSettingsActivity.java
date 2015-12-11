@@ -198,6 +198,7 @@ public class UserSettingsActivity extends AppCompatActivity {
             editTextUsername.setSelection(editTextUsername.length());
 
             final int minimumSize = getResources().getInteger(R.integer.minimumNameSize);
+            final int maximumSize = getResources().getInteger(R.integer.maximumNameSize);
 
             DialogInterface.OnClickListener emptyListener = new DialogInterface.OnClickListener() {
                 @Override
@@ -221,7 +222,12 @@ public class UserSettingsActivity extends AppCompatActivity {
                     if (newName.length() < minimumSize) {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "The username is too short");
-                    } else {
+                    }
+                    else if (newName.length() > maximumSize) {
+                        YieldsApplication.showToast(getApplicationContext(),
+                                "The username is too long");
+                    }
+                    else {
                         YieldsApplication.showToast(getApplicationContext(),
                                 "Username changed to \"" + newName + "\" !");
 
