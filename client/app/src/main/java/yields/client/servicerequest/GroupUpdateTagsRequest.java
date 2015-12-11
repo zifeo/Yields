@@ -8,6 +8,9 @@ import yields.client.node.Group;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 
+/**
+ * ServiceRequest dor updating tags of a Group.
+ */
 public class GroupUpdateTagsRequest extends ServiceRequest {
 
     public enum UpdateType {
@@ -21,11 +24,13 @@ public class GroupUpdateTagsRequest extends ServiceRequest {
     private final Group.GroupType mType;
 
     /**
-     * Main constructor for this type of ServiceRequest (renaming a Group).
+     * Main constructor for this king of ServiceRequest (updating tags of a Group).
      *
-     * @param senderId The Id of the User that created this request.
-     * @param groupId  The Id of the Group that should be renamed.
-     * @param tags   The users to add or delete from the group
+     * @param senderId The Id of the sender of the request.
+     * @param groupId The if of the group what will have it's tags updated.
+     * @param tags The updated tags.
+     * @param updateType The Type of update (ADD or REMOVE).
+     * @param groupType The type of the group being updated.
      */
     public GroupUpdateTagsRequest(Id senderId, Id groupId, List<Group.Tag> tags,
                                   GroupUpdateTagsRequest.UpdateType updateType,
@@ -49,7 +54,7 @@ public class GroupUpdateTagsRequest extends ServiceRequest {
      */
     @Override
     public ServiceRequest.RequestKind getType() {
-        return RequestKind.GROUP_UPDATE_NODES;
+        return RequestKind.GROUP_UPDATE_TAGS;
     }
 
     /**
