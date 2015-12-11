@@ -9,6 +9,7 @@ class TestGroupCreate extends YieldsSpec {
 
   "GroupCreate" should "create a group" in {
 
+    val name = "GroupName"
     val user = User.create("email@email.com")
     val meta = Metadata.now(user.uid)
 
@@ -16,12 +17,12 @@ class TestGroupCreate extends YieldsSpec {
     val nodes = List[NID](7, 8, 9)
     user.addEntourage(users)
 
-    val action = GroupCreate("GroupName", users, nodes)
+    val action = GroupCreate(name, users, nodes)
 
     action.run(meta) match {
       case GroupCreateRes(nid) =>
         val group = Group(nid)
-        group.name should be("GroupName")
+        group.name should be(name)
         group.users should contain theSameElementsAs (user.uid :: users).distinct
         group.nodes should contain theSameElementsAs nodes.distinct
         group.creator should be(user.uid)
