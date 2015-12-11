@@ -1,6 +1,7 @@
 package yields.server.actions.nodes
 
 import yields.server.actions.exceptions.UnauthorizedActionException
+import yields.server.actions.groups.GroupInfo
 import yields.server.actions.publisher.PublisherInfo
 import yields.server.actions.rss.RSSInfo
 import yields.server.actions.{Result, Action}
@@ -24,6 +25,7 @@ case class NodeInfo(nid: NID) extends Action {
     Node(nid).kind match {
       case "Publisher" => PublisherInfo(nid).run(metadata)
       case "RSS" => RSSInfo(nid).run(metadata)
+      case "Group" => GroupInfo(nid).run(metadata)
       case otherKind => throw new UnauthorizedActionException(s"$sender cannot get info on $nid ($otherKind)")
     }
     

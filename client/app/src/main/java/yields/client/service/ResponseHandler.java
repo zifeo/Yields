@@ -101,15 +101,12 @@ public class ResponseHandler {
                 groupList.add(new Group(nodeName, id, new ArrayList<Id>(), image));
             }
 
-            Date ref = DateSerialization
-                    .dateSerializer.toDate(serverResponse.getMetadata().getString("ref"));
-
             YieldsApplication.getGroupsSearched().clear();
             YieldsApplication.getGroupsSearched().addAll(groupList);
 
             mService.notifyChange(NotifiableActivity.Change.GROUP_SEARCH);
 
-        } catch (JSONException | ParseException e) {
+        } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
@@ -138,6 +135,11 @@ public class ResponseHandler {
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
+            long nid = response.getLong("nid");
+            Id gId = new Id(nid);
+            Group group = YieldsApplication.getUser().getGroup(gId);
+
+
             ArrayList<Id> userList = new ArrayList<>();
             for (int i = 0; i < users.length(); i++) {
                 Id userId = new Id(users.getLong(i));
@@ -164,10 +166,8 @@ public class ResponseHandler {
                 }
             }
 
-            long nid = response.getLong("nid");
             String name = response.getString("name");
             String image = response.getString("pic");
-            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
@@ -286,6 +286,9 @@ public class ResponseHandler {
 
             if (group == null) {
                 group = YieldsApplication.getUser().getNodeFromId(new Id(nid));
+            } else {
+                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
+                mService.sendRequest(historyRequest);
             }
 
             if (group == null) {
@@ -304,9 +307,6 @@ public class ResponseHandler {
             group.updateNodes(nodeList);
             group.updateUsers(userList);
             group.setType(Group.GroupType.PUBLISHER);
-
-            ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
-            mService.sendRequest(historyRequest);
 
             mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -361,12 +361,13 @@ public class ResponseHandler {
             Id id = new Id(nid);
 
             if (id.getId() != 0) {
-                Node rss = YieldsApplication.getUser().getGroupFromRef(DateSerialization.dateSerializer
+                Group rss = YieldsApplication.getUser().getGroupFromRef(DateSerialization.dateSerializer
                         .toDate(serverResponse.getMetadata().getString("ref")));
 
                 rss.setId(id);
 
-                Group group = new Group(rss.getName(), new Id(0), new ArrayList<Id>(), id);
+                YieldsApplication.getUser().addNode(rss);
+                Group group = new Group(rss.getName(), new Id(-1), new ArrayList<Id>(), id);
                 YieldsApplication.getUser().addGroup(group);
 
                 ServiceRequest groupCreate = new GroupCreateRequest(YieldsApplication.getUser(), group);
@@ -474,7 +475,7 @@ public class ResponseHandler {
 
             ArrayList<Id> nodeList = new ArrayList<>();
             for (int i = 0; i < nodes.length(); i++) {
-                userList.add(new Id(nodes.getLong(i)));
+                nodeList.add(new Id(nodes.getLong(i)));
             }
 
             Bitmap image = YieldsApplication.getDefaultGroupImage();
@@ -550,7 +551,7 @@ public class ResponseHandler {
 
             ArrayList<Id> nodeList = new ArrayList<>();
             for (int i = 0; i < nodes.length(); i++) {
-                userList.add(new Id(nodes.getLong(i)));
+                nodeList.add(new Id(nodes.getLong(i)));
             }
 
             Bitmap image = YieldsApplication.getDefaultGroupImage();
@@ -716,7 +717,7 @@ public class ResponseHandler {
     protected void handleUserNodeListResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            JSONArray groupsId = response.getJSONArray("groups");
+            JSONArray groupsId = response.getJSONArray("nodes");
             JSONArray updatedAt = response.getJSONArray("updatedAt");
             JSONArray refreshedAt = response.getJSONArray("refreshedAt");
 

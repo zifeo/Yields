@@ -79,8 +79,11 @@ final class ClientHub(private val socket: ActorRef,
     case OnPush(broadcast) => // Notification
       val notification = Notification(broadcast, Metadata.now(0))
       log.debug(s"[BRD] $notification")
+      val notificationSerialized = serialize(notification)
+      val notificationSerializedMessage = notificationSerialized.utf8String
+      log.debug(s"[BRD] $notificationSerializedMessage")
       tcpHistory += "brd" -> Temporal.now
-      send(serialize(notification), buffer, identified)
+      send(notificationSerialized, buffer, identified)
 
     case WriteAck(data) => // Confirm send
       confirm(data, buffer, identified)
