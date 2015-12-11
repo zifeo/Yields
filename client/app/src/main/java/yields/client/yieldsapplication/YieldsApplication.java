@@ -252,7 +252,7 @@ public class YieldsApplication {
 
     public static void setGroupsSearched(List<Group> groups) {
         Objects.requireNonNull(groups);
-        mGroupsSearched = Collections.unmodifiableList(Objects.requireNonNull(groups));
+        mGroupsSearched = new ArrayList<>(Objects.requireNonNull(groups));
     }
 
     /**
