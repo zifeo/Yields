@@ -1,10 +1,12 @@
 package yields.client.activities;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +21,8 @@ import yields.client.yieldsapplication.YieldsApplication;
  * Activity where the information about a user are displayed
  */
 public class UserInfoActivity extends AppCompatActivity {
+
+    private User mUser;
 
     /**
      * Method automatically called on the creation of the activity
@@ -50,6 +54,7 @@ public class UserInfoActivity extends AppCompatActivity {
         if (node instanceof User) {
             TextView textViewEmail = (TextView) findViewById(R.id.textViewEmail);
             textViewEmail.setText(((User) node).getEmail());
+            mUser = (User) node;
         }
     }
 
@@ -68,5 +73,14 @@ public class UserInfoActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * Listener for the click on the user Image.
+     * @param v The View.
+     */
+    public void showUserImage(View v){
+        YieldsApplication.setShownImage(mUser.getImage());
+        startActivity(new Intent(UserInfoActivity.this, ImageShowPopUp.class));
     }
 }

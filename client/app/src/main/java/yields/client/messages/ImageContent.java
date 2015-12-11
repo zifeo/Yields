@@ -1,5 +1,6 @@
 package yields.client.messages;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Objects;
@@ -81,7 +83,7 @@ public class ImageContent extends Content {
         display.getSize(size);
         int screenWidth = size.x;
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams
-                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                (LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout layout = new LinearLayout(YieldsApplication.getApplicationContext());
         layout.setLayoutParams(params);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -97,6 +99,10 @@ public class ImageContent extends Content {
         caption.setTextColor(Color.BLACK);
         caption.setTextSize(20.f);
         layout.addView(caption);
+        RelativeLayout.LayoutParams imgLayoutParams = new RelativeLayout.LayoutParams(new LinearLayout.LayoutParams
+                (LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT) );
+        imgLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        img.setLayoutParams(imgLayoutParams);
         layout.addView(img);
         return layout;
     }

@@ -24,15 +24,17 @@
         >
 
         <ImageView
-            android:layout_width="250dp"
-            android:layout_height="250dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:id="@+id/imageViewUser"
             android:contentDescription="@string/userImage"
             android:src="@drawable/default_user_image"
             android:layout_marginTop="30dp"
             android:layout_marginStart="30dp"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:clickable="true"
+            android:onClick="showUserImage"/>
 
         <TextView
             android:layout_width="wrap_content"

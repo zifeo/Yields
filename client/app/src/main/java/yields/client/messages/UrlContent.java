@@ -137,6 +137,10 @@ public class UrlContent extends Content {
     public static String makeUrlValid(String url) {
         boolean addHttp = false;
         boolean addWww = false;
+        // Here is a quick fix just before the deadline, hence the solution is not so pretty but it works well.
+        // The problem occured when the user write an url begining with http://.
+        url = url.replace("http://", "");
+        url = url.replace("www.", "");
         if (!url.startsWith("https://")) {
             addHttp = true;
         }
