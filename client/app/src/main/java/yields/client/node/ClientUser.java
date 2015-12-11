@@ -82,13 +82,11 @@ public class ClientUser extends User {
         if (node.getId().getId() != 0) {
             for (Group prevGroup : mGroups) {
                 if (prevGroup.getId().getId().equals(node.getId().getId())) {
-                    prevGroup = node;
                     return;
                 }
             }
             for (Node prevGroup : mNodes) {
                 if (prevGroup.getId().getId().equals(node.getId().getId())) {
-                    prevGroup = node;
                     return;
                 }
             }
@@ -229,6 +227,12 @@ public class ClientUser extends User {
      */
     public Group getNodeFromId(Id nodeId) {
         for (Group node : mNodes) {
+            if (nodeId.equals(node.getId())) {
+                return node;
+            }
+        }
+
+        for (Group node : mGroups) {
             if (nodeId.equals(node.getId())) {
                 return node;
             }

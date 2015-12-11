@@ -361,11 +361,12 @@ public class ResponseHandler {
             Id id = new Id(nid);
 
             if (id.getId() != 0) {
-                Node rss = YieldsApplication.getUser().getGroupFromRef(DateSerialization.dateSerializer
+                Group rss = YieldsApplication.getUser().getGroupFromRef(DateSerialization.dateSerializer
                         .toDate(serverResponse.getMetadata().getString("ref")));
 
                 rss.setId(id);
 
+                YieldsApplication.getUser().addNode(rss);
                 Group group = new Group(rss.getName(), new Id(-1), new ArrayList<Id>(), id);
                 YieldsApplication.getUser().addGroup(group);
 
