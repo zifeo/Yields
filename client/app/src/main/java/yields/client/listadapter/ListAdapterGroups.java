@@ -64,7 +64,7 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(groupImage,
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
-        Bitmap pastille = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_message_black_24dp);
+        Bitmap pastille = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_message_black_24dp).copy(Bitmap.Config.ARGB_8888, true);
 
         int [] pixels = new int [pastille.getHeight()*pastille.getWidth()];
 
