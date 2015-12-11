@@ -15,6 +15,7 @@ import yields.client.servicerequest.GroupCreateRequest;
 import yields.client.servicerequest.GroupMessageRequest;
 import yields.client.servicerequest.GroupUpdateImageRequest;
 import yields.client.servicerequest.GroupUpdateNameRequest;
+import yields.client.servicerequest.GroupUpdateNodesRequest;
 import yields.client.servicerequest.GroupUpdateTagsRequest;
 import yields.client.servicerequest.GroupUpdateUsersRequest;
 import yields.client.servicerequest.MediaMessageRequest;
@@ -179,7 +180,7 @@ public class RequestHandler {
     /**
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
-    protected void handleGroupUpdateNodesRequest(GroupUpdateTagsRequest serviceRequest) {
+    protected void handleGroupUpdateNodesRequest(GroupUpdateNodesRequest serviceRequest) {
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }
