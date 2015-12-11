@@ -444,6 +444,42 @@ public class CacheDatabaseTests {
     }
 
     /**
+     * Tests if users can be updated from the enourage (removed or added)
+     * (Test for CacheDatabaseHelper.updateEntourage(Id userId, boolean inEntourage))
+     */
+    @Test
+    public void testCanUpdateEntourage(){
+        List<Id> users = MockFactory.generateMockUsers(6);
+        for (Id user : users) {
+            mDatabaseHelper.addUser(YieldsApplication.getUserFromId(user));
+        }
+
+        Id userToUpdate = users.get(3);
+        User updatedUser = YieldsApplication.getUserFromId(userToUpdate);
+        mDatabaseHelper.updateEntourage(userToUpdate, false);
+        Cursor cursor = mDatabase.rawQuery("SELECT * FROM users WHERE nodeID = ?;",
+                new String[]{"-3"});
+        cursor.moveToFirst();
+        String inEntourage = cursor.getString(cursor.getColumnIndex("userEntourage"));
+
+        assertEquals("0", inEntourage);
+
+        User userFromDatabase = mDatabaseHelper.getUser(userToUpdate);
+
+        assertEquals(updatedUser.getName(),
+                userFromDatabase.getName());
+
+        assertEquals(updatedUser.getEmail(),
+                userFromDatabase.getEmail());
+
+        assertEquals(updatedUser.getId().getId(),
+                userFromDatabase.getId().getId());
+
+        assertTrue(compareImages(updatedUser.getImage(),
+                userFromDatabase.getImage()));
+    }
+
+    /**
      * Tests if it can add valid Groups and if the the Groups are correctly added to the database.
      * (Test for CacheDatabaseHelper.addGroup(Group group))
      */

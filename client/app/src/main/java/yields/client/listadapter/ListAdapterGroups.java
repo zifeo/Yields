@@ -2,6 +2,7 @@ package yields.client.listadapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import java.util.List;
 import yields.client.R;
 import yields.client.gui.GraphicTransforms;
 import yields.client.node.Group;
+import yields.client.yieldsapplication.YieldsApplication;
 
 /**
  * Class used to represent a list of groups, in a listview
@@ -57,7 +59,12 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
         imageGroup.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(groupImage,
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
-        // TODO implement logic for imagePastille
+        Log.d("hello", "erqhir");
+        if (YieldsApplication.getBinder().hasPending(group.getId())) {
+            imagePastille.setVisibility(View.VISIBLE);
+        } else {
+            imagePastille.setVisibility(View.GONE);
+        }
 
         return singleGroup;
     }

@@ -99,7 +99,8 @@ public class CommentView extends LinearLayout {
                 if (maxHeight > resizedImage.getHeight()) {
                     maxHeight = resizedImage.getHeight();
                 }
-                resizedImage = Bitmap.createBitmap(resizedImage, 0, 0, resizedImage.getWidth(),
+                int cropPosY = (int) ((resizedImage.getHeight() / 2.f) - (maxHeight / 2.f));
+                resizedImage = Bitmap.createBitmap(resizedImage, 0, cropPosY, resizedImage.getWidth(),
                         maxHeight);
 
                 imageView.setImageBitmap(resizedImage);
