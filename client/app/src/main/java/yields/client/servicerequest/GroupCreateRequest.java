@@ -61,7 +61,6 @@ public class GroupCreateRequest extends ServiceRequest {
         }
 
         for (Node node : mGroup.getNodes()) {
-            Log.d("NODE_NAME", node.getName());
             nodeIds.add(node.getId());
         }
 

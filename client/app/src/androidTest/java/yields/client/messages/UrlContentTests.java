@@ -56,12 +56,14 @@ public class UrlContentTests extends ActivityInstrumentationTestCase2<MessageAct
 
     @Test
     public void testMakeUrlValid() {
-        String[] urls = {"reddit.com", "www.4chan.org", "https://www.reddit.com", "https://rekt.net"};
+        String[] urls = {"reddit.com", "www.4chan.org", "https://www.reddit.com", "https://rekt.net",
+                "http://stackoverflow.com"};
         String[] expected = {
                 "https://www.reddit.com",
                 "https://www.4chan.org",
                 "https://www.reddit.com",
-                "https://www.rekt.net"
+                "https://www.rekt.net",
+                "https://www.stackoverflow.com"
         };
         for (int i = 0; i < urls.length; i++) {
             assertEquals(expected[i], UrlContent.makeUrlValid(urls[i]));
