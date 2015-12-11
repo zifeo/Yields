@@ -58,7 +58,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
         YieldsApplication.setUser(new ClientUser("test", new Id(-1), "test@epfl.ch",
                 YieldsApplication.getDefaultUserImage()));
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
-        Message message = new Message("message", new Id(-4), user.getId(),
+        Message message = new Message(new Id(-4), user.getId(),
                 MockFactory.generateFakeTextContent(1), new Date());
         assertEquals(user.getId(), message.getSender());
     }
@@ -70,7 +70,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessageHasCorrectDate() {
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Date date = new Date();
-        Message message = new Message("message", new Id(-4), user.getId(),
+        Message message = new Message(new Id(-4), user.getId(),
                 MockFactory.generateFakeTextContent(1), date);
         assertEquals(0, message.getDate().compareTo(date));
     }
@@ -82,7 +82,7 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessageHasCorrectContent() {
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Content content = MockFactory.generateFakeTextContent(1);
-        Message message = new Message("message", new Id(-4), user.getId(), content, new Date());
+        Message message = new Message( new Id(-4), user.getId(), content, new Date());
         assertEquals(content, message.getContent());
     }
 
@@ -93,15 +93,15 @@ public class MessageClassTests extends ActivityInstrumentationTestCase2<MessageA
     public void testMessageHasCorrectStatus() {
         User user = MockFactory.generateFakeUser("Johnny", new Id(-3), "YOLO@hotmail.jpg");
         Content content = MockFactory.generateFakeTextContent(1);
-        Message message = new Message("message", new Id(-4), user.getId(), content, new Date(),
+        Message message = new Message(new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.NOT_SENT);
         assertEquals(Message.MessageStatus.NOT_SENT, message.getStatus());
 
-        message = new Message("message", new Id(-4), user.getId(), content, new Date(),
+        message = new Message( new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.SENT);
         assertEquals(Message.MessageStatus.SENT, message.getStatus());
 
-        message = new Message("message", new Id(-4), user.getId(), content, new Date(),
+        message = new Message(new Id(-4), user.getId(), content, new Date(),
                 Message.MessageStatus.SEEN);
         assertEquals(Message.MessageStatus.SEEN, message.getStatus());
     }

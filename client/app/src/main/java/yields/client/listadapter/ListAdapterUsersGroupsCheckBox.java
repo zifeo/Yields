@@ -94,7 +94,7 @@ public class ListAdapterUsersGroupsCheckBox extends ArrayAdapter<User> {
         CheckBox checkBox = (CheckBox) userView.findViewById(R.id.checkboxUser);
         textViewUserName.setText(user.getName());
 
-        imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImg(),
+        imageUser.setImageBitmap(GraphicTransforms.getCroppedCircleBitmap(user.getImage(),
                 mContext.getResources().getInteger(R.integer.groupImageDiameter)));
 
         checkBox.setChecked(true);

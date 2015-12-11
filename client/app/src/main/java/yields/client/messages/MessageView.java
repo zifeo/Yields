@@ -21,6 +21,7 @@ import yields.client.activities.UserInfoActivity;
 import yields.client.exceptions.ContentException;
 import yields.client.exceptions.MessageViewException;
 import yields.client.gui.GraphicTransforms;
+import yields.client.node.Node;
 import yields.client.node.User;
 import yields.client.yieldsapplication.YieldsApplication;
 
@@ -62,7 +63,7 @@ public class MessageView extends LinearLayout {
      * @throws MessageViewException If the message contains incorrect information.
      */
     private View createMessageView() throws MessageViewException {
-        final User sender = YieldsApplication.getUserFromId(mMessage.getSender());
+        final Node sender = YieldsApplication.getNodeFromId(mMessage.getSender());
         boolean userIsSender = mMessage.getSender().equals(YieldsApplication.getUser().getId());
         final Context applicationContext = YieldsApplication.getApplicationContext();
 
@@ -89,7 +90,7 @@ public class MessageView extends LinearLayout {
         });
 
 
-        Bitmap image = sender.getImg();
+        Bitmap image = sender.getImage();
         image = GraphicTransforms.getCroppedCircleBitmap(image, 80);
         imageViewProfilPicture.setImageBitmap(image);
 
@@ -115,12 +116,12 @@ public class MessageView extends LinearLayout {
             switch (mMessage.getStatus()) {
                 case SEEN:
                     sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                            R.drawable.ic_check_circle_black_24dp);
+                            R.drawable.ic_check_black_24dp);
                     sentIndicator.setImageBitmap(sentImage);
                     break;
                 case SENT:
                     sentImage = BitmapFactory.decodeResource(YieldsApplication.getResources(),
-                            R.drawable.ic_check_circle_black_24dp);
+                            R.drawable.ic_check_black_24dp);
                     sentIndicator.setImageBitmap(sentImage);
                     break;
                 case NOT_SENT:

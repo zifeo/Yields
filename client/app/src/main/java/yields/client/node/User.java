@@ -15,7 +15,6 @@ import yields.client.yieldsapplication.YieldsApplication;
 public class User extends Node {
 
     private String mEmail;
-    private Bitmap mImg;
 
     /**
      * Constructor for the User class.
@@ -28,9 +27,8 @@ public class User extends Node {
      */
     public User(String name, Id id,
                 String email, Bitmap img) {
-        super(name, id);
+        super(name, id, img);
         this.mEmail = Objects.requireNonNull(email);
-        this.mImg = Objects.requireNonNull(img);
     }
 
     /**
@@ -44,10 +42,10 @@ public class User extends Node {
                 response.getString("email"), YieldsApplication.getDefaultUserImage());
 
         if (!response.optString("pic").equals("")) {
-            this.setImg(ImageSerialization
+            this.setImage(ImageSerialization
                     .unSerializeImage(response.getString("pic")));
         } else {
-            this.setImg(YieldsApplication.getDefaultUserImage());
+            this.setImage(YieldsApplication.getDefaultUserImage());
         }
     }
 
@@ -62,10 +60,10 @@ public class User extends Node {
         this.setEmail(response.getString("email"));
 
         if (!response.optString("pic").equals("")) {
-            this.setImg(ImageSerialization
+            this.setImage(ImageSerialization
                     .unSerializeImage(response.getString("pic")));
         } else {
-            this.setImg(YieldsApplication.getDefaultUserImage());
+            this.setImage(YieldsApplication.getDefaultUserImage());
         }
     }
 
@@ -77,7 +75,7 @@ public class User extends Node {
     public void update(User userUpdated) {
         this.setName(userUpdated.getName());
         this.setEmail(userUpdated.getEmail());
-        this.setImg(userUpdated.getImg());
+        this.setImage(userUpdated.getImage());
     }
 
     /**
@@ -89,29 +87,12 @@ public class User extends Node {
     }
 
     /**
-     * Getter for  the image of the user.
-     *
-     * @return The image of the user.
-     */
-    public Bitmap getImg() {
-        return mImg;
-    }
-
-    /**
      * Getter for the email of the user.
      *
      * @return The email of the user.
      */
     public String getEmail() {
         return mEmail;
-    }
-
-    /**
-     * Setter for the user picture
-     * @param img The new image
-     */
-    public void setImg(Bitmap img) {
-        mImg = Objects.requireNonNull(img);
     }
 
     /**

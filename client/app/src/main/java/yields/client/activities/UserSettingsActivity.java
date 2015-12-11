@@ -24,7 +24,6 @@ import java.util.Objects;
 import yields.client.R;
 import yields.client.listadapter.ListAdapterUserSettings;
 import yields.client.node.ClientUser;
-import yields.client.serverconnection.YieldEmulatorSocketProvider;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.servicerequest.UserUpdateNameRequest;
 import yields.client.servicerequest.UserUpdateRequest;
@@ -122,7 +121,9 @@ public class UserSettingsActivity extends AppCompatActivity {
                     YieldsApplication.showToast(getApplicationContext(), message);
                     
                     int diameter = getResources().getInteger(R.integer.largeGroupImageDiameter);
-                    mUser.setImg(Bitmap.createScaledBitmap(getCroppedSquaredBitmap(image), diameter, diameter, false));
+
+                    mUser.setImage(Bitmap.createScaledBitmap(getCroppedSquaredBitmap(image),
+                            diameter, diameter, false));
 
                     ServiceRequest request = new UserUpdateRequest(mUser);
                     YieldsApplication.getBinder().sendRequest(request);
