@@ -279,7 +279,7 @@ public class YieldsApplication {
      * @param users The user list.
      */
     public static void setUserList(List<User> users) {
-        mUserList = Collections.unmodifiableList(Objects.requireNonNull(users));
+        mUserList = new ArrayList<>(Objects.requireNonNull(users));
     }
 
     /**
