@@ -23,7 +23,7 @@ public class ImageSerialization {
         }
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 20, stream);
+        image.compress(Bitmap.CompressFormat.JPEG, 80, stream);
 
         return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT);
     }

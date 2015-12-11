@@ -204,6 +204,7 @@ public class MessageActivity extends NotifiableActivity {
         super.onResume();
         mUser = YieldsApplication.getUser();
         YieldsApplication.setGroup(mGroup);
+        Log.d("Y:" + this.getClass().getName(),"Resume message Activity");
         setHeaderBar();
         runOnUiThread(new Runnable() {
             @Override

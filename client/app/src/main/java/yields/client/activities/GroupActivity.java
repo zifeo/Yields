@@ -209,8 +209,8 @@ public class GroupActivity extends NotifiableActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mGroups.clear();
-        mGroups.addAll(YieldsApplication.getUser().getUserGroups());
+        mAdapterGroups.clear();
+        mAdapterGroups.addAll(YieldsApplication.getUser().getUserGroups());
         mAdapterGroups.notifyDataSetChanged();
 
         checkNoGroup();
