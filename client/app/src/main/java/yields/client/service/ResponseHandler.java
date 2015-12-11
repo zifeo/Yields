@@ -139,6 +139,11 @@ public class ResponseHandler {
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
+            long nid = response.getLong("nid");
+            Id gId = new Id(nid);
+            Group group = YieldsApplication.getUser().getGroup(gId);
+
+
             ArrayList<Id> userList = new ArrayList<>();
             for (int i = 0; i < users.length(); i++) {
                 Id userId = new Id(users.getLong(i));
@@ -165,10 +170,8 @@ public class ResponseHandler {
                 }
             }
 
-            long nid = response.getLong("nid");
             String name = response.getString("name");
             String image = response.getString("pic");
-            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
@@ -702,7 +705,7 @@ public class ResponseHandler {
     protected void handleUserGroupListResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            JSONArray groupsId = response.getJSONArray("groups");
+            JSONArray groupsId = response.getJSONArray("nodes");
             JSONArray updatedAt = response.getJSONArray("updatedAt");
             JSONArray refreshedAt = response.getJSONArray("refreshedAt");
 
