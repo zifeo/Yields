@@ -391,7 +391,6 @@ public class MessageActivity extends NotifiableActivity {
                 return true;
 
             default:
-                Log.d("MessageActivity", "default.");
                 return super.onOptionsItemSelected(item);
         }
     }

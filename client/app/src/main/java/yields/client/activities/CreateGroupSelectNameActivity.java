@@ -73,6 +73,10 @@ public class CreateGroupSelectNameActivity extends AppCompatActivity {
         if (groupName.length() < getResources().getInteger(R.integer.minimumNameSize)) {
             String message = getString(R.string.messageGroupNameTooShort);
             YieldsApplication.showToast(getApplicationContext(), message);
+
+        } else if (groupName.length() > getResources().getInteger(R.integer.maximumNameSize)) {
+            String message = getString(R.string.messageGroupNameTooLong);
+            YieldsApplication.showToast(getApplicationContext(), message);
         } else {
             Group.GroupType groupType;
             Intent intent;
