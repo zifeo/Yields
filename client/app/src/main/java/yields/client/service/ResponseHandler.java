@@ -259,54 +259,57 @@ public class ResponseHandler {
             Bitmap pic = image.equals("") ? YieldsApplication.getDefaultGroupImage() : ImageSerialization
                     .unSerializeImage(image);
 
+            ArrayList<Id> userList = new ArrayList<>();
+            for (int i = 0; i < users.length(); i++) {
+                Id userId = new Id(users.getLong(i));
+                userList.add(userId);
+                if (YieldsApplication.getUserFromId(userId) == null) {
+                    User newUser = new User(userId);
+                    YieldsApplication.addNotKnown(newUser);
+                    ServiceRequest userInfo =
+                            new UserInfoRequest(YieldsApplication.getUser(), userId);
+                    mService.sendRequest(userInfo);
+                }
+            }
+
+            ArrayList<Id> nodeList = new ArrayList<>();
+            for (int i = 0; i < nodes.length(); i++) {
+                Id nodeId = new Id(nodes.getLong(i));
+                nodeList.add(nodeId);
+                if (YieldsApplication.getNodeFromId(nodeId) == null) {
+                    Group newNode = new Group("", nodeId, new ArrayList<Id>());
+                    YieldsApplication.getUser().addNode(newNode);
+                    ServiceRequest nodeInfo =
+                            new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
+                    mService.sendRequest(nodeInfo);
+                }
+            }
+
             Group group = YieldsApplication.getUser().getGroup(new Id(nid));
 
-            if (group != null) {
-                ArrayList<Id> userList = new ArrayList<>();
-                for (int i = 0; i < users.length(); i++) {
-                    Id userId = new Id(users.getLong(i));
-                    userList.add(userId);
-                    if (YieldsApplication.getUserFromId(userId) == null) {
-                        User newUser = new User(userId);
-                        YieldsApplication.addNotKnown(newUser);
-                        ServiceRequest userInfo =
-                                new UserInfoRequest(YieldsApplication.getUser(), userId);
-                        mService.sendRequest(userInfo);
-                    }
-                }
-
-                ArrayList<Id> nodeList = new ArrayList<>();
-                for (int i = 0; i < nodes.length(); i++) {
-                    Id nodeId = new Id(nodes.getLong(i));
-                    nodeList.add(nodeId);
-                    if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                        Group newNode = new Group("", nodeId, new ArrayList<Id>());
-                        YieldsApplication.getUser().addNode(newNode);
-                        ServiceRequest nodeInfo =
-                                new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
-                        mService.sendRequest(nodeInfo);
-                    }
-                }
-
-                group.updateNodes(nodeList);
-                group.updateUsers(userList);
-
-            }else {
+            if (group == null) {
                 group = YieldsApplication.getUser().getNodeFromId(new Id(nid));
-                group = new Group(name, new Id(nid), new ArrayList<Id>(), pic,
-                        Group.GroupType.PUBLISHER, true, new Date());
+            } else {
+                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
+                mService.sendRequest(historyRequest);
+            }
+
+            if (group == null) {
+                group = new Group(name, new Id(nid), userList, pic, Group.GroupType.PUBLISHER, true, new Date());
+                group.updateNodes(nodeList);
                 for (int i = 0; i < tags.length(); i++) {
                     group.addTag(new Group.Tag(tags.getString(i)));
                 }
+                YieldsApplication.getUser().addGroup(group);
                 YieldsApplication.getUser().addNode(group);
+
             }
 
             group.setName(name);
             group.setImage(pic);
+            group.updateNodes(nodeList);
+            group.updateUsers(userList);
             group.setType(Group.GroupType.PUBLISHER);
-
-            ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
-            mService.sendRequest(historyRequest);
 
             mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
