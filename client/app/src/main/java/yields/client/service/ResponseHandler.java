@@ -389,12 +389,17 @@ public class ResponseHandler {
             JSONObject response = serverResponse.getMessage();
 
             long contentNid = response.optLong("contentNid", -1);
-
             Message message = new Message(response.getString("datetime"), contentNid,
                     response.getLong("sender"), response.getString("text"),
                     response.optString("contentType"), response.optString("content"));
 
             Id groupId = new Id(response.getLong("nid"));
+
+            if (contentNid != -1) {
+                YieldsApplication.getUser().addCommentGroup(
+                        Group.createGroupForMessageComment(message,
+                                YieldsApplication.getUser().getGroup(groupId)));
+            }
 
             mCacheHelper.addMessage(message, groupId);
             mService.receiveMessage(groupId, message);
@@ -783,6 +788,13 @@ public class ResponseHandler {
 
                 Message message = new Message(datetimes.getString(i), contentNid, senders.getLong(i), texts
                         .getString(i), contentTypes.getString(i), contents.getString(i));
+
+                if (contentNid != -1) {
+                    YieldsApplication.getUser().addCommentGroup(
+                            Group.createGroupForMessageComment(message,
+                                    YieldsApplication.getUser().getGroup(groupId)));
+                }
+
                 messageList.add(message);
                 mCacheHelper.addMessage(message, groupId);
             }
