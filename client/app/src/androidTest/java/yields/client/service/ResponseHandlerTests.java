@@ -105,8 +105,6 @@ public class ResponseHandlerTests {
     @Test
     public void testHandleUserEntourageRemoveRequest() {
 
-
-
         UserEntourageRemoveRequest request = new UserEntourageRemoveRequest(YieldsApplication.getUser().getId(), new
                 Id(117));
 
@@ -171,6 +169,7 @@ public class ResponseHandlerTests {
         Message message = new Message(new Id(69), YieldsApplication.getUser().getId(), new TextContent
                 ("topkek"), DateSerialization.dateSerializer.toDate("2015-12-10T21:27:41.732+01:00"));
         YieldsApplication.getUser().getGroup(new Id(10)).addMessage(message);
+        YieldsApplication.getUser().getGroup(new Id(10)).setRef(DateSerialization.dateSerializer.toDate("2015-12-10T21:27:41.732+01:00"));
         String response = "{\"kind\":\"PublisherCreateRes\",\"message\":{\"nid\":10},\"metadata\":{\"client\":1," +
                 "\"datetime\":\"2015-12-10T20:27:41.692Z\",\"ref\":\"2015-12-10T21:27:41.732+01:00\"}}";
         mHandler.handlePublisherCreateResponse(new Response(response));
