@@ -101,7 +101,7 @@ public class CacheDatabaseTests {
         for (int i = 0; i < 5; i++) {
             User user = new User("John" + i, new Id(-i), "lol@jpg", YieldsApplication.getDefaultUserImage());
             YieldsApplication.addNotKnown(user);
-            Message message = new Message("Node " + i, new Id(i), new Id(-i),
+            Message message = new Message( new Id(i), new Id(-i),
                     MockFactory.generateFakeTextContent(i), new Date(), Message.MessageStatus.NOT_SENT);
             mDatabaseHelper.addMessage(message, new Id(666));
             try {
@@ -147,7 +147,7 @@ public class CacheDatabaseTests {
         try {
             ImageContent content = new ImageContent(YieldsApplication.getDefaultGroupImage(), "hello");
             Id user = MockFactory.generateMockUsers(2).get(1);
-            Message message = new Message("Bob", new Id(2), user, content, new Date());
+            Message message = new Message( new Id(2), user, content, new Date());
             Group group = MockFactory.generateMockGroups(2).get(0);
             group.addUser(message.getSender());
             mDatabaseHelper.addMessage(message, group.getId());
@@ -222,7 +222,7 @@ public class CacheDatabaseTests {
 
         updatedUser.setName("Johhny Cash");
         updatedUser.setEmail("rialtoGaming@jpg.com");
-        updatedUser.setImg(YieldsApplication.getDefaultGroupImage());
+        updatedUser.setImage(YieldsApplication.getDefaultGroupImage());
 
         mDatabaseHelper.updateUser(updatedUser);
 
@@ -237,8 +237,8 @@ public class CacheDatabaseTests {
         assertEquals(updatedUser.getId().getId(),
                 userFromDatabase.getId().getId());
 
-        assertTrue(compareImages(updatedUser.getImg(),
-                userFromDatabase.getImg()));
+        assertTrue(compareImages(updatedUser.getImage(),
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -267,8 +267,8 @@ public class CacheDatabaseTests {
         assertEquals(userToRename.getId(),
                 userFromDatabase.getId().getId());
 
-        assertTrue(compareImages(YieldsApplication.getUserFromId(userToRename).getImg(),
-                userFromDatabase.getImg()));
+        assertTrue(compareImages(YieldsApplication.getUserFromId(userToRename).getImage(),
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -297,8 +297,8 @@ public class CacheDatabaseTests {
         assertEquals(userToUpdateEmail.getId(),
                 userFromDatabase.getId().getId());
 
-        assertTrue(compareImages(YieldsApplication.getUserFromId(userToUpdateEmail).getImg(),
-                userFromDatabase.getImg()));
+        assertTrue(compareImages(YieldsApplication.getUserFromId(userToUpdateEmail).getImage(),
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -328,7 +328,7 @@ public class CacheDatabaseTests {
                 userFromDatabase.getId().getId());
 
         assertTrue(compareImages(newImage,
-                userFromDatabase.getImg()));
+                userFromDatabase.getImage()));
     }
 
     /**
@@ -354,8 +354,8 @@ public class CacheDatabaseTests {
             assertEquals(users.get(i).getId(),
                     userFromDatabase.getId().getId());
 
-            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImg(),
-                    userFromDatabase.getImg()));
+            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImage(),
+                    userFromDatabase.getImage()));
         }
     }
 
@@ -383,8 +383,8 @@ public class CacheDatabaseTests {
             assertEquals(users.get(i).getId(),
                     usersFromDatabase.get(users.size() - i - 1).getId().getId());
 
-            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImg(),
-                    usersFromDatabase.get(users.size() - i - 1).getImg()));
+            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImage(),
+                    usersFromDatabase.get(users.size() - i - 1).getImage()));
         }
     }
 
@@ -418,8 +418,8 @@ public class CacheDatabaseTests {
             assertEquals(users.get(i).getId(),
                     usersFromDatabase.get(users.size() - i - 1).getId().getId());
 
-            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImg(),
-                    usersFromDatabase.get(users.size() - i - 1).getImg()));
+            assertTrue(compareImages(YieldsApplication.getUserFromId(users.get(i)).getImage(),
+                    usersFromDatabase.get(users.size() - i - 1).getImage()));
         }
     }
 
@@ -713,13 +713,13 @@ public class CacheDatabaseTests {
             mDatabaseHelper.addGroup(group);
 
             for (int i = 0; i < 30; i++) {
-                Message message = new Message("Mock node name User1 " + i, new Id(-i),
+                Message message = new Message(new Id(-i),
                         user1.getId(), MockFactory.generateFakeTextContent(i), new Date());
                 mDatabaseHelper.addMessage(message, group.getId());
                 Thread.sleep(15);
             }
             for (int i = 0; i < 30; i++) {
-                Message message = new Message("Mock node name User2 " + i, new Id(-i - 30),
+                Message message = new Message( new Id(-i - 30),
                         user2.getId(), MockFactory.generateFakeTextContent(i + 30), new Date());
                 mDatabaseHelper.addMessage(message, group.getId());
                 Thread.sleep(15);
@@ -759,7 +759,7 @@ public class CacheDatabaseTests {
         Bitmap imageFromCache =
                 ImageSerialization.unSerializeImage(cursor.getString(cursor.getColumnIndex("userImage")));
         boolean userImageIsCorrect =
-                compareImages(user.getImg(), imageFromCache);
+                compareImages(user.getImage(), imageFromCache);
 
         return idIsCorrect && userNameIsCorrect && userEmailIsCorrect && userImageIsCorrect;
     }
@@ -873,7 +873,8 @@ public class CacheDatabaseTests {
     private boolean compareMessages(Message originalMessage, Message messageFromCache) {
         boolean equal = originalMessage.getSender().equals(messageFromCache.getSender());
 
-        equal = equal && originalMessage.getId().getId().equals(messageFromCache.getId().getId());
+        equal = equal && originalMessage.getCommentGroupId().getId()
+                .equals(messageFromCache.getCommentGroupId().getId());
         equal = equal && (originalMessage.getDate().compareTo(messageFromCache.getDate()) == 0);
         equal = equal && originalMessage.getPreview().equals(messageFromCache.getPreview());
         equal = equal && originalMessage.getStatus().equals(messageFromCache.getStatus());

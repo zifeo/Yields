@@ -62,7 +62,7 @@ public class MockFactory {
     }
 
     public static Message generateMockMessage(String nodeName, Id nodeID, User sender, Content content) {
-        return new Message(nodeName, nodeID, sender.getId(), content, new Date());
+        return new Message( nodeID, sender.getId(), content, new Date());
     }
 
     public static TextContent generateFakeTextContent(int i) {
@@ -83,6 +83,10 @@ public class MockFactory {
             throw new IllegalArgumentException(e.getMessage());
         }
 
+    }
+
+    public static Bitmap generateMockImage() {
+        return Bitmap.createBitmap(10, 10, Bitmap.Config.RGB_565);
     }
 
     private static class FakeClientUser extends ClientUser {

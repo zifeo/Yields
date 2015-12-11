@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,6 +20,7 @@ public class ClientUser extends User {
     private List<Group> mGroups;
     private List<Group> mCommentGroups;
     private final List<User> mEntourage;
+    private final List<Group> mNodes;
 
     /**
      * Creates a client user which represents the client connected to the application.
@@ -32,6 +34,7 @@ public class ClientUser extends User {
         super(name, id, email, img);
         mGroups = new ArrayList<>();
         mEntourage = new ArrayList<>();
+        mNodes = new ArrayList<>();
         mCommentGroups = new ArrayList<>();
     }
 
@@ -67,6 +70,27 @@ public class ClientUser extends User {
             }
         }
         mGroups.add(group);
+    }
+
+    /**
+     * Add a group to the user
+     *
+     * @param node the node to add.
+     */
+    public void addNode(Group node) {
+        if (node.getId().getId() != 0) {
+            for (Group prevGroup : mGroups) {
+                if (prevGroup.getId().getId().equals(node.getId().getId())) {
+                    return;
+                }
+            }
+            for (Node prevGroup : mNodes) {
+                if (prevGroup.getId().getId().equals(node.getId().getId())) {
+                    return;
+                }
+            }
+        }
+        mNodes.add(node);
     }
 
     /**
@@ -112,6 +136,15 @@ public class ClientUser extends User {
     }
 
     /**
+     * Remove a User from the entourage.
+     *
+     * @param user the user to remove.
+     */
+    public void removeUserFromEntourage(User user) {
+        mEntourage.remove(Objects.requireNonNull(user));
+    }
+
+    /**
      * Gets an unmodifiable list of users.
      *
      * @return The list of user connected to this user.
@@ -121,30 +154,15 @@ public class ClientUser extends User {
     }
 
     /**
-     * The group comparator.
-     */
-    private final Comparator<Group> mComparator = new Comparator<Group>() {
-
-        @Override
-        public int compare(Group lhs, Group rhs) {
-            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
-        }
-    };
-
-    /**
      * Activates the group when we received confirmation from the server.
      *
      * @param id The id of the group to activate.
      */
-    //TODO: to be changed when response from server changed
-    //TODO: use ref to know which Group to activate
-    public void activateGroup(Id id) {
-        for (Group group : mGroups) {
-            if (!group.isValidated()) {
-                group.setValidated();
-                group.setId(id);
-            }
-        }
+    public void activateGroup(Date ref, Id id) {
+        Group group = getGroupFromRef(ref);
+        group.setId(id);
+        group.setValidated();
+        group.setLastUpdate(new Date());
     }
 
     /**
@@ -160,7 +178,7 @@ public class ClientUser extends User {
                 return group;
             }
         }
-        return null;
+        return getCommentGroup(groupId);
     }
 
     /**
@@ -196,4 +214,56 @@ public class ClientUser extends User {
 
         return null;
     }
+
+    /**
+     * Getter for a Node from the connected nodes.
+     * Returns null if the Id of the Node is not in the entourage.
+     *
+     * @param nodeId The id of the Node.
+     * @return The User from the entourage with the same id or null
+     * if there is no User with that Id in the entourage.
+     */
+    public Group getNodeFromId(Id nodeId) {
+        for (Group node : mNodes) {
+            if (nodeId.equals(node.getId())) {
+                return node;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Getter for a Node from the connected nodes.
+     * Returns null if the Id of the Node is not in the entourage.
+     *
+     * @return The User from the entourage with the same id or null
+     * if there is no User with that Id in the entourage.
+     */
+    public Group getGroupFromRef(Date ref) {
+        for (Group node : mNodes) {
+            if (node.getRef() != null && node.getRef().compareTo(ref) == 0) {
+                return node;
+            }
+        }
+        for (Group group : mGroups) {
+            if (group.getRef() != null && group.getRef().compareTo(ref) == 0) {
+                return group;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The group comparator.
+     */
+    private final Comparator<Group> mComparator = new Comparator<Group>() {
+
+        @Override
+        public int compare(Group lhs, Group rhs) {
+            return rhs.getLastUpdate().compareTo(lhs.getLastUpdate());
+        }
+    };
+
 }

@@ -13,8 +13,8 @@ import yields.server.utils.Temporal
   *
   * @param nid media id
   *
-  *            Special field :
-  *            nodes:[nid]   -> hash  hash / path / contentType
+  * Special field :
+  * nodes:[nid]   -> hash  hash / path / contentType
   *
   */
 class Media private(nid: NID) extends Node(nid) {
@@ -27,7 +27,6 @@ class Media private(nid: NID) extends Node(nid) {
 
   private var _filename: Option[String] = None
   private var _contentType: Option[String] = None
-  // private var _path: Option[String] = None
 
   /** Media content getter */
   def content: Blob = {
@@ -49,20 +48,23 @@ class Media private(nid: NID) extends Node(nid) {
     writeContentOnDisk(_filename.getOrElse(throw new MediaException("name is empty")), content)
   }
 
+  /** filename getter */
   def filename: String = _filename.getOrElse {
     _filename = redis(_.hget[String](NodeKey.node, MediaKey.hash))
     valueOrException(_filename)
   }
 
-  /** Store the hash in the database to easily retrieve the content from the disk */
+  /** filename setter */
   private def filename_=(filename: String): Unit = {
     _filename = update(NodeKey.node, MediaKey.hash, filename)
   }
 
+  /** content type getter */
   private def contentType_=(contentType: String): Unit = {
     _contentType = update(NodeKey.node, MediaKey.contentType, contentType)
   }
 
+  /** content type setter */
   def contentType: String = _contentType.getOrElse {
     _contentType = redis(_.hget[String](NodeKey.node, MediaKey.contentType))
     valueOrDefault(_contentType, "")
@@ -119,10 +121,12 @@ object Media {
     models.checkFileExist(filename)
   }
 
+  /** delete a media on disk */
   def deleteContentOnDisk(nid: NID): Unit = {
     models.deleteContentOnDisk(nid)
   }
 
+  /** get path from a filename */
   def buildPathFromName(name: String): String = {
     models.buildPathFromName(name)
   }
