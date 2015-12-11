@@ -167,19 +167,25 @@ public class ResponseHandlerTests {
     @Test
     public void handlePublisherInfoResponseTest() throws JSONException {
         String response = "{\"kind\":\"PublisherInfoRes\",\"message\":{\"name\":\"Toto\",\"tags\":[],\"" +
-                "users\":[],\"nodes\":[],\"pic\":\"\",\"nid\":258},\"metadata\":{\"client\":6,\"datetime\"" +
+                "users\":[2],\"nodes\":[3],\"pic\":\"\",\"nid\":258},\"metadata\":{\"client\":6,\"datetime\"" +
                 ":\"2015-12-10T18:20:48.005Z\",\"ref\":\"2015-12-10T19:20:47.204+01:00\"}}";
         mHandler.handlePublisherInfoResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
+        assertEquals("Toto", mCacheDatabaseHelper.mLastGroupAdded.getName());
+        assertEquals("2", mCacheDatabaseHelper.mLastGroupAdded.getUsers().get(0).getId().getId().toString());
+        assertEquals("3", mCacheDatabaseHelper.mLastGroupAdded.getNodes().get(0).getId().getId().toString());
+        assertEquals("258", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
     }
 
     @Test
-    public void handlePublisherMessageResponseTest() throws JSONException {
+    public void handlePublisherMessageResponseTest() throws JSONException, ParseException {
         String response = "{\"kind\":\"PublisherMessageRes\",\"message\":{\"nid\":10,\"datetime\":" +
                 "\"2015-12-10T20:31:52.079Z\"},\"metadata\":{\"client\":1,\"datetime\":\"2015-12-10T20:31:52.080Z\"" +
                 ",\"ref\":\"2015-12-10T21:31:51.784+01:00\"}}";
         mHandler.handlePublisherMessageResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.MESSAGES_RECEIVE, mService.mLastChange);
+        assertEquals(DateSerialization.dateSerializer.toDate("2015-12-10T20:31:52.079Z"),
+                mCacheDatabaseHelper.mLastMessageAdded.getDate());
     }
 
     @Test
@@ -187,25 +193,32 @@ public class ResponseHandlerTests {
         String response = "{\"kind\":\"RSSCreateRes\",\"message\":{\"nid\":10},\"metadata\":{\"client\"" +
                 ":2,\"datetime\":\"2015-12-10T23:17:22.044Z\",\"ref\":\"2015-12-11T00:17:20.749+01:00\"}}";
         mHandler.handleRSSCreateResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.RSS_CREATE, mService.mLastChange);
     }
 
     @Test
     public void handleUserUpdateBroadcastTest() throws JSONException {
         String response = "{\"kind\":\"UserUpdateBrd\",\"message\":{\"uid\":2,\"email\":" +
-                "\"ncasademont@gmail.com\",\"name\":\"Trofleb\",\"pic\":\"\"},\"metadata\":{\"client\":0," +
+                "\"ncmont@gmail.com\",\"name\":\"Trofleb\",\"pic\":\"\"},\"metadata\":{\"client\":0," +
                 "\"datetime\":\"2015-12-10T23:47:42.405Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
         mHandler.handleUserUpdateBroadcast(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.ENTOURAGE_UPDATE, mService.mLastChange);
+        assertEquals("Trofleb", mCacheDatabaseHelper.mLastUserAdded.getName());
+        assertEquals("ncmont@gmail.com", mCacheDatabaseHelper.mLastUserAdded.getEmail());
+        assertEquals("2", mCacheDatabaseHelper.mLastUserAdded.getId().getId().toString());
     }
 
     @Test
     public void handleGroupCreateBroadcastTest() throws JSONException {
         String response = "{\"kind\":\"GroupCreateBrd\",\"message\":{\"nid\":10,\"name\":\"test\"," +
-                "\"users\":[2,3],\"nodes\":[]},\"metadata\":{\"client\":0,\"datetime\":" +
+                "\"users\":[2,4],\"nodes\":[3]},\"metadata\":{\"client\":0,\"datetime\":" +
                 "\"2015-12-10T23:41:07.453Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
         mHandler.handleGroupCreateBroadcast(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
+        assertEquals("test", mCacheDatabaseHelper.mLastGroupAdded.getName());
+        assertEquals("2", mCacheDatabaseHelper.mLastGroupAdded.getUsers().get(0).getId().getId().toString());
+        assertEquals("3", mCacheDatabaseHelper.mLastGroupAdded.getNodes().get(0).getId().getId().toString());
+        assertEquals("10", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
     }
 
     @Test
@@ -214,16 +227,19 @@ public class ResponseHandlerTests {
                 "\"nodes\":[],\"pic\":\"\",\"nid\":37},\"metadata\":{\"client\":0,\"datetime\":" +
                 "\"2015-12-10T23:41:57.693Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
         mHandler.handleGroupUpdateBroadcast(new Response(response));
-
     }
 
     @Test
     public void handlePublisherCreateBroadcastTest() throws JSONException {
         String response = "{\"kind\":\"PublisherCreateBrd\",\"message\":{\"nid\":10,\"name\":\"tewt\"" +
-                ",\"users\":[2,3],\"nodes\":[]},\"metadata\":{\"client\":0,\"datetime\":" +
+                ",\"users\":[2],\"nodes\":[3,4]},\"metadata\":{\"client\":0,\"datetime\":" +
                 "\"2015-12-10T23:48:12.124Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
         mHandler.handlePublisherCreateBroadcast(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
+        assertEquals("tewt", mCacheDatabaseHelper.mLastGroupAdded.getName());
+        assertEquals("2", mCacheDatabaseHelper.mLastGroupAdded.getUsers().get(0).getId().getId().toString());
+        assertEquals("3", mCacheDatabaseHelper.mLastGroupAdded.getNodes().get(0).getId().getId().toString());
+        assertEquals("10", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
     }
 
     @Test
@@ -259,7 +275,8 @@ public class ResponseHandlerTests {
         String response = "{\"kind\":\"GroupCreateRes\",\"message\":{\"nid\":10},\"metadata\":{" +
                 "\"client\":10,\"datetime\":\"2015-12-10T22:48:23.553Z\",\"ref\":\"2015-12-10T22:48:23.553Z\"}}";
         mHandler.handleGroupCreateResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
+        assertEquals("10", mCacheDatabaseHelper.mLastGroupAdded.getId().getId().toString());
     }
 
     @Test
