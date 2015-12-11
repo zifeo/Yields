@@ -30,7 +30,7 @@ public class NodeInfoRequest extends ServiceRequest {
      */
     @Override
     public RequestKind getType() {
-        return RequestKind.GROUP_INFO;
+        return RequestKind.NODE_INFO;
     }
 
     /**

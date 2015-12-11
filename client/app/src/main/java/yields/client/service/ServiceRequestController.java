@@ -151,6 +151,9 @@ public class ServiceRequestController {
             case GROUP_INFO:
                 mRequestHandler.handleGroupInfoRequest(serviceRequest);
                 break;
+            case NODE_INFO:
+                mRequestHandler.handleNodeInfoRequest(serviceRequest);
+                break;
             case GROUP_UPDATE_NAME:
                 mRequestHandler.handleGroupUpdateNameRequest((GroupUpdateNameRequest) serviceRequest);
                 break;

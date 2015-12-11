@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.renderscript.RenderScript;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -315,6 +316,9 @@ public class YieldService extends Service {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setLargeIcon(group.getImage())
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                         .setContentTitle("Message from " + YieldsApplication
                                 .getNodeFromId(message.getSender()).getName())
                         .setContentText(message.getContent().getTextForRequest().substring(0,
