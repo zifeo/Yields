@@ -3,61 +3,33 @@ package yields.client.service;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import yields.client.activities.MockFactory;
 import yields.client.activities.NotifiableActivity;
 import yields.client.cache.CacheDatabaseHelper;
 import yields.client.id.Id;
-import yields.client.messages.Content;
-import yields.client.messages.ImageContent;
 import yields.client.messages.Message;
 import yields.client.messages.TextContent;
-import yields.client.messages.UrlContent;
 import yields.client.node.ClientUser;
 import yields.client.node.Group;
-
 import yields.client.node.User;
 import yields.client.serverconnection.DateSerialization;
-import yields.client.serverconnection.ImageSerialization;
-import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
-import yields.client.serverconnection.YieldEmulatorSocketProvider;
-import yields.client.service.RequestHandler;
-import yields.client.service.ServiceRequestController;
-import yields.client.service.YieldService;
-import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupMessageRequest;
-import yields.client.servicerequest.GroupUpdateImageRequest;
-import yields.client.servicerequest.GroupUpdateNameRequest;
-import yields.client.servicerequest.GroupUpdateUsersRequest;
-import yields.client.servicerequest.ServiceRequest;
-import yields.client.servicerequest.UserEntourageAddRequest;
-import yields.client.servicerequest.UserEntourageRemoveRequest;
-import yields.client.servicerequest.UserGroupListRequest;
-import yields.client.servicerequest.UserUpdateNameRequest;
-import yields.client.servicerequest.UserUpdateRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 public class ResponseHandlerTests {
@@ -282,11 +254,25 @@ public class ResponseHandlerTests {
     @Test
     public void handleUserInfoResponseTest() throws JSONException {
         String response = "{\"kind\":\"UserInfoRes\",\"message\":{\"name\":\"test\",\"email\":" +
-                "\"teo@zifeo.com\",\"entourage\":[],\"entourageUpdatedAt\":[],\"uid\":3,\"pic\":\"" +
+                "\"dsf@zifeo.com\",\"entourage\":[],\"entourageUpdatedAt\":[],\"uid\":3,\"pic\":\"" +
                 "\"},\"metadata\":{\"client\":2,\"datetime\":\"2015-12-10T23:27:43.269Z\",\"ref\":" +
                 "\"2015-12-11T00:27:42.220+01:00\"}}";
         mHandler.handleUserInfoResponse(new Response(response));
+        assertEquals("test", mCacheDatabaseHelper.mLastUserAdded.getName());
+        assertEquals("dsf@zifeo.com", mCacheDatabaseHelper.mLastUserAdded.getEmail());
+        assertEquals("3", mCacheDatabaseHelper.mLastUserAdded.getId().getId().toString());
+    }
 
+    @Test
+    public void handleUserInfoResponseTest2() throws JSONException {
+        String response = "{\"kind\":\"UserInfoRes\",\"message\":{\"name\":\"test\",\"email\":" +
+                "\"dsf@zifeo.com\",\"entourage\":[],\"entourageUpdatedAt\":[],\"uid\":10,\"pic\":\"" +
+                "\"},\"metadata\":{\"client\":2,\"datetime\":\"2015-12-10T23:27:43.269Z\",\"ref\":" +
+                "\"2015-12-11T00:27:42.220+01:00\"}}";
+        mHandler.handleUserInfoResponse(new Response(response));
+        assertEquals("test", mCacheDatabaseHelper.mLastUserAdded.getName());
+        assertEquals("dsf@zifeo.com", mCacheDatabaseHelper.mLastUserAdded.getEmail());
+        assertEquals("10", mCacheDatabaseHelper.mLastUserAdded.getId().getId().toString());
     }
 
     @Test
@@ -296,7 +282,7 @@ public class ResponseHandlerTests {
                 "],\"refreshedAt\":[\"2015-12-10T20:55:21.121Z\",\"2015-12-10T21:00:47.771Z\"]},\"metadata\"" +
                 ":{\"client\":1,\"datetime\":\"2015-12-10T22:33:30.942Z\",\"ref\":\"2015-12-10T23:33:30.199+01:00\"}}";
         mHandler.handleUserGroupListResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
     }
 
     @Test
@@ -305,7 +291,7 @@ public class ResponseHandlerTests {
                 "\"metadata\":{\"client\":0,\"datetime\":\"2015-12-10T23:28:14.147Z\",\"ref\":" +
                 "\"2015-12-11T00:28:13.137+01:00\"}}";
         mHandler.handleUserConnectResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.NEW_USER, mService.mLastChange);
     }
 
     @Test
@@ -315,7 +301,6 @@ public class ResponseHandlerTests {
                 "\"metadata\":{\"client\":2,\"datetime\":\"2015-12-10T23:28:05.105Z\",\"ref\":" +
                 "\"2015-12-11T00:28:04.068+01:00\"}}";
         mHandler.handleNodeHistoryResponse(new Response(response));
-
     }
 
     @Test
@@ -326,26 +311,25 @@ public class ResponseHandlerTests {
     }
 
     @Test
-    public void handleMediaMessageResponseTest() throws JSONException {
+    public void handleMediaMessageResponseTest() throws JSONException, ParseException {
         String response = "{\"kind\":\"MediaMessageRes\",\"message\":{\"nid\":10,\"datetime\":" +
                 "\"2015-12-10T18:01:51.460Z\"},\"metadata\":{\"client\":1,\"datetime\":" +
                 "\"2015-12-10T18:01:51.461Z\",\"ref\":\"2015-12-10T19:01:51.412+01:00\"}}";
         mHandler.handleMediaMessageResponse(new Response(response));
-
+        assertEquals(NotifiableActivity.Change.MESSAGES_RECEIVE, mService.mLastChange);
+        assertEquals(DateSerialization.dateSerializer.toDate("2015-12-10T18:01:51.460Z"),
+                mCacheDatabaseHelper.mLastMessageAdded.getDate());
     }
 
     @Test
-    public void handleNodeMessageBroadcastTest() throws JSONException {
+    public void handleNodeMessageBroadcastTest() throws JSONException, ParseException {
         String response = "{\"kind\":\"NodeMessageBrd\",\"message\":{\"nid\":10,\"datetime\":" +
                 "\"2015-12-10T23:39:34.013Z\",\"sender\":2,\"text\":\"hcjcjvcjcjcj\"},\"metadata\"" +
                 ":{\"client\":0,\"datetime\":\"2015-12-10T23:39:34.019Z\",\"ref\":\"-999999999-01-01T00:00+18:00\"}}";
         mHandler.handleNodeMessageBroadcast(new Response(response));
-
+        assertEquals(DateSerialization.dateSerializer.toDate("2015-12-10T23:39:34.013Z"),
+                mCacheDatabaseHelper.mLastMessageAdded.getDate());
     }
-
-
-
-
 
     private class MockYieldsService extends YieldService {
 
