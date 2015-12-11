@@ -2,9 +2,7 @@ package yields.client.messages;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.SystemClock;
@@ -16,32 +14,20 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
 
 import yields.client.R;
 import yields.client.activities.MessageActivity;
-import yields.client.activities.MockFactory;
 import yields.client.exceptions.CommentViewException;
-import yields.client.exceptions.ContentException;
 import yields.client.generalhelpers.MockModel;
 import yields.client.id.Id;
-import yields.client.node.ClientUser;
 import yields.client.node.User;
-import yields.client.serverconnection.DateSerialization;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**

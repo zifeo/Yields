@@ -1,15 +1,12 @@
 package yields.client.messages;
 
 import android.graphics.Bitmap;
-import android.nfc.NdefMessage;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 
