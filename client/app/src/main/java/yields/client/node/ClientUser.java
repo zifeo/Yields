@@ -124,7 +124,7 @@ public class ClientUser extends User {
      */
     public List<Group> getUserGroups() {
         Collections.sort(mGroups, mComparator);
-        return Collections.unmodifiableList(mGroups);
+        return new ArrayList<>(mGroups);
     }
 
     /**
@@ -227,6 +227,12 @@ public class ClientUser extends User {
      */
     public Group getNodeFromId(Id nodeId) {
         for (Group node : mNodes) {
+            if (nodeId.equals(node.getId())) {
+                return node;
+            }
+        }
+
+        for (Group node : mGroups) {
             if (nodeId.equals(node.getId())) {
                 return node;
             }

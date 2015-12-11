@@ -31,7 +31,7 @@ case class PublisherMessage(nid: NID, text: Option[String], contentType: Option[
     Yields.broadcast(users)(bcast)
 
     Publisher(nid).receivers.map(Node(_)).foreach { node =>
-      Yields.broadcast(node.receivers)(bcast.copy(nid = node.nid, sender = nid))
+      Yields.broadcast(node.users)(bcast.copy(nid = node.nid, sender = nid))
     }
   }
 
