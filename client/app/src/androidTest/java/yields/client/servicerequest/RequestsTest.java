@@ -107,7 +107,7 @@ public class RequestsTest {
     }
 
     @Test
-    public void testGroupUpdateUsersRequestTest() {
+    public void testGroupUpdateUsersAddRequestTest() {
         List<User> newUsers = new ArrayList<>();
         newUsers.add(mUser);
         GroupUpdateUsersRequest req = new GroupUpdateUsersRequest(mUser.getId(), mGroup.getId(),
@@ -117,6 +117,22 @@ public class RequestsTest {
         assertEquals(GroupUpdateUsersRequest.UpdateType.ADD, req.getUpdateType());
         assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_USERS, req.getType());
         String mes = req.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, mGroup.getId());
+    }
+
+    @Test
+    public void testGroupUpdateUsersRemoveRequestTest() {
+        List<User> newUsers = new ArrayList<>();
+        newUsers.add(mUser);
+        GroupUpdateUsersRequest req = new GroupUpdateUsersRequest(mUser.getId(), mGroup.getId(),
+                newUsers, GroupUpdateUsersRequest.UpdateType.REMOVE,
+                Group.GroupType.PRIVATE);
+        assertEquals(mGroup.getId(), req.getGroupId());
+        assertEquals(GroupUpdateUsersRequest.UpdateType.REMOVE, req.getUpdateType());
+        assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_USERS, req.getType());
+        String mes = req.parseRequestForServer().message();
+        assertTrue(req.getUsersToUpdate().contains(mUser));
         assertContains(mes, mUser.getId());
         assertContains(mes, mGroup.getId());
     }
@@ -228,7 +244,7 @@ public class RequestsTest {
         assertContains(mes, mUser.getId());
     }
 
-    @Test
+        @Test
     public void testGroupUpdateNodesAddRequest() {
         List<Id> users = new ArrayList<>();
         users.add(mUser.getId());
@@ -267,6 +283,43 @@ public class RequestsTest {
     }
 
     @Test
+    public void testGroupUpdateTagsAddRequest() {
+        List<Id> users = new ArrayList<>();
+        users.add(mUser.getId());
+
+
+        Group.Tag tag = new Group.Tag("hello");
+        List<Group.Tag> tags = new ArrayList<>();
+        tags.add(tag);
+
+        GroupUpdateTagsRequest serviceRequest = new GroupUpdateTagsRequest(mUser.getId(), mGroup.getId(), tags,
+                GroupUpdateTagsRequest.UpdateType.ADD, mGroup.getType());
+        assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_TAGS, serviceRequest.getType());
+        String mes = serviceRequest.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, serviceRequest.getType().getValue());
+    }
+
+    @Test
+    public void testGroupUpdateTagsRemoveRequest() {
+        List<Id> users = new ArrayList<>();
+        users.add(mUser.getId());
+
+
+        Group.Tag tag = new Group.Tag("hello");
+        List<Group.Tag> tags = new ArrayList<>();
+        tags.add(tag);
+
+        GroupUpdateTagsRequest serviceRequest = new GroupUpdateTagsRequest(mUser.getId(), mGroup.getId(), tags,
+                GroupUpdateTagsRequest.UpdateType.REMOVE, mGroup.getType());
+        assertEquals(ServiceRequest.RequestKind.GROUP_UPDATE_TAGS, serviceRequest.getType());
+        String mes = serviceRequest.parseRequestForServer().message();
+        assertContains(mes, mUser.getId());
+        assertContains(mes, serviceRequest.getType().getValue());
+    }
+
+
+    @Test
     public void testRSSCreateRequest(){
         List<Id> users = new ArrayList<>();
         users.add(mUser.getId());
@@ -281,6 +334,9 @@ public class RequestsTest {
     @Test
     public void testNodeInfoRequest(){
         NodeInfoRequest nodeInfoRequest = new NodeInfoRequest(mUser.getId(), mClientUser.getId());
+        String mes = nodeInfoRequest.parseRequestForServer().message();
+        assertEquals(ServiceRequest.RequestKind.NODE_INFO, nodeInfoRequest.getType());
+        assertContains(mes, mUser.getId());
     }
 
     private void assertContains(Object container, Object given) {
