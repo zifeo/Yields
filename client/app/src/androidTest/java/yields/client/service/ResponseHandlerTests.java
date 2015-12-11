@@ -321,7 +321,7 @@ public class ResponseHandlerTests {
                 "Group\",\"Group\"],\"updatedAt\":[\"2015-12-10T20:55:21.121Z\",\"2015-12-10T21:00:47.771Z\"" +
                 "],\"refreshedAt\":[\"2015-12-10T20:55:21.121Z\",\"2015-12-10T21:00:47.771Z\"]},\"metadata\"" +
                 ":{\"client\":1,\"datetime\":\"2015-12-10T22:33:30.942Z\",\"ref\":\"2015-12-10T23:33:30.199+01:00\"}}";
-        mHandler.handleUserGroupListResponse(new Response(response));
+        mHandler.handleUserNodeListResponse(new Response(response));
         assertEquals(NotifiableActivity.Change.GROUP_LIST, mService.mLastChange);
     }
 
