@@ -64,6 +64,7 @@ final class RSSPooler extends Actor with ActorLogging {
           val media = Media.create(Media.ContentType.url, link, rss.nid)
           media.addUser(node.users)
           val text = s"$title $link"
+          node.addMessage((now, rss.nid, Some(media.nid), text))
           Yields.broadcast(node.users) {
             NodeMessageBrd(node.nid, now, rss.nid, Some(text),
               Some(media.contentType), Some(media.content), Some(media.nid))

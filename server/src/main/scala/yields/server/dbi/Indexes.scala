@@ -70,11 +70,11 @@ private[dbi] object Indexes {
     val lookup = redis[Option[(Option[Int], Option[List[Option[String]]])]] (_.scan[String](
       0,
       s"$base:*$name*".toLowerCase,
-      fuzycount)
-    )
+      Integer.MAX_VALUE
+    ))
 
     val keys = lookup match {
-      case Some((_, Some(matches))) => matches.flatten
+      case Some((_, Some(matches))) => matches.flatten.take(fuzycount)
       case _ => List.empty
     }
 
