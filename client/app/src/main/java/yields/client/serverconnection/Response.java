@@ -65,7 +65,7 @@ public class Response {
         this.mResponseObj = new JSONObject(rawResponse);
         mKind = ResKind.getEnumByName(mResponseObj.getString("kind"));
         if (mKind == null) {
-            throw new JSONException("mKind is not known");
+            throw new JSONException("mKind is not known " + mResponseObj.getString("kind"));
         }
     }
 
