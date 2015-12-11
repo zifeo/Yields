@@ -101,15 +101,12 @@ public class ResponseHandler {
                 groupList.add(new Group(nodeName, id, new ArrayList<Id>(), image));
             }
 
-            Date ref = DateSerialization
-                    .dateSerializer.toDate(serverResponse.getMetadata().getString("ref"));
-
             YieldsApplication.getGroupsSearched().clear();
             YieldsApplication.getGroupsSearched().addAll(groupList);
 
             mService.notifyChange(NotifiableActivity.Change.GROUP_SEARCH);
 
-        } catch (JSONException | ParseException e) {
+        } catch (JSONException e) {
             Log.d("Y:" + this.getClass().getName(), "failed to parse response : " +
                     serverResponse.object().toString());
         }
