@@ -23,7 +23,6 @@ import yields.client.serverconnection.DateSerialization;
 import yields.client.serverconnection.ImageSerialization;
 import yields.client.serverconnection.Response;
 import yields.client.servicerequest.GroupCreateRequest;
-import yields.client.servicerequest.GroupInfoRequest;
 import yields.client.servicerequest.NodeHistoryRequest;
 import yields.client.servicerequest.NodeInfoRequest;
 import yields.client.servicerequest.ServiceRequest;
@@ -139,6 +138,11 @@ public class ResponseHandler {
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
 
+            long nid = response.getLong("nid");
+            Id gId = new Id(nid);
+            Group group = YieldsApplication.getUser().getGroup(gId);
+
+
             ArrayList<Id> userList = new ArrayList<>();
             for (int i = 0; i < users.length(); i++) {
                 Id userId = new Id(users.getLong(i));
@@ -165,10 +169,8 @@ public class ResponseHandler {
                 }
             }
 
-            long nid = response.getLong("nid");
             String name = response.getString("name");
             String image = response.getString("pic");
-            Group group = YieldsApplication.getUser().getGroup(new Id(nid));
             group.setName(name);
             if (!image.equals("")) {
                 group.setImage(ImageSerialization.unSerializeImage(image));
@@ -249,50 +251,62 @@ public class ResponseHandler {
             JSONObject response = serverResponse.getMessage();
             JSONArray users = response.getJSONArray("users");
             JSONArray nodes = response.getJSONArray("nodes");
-
-            ArrayList<Id> userList = new ArrayList<>();
-            for (int i = 0; i < users.length(); i++) {
-                Id userId = new Id(users.getLong(i));
-                userList.add(userId);
-                if (YieldsApplication.getUserFromId(userId) == null) {
-                    User newUser = new User(userId);
-                    YieldsApplication.addNotKnown(newUser);
-                    ServiceRequest userInfo =
-                            new UserInfoRequest(YieldsApplication.getUser(), userId);
-                    mService.sendRequest(userInfo);
-                }
-            }
-
-            ArrayList<Id> nodeList = new ArrayList<>();
-            for (int i = 0; i < nodes.length(); i++) {
-                Id nodeId = new Id(nodes.getLong(i));
-                nodeList.add(nodeId);
-                if (YieldsApplication.getNodeFromId(nodeId) == null) {
-                    Group newNode = new Group("", nodeId, new ArrayList<Id>());
-                    YieldsApplication.getUser().addNode(newNode);
-                    ServiceRequest nodeInfo =
-                            new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
-                    mService.sendRequest(nodeInfo);
-                }
-            }
-
-            long nid = response.getLong("nid");
+            JSONArray tags = response.getJSONArray("tags");
             String name = response.getString("name");
+            long nid = response.getLong("nid");
             String image = response.getString("pic");
+
+            Bitmap pic = image.equals("") ? YieldsApplication.getDefaultGroupImage() : ImageSerialization
+                    .unSerializeImage(image);
+
             Group group = YieldsApplication.getUser().getGroup(new Id(nid));
 
-            if (group == null) {
+            if (group != null) {
+                ArrayList<Id> userList = new ArrayList<>();
+                for (int i = 0; i < users.length(); i++) {
+                    Id userId = new Id(users.getLong(i));
+                    userList.add(userId);
+                    if (YieldsApplication.getUserFromId(userId) == null) {
+                        User newUser = new User(userId);
+                        YieldsApplication.addNotKnown(newUser);
+                        ServiceRequest userInfo =
+                                new UserInfoRequest(YieldsApplication.getUser(), userId);
+                        mService.sendRequest(userInfo);
+                    }
+                }
+
+                ArrayList<Id> nodeList = new ArrayList<>();
+                for (int i = 0; i < nodes.length(); i++) {
+                    Id nodeId = new Id(nodes.getLong(i));
+                    nodeList.add(nodeId);
+                    if (YieldsApplication.getNodeFromId(nodeId) == null) {
+                        Group newNode = new Group("", nodeId, new ArrayList<Id>());
+                        YieldsApplication.getUser().addNode(newNode);
+                        ServiceRequest nodeInfo =
+                                new NodeInfoRequest(YieldsApplication.getUser().getId(), nodeId);
+                        mService.sendRequest(nodeInfo);
+                    }
+                }
+
+                group.updateNodes(nodeList);
+                group.updateUsers(userList);
+
+            }else {
                 group = YieldsApplication.getUser().getNodeFromId(new Id(nid));
-            } else {
-                ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
-                mService.sendRequest(historyRequest);
+                group = new Group(name, new Id(nid), new ArrayList<Id>(), pic,
+                        Group.GroupType.PUBLISHER, true, new Date());
+                for (int i = 0; i < tags.length(); i++) {
+                    group.addTag(new Group.Tag(tags.getString(i)));
+                }
+                YieldsApplication.getUser().addNode(group);
             }
 
             group.setName(name);
-            if (!image.equals("")) {
-                group.setImage(ImageSerialization.unSerializeImage(image));
-            }
+            group.setImage(pic);
             group.setType(Group.GroupType.PUBLISHER);
+
+            ServiceRequest historyRequest = new NodeHistoryRequest(group.getId(), new Date());
+            mService.sendRequest(historyRequest);
 
             mCacheHelper.addGroup(group);
             mService.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -699,10 +713,10 @@ public class ResponseHandler {
     /**
      * Handles the appropriate Response which is given to it by argument.
      */
-    protected void handleUserGroupListResponse(Response serverResponse) {
+    protected void handleUserNodeListResponse(Response serverResponse) {
         try {
             JSONObject response = serverResponse.getMessage();
-            JSONArray groupsId = response.getJSONArray("groups");
+            JSONArray groupsId = response.getJSONArray("nodes");
             JSONArray updatedAt = response.getJSONArray("updatedAt");
             JSONArray refreshedAt = response.getJSONArray("refreshedAt");
 
