@@ -66,6 +66,7 @@ public class MessageActivity extends NotifiableActivity {
     private static EditText mInputField;
     private static ActionBar mActionBar;
     private static TextView mTextTitle;
+    private Group mPrevGroup;
     private Menu mMenu;
 
     private ServiceConnection mConnection;
@@ -112,6 +113,7 @@ public class MessageActivity extends NotifiableActivity {
             public void onClick(View v) {
                 if (mType == ContentType.GROUP_MESSAGES) {
                     YieldsApplication.setInfoGroup(mGroup);
+                    mPrevGroup = mGroup;
                     Intent intent = new Intent(MessageActivity.this, GroupInfoActivity.class);
                     intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
                     startActivity(intent);
@@ -141,7 +143,6 @@ public class MessageActivity extends NotifiableActivity {
                 if (mGroup == null) {
                     mGroup = mUser.getCommentGroup(groupId);
                     if (mGroup == null) {
-                        YieldsApplication.setGroup(mGroup);
                         mType = ContentType.MESSAGE_COMMENTS;
                         createCommentFragment();
                     } else {
@@ -153,16 +154,14 @@ public class MessageActivity extends NotifiableActivity {
                     mType = ContentType.GROUP_MESSAGES;
                     createGroupMessageFragment();
                 }
-
-                Log.d("Delete", groupId.getId().toString());
-                YieldsApplication.getBinder().cancelNotificationFromId(groupId);
-
             }
         } else {
             mGroup = YieldsApplication.getGroup();
             mType = ContentType.GROUP_MESSAGES;
             createGroupMessageFragment();
         }
+
+        YieldsApplication.getBinder().cancelNotificationFromId(mGroup.getId());
 
         if (YieldsApplication.getBinder() != null) {
             NodeHistoryRequest historyRequest = new NodeHistoryRequest(mGroup.getId(), new Date());
@@ -376,8 +375,14 @@ public class MessageActivity extends NotifiableActivity {
 
             case R.id.actionSettingsGroup:
                 Log.d("MessageActivity", "actionSettingsGroup.");
-                Intent intent = new Intent(this, GroupSettingsActivity.class);
-                startActivity(intent);
+
+                if (getType() == ContentType.GROUP_MESSAGES) {
+                    YieldsApplication.setInfoGroup(mGroup);
+
+                    Intent intent = new Intent(this, GroupSettingsActivity.class);
+                    startActivity(intent);
+                }
+
                 return true;
 
             case R.id.iconConnect:
@@ -513,7 +518,7 @@ public class MessageActivity extends NotifiableActivity {
         YieldsApplication.getBinder().attachActivity(this);
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         assert (mType == ContentType.MESSAGE_COMMENTS);
-        mTextTitle.setText("Message from " + YieldsApplication.getUserFromId(mCommentMessage.getSender())
+        mTextTitle.setText("Message from " + YieldsApplication.getNodeFromId(mCommentMessage.getSender())
                 .getName());
         mCurrentFragment = new CommentFragment();
         retrieveCommentMessages();
@@ -528,12 +533,14 @@ public class MessageActivity extends NotifiableActivity {
                         case IMAGE:
                             YieldsApplication.setShownImage(((ImageContent) mCommentMessage.getContent()).
                                     getImage());
+                            mPrevGroup = mGroup;
                             startActivity(new Intent(MessageActivity.this, ImageShowPopUp.class));
                             break;
 
                         case URL:
                             String url = ((UrlContent) mCommentMessage.getContent()).getUrl();
                             Log.d("MessageActivity", "Open URL in browser : " + url);
+                            mPrevGroup = mGroup;
                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                             startActivity(browserIntent);
                             break;
@@ -635,22 +642,21 @@ public class MessageActivity extends NotifiableActivity {
         Log.d("MessageActivity", "retrieveGroupMessages");
         SortedMap<Date, Message> messagesTree = mGroup.getLastMessages();
 
-        if (mGroupMessageAdapter.getCount() < messagesTree.size()) {
-            mGroupMessageAdapter.clear();
-            Log.d("Y:" + this.getClass().getName(), "Cleared message adapter");
-
-            for (Message message : messagesTree.values()) {
-                mGroupMessageAdapter.add(message);
-            }
-            Log.d("Y:" + this.getClass().getName(), "Added most recent messages in adapter");
-        }
-
         ListView listView = ((GroupMessageFragment) mCurrentFragment).getMessageListView();
 
-        if (mGroupMessageAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
-            listView.setSelection(mGroupMessageAdapter.getCount() - 1);
+        int count = mGroupMessageAdapter.getCount();
+
+        mGroupMessageAdapter.clear();
+
+        for (Message message : messagesTree.values()) {
+            mGroupMessageAdapter.add(message);
+        }
+        mGroupMessageAdapter.notifyDataSetChanged();
+
+        if (mGroupMessageAdapter.getCount() - count > 3) {
+            listView.setSelection(mGroupMessageAdapter.getCount());
         } else {
-            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount() - 1);
+            listView.smoothScrollToPosition(mGroupMessageAdapter.getCount());
         }
 
         mGroupMessageAdapter.notifyDataSetChanged();
@@ -670,11 +676,7 @@ public class MessageActivity extends NotifiableActivity {
 
         ListView listView = ((CommentFragment) mCurrentFragment).getCommentListView();
 
-        if (mCommentAdapter.getCount() - listView.getSelectedItemPosition() > 3) {
-            listView.setSelection(mCommentAdapter.getCount() - 1);
-        } else {
-            listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
-        }
+        listView.smoothScrollToPosition(mCommentAdapter.getCount() - 1);
 
         mCommentAdapter.notifyDataSetChanged();
     }

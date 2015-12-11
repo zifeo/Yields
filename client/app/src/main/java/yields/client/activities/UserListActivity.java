@@ -21,7 +21,7 @@ import yields.client.yieldsapplication.YieldsApplication;
 /**
  * Class used to display a list of users, set in YieldsApplication
  */
-public class UserListActivity extends AppCompatActivity {
+public class UserListActivity extends NotifiableActivity {
 
     private ListAdapterUsers mArrayAdapter;
 
@@ -94,6 +94,31 @@ public class UserListActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         mArrayAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyChange(Change changed) {
+        switch (changed) {
+            case ENTOURAGE_UPDATE:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mArrayAdapter.clear();
+                        mArrayAdapter.addAll(YieldsApplication.getUser().getEntourage());
+                        mArrayAdapter.notifyDataSetChanged();
+                    }
+                });
+        }
+    }
+
+    @Override
+    public void notifyOnServerConnected() {
+
+    }
+
+    @Override
+    public void notifyOnServerDisconnected() {
+
     }
 
     /**

@@ -157,7 +157,7 @@ public class GroupInfoActivity extends NotifiableActivity {
             groupView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    YieldsApplication.setGroup(group);
+                    YieldsApplication.setInfoGroup(group);
 
                     Intent intent = new Intent(GroupInfoActivity.this, GroupInfoActivity.class);
                     intent.putExtra(SearchGroupActivity.MODE_KEY, 0);
@@ -292,7 +292,8 @@ public class GroupInfoActivity extends NotifiableActivity {
                         ServiceRequest request = new GroupUpdateUsersRequest(
                                 YieldsApplication.getUser().getId(),
                                 subscriptionGroup.getId(), list,
-                                GroupUpdateUsersRequest.UpdateType.REMOVE);
+                                GroupUpdateUsersRequest.UpdateType.REMOVE,
+                                subscriptionGroup.getType());
                         YieldsApplication.getBinder().sendRequest(request);
 
                         unsubscribeButton.setEnabled(false);

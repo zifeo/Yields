@@ -57,7 +57,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GROUP_IMAGE = "groupImage";
     private static final String KEY_GROUP_TYPE = "groupType";
     private static final String KEY_GROUP_VALIDATED = "groupValidated";
-
+   
     private static final String KEY_MESSAGE_NODE_ID = "nodeID";
     private static final String KEY_MESSAGE_GROUP_ID = "messageGroup";
     private static final String KEY_MESSAGE_SENDER_ID = "messageSender";

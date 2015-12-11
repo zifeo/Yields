@@ -6,7 +6,6 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,6 +122,7 @@ public class Group extends Node {
                 false, new Date());
     }
 
+
     /**
      * Overloaded constructor.
      *
@@ -187,7 +187,7 @@ public class Group extends Node {
      *
      * @param date The date of the last update.
      */
-    public void setLastUpdate(Date date){
+    public void setLastUpdate(Date date) {
         if (date.compareTo(mDate) > 0) {
             mDate = new Date(date.getTime());
         }
@@ -216,13 +216,7 @@ public class Group extends Node {
      * @return The Message updated.
      */
     public Message updateMessageIdDateAndStatus(Id contentId, Date date, Date newDate) {
-        Integer size = this.mMessages.size();
-        Log.d("Y:" + this.getClass().getName(), size.toString());
-
         Message message = mMessages.remove(date);
-
-        size = this.mMessages.size();
-        Log.d("Y:" + this.getClass().getName(), size.toString());
 
         if (message != null) {
             message.setStatusAndUpdateDate(Message.MessageStatus.SENT, newDate);
@@ -265,6 +259,7 @@ public class Group extends Node {
         Objects.requireNonNull(user);
         mUsers.add(YieldsApplication.getUserFromId(user));
     }
+
     /**
      * Remove a user from the group.
      *
@@ -293,7 +288,7 @@ public class Group extends Node {
      *
      * @param nodeList
      */
-    public void updateNodes(ArrayList<Id> nodeList) {
+    public void updateNodes(List<Id> nodeList) {
         mNodes.clear();
         for (Id uId : nodeList) {
             mNodes.add(YieldsApplication.getUser().getNodeFromId(uId));
@@ -335,7 +330,12 @@ public class Group extends Node {
      */
     public boolean containsNode(Group group) {
         Objects.requireNonNull(group);
-        return mNodes.contains(group);
+        for (Group g : mNodes) {
+            if (g.getId().equals(group.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -455,6 +455,16 @@ public class Group extends Node {
      */
     private Message getLastMessage() {
         return mMessages.lastEntry().getValue();
+    }
+
+    /**
+     * Override hashcode method.
+     *
+     * @return hash of Id
+     */
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 
     /**
