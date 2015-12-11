@@ -429,7 +429,7 @@ public class ResponseHandlerTests {
 
     }
 
-    private class MockServiceRequestController extends ServiceRequestControlle {
+    private class MockServiceRequestController extends ServiceRequestController {
 
         public ServerRequest mLastRequest;
 

@@ -265,7 +265,7 @@ public class RequestHandler {
      * Handles the appropriate ServiceRequest which is given to it by argument.
      */
     protected void handleNodeInfoRequest(ServiceRequest serviceRequest) {
-        //TODO : see with Trofleb
+        Log.d("JFBADFIASIFAS", "kabdjfafgi");
         ServerRequest serverRequest = serviceRequest.parseRequestForServer();
         mController.sendToServer(serverRequest);
     }
