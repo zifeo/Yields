@@ -428,7 +428,7 @@ public class Group extends Node {
      * @return the users.
      */
     public List<User> getUsers() {
-        return Collections.unmodifiableList(mUsers);
+        return new ArrayList<>(mUsers);
     }
 
     /**
