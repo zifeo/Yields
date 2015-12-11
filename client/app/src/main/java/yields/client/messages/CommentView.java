@@ -116,8 +116,8 @@ public class CommentView extends LinearLayout {
                 messageInfos.setText("Sent by " + YieldsApplication.getUserFromId(
                         mMessage.getSender()).getName() + " at " +
                         time);
-                messageInfos.setTextColor(Color.BLUE);
-                messageInfos.setTextSize((float) 10.0);
+                /*messageInfos.setTextColor(Color.BLUE);
+                messageInfos.setTextSize((float) 10.0);*/
                 break;
 
             case URL:
@@ -158,8 +158,8 @@ public class CommentView extends LinearLayout {
                 messageInfos.setText("Sent by " + YieldsApplication.getNodeFromId(
                         mMessage.getSender()).getName() + " at " +
                         time);
-                messageInfos.setTextColor(Color.BLUE);
-                messageInfos.setTextSize((float) 10.0);
+                /*messageInfos.setTextColor(Color.BLUE);
+                messageInfos.setTextSize((float) 10.0);*/
 
                 ImageView icon = (ImageView) v.findViewById(R.id.pageicon);
                 icon.setImageBitmap(urlContent.getThumbnail());
