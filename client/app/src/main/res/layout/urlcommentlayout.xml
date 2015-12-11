@@ -69,7 +69,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3px"
             android:layout_marginBottom="3px"
-            android:layout_marginLeft="6dp"/>
+            android:layout_marginLeft="6dp"
+            android:textColor="@android:color/tertiary_text_dark"
+            android:textSize="10dp"/>
     </LinearLayout>
 
 </RelativeLayout>

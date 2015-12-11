@@ -133,7 +133,6 @@ public class ClientUser extends User {
      * @param user the user to add.
      */
     public void addUserToEntourage(User user) {
-        Log.d("ENTOURAGE","test " + user.getEmail());
         mEntourage.add(user);
     }
 
