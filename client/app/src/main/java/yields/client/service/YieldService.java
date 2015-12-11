@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.renderscript.RenderScript;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -247,8 +248,13 @@ public class YieldService extends Service {
         if (mCurrentNotifiableActivity == null || mCurrentGroup == null ||
                 !mCurrentGroup.getId().getId().equals(groupId.getId())) {
             Group group = YieldsApplication.getUser().getGroup(groupId);
-
             group.addMessage(message);
+
+            if(!message.getCommentGroupId().equals(new Id(-1))){
+                Group commentGroup = Group.createGroupForMessageComment(message, group);
+                YieldsApplication.getUser().addCommentGroup(commentGroup);
+            }
+
             sendMessageNotification(group, message);
             if (mCurrentNotifiableActivity != null) {
                 mCurrentNotifiableActivity.notifyChange(NotifiableActivity.Change.GROUP_LIST);
@@ -310,6 +316,9 @@ public class YieldService extends Service {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setLargeIcon(group.getImage())
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                         .setContentTitle("Message from " + YieldsApplication
                                 .getNodeFromId(message.getSender()).getName())
                         .setContentText(message.getContent().getTextForRequest().substring(0,
