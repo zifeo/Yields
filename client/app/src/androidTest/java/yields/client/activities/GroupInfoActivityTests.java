@@ -129,6 +129,25 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
     }
 
     /**
+     * Test that the correct users are displayed
+     */
+    public void testCorrectNodes(){
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
+        Group g1 = new Group("G1", new Id(1), new ArrayList<Id>());
+        Group g2 = new Group("G2", new Id(2), new ArrayList<Id>());
+        g.addNode(g1);
+        g.addNode(g2);
+
+        YieldsApplication.setInfoGroup(g);
+        getActivity();
+
+        onView(withText("G1")).perform(click());
+
+        onView(withId(R.id.textViewGroupName)).check(matches(isDisplayed()));
+    }
+
+    /**
      * Test that subscribe to the group.
      */
     public void testSubscribe(){
@@ -156,5 +175,22 @@ public class GroupInfoActivityTests extends ActivityInstrumentationTestCase2<Gro
         getActivity();
 
         onView(withId(R.id.buttonUnsubscribeGroup)).perform(click());
+    }
+
+    /**
+     * Test that add the node to the group.
+     */
+    public void testAddGroup(){
+        Intent intent = new Intent();
+        intent.putExtra(SearchGroupActivity.MODE_KEY, 2);
+        setActivityIntent(intent);
+
+        Group g = new Group("Kapoue", new Id(123), new ArrayList<Id>(),
+                YieldsApplication.getDefaultGroupImage(), Group.GroupType.PUBLISHER, false, new Date());
+        YieldsApplication.setInfoGroup(g);
+
+        getActivity();
+
+        onView(withId(R.id.buttonAddGroup)).perform(click());
     }
 }
