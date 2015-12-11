@@ -60,8 +60,8 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class MessageActivityTests extends ActivityInstrumentationTestCase2<MessageActivity> {
 
-    private static final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
-    private static final ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
+    private  final Group MOCK_GROUP = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
+    private  final ClientUser MOCK_CLIENT_USER = MockFactory.generateFakeClientUser("Mock client user",
             new Id(117), "Mock email client user", Bitmap.createBitmap(80, 80, Bitmap.Config.RGB_565));
 
     public MessageActivityTests() {
@@ -83,7 +83,9 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
 
         SystemClock.sleep(1000);
         YieldsApplication.setUser(MOCK_CLIENT_USER);
-        YieldsApplication.setGroup(MOCK_GROUP);
+
+        Group mockGroup = MockFactory.createMockGroup("Mock group", new Id(11111), new ArrayList<Id>());
+        YieldsApplication.setGroup(mockGroup);
         assertTrue(YieldsApplication.getUser().getImage() != null);
     }
 
@@ -147,7 +149,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testWrittenTextMessageIsCorrect() {
         MessageActivity messageActivity = getActivity();
         YieldsApplication.setResources(messageActivity.getResources());
-        sendInput("Mock input message 1");
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
+        onView(withId(R.id.sendButton)).perform(click());
         ListView listView = messageActivity.getCurrentFragmentListView();
         int i = listView.getChildCount();
         MessageView messageView = (MessageView) listView.getChildAt(i - 1);
@@ -189,10 +192,10 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testPressingOnMessageChangeType() {
         MessageActivity messageActivity = getActivity();
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
-        String input = "Mock message #1";
         messageActivity.simulateImageMessage();
         YieldsApplication.setGroup(MOCK_GROUP);
-        sendInput(input);
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message #1"));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -209,7 +212,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         YieldsApplication.setResources(messageActivity.getResources());
         messageActivity.simulateImageMessage();
         YieldsApplication.setGroup(MOCK_GROUP);
-        sendInput("Mock input message 1");
+        onView(withId(R.id.inputMessageField)).perform(typeText("Mock input message 1"));
+        onView(withId(R.id.sendButton)).perform(click());
 
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
@@ -239,7 +243,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock comment";
         messageActivity.simulateImageMessage();
-        sendInput(input);
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -261,7 +266,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        sendInput(input);
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
         input = "Should be flushed";
         onView(withId(R.id.inputMessageField)).perform(typeText(input));
         Fragment fragment = messageActivity.getCurrentFragment();
@@ -280,7 +286,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         EditText inputMessageField = (EditText) messageActivity.findViewById(R.id.inputMessageField);
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        sendInput(input);
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -303,7 +310,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testCannotSendEmptyTextMessage() {
         final MessageActivity messageActivity = getActivity();
-        sendInput("");
+        onView(withId(R.id.inputMessageField)).perform(typeText(""));
+        onView(withId(R.id.sendButton)).perform(click());
         assertTrue(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
     }
@@ -312,7 +320,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     public void testCaptionForImageIsNotMandatory() {
         final MessageActivity messageActivity = getActivity();
         messageActivity.simulateImageMessage();
-        sendInput("");
+        onView(withId(R.id.inputMessageField)).perform(typeText(""));
+        onView(withId(R.id.sendButton)).perform(click());
         assertFalse(messageActivity.getCurrentFragmentListView().getAdapter().isEmpty());
         messageActivity.finish();
     }
@@ -322,7 +331,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         final MessageActivity messageActivity = getActivity();
         String input = "Mock message #1";
         messageActivity.simulateImageMessage();
-        sendInput(input);
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         int tag = 0;
@@ -344,7 +354,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
     @Test
     public void testSendUrlMessage() {
         final MessageActivity messageActivity = getActivity();
-        sendInput("www.reddit.com");
+        onView(withId(R.id.inputMessageField)).perform(typeText("www.reddit.com"));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         Message message = (Message) messageList.getAdapter().getItem(0);
@@ -389,7 +400,8 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
                 messageActivity.cancelImageSending(null);
             }
         });
-        sendInput(input);
+        onView(withId(R.id.inputMessageField)).perform(typeText(input));
+        onView(withId(R.id.sendButton)).perform(click());
         Fragment fragment = messageActivity.getCurrentFragment();
         ListView messageList = (ListView) fragment.getView().findViewById(R.id.groupMessageFragmentList);
         Message message = (Message) messageList.getAdapter().getItem(0);
@@ -408,13 +420,6 @@ public class MessageActivityTests extends ActivityInstrumentationTestCase2<Messa
         messageActivity.notifyChange(NotifiableActivity.Change.MESSAGES_RECEIVE);
         SystemClock.sleep(1000);
         assertEquals(30, messageActivity.getCurrentFragmentListView().getCount());
-    }
-
-
-
-    private void sendInput(String input){
-        onView(withId(R.id.inputMessageField)).perform(typeText(input));
-        onView(withId(R.id.sendButton)).perform(click());
     }
 
     private MenuItem createMenuItem(final int itemId){
