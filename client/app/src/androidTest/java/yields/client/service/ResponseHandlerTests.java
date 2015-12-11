@@ -157,15 +157,22 @@ public class ResponseHandlerTests {
     }
 
     @Test
-    public void handleGroupMessageResponseTest() throws JSONException {
+    public void handleGroupMessageResponseTest() throws JSONException, ParseException {
+        Message message = new Message(new Id(69), YieldsApplication.getUser().getId(), new TextContent
+                ("topkek"), DateSerialization.dateSerializer.toDate("2015-12-10T23:48:22.679+01:00"));
+        YieldsApplication.getUser().getGroup(new Id(10)).addMessage(message);
         String response = "{\"kind\":\"GroupMessageRes\",\"message\":{\"nid\":10,\"datetime\":\"2015-12-10T22:48:23.553Z\"},\"metadata\":{\"client\":1,\"datetime\":\"2015-12-10T22:48:23.554Z\",\"ref\":\"2015-12-10T23:48:22.679+01:00\"}}";
         mHandler.handleGroupMessageResponse(new Response(response));
 
     }
 
     @Test
-    public void handlePublisherCreateResponseTest() throws JSONException {
-        String response = "{\"kind\":\"PublisherCreateRes\",\"message\":{\"nid\":228},\"metadata\":{\"client\":2,\"datetime\":\"2015-12-10T20:27:41.692Z\",\"ref\":\"2015-12-10T21:27:41.732+01:00\"}}";
+    public void handlePublisherCreateResponseTest() throws JSONException, ParseException {
+        Message message = new Message(new Id(69), YieldsApplication.getUser().getId(), new TextContent
+                ("topkek"), DateSerialization.dateSerializer.toDate("2015-12-10T21:27:41.732+01:00"));
+        YieldsApplication.getUser().getGroup(new Id(10)).addMessage(message);
+        String response = "{\"kind\":\"PublisherCreateRes\",\"message\":{\"nid\":10},\"metadata\":{\"client\":1," +
+                "\"datetime\":\"2015-12-10T20:27:41.692Z\",\"ref\":\"2015-12-10T21:27:41.732+01:00\"}}";
         mHandler.handlePublisherCreateResponse(new Response(response));
 
     }
