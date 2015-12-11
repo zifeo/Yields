@@ -3,6 +3,7 @@ package yields.client.servicerequest;
 import java.util.Objects;
 
 import yields.client.id.Id;
+import yields.client.node.Group;
 import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
@@ -15,6 +16,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
     private final User mSender;
     private final Id mGroupId;
     private final String mName;
+    private final Group.GroupType mType;
 
     /**
      * Main constructor for this type of ServiceRequest (renaming a Group).
@@ -23,7 +25,8 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      * @param groupId The Id of the Group that should be renamed.
      * @param name    The new name of the Group.
      */
-    public GroupUpdateNameRequest(User sender, Id groupId, String name) {
+    public GroupUpdateNameRequest(User sender, Id groupId, String name,
+                                  Group.GroupType groupType) {
         super();
         Objects.requireNonNull(sender);
         Objects.requireNonNull(groupId);
@@ -32,6 +35,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
         mSender = sender;
         mGroupId = groupId;
         mName = name;
+        mType = groupType;
     }
 
     /**
@@ -51,7 +55,7 @@ public class GroupUpdateNameRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroupId, mName);
+        return RequestBuilder.groupUpdateNameRequest(mSender.getId(), mGroupId, mName, mType);
     }
 
     /**
