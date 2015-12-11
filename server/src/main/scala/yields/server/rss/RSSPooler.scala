@@ -52,25 +52,36 @@ final class RSSPooler extends Actor with ActorLogging {
     */
   def updateRSS(rss: List[RSS]): List[(String, String)] =
     rss.flatMap { rss =>
-      val feed = new RSSFeed(rss.url)
-      val news = feed.sinceFiltered(rss.refreshedAt, rss.filter)
-      if (news.nonEmpty) {
-        rss.refreshed()
-      }
-
-      news.map { case RSSEntry(title, author, link, entry, _) =>
-        val now = Temporal.now
-        rss.receivers.map(Node(_)).foreach { case node if node.users.nonEmpty =>
-          val media = Media.create(Media.ContentType.url, link, rss.nid)
-          media.addUser(node.users)
-          val text = s"$title $link"
-          node.addMessage((now, rss.nid, Some(media.nid), text))
-          Yields.broadcast(node.users) {
-            NodeMessageBrd(node.nid, now, rss.nid, Some(text),
-              Some(media.contentType), Some(media.content), Some(media.nid))
-          }
+      try {
+        val feed = new RSSFeed(rss.url)
+        val news = feed.sinceFiltered(rss.refreshedAt, rss.filter)
+        if (news.nonEmpty) {
+          rss.refreshed()
         }
-        (rss.name, title)
+
+        news.map { case RSSEntry(title, author, link, entry, _) =>
+
+          val now = Temporal.now
+          rss.receivers.map(Node(_)).foreach { case node =>
+            if (node.users.nonEmpty) {
+              val media = Media.create(Media.ContentType.url, link, rss.nid)
+              media.addUser(node.users)
+              val text = s"$title $link"
+              node.addMessage((now, rss.nid, Some(media.nid), text))
+              Yields.broadcast(node.users) {
+                NodeMessageBrd(node.nid, now, rss.nid, Some(text),
+                  Some(media.contentType), Some(media.content), Some(media.nid))
+              }
+            }
+          }
+
+          (rss.name, title)
+        }
+      } catch {
+        case err: Throwable =>
+          val rssname = rss.name
+          log.error(err, s"RSS pooling failed on $rssname")
+          List.empty
       }
     }
 
