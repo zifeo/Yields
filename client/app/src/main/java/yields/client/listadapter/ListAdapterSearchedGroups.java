@@ -33,9 +33,10 @@ public class ListAdapterSearchedGroups extends ArrayAdapter<Group> {
 
     /**
      * Get the view at the position
-     * @param position the position of the item
+     *
+     * @param position    the position of the item
      * @param convertView The old view
-     * @param parent The parent view
+     * @param parent      The parent view
      * @return The new view
      */
     @Override

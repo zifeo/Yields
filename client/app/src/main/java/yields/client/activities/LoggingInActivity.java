@@ -13,8 +13,6 @@ import com.google.android.gms.plus.Plus;
 import yields.client.R;
 import yields.client.service.YieldService;
 import yields.client.service.YieldServiceBinder;
-import yields.client.servicerequest.ServiceRequest;
-import yields.client.servicerequest.UserConnectRequest;
 import yields.client.yieldsapplication.YieldsApplication;
 
 /**
@@ -26,6 +24,7 @@ public class LoggingInActivity extends NotifiableActivity {
 
     /**
      * onCreate method for the LoggingInActivity.
+     *
      * @param savedInstanceState The bundle.
      */
     @Override
@@ -50,7 +49,7 @@ public class LoggingInActivity extends NotifiableActivity {
      * Method called by clientUser when the server indicates that the account
      * already exists.
      */
-    public void goToGroupActivity(){
+    public void goToGroupActivity() {
         Intent intent = new Intent(this, GroupActivity.class);
         startActivity(intent);
     }
@@ -59,7 +58,7 @@ public class LoggingInActivity extends NotifiableActivity {
      * Method called by clientUser when the server indicates that the account
      * doesn't exist.
      */
-    public void goToSelectUsernameActivity(){
+    public void goToSelectUsernameActivity() {
         Intent intent = new Intent(this, SelectUsernameActivity.class);
         startActivity(intent);
     }

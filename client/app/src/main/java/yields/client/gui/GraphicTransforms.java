@@ -17,22 +17,23 @@ public class GraphicTransforms {
     /**
      * Class cannot be instantiated
      */
-    private GraphicTransforms(){
+    private GraphicTransforms() {
     }
 
     /**
-     *  Computes a circle shaped {@code Bitmap} image of the one passed as an argument (must be a square).
-     *  The input image must have a square shape.
+     * Computes a circle shaped {@code Bitmap} image of the one passed as an argument (must be a square).
+     * The input image must have a square shape.
+     *
      * @param inputImage The image that is corped in a circle shape manner.
-     * @param diameter The diameter of the the new image.
-     * @return  A {@code Bitmap} image which has a circle shape.
+     * @param diameter   The diameter of the the new image.
+     * @return A {@code Bitmap} image which has a circle shape.
      */
-    public static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter){
+    public static Bitmap getCroppedCircleBitmap(Bitmap inputImage, int diameter) {
         Objects.requireNonNull(inputImage);
         if (inputImage.getWidth() != inputImage.getHeight()) {
             int a = inputImage.getWidth() > inputImage.getHeight() ?
                     inputImage.getHeight() : inputImage.getWidth();
-            inputImage = Bitmap.createBitmap(inputImage, 0,0,a, a);
+            inputImage = Bitmap.createBitmap(inputImage, 0, 0, a, a);
             //throw new IllegalArgumentException("Image should be squared.");
         }
 
@@ -61,20 +62,20 @@ public class GraphicTransforms {
     }
 
     /**
-     *  Computes a squared shaped, cropped {@code Bitmap} image of the one passed as an argument.
+     * Computes a squared shaped, cropped {@code Bitmap} image of the one passed as an argument.
+     *
      * @param inputImage The image that will be cropped.
-     * @return  A {@code Bitmap} image which has a circle shape.
+     * @return A {@code Bitmap} image which has a circle shape.
      */
-    public static Bitmap getCroppedSquaredBitmap(Bitmap inputImage){
+    public static Bitmap getCroppedSquaredBitmap(Bitmap inputImage) {
         Objects.requireNonNull(inputImage);
         Bitmap croppedImage;
         int h = inputImage.getHeight();
         int w = inputImage.getWidth();
-        if (w > h){
-            croppedImage = Bitmap.createBitmap(inputImage, (w-h)/2, 0, h, h);
-        }
-        else {
-            croppedImage = Bitmap.createBitmap(inputImage, 0, (h-w)/2, w, w);
+        if (w > h) {
+            croppedImage = Bitmap.createBitmap(inputImage, (w - h) / 2, 0, h, h);
+        } else {
+            croppedImage = Bitmap.createBitmap(inputImage, 0, (h - w) / 2, w, w);
         }
 
         return croppedImage;

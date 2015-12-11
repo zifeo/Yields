@@ -57,7 +57,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_GROUP_IMAGE = "groupImage";
     private static final String KEY_GROUP_TYPE = "groupType";
     private static final String KEY_GROUP_VALIDATED = "groupValidated";
-   
+
     private static final String KEY_MESSAGE_NODE_ID = "nodeID";
     private static final String KEY_MESSAGE_GROUP_ID = "messageGroup";
     private static final String KEY_MESSAGE_SENDER_ID = "messageSender";
@@ -378,7 +378,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
     public void addGroup(Group group) {
         Objects.requireNonNull(group);
 
-        //TODO: Check if adding Users is necessary !
         List<User> usersInGroup = group.getUsers();
         for (User user : usersInGroup) {
             ContentValues userValues = createContentValuesForUser(user);
@@ -486,7 +485,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
             }
         }
 
-        //TODO: CHECK CONCURRENCY ISSUES
         List<Id> ids = getUserIdsFromGroup(groupId);
         Iterator<Id> idIterator = ids.iterator();
         while (idIterator.hasNext()) {
@@ -518,9 +516,7 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         for (User user : users) {
             Objects.requireNonNull(user);
 
-            //TODO : Check if adding the user is necessary
             addUser(user);
-            //TODO: CHECK CONCURRENCY ISSUES
             List<Id> ids = getUserIdsFromGroup(groupId);
             ids.add(user.getId());
             ContentValues values = new ContentValues();
@@ -672,7 +668,6 @@ public class CacheDatabaseHelper extends SQLiteOpenHelper {
         } else {
             do {
                 Id messageId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_NODE_ID)));
-                String nodeName = ""; //TODO: Define message's Node name attribute
                 Id senderId = new Id(cursor.getLong(cursor.getColumnIndex(KEY_MESSAGE_SENDER_ID)));
                 String contentType = cursor.getString(cursor.getColumnIndex(KEY_MESSAGE_CONTENT_TYPE));
                 Content content = deserializeContent(cursor, Content.ContentType.valueOf(contentType));

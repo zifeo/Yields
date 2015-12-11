@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,9 +37,10 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
 
     /**
      * Get the view at the position
-     * @param position the position of the item
+     *
+     * @param position    the position of the item
      * @param convertView The old view
-     * @param parent The parent view
+     * @param parent      The parent view
      * @return The new view
      */
     @Override
@@ -66,21 +65,19 @@ public class ListAdapterGroups extends ArrayAdapter<Group> {
 
         Bitmap pastille = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_message_black_24dp).copy(Bitmap.Config.ARGB_8888, true);
 
-        int [] pixels = new int [pastille.getHeight()*pastille.getWidth()];
+        int[] pixels = new int[pastille.getHeight() * pastille.getWidth()];
 
         pastille.getPixels(pixels, 0, pastille.getWidth(), 0, 0,
                 pastille.getWidth(), pastille.getHeight());
 
-        for(int i = 0; i < pixels.length; i++) {
-            if(pixels[i] == Color.BLACK) {
+        for (int i = 0; i < pixels.length; i++) {
+            if (pixels[i] == Color.BLACK) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     pixels[i] = mContext.getResources().getColor(R.color.barColor, mContext.getTheme());
-                }
-                else {
+                } else {
                     pixels[i] = mContext.getResources().getColor(R.color.barColor);
                 }
-            }
-            else {
+            } else {
                 pixels[i] = Color.TRANSPARENT;
             }
         }

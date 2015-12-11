@@ -1,12 +1,9 @@
 package yields.client.servicerequest;
 
-import android.app.Service;
-
 import java.util.Objects;
 
 import yields.client.node.ClientUser;
 import yields.client.serverconnection.RequestBuilder;
-import yields.client.serverconnection.Response;
 import yields.client.serverconnection.ServerRequest;
 
 /**

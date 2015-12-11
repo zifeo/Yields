@@ -26,6 +26,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -57,7 +58,8 @@ public class UserInfoActivity extends AppCompatActivity {
         }
     }
 
-    /** Method used to take care of clicks on the tool bar
+    /**
+     * Method used to take care of clicks on the tool bar
      *
      * @param item The tool bar item clicked
      * @return true iff the click is not propagated

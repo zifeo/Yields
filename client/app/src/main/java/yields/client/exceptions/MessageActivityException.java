@@ -5,15 +5,15 @@ package yields.client.exceptions;
  */
 public class MessageActivityException extends RuntimeException {
 
-    public MessageActivityException(){
+    public MessageActivityException() {
         super();
     }
 
-    public MessageActivityException(String message){
+    public MessageActivityException(String message) {
         super(message);
     }
 
-    public MessageActivityException(Throwable th){
+    public MessageActivityException(Throwable th) {
         super(th);
     }
 }

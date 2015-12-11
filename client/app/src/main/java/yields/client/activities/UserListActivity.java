@@ -2,7 +2,6 @@ package yields.client.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,8 +75,7 @@ public class UserListActivity extends NotifiableActivity {
 
                     Intent intent = new Intent(UserListActivity.this, UserInfoActivity.class);
                     startActivity(intent);
-                }
-                else {
+                } else {
                     Intent intent = new Intent(UserListActivity.this, AddUserToEntourageActivity.class);
                     startActivity(intent);
                 }
@@ -91,7 +89,7 @@ public class UserListActivity extends NotifiableActivity {
      * activity was displayed.
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         mArrayAdapter.notifyDataSetChanged();
     }

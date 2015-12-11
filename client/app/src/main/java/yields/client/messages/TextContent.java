@@ -20,8 +20,7 @@ public class TextContent extends Content {
      */
     public TextContent(String text) {
         super();
-        //TODO Check for safe content
-        mText = new String(text);
+        mText = text;
     }
 
     /**

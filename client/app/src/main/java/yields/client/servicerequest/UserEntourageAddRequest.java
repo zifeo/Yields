@@ -3,7 +3,6 @@ package yields.client.servicerequest;
 import java.util.Objects;
 
 import yields.client.id.Id;
-import yields.client.node.User;
 import yields.client.serverconnection.RequestBuilder;
 import yields.client.serverconnection.ServerRequest;
 
@@ -47,7 +46,7 @@ public class UserEntourageAddRequest extends ServiceRequest {
      */
     @Override
     public ServerRequest parseRequestForServer() {
-        return RequestBuilder.userEntourageAddRequest(mUser , mUserToAdd);
+        return RequestBuilder.userEntourageAddRequest(mUser, mUserToAdd);
     }
 
     /**

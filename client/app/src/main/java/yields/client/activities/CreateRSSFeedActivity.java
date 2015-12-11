@@ -10,13 +10,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import yields.client.R;
 import yields.client.exceptions.MissingIntentExtraException;
 import yields.client.id.Id;
 import yields.client.node.Group;
-import yields.client.node.Node;
 import yields.client.servicerequest.RSSCreateRequest;
 import yields.client.servicerequest.ServiceRequest;
 import yields.client.yieldsapplication.YieldsApplication;
@@ -34,6 +32,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
 
     /**
      * Method automatically called on the creation of the activity
+     *
      * @param savedInstanceState the previous instance of the activity
      */
     @Override
@@ -50,7 +49,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
 
         Intent intent = getIntent();
 
-        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY)){
+        if (!intent.hasExtra(CreateGroupSelectNameActivity.GROUP_NAME_KEY)) {
             throw new MissingIntentExtraException(
                     "Group name extra is missing from intent in CreateRSSFeedActivity");
         }
@@ -60,6 +59,7 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
 
     /**
      * Method automatically called for the tool bar items
+     *
      * @param menu The tool bar menu
      */
     @Override
@@ -70,7 +70,9 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    /** Method called when the user clicks on 'Done'
+    /**
+     * Method called when the user clicks on 'Done'
+     *
      * @param item The tool bar item clicked
      * @return true
      */
@@ -78,11 +80,10 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String url = mEditTextUrl.getText().toString();
 
-        if (!url.startsWith("http://") && !url.startsWith("https://")){
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
             String message = getString(R.string.messageUrlHttp);
             YieldsApplication.showToast(getApplicationContext(), message);
-        }
-        else {
+        } else {
             Group rss = new Group(mGroupName, new Id(0), new ArrayList<Id>());
             YieldsApplication.getUser().addNode(rss);
 
@@ -98,16 +99,12 @@ public class CreateRSSFeedActivity extends NotifiableActivity {
     @Override
     public void notifyChange(Change change) {
         switch (change) {
-            //TODO Add right change type
-
             case RSS_CREATE:
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String message = getString(R.string.messageRssCreated);
                         YieldsApplication.showToast(getApplicationContext(), message);
-
-                        //TODO Check if new request is necessary
 
                         Intent createGroupIntent = new Intent(CreateRSSFeedActivity.this, GroupActivity.class);
                         createGroupIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP

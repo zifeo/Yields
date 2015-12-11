@@ -35,8 +35,6 @@ import static junit.framework.Assert.fail;
  */
 public class ServerRequestsTests {
 
-    //TODO: Find a way to approximate Date testing.
-
     /**
      * Tests if a UserGroupListRequest is correctly built.
      * (Test for userGroupListRequest(Id senderId))
@@ -245,11 +243,6 @@ public class ServerRequestsTests {
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            /* // TODO: Définir pour la request le field correct
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
-                    newUserId.getId());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
-                    groupId.getId());*/
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }
@@ -274,12 +267,6 @@ public class ServerRequestsTests {
                     ServiceRequest.RequestKind.GROUP_UPDATE.getValue());
             assertEquals(json.getJSONObject("metadata").getString("client"), senderId
                     .getId().toString());
-            /* // TODO: Définir pour la request le field correct
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
-                    userToRemoveId.getId());
-            assertEquals(json.getJSONObject("message").getString(RequestBuilder.Fields.NID.getValue()),
-                    groupId.getId());
-            */
         } catch (JSONException e) {
             fail("Request was not built correctly !");
         }

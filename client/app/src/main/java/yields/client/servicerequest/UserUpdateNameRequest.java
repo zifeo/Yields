@@ -50,7 +50,7 @@ public class UserUpdateNameRequest extends ServiceRequest {
      *
      * @return The User that should be updated through this request.
      */
-    public User getUser(){
+    public User getUser() {
         return mUser;
     }
 }
