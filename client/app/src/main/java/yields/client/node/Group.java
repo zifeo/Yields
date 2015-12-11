@@ -225,9 +225,7 @@ public class Group extends Node {
             mMessages.put(newDate, message);
             return message;
         } else {
-            Log.d("Y:" + this.getClass().getName(), DateSerialization.dateSerializer.toString(date));
-            Log.d("Y:" + this.getClass().getName(), "Couldn't update message " + contentId.getId().toString()
-                    + " as it was not in the group with id " + this.getId().getId().toString());
+            Log.d("Y:" + this.getClass().getName(), "Couldn't update message !");
             return null;
         }
     }
@@ -353,12 +351,6 @@ public class Group extends Node {
             previousMessage = previous.getContent().getTextForRequest();
         }
         Integer size = mMessages.size();
-        Log.d("Y:" + this.getClass().toString(), "New message count in Group is : " + size.toString());
-        Log.d("Y:" + this.getClass().toString(), DateSerialization.dateSerializer.toString(newMessage.getDate()));
-
-        Log.d("Y:" + this.getClass().toString(), "Added message to group: " + this.getId().getId().toString()
-                + ", this message was replaced: " + previousMessage);
-        Log.d("Y:" + this.getClass().toString(), "Message added had text " + newMessage.getContent().getTextForRequest());
     }
 
     /**
